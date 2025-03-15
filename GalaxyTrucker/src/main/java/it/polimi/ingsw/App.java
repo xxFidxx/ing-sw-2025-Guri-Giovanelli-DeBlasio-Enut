@@ -1,7 +1,7 @@
 package it.polimi.ingsw;
 
 /**
- * Hello  AndGiova!
+ * Hello  Claudio!
  *
  */
 public class App 
