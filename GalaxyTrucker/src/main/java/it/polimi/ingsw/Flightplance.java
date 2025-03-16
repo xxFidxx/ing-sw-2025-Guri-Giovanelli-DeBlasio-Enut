@@ -14,4 +14,7 @@ public class Flightplance {
 
     public Placeholder[] getFirst() {}
 
+    public Placeholder[] getSpots() {
+        return spots;
+    }
 }

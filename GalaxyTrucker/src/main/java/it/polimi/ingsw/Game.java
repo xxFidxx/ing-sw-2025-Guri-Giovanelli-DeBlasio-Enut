@@ -1,19 +1,19 @@
 package it.polimi.ingsw;
 
 public class Game {
-    private Players[] player;
+    private Player[] players;
     private Timer timer;
     private Dice[] dices;
     private Flightplance plance;
 
-    public Startgame(){}
+    public void Startgame(){}
 
-    public Players getPlayer() {
-        return player;
+    public Player[] getPlayer() {
+        return players;
     }
 
-    public Dice getDice() {
-        return dice;
+    public Dice[] getDice() {
+        return dices;
     }
 
     public Timer getTimer() {
