@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.game;
 
 public class Game {
     private Player[] players;

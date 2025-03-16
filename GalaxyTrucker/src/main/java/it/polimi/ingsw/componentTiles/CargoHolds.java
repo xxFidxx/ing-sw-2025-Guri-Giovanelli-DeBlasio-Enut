@@ -1,4 +1,25 @@
 package it.polimi.ingsw.componentTiles;
 
-public class CargoHolds {
+import it.polimi.ingsw.Bank.GoodsBlock;
+
+import java.util.ArrayList;
+
+public class CargoHolds extends ComponentTile{
+    private GoodsBlock[] goods;
+    private boolean isSpecial;
+
+    public CargoHolds(ConnectorType[] connectors, Direction direction, GoodsBlock[] goods, boolean isSpecial) {
+        super(connectors, direction);
+        this.goods = goods;
+        this.isSpecial = isSpecial;
+    }
+
+    public GoodsBlock[] getGoods() {
+        return goods;
+    }
+
+    public boolean isSpecial() {
+        return isSpecial;
+    }
+
 }
