@@ -6,6 +6,13 @@ public class Game {
     private Dice[] dices;
     private Flightplance plance;
 
+    public Game(Player[] player,Timer timer,Dice[] dices,Flightplance plance) {
+        this.players = players;
+        this.timer = timer;
+        this.dices = dices;
+        this.plance = plance;
+    }
+
     public void Startgame(){}
 
     public Player[] getPlayer() {

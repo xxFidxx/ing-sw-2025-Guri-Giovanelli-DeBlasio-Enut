@@ -17,25 +17,5 @@ public class SpaceshipPlance {
 
     }
 
-    public static class Player {
-        private String nickname;
-        private Placeholder placeholder;
-        private SpaceshipPlance spaceshipPlance;
-        private List<CosmicCredit> credits;
 
-        public String getNickname() {
-            return nickname;
-        }
-
-        public Placeholder getPlaceholder() {
-            return placeholder;
-        }
-
-        public SpaceshipPlance getSpaceshipPlance() {
-            return spaceshipPlance;
-        }
-        public List<CosmicCredit> getCredits() {
-            return credits;
-        }
-    }
 }

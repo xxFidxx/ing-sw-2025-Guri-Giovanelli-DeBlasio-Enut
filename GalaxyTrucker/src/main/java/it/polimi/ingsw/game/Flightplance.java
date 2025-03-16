@@ -4,6 +4,11 @@ public class Flightplance {
     private Placeholder[] spots;
     private Deck[] decks;
 
+    public Flightplance(Placeholder[] spots, Deck[] decks) {
+        this.spots = spots;
+        this.decks = decks;
+    }
+
     public Deck[] getDecks() {
         return decks;
     }

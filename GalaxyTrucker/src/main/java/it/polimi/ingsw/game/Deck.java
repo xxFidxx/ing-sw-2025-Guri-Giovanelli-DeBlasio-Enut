@@ -5,6 +5,10 @@ import it.polimi.ingsw.adventureCards.AdventureCard;
 public class Deck {
     private AdventureCard[] cards;
 
+    public Deck(AdventureCard[] cards) {
+        this.cards = cards;
+    }
+
     public AdventureCard[] getCards() {
         return cards;
     }

@@ -13,7 +13,15 @@ public class Player {
         private SpaceshipPlance spaceshipPlance;
         private List<CosmicCredit> credits;
 
-        public String getNickname() {
+    public Player(String nickname, Placeholder placeholder, SpaceshipPlance spaceshipPlance, List<CosmicCredit> credits) {
+        this.nickname = nickname;
+        this.placeholder = placeholder;
+        this.spaceshipPlance = spaceshipPlance;
+        this.credits = credits;
+
+    }
+
+    public String getNickname() {
             return nickname;
         }
 
