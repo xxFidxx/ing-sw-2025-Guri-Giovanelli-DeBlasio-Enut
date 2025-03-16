@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class PiratesCard extends EnemyCard {
+public class PiratesCard extends EnemyCard implements Penalizable, Rewardable{
     private CannonFire[] shots; //liste o array?
     private int reward;
 
@@ -13,6 +13,10 @@ public class PiratesCard extends EnemyCard {
     public void activate() {
 
     }
+
+    public void penalize() {}
+
+    public void reward() {}
 
     public CannonFire[] getShots() {
         return shots;

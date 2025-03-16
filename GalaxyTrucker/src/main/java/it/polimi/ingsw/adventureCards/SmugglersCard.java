@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class SmugglersCard extends EnemyCard{
+public class SmugglersCard extends EnemyCard implements Penalizable, Rewardable{
     private int lossMalus;
     private int reward; // da aggiornare con goods block
 
@@ -13,6 +13,10 @@ public class SmugglersCard extends EnemyCard{
     public void activate() {
 
     }
+
+    public void penalize() {}
+
+    public void reward() {}
 
     public int getLossMalus() {
         return lossMalus;
