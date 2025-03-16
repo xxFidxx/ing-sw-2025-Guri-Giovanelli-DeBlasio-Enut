@@ -1,5 +1,9 @@
 package it.polimi.ingsw.adventureCards;
 
+import it.polimi.ingsw.Bank.GoodsBlock;
+
+import java.util.List;
+
 public class AbandonedStationCard extends AdventureCard implements Rewardable, Penalizable{
     private int lostDays;
     private int lostCrew;
