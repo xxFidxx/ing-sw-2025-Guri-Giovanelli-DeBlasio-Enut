@@ -10,6 +10,8 @@
 # Ignore game assets
 assets/*
 
+.idea/
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
