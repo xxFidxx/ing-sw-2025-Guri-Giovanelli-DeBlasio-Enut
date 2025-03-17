@@ -4,9 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1981775-8cf6-47d9-b09e-c861bd43ae63" name="Changes" comment="prova prima parte adventure cards">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+    <list default="true" id="e1981775-8cf6-47d9-b09e-c861bd43ae63" name="Changes" comment="aggiornato gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/CannonFire.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/CannonFire.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Meteor.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Meteor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/MeteorSwarmCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/MeteorSwarmCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Projectile.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Projectile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +27,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="test" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -50,22 +60,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/fidel/OneDrive/Desktop/Ing Software/ing-sw-2025-Guri-Giovanelli-DeBlasio-Enut/GalaxyTrucker",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "configurable.group.appearance",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/teo/IdeaProjects/ing-sw-2025-Guri-Giovanelli-DeBlasio-Enut&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.appearance&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="ing-sw-2025-Guri-Giovanelli-DeBlasio-Enut" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -90,7 +115,9 @@
       <workItem from="1742136582505" duration="3903000" />
       <workItem from="1742162214591" duration="42000" />
       <workItem from="1742162350627" duration="32000" />
-      <workItem from="1742162416694" duration="500000" />
+      <workItem from="1742162416694" duration="852000" />
+      <workItem from="1742163661528" duration="398000" />
+      <workItem from="1742241502801" duration="975000" />
     </task>
     <task id="LOCAL-00001" summary="prova prima parte adventure cards">
       <option name="closed" value="true" />
@@ -100,7 +127,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742137205610</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="aggiornato gitignore">
+      <option name="closed" value="true" />
+      <created>1742163141879</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1742163141879</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -108,6 +143,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="prova prima parte adventure cards" />
-    <option name="LAST_COMMIT_MESSAGE" value="prova prima parte adventure cards" />
+    <MESSAGE value="aggiornato gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="aggiornato gitignore" />
   </component>
 </project>

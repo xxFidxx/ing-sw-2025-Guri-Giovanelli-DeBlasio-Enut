@@ -16,7 +16,7 @@ public abstract class Projectile {
         return direction;
     }
 
-    public boolean getSize() {
+    public ProjectileSize getSize() {
         return size;
     }
 }
