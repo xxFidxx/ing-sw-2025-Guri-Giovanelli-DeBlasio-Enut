@@ -38,4 +38,8 @@ public class Flightplance {
     public Placeholder[] getSpots() {
         return spots;
     }
+
+    public Game getGame() {
+        return game;
+    }
 }

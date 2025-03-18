@@ -9,13 +9,21 @@ public class SpaceshipPlance {
     private ComponentTile[][] components;
     private ComponentTile[] reserveSpot;
 
-    public SpaceshipPlance() {
-
+    public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot) {
+    this.components = components;
+    this.reserveSpot = reserveSpot;
     }
 
     public boolean checkCorrectness(){
-
+        return true;
     }
 
+    public int countAstronauts(){
+        return 0;
+    }
+
+    public int countAliens(){
+        return 0;
+    }
 
 }
