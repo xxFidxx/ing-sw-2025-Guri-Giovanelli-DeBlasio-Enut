@@ -1,20 +1,29 @@
 package it.polimi.ingsw.adventureCards;
 
-public class AbandonedShipCard extends AdventureCard implements Rewardable, Penalizable {
+import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Player;
+
+public class AbandonedShipCard extends AdventureCard {
     private int lostDays;
-    private int lostCrew;
+    private int requiredCrew;
     private int reward;
 
-    public AbandonedShipCard(String name, int level, int lostDays, int lostCrew, int reward) {
-        super(name, level);
+    public AbandonedShipCard(String name, int level, Deck deck, int lostDays, int requiredCrew, int reward) {
+        super(name, level,deck);
         this.lostDays = lostDays;
-        this.lostCrew = lostCrew;
+        this.requiredCrew = requiredCrew;
         this.reward = reward;
     }
 
     @Override
     public void activate(){
+        Player p = deck.getFlightplance().getGame().choosePlayer();
 
+        if(p.getNumAstronauts() >= requiredCrew){
+
+        }else{
+            System.out.println("NOT ENOUGH CREW");
+        }
     }
 
     public void reward(){
@@ -29,8 +38,8 @@ public class AbandonedShipCard extends AdventureCard implements Rewardable, Pena
         return lostDays;
     }
 
-    public int getLostCrew(){
-        return lostCrew;
+    public int getRequiredCrew(){
+        return requiredCrew;
     }
 
     public int getReward(){

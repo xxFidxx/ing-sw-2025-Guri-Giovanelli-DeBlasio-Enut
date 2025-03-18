@@ -26,4 +26,8 @@ public class Game {
     public Timer getTimer() {
         return timer;
     }
+
+    public Player choosePlayer() {
+        return players[0];
+    }
 }

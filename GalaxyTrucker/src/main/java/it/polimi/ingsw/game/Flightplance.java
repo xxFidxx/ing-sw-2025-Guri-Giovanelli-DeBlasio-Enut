@@ -3,10 +3,12 @@ package it.polimi.ingsw.game;
 public class Flightplance {
     private Placeholder[] spots;
     private Deck[] decks;
+    private Game game;
 
-    public Flightplance(Placeholder[] spots, Deck[] decks) {
+    public Flightplance(Placeholder[] spots, Deck[] decks, Game game) {
         this.spots = spots;
         this.decks = decks;
+        this.game = game;
     }
 
     public Deck[] getDecks() {
@@ -21,5 +23,9 @@ public class Flightplance {
 
     public Placeholder[] getSpots() {
         return spots;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }
