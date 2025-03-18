@@ -2,7 +2,7 @@ package it.polimi.ingsw.adventureCards;
 
 import java.util.List;
 
-public class PlanetsCard extends AdventureCard implements Rewardable, Penalizable{
+public class PlanetsCard extends AdventureCard {
     private List<Planet> planets;
     private int lostDays;
 
@@ -17,13 +17,11 @@ public class PlanetsCard extends AdventureCard implements Rewardable, Penalizabl
 
     }
 
-    public void reward(){
 
-    }
 
-    public void penalize(){
 
-    }
+
+
 
     public int getLostDays() {
         return lostDays;
