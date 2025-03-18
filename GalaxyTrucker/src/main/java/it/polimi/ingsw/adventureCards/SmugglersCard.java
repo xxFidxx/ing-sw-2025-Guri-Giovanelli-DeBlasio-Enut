@@ -1,10 +1,11 @@
 package it.polimi.ingsw.adventureCards;
+import it.polimi.ingsw.Bank.GoodsBlock;
 
 public class SmugglersCard extends EnemyCard {
     private int lossMalus;
-    private int reward; // da aggiornare con goods block
+    private GoodsBlock[] reward; // da aggiornare con goods block
 
-    public SmugglersCard(String name, int level, int cannonStrength, int lostDays, int lossMalus, int reward) {
+    public SmugglersCard(String name, int level, int cannonStrength, int lostDays, int lossMalus, GoodsBlock[] reward) {
         super(name, level, cannonStrength, lostDays);
         this.lossMalus = lossMalus;
         this.reward = reward;
@@ -22,7 +23,7 @@ public class SmugglersCard extends EnemyCard {
         return lossMalus;
     }
 
-    public int getReward() {
+    public GoodsBlock[] getReward() {
         return reward;
     }
 }
