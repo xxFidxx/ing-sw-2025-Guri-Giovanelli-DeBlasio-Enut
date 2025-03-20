@@ -9,6 +9,7 @@ import java.util.List;
 public class SpaceshipPlance {
     private ComponentTile[][] components;
     private ComponentTile[] reserveSpot;
+    private
 
     public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot) {
     this.components = components;

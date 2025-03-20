@@ -49,4 +49,23 @@ public class Game {
         Dice dice2 = new Dice;
         return dice1.thr() + dice2.thr();
     }
+
+    public void cargoManagement(Player player){
+
+        if(checkStorage(player) == false){
+            System.out.println("Not enough space");
+            return;
+        }
+
+
+
+
+
+
+
+    }
+
+
+
+
 }

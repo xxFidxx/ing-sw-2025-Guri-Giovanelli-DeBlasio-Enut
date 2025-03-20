@@ -19,7 +19,7 @@ import it.polimi.ingsw.game.Player;
 
         @Override
         public void activate() {
-            Player p = deck.getFlightplance().getGame().choosePlayer();
+            Player p = deck.getFlightplance().getGame().choosePlayer(this);
 
             if (p == null) {
                 System.out.println("No player selected");
