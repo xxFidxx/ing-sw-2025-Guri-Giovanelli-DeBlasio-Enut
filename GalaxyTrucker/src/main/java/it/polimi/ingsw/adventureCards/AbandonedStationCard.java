@@ -2,6 +2,7 @@ package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
 
     public class AbandonedStationCard extends AdventureCard {
@@ -20,11 +21,15 @@ import it.polimi.ingsw.game.Player;
         @Override
         public void activate() {
             Player p = deck.getFlightplance().getGame().choosePlayer(this);
+            Game g = deck.getFlightplance().getGame();
+
 
             if (p == null) {
                 System.out.println("No player selected");
                 return;
             }
+
+            g.cargoManagement(p,reward);
 
 
 
