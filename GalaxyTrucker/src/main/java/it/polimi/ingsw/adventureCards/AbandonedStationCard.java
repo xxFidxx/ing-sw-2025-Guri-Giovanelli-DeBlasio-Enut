@@ -2,36 +2,47 @@ package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Player;
 
-import java.util.List;
+    public class AbandonedStationCard extends AdventureCard {
+        private int lostDays;
+        private int requiredCrew;
+        private GoodsBlock[] reward;
 
-public class AbandonedStationCard extends AdventureCard {
-    private int lostDays;
-    private int lostCrew;
-    private List<GoodsBlock> goods;
 
-    public AbandonedStationCard(String name, int level, int lostDays, int lostCrew, List<GoodsBlock> goods, Deck deck) {
-        super(name, level,deck);
-        this.lostDays = lostDays;
-        this.lostCrew = lostCrew;
-        this.goods = goods;
+        public AbandonedStationCard(String name, int level, Deck deck, int lostDays, int requiredCrew, GoodsBlock[] reward) {
+            super(name, level, deck);
+            this.lostDays = lostDays;
+            this.requiredCrew = requiredCrew;
+            this.reward = reward;
+        }
+
+        @Override
+        public void activate() {
+            Player p = deck.getFlightplance().getGame().choosePlayer();
+
+            if (p == null) {
+                System.out.println("No player selected");
+                return;
+            }
+
+
+
+
+
+        }
+
+        private void reward(Player p){
+            // p.loadGoods()
+        }
+
+
+        public int getRequiredCrew() {
+            return requiredCrew;
+        }
+
+        public GoodsBlock[] getReward() {
+            return reward;
+        }
+
     }
-
-    @Override
-    public void activate(){
-
-    }
-
-
-    public int getLostDays() {
-        return lostDays;
-    }
-
-    public int getLostCrew() {
-        return lostCrew;
-    }
-
-    public List<GoodsBlock> getReward(){
-        return goods;
-    }
-}
