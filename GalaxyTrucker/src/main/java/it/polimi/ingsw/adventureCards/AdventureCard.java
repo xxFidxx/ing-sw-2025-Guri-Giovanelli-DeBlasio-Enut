@@ -21,5 +21,9 @@ public abstract class AdventureCard {
         return level;
     }
 
+    public boolean checkCondition() {
+        return true;
+    }
+
     public abstract void activate();
 }
