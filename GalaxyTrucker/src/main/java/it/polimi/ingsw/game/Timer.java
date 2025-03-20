@@ -28,6 +28,6 @@ public class Timer {
     }
 
     public void reset() {
-        time = (int) startTime / 1000;
+        time =  (int) startTime / 1000;
     }
 }
