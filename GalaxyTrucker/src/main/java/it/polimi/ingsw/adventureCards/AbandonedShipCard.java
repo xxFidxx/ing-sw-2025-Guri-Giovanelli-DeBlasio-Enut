@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class AbandonedShipCard extends AdventureCard implements Rewardable, Penalizable {
+public class AbandonedShipCard extends AdventureCard  {
     private int lostDays;
     private int lostCrew;
     private int reward;
@@ -14,14 +14,6 @@ public class AbandonedShipCard extends AdventureCard implements Rewardable, Pena
 
     @Override
     public void activate(){
-
-    }
-
-    public void reward(){
-
-    }
-
-    public void penalize(){
 
     }
 

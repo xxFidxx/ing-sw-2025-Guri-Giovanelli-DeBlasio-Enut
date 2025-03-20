@@ -4,7 +4,7 @@ import it.polimi.ingsw.Bank.GoodsBlock;
 
 import java.util.List;
 
-public class AbandonedStationCard extends AdventureCard implements Rewardable, Penalizable{
+public class AbandonedStationCard extends AdventureCard {
     private int lostDays;
     private int lostCrew;
     private List<GoodsBlock> goods;
@@ -21,13 +21,6 @@ public class AbandonedStationCard extends AdventureCard implements Rewardable, P
 
     }
 
-    public void reward(){
-
-    }
-
-    public void penalize(){
-
-    }
 
     public int getLostDays() {
         return lostDays;
