@@ -13,9 +13,7 @@ public class StardustCard extends AdventureCard {
 
     }
 
-    public void penalize() {
-
-    }
+    public void penalize() {}
 
     public int getLostDays() {
         return lostDays;
