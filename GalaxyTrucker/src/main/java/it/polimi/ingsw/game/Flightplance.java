@@ -1,7 +1,6 @@
 package it.polimi.ingsw.game;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import java.util.Arrays;
 
@@ -24,15 +23,8 @@ public class Flightplance {
 
     }
 
-    public void move(Placeholder placeholder, int num){}
-
-    public Optional <Player> getFirst() {
+    public Optional<Player> getFirst() {
         return Arrays.stream(game.getPlayer()).max(Comparator.comparingInt(p->p.getPlaceholder().getPosizione()));
-
-
-
-
-
     }
 
     public Placeholder[] getSpots() {

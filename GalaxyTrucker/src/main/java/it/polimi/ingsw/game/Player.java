@@ -45,5 +45,8 @@ public class Player {
         public int getNumAliens() {
         return numAliens;
         }
+        public boolean getResponse() {
+            return true;
+        }
 }
 

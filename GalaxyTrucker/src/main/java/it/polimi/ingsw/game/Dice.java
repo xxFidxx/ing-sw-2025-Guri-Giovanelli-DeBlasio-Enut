@@ -1,15 +1,22 @@
 package it.polimi.ingsw.game;
 
+import java.util.Random;
+
 public class Dice {
-    int number;
+    private int number;
+    private Random random;
 
     public Dice(int number) {
         this.number = number;
+        this.random = new Random();
     }
 
     public int getNumber() {
         return number;
     }
-    public void thr(){}
-}
 
+    public int thr(){
+        number = random.nextInt(6) + 1;
+        return number;
+    }
+}
