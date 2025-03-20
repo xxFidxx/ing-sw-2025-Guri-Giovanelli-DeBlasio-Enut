@@ -1,6 +1,7 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.game.Deck;
 
 import java.util.List;
 
@@ -9,8 +10,8 @@ public class AbandonedStationCard extends AdventureCard {
     private int lostCrew;
     private List<GoodsBlock> goods;
 
-    public AbandonedStationCard(String name, int level, int lostDays, int lostCrew, List<GoodsBlock> goods) {
-        super(name, level);
+    public AbandonedStationCard(String name, int level, int lostDays, int lostCrew, List<GoodsBlock> goods, Deck deck) {
+        super(name, level,deck);
         this.lostDays = lostDays;
         this.lostCrew = lostCrew;
         this.goods = goods;
