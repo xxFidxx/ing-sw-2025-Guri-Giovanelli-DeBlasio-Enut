@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class EpidemicCard extends AdventureCard implements Penalizable {
+public class EpidemicCard extends AdventureCard {
     private int lostCrew;
 
     public EpidemicCard(String name, int level, int lostCrew){
@@ -8,12 +8,10 @@ public class EpidemicCard extends AdventureCard implements Penalizable {
         this.lostCrew = lostCrew;
     }
 
-    @Override
     public void activate(){
 
     }
 
-    @Override
     public void penalize() {
 
     }

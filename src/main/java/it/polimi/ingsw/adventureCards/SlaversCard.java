@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class SlaversCard extends EnemyCard implements Penalizable, Rewardable {
+public class SlaversCard extends EnemyCard {
     private int lostCrew;
     private int reward;
 

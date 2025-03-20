@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class MeteorSwarmCard extends AdventureCard implements Penalizable{
+public class MeteorSwarmCard extends AdventureCard{
     private final Meteor[] meteors;
 
     public MeteorSwarmCard(String name, int level, Meteor[] meteors) {

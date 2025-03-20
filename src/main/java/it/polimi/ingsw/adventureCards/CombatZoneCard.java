@@ -1,6 +1,6 @@
 package it.polimi.ingsw.adventureCards;
 
-public class CombatZoneCard extends AdventureCard implements Penalizable {
+public class CombatZoneCard extends AdventureCard {
     private int lostDays;
     private CombatZoneType type;
     private int lostOther;
