@@ -48,5 +48,9 @@ public class Player {
         public boolean getResponse() {
             return true;
         }
+
+        public boolean checkStorage(){
+        return true;
+        }
 }
 

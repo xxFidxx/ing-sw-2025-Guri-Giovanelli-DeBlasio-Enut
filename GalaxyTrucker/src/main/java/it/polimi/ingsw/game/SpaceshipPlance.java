@@ -2,14 +2,16 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.componentTiles.CargoHolds;
 import it.polimi.ingsw.componentTiles.ComponentTile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpaceshipPlance {
     private ComponentTile[][] components;
     private ComponentTile[] reserveSpot;
-    private
+    private ArrayList<CargoHolds> cargoHolds;
 
     public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot) {
     this.components = components;
@@ -30,6 +32,10 @@ public class SpaceshipPlance {
 
     public void loadGoodsBlocks(GoodsBlock[] goodsBlocks){
 
+    }
+
+    public ArrayList<CargoHolds> getCargoHolds(){
+        return cargoHolds;
     }
 
 }
