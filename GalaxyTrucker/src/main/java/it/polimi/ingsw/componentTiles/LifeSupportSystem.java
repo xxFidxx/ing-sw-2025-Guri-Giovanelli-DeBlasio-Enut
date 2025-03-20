@@ -7,6 +7,4 @@ public class LifeSupportSystem extends ComponentTile{
         super(connectors,direction);
         this.color = color;
     }
-
-
 }

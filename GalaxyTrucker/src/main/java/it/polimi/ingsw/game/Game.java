@@ -4,7 +4,6 @@ import it.polimi.ingsw.adventureCards.AdventureCard;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Optional;
 
 public class Game {
     private Player[] players;
@@ -21,7 +20,7 @@ public class Game {
 
     public void Startgame(){}
 
-    public Player[] getPlayer() {
+    public Player[] getPlayers() {
         return players;
     }
 

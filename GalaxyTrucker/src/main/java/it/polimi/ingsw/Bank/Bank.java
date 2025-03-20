@@ -16,7 +16,6 @@ public class Bank {
     public ArrayList <CosmicCredit> getAvaibleCredits(){
         return avaiableCredits;
     }
-    
     public ArrayList <GoodsBlock> getAvaiableGoodsBlocks(){
         return avaiableGoodsBlocks;
     }
