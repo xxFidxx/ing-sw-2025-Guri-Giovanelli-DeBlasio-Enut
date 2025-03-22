@@ -2,7 +2,7 @@ package it.polimi.ingsw.componentTiles;
 
 public abstract class ComponentTile {
     private final ConnectorType[] connectors;
-    private Direction direction;
+    protected Direction direction;
 
     public ComponentTile(ConnectorType[] connectors,Direction direction){
         this.connectors = connectors;

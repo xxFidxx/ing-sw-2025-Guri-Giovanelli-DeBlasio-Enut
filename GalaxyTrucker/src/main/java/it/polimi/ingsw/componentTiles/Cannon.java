@@ -1,7 +1,7 @@
 package it.polimi.ingsw.componentTiles;
 
 public class Cannon extends ComponentTile {
-    private float power;
+    protected float power;
 
     public Cannon(ConnectorType[] connectors,Direction direction,float power) {
         super(connectors, direction);
@@ -9,7 +9,10 @@ public class Cannon extends ComponentTile {
     }
 
     public float getPower() {
-        return power;
+        if( direction == direction.NORTH )
+            return power;
+        else
+            return (float) (power * 0.5);
     }
 
     public void setPower(float power) {

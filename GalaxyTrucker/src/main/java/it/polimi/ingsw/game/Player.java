@@ -46,6 +46,9 @@ public class Player {
         public int getNumAliens() {
         return numAliens;
         }
+        public int getNumEquip(){
+            return numAstronauts + numAliens;
+        }
         public boolean getResponse() {
             return true;
         }
@@ -54,14 +57,17 @@ public class Player {
         return true;
         }
 
-        public float engineStrenght(SpaceshipPlance plance) {
+        public int getEngineStrenght() {
+            int sumPower=0;
+            for(int i=0; i < spaceshipPlance.getEngines().size(); i++)
+                sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
+            return sumPower;
+        }
+
+        public float getFireStrenght() {
             float sumPower=0;
-            for(int i=0; i < plance.getComponents().length; i++) {
-                for (int j = 0; j < plance.getComponents()[i].length; j++) {
-                    if( plance.getComponents()[i][j] instanceof Engine)
-                        sumPower = sumPower + ((Engine) plance.getComponents()[i][j]).getPower();
-                }
-            }
+            for(int i=0; i < spaceshipPlance.getCannons().size(); i++)
+                sumPower = sumPower + spaceshipPlance.getCannons().get(i).getPower();
             return sumPower;
         }
 }
