@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static it.polimi.ingsw.game.ColorType.RED;
+
 public class Game {
     private Player[] players;
     private Timer timer;
@@ -52,6 +54,11 @@ public class Game {
         return dice1.thr() + dice2.thr();
     }
 
+    /**
+     * @param player
+     * @param cardReward
+     */
+
     public void cargoManagement(Player player, GoodsBlock[] cardReward){
 
         if(player.checkStorage() == false){
@@ -67,13 +74,53 @@ public class Game {
         // metti remove ( non puoi rimuovere dal cardReward)
 
         while("player is done" != null){
-
+            int i1 =0; // cargo index
+            int i2 =-1;
+            int j1=0; // good index
+            int j2=0;
+            int k = 0; //card reward's good index
             if("player input is swap" == true){
+                CargoHolds cargo1 =playerCargos.get(i1);
+                CargoHolds cargo2 =playerCargos.get(i2);
+
+                GoodsBlock good1 = cargo1.getGoods()[j1];
+                GoodsBlock good2 = cargo2.getGoods()[j2];
+
+
+                /** check of**/
+                if((good1.getType() == RED && !cargo2.isSpecial()) || (good2.getType() == RED && !cargo1.isSpecial())){
+                    System.out.println("Can't put a Red block in grey cargo");
+
+                }else{
+                    GoodsBlock tmp = good1;
+                    good1 = good2;
+                    good2 = tmp;
+
+                }
+
 
             }
 
             if("player input is remove" == true){
+                GoodsBlock good1 = playerCargos.get(i1).getGoods()[j1];
+                good1 = null;
+            }
 
+            if("player input is add" == true){
+                CargoHolds cargo1 =playerCargos.get(i1);
+                GoodsBlock good1 = cargo1.getGoods()[j1];
+                GoodsBlock good2 = cardReward[k];
+
+                if(good1 != null){
+                    System.out.println("You can't add on a busy spot");
+                }else{
+                    if(good2.getType() == RED && !cargo1.isSpecial()){
+                        System.out.println("Can't put a Red block in grey cargo");
+                    }else{
+                        good1 = good2;
+                        good2 = null;
+                    }
+                }
             }
 
             if("player input is else" == true){
