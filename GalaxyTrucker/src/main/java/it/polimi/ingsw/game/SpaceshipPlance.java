@@ -38,4 +38,7 @@ public class SpaceshipPlance {
         return cargoHolds;
     }
 
+    public ComponentTile[][] getComponents(){
+        return components;
+    }
 }

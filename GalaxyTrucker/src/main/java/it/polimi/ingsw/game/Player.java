@@ -1,6 +1,7 @@
 package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.Bank.CosmicCredit;
+import it.polimi.ingsw.componentTiles.Engine;
 
 import java.util.List;
 
@@ -51,6 +52,17 @@ public class Player {
 
         public boolean checkStorage(){
         return true;
+        }
+
+        public float engineStrenght(SpaceshipPlance plance) {
+            float sumPower=0;
+            for(int i=0; i < plance.getComponents().length; i++) {
+                for (int j = 0; j < plance.getComponents()[i].length; j++) {
+                    if( plance.getComponents()[i][j] instanceof Engine)
+                        sumPower = sumPower + ((Engine) plance.getComponents()[i][j]).getPower();
+                }
+            }
+            return sumPower;
         }
 }
 

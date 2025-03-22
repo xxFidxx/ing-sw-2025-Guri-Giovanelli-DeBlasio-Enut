@@ -12,4 +12,10 @@ public class DoubleEngine extends Engine {
     public boolean isCharged() {
         return isCharged;
     }
+
+    public float getPower() {
+        if(isCharged)
+            return power;
+        return 0;
+    }
 }
