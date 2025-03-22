@@ -46,6 +46,10 @@ public class Player {
         public int getNumAliens() {
         return numAliens;
         }
+        public int getNumEquip(){
+            return numAstronauts + numAliens;
+        }
+
         public boolean getResponse() {
             return true;
         }
@@ -58,6 +62,13 @@ public class Player {
             int sumPower=0;
             for(int i=0; i < spaceshipPlance.getEngines().size(); i++)
                 sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
+            return sumPower;
+        }
+
+        public float getFireStrenght() {
+            float sumPower=0;
+            for(int i=0; i < spaceshipPlance.getCannons().size(); i++)
+                sumPower = sumPower + spaceshipPlance.getCannons().get(i).getPower();
             return sumPower;
         }
 }
