@@ -21,8 +21,7 @@ public class OpenSpaceCard extends AdventureCard {
         Player[] players = deck.getFlightplance().getGame().getPlayers();
         Arrays.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
         for (int i = players.length -1; i >= 0; i--) {
-            SpaceshipPlance plance = players[i].getSpaceshipPlance();
-            int power = (int) players[i].engineStrenght(plance);
+            int power = players[i].getEngineStrenght();
             players[i].getPlaceholder().move(power);
         }
     }

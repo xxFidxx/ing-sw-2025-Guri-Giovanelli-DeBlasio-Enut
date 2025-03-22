@@ -54,14 +54,10 @@ public class Player {
         return true;
         }
 
-        public float engineStrenght(SpaceshipPlance plance) {
-            float sumPower=0;
-            for(int i=0; i < plance.getComponents().length; i++) {
-                for (int j = 0; j < plance.getComponents()[i].length; j++) {
-                    if( plance.getComponents()[i][j] instanceof Engine)
-                        sumPower = sumPower + ((Engine) plance.getComponents()[i][j]).getPower();
-                }
-            }
+        public int getEngineStrenght() {
+            int sumPower=0;
+            for(int i=0; i < spaceshipPlance.getEngines().size(); i++)
+                sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
             return sumPower;
         }
 }

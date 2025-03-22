@@ -4,7 +4,7 @@ public class DoubleEngine extends Engine {
     private boolean isCharged;
 
 
-    public DoubleEngine(ConnectorType[] connectors,Direction direction, float power,boolean isCharged) {
+    public DoubleEngine(ConnectorType[] connectors,Direction direction, int power,boolean isCharged) {
         super(connectors, direction,power);
         this.isCharged = isCharged;
     }
@@ -13,7 +13,7 @@ public class DoubleEngine extends Engine {
         return isCharged;
     }
 
-    public float getPower() {
+    public int getPower() {
         if(isCharged)
             return power;
         return 0;

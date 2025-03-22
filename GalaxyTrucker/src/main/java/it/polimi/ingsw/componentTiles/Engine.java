@@ -2,14 +2,14 @@ package it.polimi.ingsw.componentTiles;
 
 public class Engine extends ComponentTile{
 
-    protected float power;
+    protected int power;
 
-    public Engine(ConnectorType[] connectors,Direction direction, float power) {
+    public Engine(ConnectorType[] connectors,Direction direction, int power) {
         super(connectors, direction);
         this.power = power;
     }
 
-    public float getPower() {
+    public int getPower() {
         return power;
     }
 }
