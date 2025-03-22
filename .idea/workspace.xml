@@ -5,13 +5,69 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1981775-8cf6-47d9-b09e-c861bd43ae63" name="Changes" comment="aggiornato gitignore">
+      <change afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/BigMeteor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmallMeteor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/CannonFire.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/CannonFire.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Meteor.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Meteor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/MeteorSwarmCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/MeteorSwarmCard.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Projectile.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/Projectile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/AdventureCardFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/App.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/Bank/Bank.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/Bank/BatteryToken.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/Bank/CosmicCredit.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/Bank/GoodsBlock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/CardType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/AbandonedShipCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/AbandonedStationCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/AdventureCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/CannonFire.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/CombatZoneCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/CombatZoneType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/EpidemicCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/Meteor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/MeteorSwarmCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/OpenSpaceCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/PiratesCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/Planet.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/PlanetsCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/Projectile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/ProjectileSize.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/SlaversCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/adventureCards/StardustCard.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Alien.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/AlienColor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Astronaut.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Cabin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Cannon.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/CargoHolds.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/ComponentTile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/ConnectorType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Direction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/DoubleCannon.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/DoubleEngine.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Engine.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/Figure.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/LifeSupportSystem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/PowerCenter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/ShieldGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/componentTiles/StructuralModule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/ColorType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Deck.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Dice.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Flightplance.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Game.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Placeholder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Player.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/SpaceshipPlance.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/polimi/ingsw/game/Timer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/it/polimi/ingsw/AppTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,6 +174,7 @@
       <workItem from="1742162416694" duration="852000" />
       <workItem from="1742163661528" duration="398000" />
       <workItem from="1742241502801" duration="975000" />
+      <workItem from="1742657591055" duration="6622000" />
     </task>
     <task id="LOCAL-00001" summary="prova prima parte adventure cards">
       <option name="closed" value="true" />

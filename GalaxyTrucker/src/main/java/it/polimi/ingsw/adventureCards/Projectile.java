@@ -1,13 +1,13 @@
 package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.componentTiles.Direction;
+import it.polimi.ingsw.game.Game;
 
 public abstract class Projectile {
-    private final Direction direction;
-    private final ProjectileSize size;
+    private Direction direction;
+    protected Game game;
 
-    public Projectile(Direction direction, ProjectileSize size) {
+    public Projectile(Game game, Direction direction) {
         this.direction = direction;
-        this.size = size;
     }
 
     public abstract void activate();
@@ -16,7 +16,4 @@ public abstract class Projectile {
         return direction;
     }
 
-    public ProjectileSize getSize() {
-        return size;
-    }
 }

@@ -16,14 +16,16 @@ public class Game {
     private Dice[] dices;
     private Flightplance plance;
 
-    public Game(Player[] player,Timer timer,Dice[] dices,Flightplance plance) {
+    public Game(Player[] players,Timer timer,Flightplance plance) {
         this.players = players;
         this.timer = timer;
-        this.dices = dices;
+        this.dices = new Dice[2];
+        this.dices[0] = new Dice();
+        this.dices[1] = new Dice();
         this.plance = plance;
     }
 
-    public void Startgame(){}
+    public void startGame(){}
 
     public Player[] getPlayers() {
         return players;
@@ -49,9 +51,7 @@ public class Game {
     }
 
     public int throwDices(){
-        Dice dice1 = new Dice();
-        Dice dice2 = new Dice();
-        return dice1.thr() + dice2.thr();
+        return dices[0].thr() + dices[1].thr();
     }
 
     /**

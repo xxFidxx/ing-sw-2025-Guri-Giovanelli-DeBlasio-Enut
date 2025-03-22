@@ -60,5 +60,28 @@ public class Player {
                 sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
             return sumPower;
         }
+
+    public boolean checkExposedConnector(int n) {
+        // controlla se c'è un connettore esposto li
+        return true;
+    }
+
+    public boolean askActivateShield() {
+        // controlla se ha uno scudo
+        // chiede al giocatore se vuole usare lo scudo
+        return true;
+    }
+
+    public void takeHit(int n) {
+        // distrugge cio che viene impattato
+        // update della navicella
+    }
+
+    public boolean useCannon(int n) {
+        // controlla se c'è un cannone su quella riga
+        // se è singolo return true
+        // se è doppio chiede se lo vuole attivare e returna in base a quello
+        return true;
+    }
 }
 

@@ -1,20 +1,25 @@
 package it.polimi.ingsw.adventureCards;
 
-public class MeteorSwarmCard extends AdventureCard {
-    private Meteor[] meteors;
+import it.polimi.ingsw.game.Deck;
 
-    public MeteorSwarmCard(String name, int level, Meteor[] meteors) {
-        super(name, level);
+public class MeteorSwarmCard extends AdventureCard {
+    private Projectile[] meteors;
+
+    public MeteorSwarmCard(String name, int level, Projectile[] meteors, Deck deck) {
+        super(name, level, deck);
         this.meteors = meteors;
     }
-
+    /**
+     *
+     * */
     public void activate() {
 
+        for (Projectile meteor : meteors) {
+            meteor.activate();
+        }
     }
 
-
-
-    public Meteor[] getMeteors() {
+    public Projectile[] getMeteors() {
         return meteors;
     }
 }
