@@ -6,8 +6,8 @@ public class Dice {
     private int number;
     private Random random;
 
-    public Dice(int number) {
-        this.number = number;
+    public Dice() {
+        this.number = 6;
         this.random = new Random();
     }
 

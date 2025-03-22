@@ -47,8 +47,8 @@ public class Game {
     }
 
     public int throwDices(){
-        Dice dice1 = new Dice;
-        Dice dice2 = new Dice;
+        Dice dice1 = new Dice();
+        Dice dice2 = new Dice();
         return dice1.thr() + dice2.thr();
     }
 
