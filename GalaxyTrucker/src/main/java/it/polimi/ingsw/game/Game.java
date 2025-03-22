@@ -118,7 +118,7 @@ public class Game {
             } else if ("player input is add" == true) {
                 if(i1 >= 0 && i1 < playerCargos.size()) {
                     CargoHolds cargo1 = playerCargos.get(i1);
-                    if(j1 >= 0 && j1 < cargo1.getGoods().length && k>= 0 && k < cardReward.length) {
+                    if(j1 >= 0 && j1 < cargo1.getGoods().length && k>=0 && k < cardReward.length) {
                         GoodsBlock good1 = cargo1.getGoods()[j1];
                         GoodsBlock good2 = cardReward[k];
                         if (good1 == null) {
