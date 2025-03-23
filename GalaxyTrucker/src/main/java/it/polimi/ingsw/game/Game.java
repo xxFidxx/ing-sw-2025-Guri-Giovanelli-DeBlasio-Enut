@@ -2,11 +2,14 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.adventureCards.AdventureCard;
+import it.polimi.ingsw.adventureCards.Planet;
+import it.polimi.ingsw.adventureCards.PlanetsCard;
 import it.polimi.ingsw.componentTiles.CargoHolds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import static it.polimi.ingsw.game.ColorType.RED;
 
@@ -55,12 +58,30 @@ public class Game {
         return dice1.thr() + dice2.thr();
     }
 
-    /**
-     * @param player
-     * @param cardReward
-     */
+    public Player choosePlayer(AdventureCard card, int n) {
+        Player[] tmp = players;
+        Arrays.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        for (int i = tmp.length - 1; i >= 0; i--) {
+            if (card.checkCondition(tmp[i]))
+                if (tmp[i].getResponse())
+                    return tmp[i];
+        }
+        return null;
+    }
 
 
+    public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, int skip ) {
+        Player[] tmp = players;
+        Arrays.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        for (int i = tmp.length - 1 - skip; i >= 0; i--) {
+            for (Planet planet : planets) {
+                if (!planet.isBusy())
+                    if (tmp[i].getResponse())
+                        return tmp[i];
+            }
 
+        }
+        return null;
+    }
 }
 

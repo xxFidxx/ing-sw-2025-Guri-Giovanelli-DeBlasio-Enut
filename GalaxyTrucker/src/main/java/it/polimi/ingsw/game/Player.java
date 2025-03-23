@@ -2,6 +2,8 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.adventureCards.Planet;
+import it.polimi.ingsw.adventureCards.PlanetsCard;
 import it.polimi.ingsw.componentTiles.CargoHolds;
 import it.polimi.ingsw.componentTiles.Engine;
 
@@ -224,6 +226,16 @@ public class Player {
         cargo1.getGoods()[j1] = cardReward[k];
         cardReward[k] = null;
 
+    }
+
+    public Planet choosePlanet(ArrayList<Planet> planets) {
+        for (Planet planet : planets) {
+            if (!planet.isBusy())
+                if (getResponse())
+                    return planet;
+        }
+
+        return null;
     }
 }
 
