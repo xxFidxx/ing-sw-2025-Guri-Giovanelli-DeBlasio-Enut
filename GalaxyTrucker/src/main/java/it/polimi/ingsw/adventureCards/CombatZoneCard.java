@@ -3,10 +3,7 @@ package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.game.Deck;
 import it.polimi.ingsw.game.Player;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class CombatZoneCard extends AdventureCard  {
     private int lostDays;
@@ -22,24 +19,23 @@ public class CombatZoneCard extends AdventureCard  {
     }
 
     public void activate() {
-        Player[] players = deck.getFlightPlance().getGame().getPlayers();
-        Arrays.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        ArrayList<Player> players = deck.getFlightplance().getGame().getPlayers();
         if( type == type.LOSTCREW ){
-            Player minEquipPlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getNumEquip));
-            deck.getFlightPlance().move(-lostDays, minEquipPlayer);
-            Player minEnginePlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getEngineStrenght));
+            Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
+            minEquipPlayer.getPlaceholder().move(-lostDays);
+            Player minEnginePlayer =players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
             minEnginePlayer.loseCrew(lostOther);
-            Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
+            Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
             //AGGIUNGERE METODO PER GESTIRE I COLPI
 
         }
         if(type == type.LOSTGOODS){
-            Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
+            Player minFirePlayer =players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
             minFirePlayer.getPlaceholder().move(-lostDays);
-            Player minEnginePlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getEngineStrenght));
+            Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
             minEnginePlayer.looseGoods(lostOther);
-            Player minEquipPlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getNumEquip));
-            //AGGIUNGERE METODO PER GESTIRE I COLPI
+            Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
+            //AGGIUNGERE METODO PER GESTIRE I COLPI(GUARDARE PIRATI)
 
         }
 

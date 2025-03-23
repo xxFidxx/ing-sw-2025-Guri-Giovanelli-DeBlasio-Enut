@@ -5,6 +5,7 @@ import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.adventureCards.Planet;
 import it.polimi.ingsw.componentTiles.Cabin;
 import it.polimi.ingsw.componentTiles.CargoHolds;
+import it.polimi.ingsw.componentTiles.DoubleEngine;
 import it.polimi.ingsw.componentTiles.Figure;
 
 import java.util.ArrayList;
@@ -71,10 +72,14 @@ public class Player {
 
 
         // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
-        public int getEngineStrenght() {
+        public int getEngineStrenght() {//è da vedere se controllare qui se ci sono batterie
             int sumPower=0;
-            for(int i=0; i < spaceshipPlance.getEngines().size(); i++)
-                sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
+            for(int i=0; i < spaceshipPlance.getEngines().size(); i++){
+                if(spaceshipPlance.getEngines().get(i) instanceof DoubleEngine)
+                    if(askToUseBattery())
+                        sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();
+
+                sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();}
             return sumPower;
         }
 
@@ -98,6 +103,11 @@ public class Player {
             // controlla se ha uno scudo
             // chiede al giocatore se vuole usare lo scudo
             return true;
+        }
+
+        public boolean askToUseBattery(){
+
+            return true; //CHIEDE AL GIOCATORE SE VUOLE USARE LA BATTERIA
         }
 
         public void takeHit(int n) {
