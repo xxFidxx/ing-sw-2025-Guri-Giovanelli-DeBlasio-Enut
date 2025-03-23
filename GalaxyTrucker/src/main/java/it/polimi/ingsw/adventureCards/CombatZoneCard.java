@@ -40,7 +40,9 @@ public class CombatZoneCard extends AdventureCard  {
 
             Player minEquipPlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getNumEquip));
 
+            minFirePlayer.looseGoods(lostOther);
         }
+
 
 
     }

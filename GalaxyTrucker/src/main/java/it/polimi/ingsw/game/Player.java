@@ -3,12 +3,9 @@ package it.polimi.ingsw.game;
 import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.adventureCards.Planet;
-import it.polimi.ingsw.adventureCards.PlanetsCard;
 import it.polimi.ingsw.componentTiles.CargoHolds;
-import it.polimi.ingsw.componentTiles.Engine;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static it.polimi.ingsw.game.ColorType.RED;
 
@@ -61,8 +58,8 @@ public class Player {
             return true;
         }
 
-        public boolean checkStorage(){
-        return true;
+        public int checkStorage(){
+        return 0;
         }
 
 
@@ -106,7 +103,7 @@ public class Player {
 
     public void cargoManagement(GoodsBlock[] cardReward) {
 
-        if (!checkStorage()) {
+        if (checkStorage()==0) {
             System.out.println("Not enough space");
             return;
         }
@@ -236,6 +233,29 @@ public class Player {
         }
 
         return null;
+    }
+
+    public void looseGoods(int lostOther) {
+        int actualLost = 0;
+        if(checkStorage() < lostOther)
+            actualLost = checkStorage();
+        else
+            actualLost = lostOther;
+
+        ArrayList<CargoHolds> playerCargos = getSpaceshipPlance().getCargoHolds();
+
+        for(int i = 0; i< actualLost; i++) {
+            int i1=0; // indice cargo
+            int j1=0; // indice good
+            if (i1 >= 0 && i1 < playerCargos.size()) {
+                CargoHolds cargo1 = playerCargos.get(i1);
+                if(j1 >= 0 && j1 < cargo1.getGoods().length) {
+                    removeGoods(cargo1, j1);
+                }else
+                    System.out.println("goods index is outbound");
+            } else
+                System.out.println("cargo index is outbound");
+        }
     }
 }
 
