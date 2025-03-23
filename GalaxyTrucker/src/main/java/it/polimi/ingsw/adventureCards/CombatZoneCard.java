@@ -30,6 +30,15 @@ public class CombatZoneCard extends AdventureCard  {
             Player minEnginePlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getEngineStrenght));
 
             Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
+            minFirePlayer.take
+
+        }
+        if(type == type.LOSTGOODS){
+            Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
+            minFirePlayer.getPlaceholder().move(-lostDays);
+            Player minEnginePlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getEngineStrenght));
+
+            Player minEquipPlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getNumEquip));
 
         }
 
