@@ -31,7 +31,9 @@ public class CombatZoneCard extends AdventureCard  {
 
             Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
 
+            minFirePlayer.looseGods(lostOther);
         }
+
 
 
     }
