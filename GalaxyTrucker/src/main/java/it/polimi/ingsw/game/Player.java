@@ -235,7 +235,7 @@ public class Player {
         return null;
     }
 
-    public void looseGods(int lostOther) {
+    public void looseGoods(int lostOther) {
         int actualLost = 0;
         if(checkStorage() < lostOther)
             actualLost = checkStorage();
