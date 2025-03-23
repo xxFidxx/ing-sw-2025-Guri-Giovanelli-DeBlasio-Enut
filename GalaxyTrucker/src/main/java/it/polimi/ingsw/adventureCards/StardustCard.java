@@ -14,7 +14,7 @@ public class StardustCard extends AdventureCard  {
 
     @Override
     public void activate() {
-        ArrayList<Player> tmp = deck.getFlightplance().getGame().getPlayers();
+        ArrayList<Player> tmp = deck.getFlightPlance().getGame().getPlayers();
 
         Stack<Player> playerStack = new Stack<>();
 
@@ -26,7 +26,7 @@ public class StardustCard extends AdventureCard  {
             Player chosenPlayer = playerStack.pop();
             int lost = chosenPlayer.getSpaceshipPlance().countExposedConnectors();
 
-            chosenPlayer.getPlaceholder().move(- lost);
+            deck.getFlightPlance().move(- lost,chosenPlayer);
         }
     }
 

@@ -18,7 +18,7 @@ public class EpidemicCard extends AdventureCard  {
     @Override
     public void activate(){
         // toglie un membro da ogni cabina interconnessa
-        Game game = deck.getFlightplance().getGame();
+        Game game = deck.getFlightPlance().getGame();
         for (Player player : game.getPlayers()) {
             ArrayList<Cabin> cabins = player.getSpaceshipPlance().getConnectedCabins();
             for (Cabin cabin : cabins) {

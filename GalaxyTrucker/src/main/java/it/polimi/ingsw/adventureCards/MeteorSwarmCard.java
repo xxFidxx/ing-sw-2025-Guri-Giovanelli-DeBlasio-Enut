@@ -1,6 +1,10 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.Player;
+
+import java.util.ArrayList;
 
 public class MeteorSwarmCard extends AdventureCard {
     private Projectile[] meteors;
@@ -15,11 +19,12 @@ public class MeteorSwarmCard extends AdventureCard {
     public void activate() {
 
         for (Projectile meteor : meteors) {
-            meteor.activate();
+            Game game = deck.getFlightplance().getGame();
+            int position = game.throwDices();
+            ArrayList<Player> players = game.getPlayers();
+            for (Player player: players) {
+                meteor.activate(player, position);
+            }
         }
-    }
-
-    public Projectile[] getMeteors() {
-        return meteors;
     }
 }

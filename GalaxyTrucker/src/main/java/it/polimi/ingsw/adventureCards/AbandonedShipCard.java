@@ -1,20 +1,17 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.Bank.CosmicCredit;
-import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.game.Deck;
-import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AbandonedShipCard extends AdventureCard {
     private int lostDays;
     private int lostCrew;
-    private ArrayList<CosmicCredit> credits;;
+    private int credits;
 
-    public AbandonedShipCard(String name, int level, int lostDays, int lostCrew,  ArrayList<CosmicCredit> credits, Deck deck) {
+    public AbandonedShipCard(String name, int level, int lostDays, int lostCrew,  int credits, Deck deck) {
         super(name, level,deck);
         this.lostDays = lostDays;
         this.lostCrew = lostCrew;
@@ -23,7 +20,7 @@ public class AbandonedShipCard extends AdventureCard {
 
     @Override
     public void activate(){
-        Player p = deck.getFlightplance().getGame().choosePlayer(this);
+        Player p = deck.getFlightPlance().getGame().choosePlayer(this);
 
 
         if (p == null) {
@@ -56,7 +53,6 @@ public class AbandonedShipCard extends AdventureCard {
     }
 
     public void manageCredits(Player p){
-        ArrayList<CosmicCredit> playercredits = p.getCredits();
-        playercredits.addAll(credits);
+        p.setCredits(p.getCredits() + credits);
     }
 }

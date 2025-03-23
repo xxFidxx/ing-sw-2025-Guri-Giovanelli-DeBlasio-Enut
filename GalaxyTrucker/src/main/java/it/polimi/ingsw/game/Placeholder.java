@@ -13,12 +13,12 @@ public class Placeholder {
         return color;
     }
 
-    public void move(int num){
-        this.posizione = this.getPosizione() + num;
-    }
-
     public int getPosizione() {
         return posizione;
+    }
+
+    public void setPosizione(int posizione) {
+        this.posizione = posizione;
     }
 
 }

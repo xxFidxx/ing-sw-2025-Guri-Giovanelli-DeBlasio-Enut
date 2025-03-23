@@ -10,19 +10,14 @@ public class SmallMeteor extends Projectile{
     }
 
     @Override
-    public void activate() {
-        int n = game.throwDices();
+    public void activate(Player player, int position) {
 
-        for (Player player : game.getPlayers()) {
-            if (player.checkExposedConnector(n) == false) {
-                continue;
-            }
-            if (player.askActivateShield() == true) {
-                continue;
-            }
-            player.takeHit(n);
+        if (player.checkExposedConnector(position) == false) {
+            return;
         }
-
-
+        if (player.askActivateShield() == true) {
+            return;
+        }
+        player.takeHit(position);
     }
 }

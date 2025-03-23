@@ -4,18 +4,13 @@ import it.polimi.ingsw.componentTiles.Direction;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
 
-public class BigMeteor extends Projectile {
-
-    public BigMeteor(Game game, Direction direction) {
+public class BigCannonShot extends Projectile {
+    public BigCannonShot(Game game, Direction direction) {
         super(game, direction);
     }
 
     @Override
     public void activate(Player player, int position) {
-
-        if (player.useCannon(position) == true) {
-            return;
-        }
         player.takeHit(position);
     }
 }

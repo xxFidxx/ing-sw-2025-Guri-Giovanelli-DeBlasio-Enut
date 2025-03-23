@@ -15,7 +15,7 @@ public class Deck {
         return cards;
     }
 
-    public Flightplance getFlightplance() {
+    public Flightplance getFlightPlance() {
         return flightplance;
     }
 }

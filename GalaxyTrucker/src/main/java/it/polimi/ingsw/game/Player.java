@@ -16,11 +16,11 @@ public class Player {
         private String nickname;
         private Placeholder placeholder;
         private SpaceshipPlance spaceshipPlance;
-        private ArrayList<CosmicCredit> credits;
+        private int credits;
         private int numAstronauts;
         private int numAliens;
 
-    public Player(String nickname, Placeholder placeholder, SpaceshipPlance spaceshipPlance, ArrayList<CosmicCredit> credits, int numAstronauts, int numAliens) {
+    public Player(String nickname, Placeholder placeholder, SpaceshipPlance spaceshipPlance, int credits, int numAstronauts, int numAliens) {
         this.nickname = nickname;
         this.placeholder = placeholder;
         this.spaceshipPlance = spaceshipPlance;
@@ -41,9 +41,13 @@ public class Player {
         public SpaceshipPlance getSpaceshipPlance() {
             return spaceshipPlance;
         }
-        public ArrayList<CosmicCredit> getCredits() {
+        public void setCredits(int credits) {
+            this.credits = credits;
+        }
+        public int getCredits() {
             return credits;
         }
+
         public int getNumAstronauts() {
         return numAstronauts;
         }
@@ -81,6 +85,10 @@ public class Player {
             return sumPower;
         }
 
+        public int checkExposedConnectors(){
+            int sumExposed=0;
+            return 0;
+        }
         public boolean checkExposedConnector(int n) {
             // controlla se c'è un connettore esposto li
             return true;
@@ -106,7 +114,7 @@ public class Player {
 
     public void cargoManagement(GoodsBlock[] cardReward) {
 
-        if (checkStorage()==0) {
+        if (getSpaceshipPlance().checkStorage()==0) {
             System.out.println("Not enough space");
             return;
         }
@@ -228,6 +236,11 @@ public class Player {
 
     }
 
+    public void askRemoveCrew(Cabin cabin) {
+        if (cabin.getCrew().isEmpty()) return;
+        // invia il prompt per rimuovere un membro dell'equipaggio della cabina
+    }
+
     public Planet choosePlanet(ArrayList<Planet> planets) {
         for (Planet planet : planets) {
             if (!planet.isBusy())
@@ -240,8 +253,8 @@ public class Player {
 
     public void looseGoods(int lostOther) {
         int actualLost = 0;
-        if(checkStorage() < lostOther)
-            actualLost = checkStorage();
+        if(getSpaceshipPlance().checkStorage() < lostOther)
+            actualLost = getSpaceshipPlance().checkStorage();
         else
             actualLost = lostOther;
 
@@ -284,5 +297,12 @@ public class Player {
             }else  System.out.println("cabin index is outbound");
         }
     }
+
+    public void removeMostValuableCargo() {
+        // toglie le due merci piu importanti
+        // altrimenti toglie due batterie
+    }
+
+
 }
 

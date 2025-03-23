@@ -3,6 +3,9 @@ package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.game.Deck;
 import it.polimi.ingsw.game.Player;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 public abstract class EnemyCard extends AdventureCard {
     private int cannonStrength;
     private int lostDays;
@@ -31,4 +34,34 @@ public abstract class EnemyCard extends AdventureCard {
         else if (fireStrenght < cannonStrength) return -1;
         return 0;
     }
+
+    @Override
+    public void activate() {
+        ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
+        Stack<Player> playerStack = new Stack<>();
+
+        for (Player player : players) {
+            playerStack.push(player);
+        }
+
+        while (!playerStack.isEmpty()) {
+            Player fightingPlayer = playerStack.pop();
+            int out = getFightOutcome(fightingPlayer);
+
+            switch (out) {
+                case 1:
+                    reward(fightingPlayer);
+                    deck.getFlightPlance().move(-lostDays,fightingPlayer);
+                    return;
+                case -1:
+                    penalize(fightingPlayer);
+                    break;
+                case 0:
+                    continue;
+            }
+        }
+    }
+
+    public abstract void reward(Player player);
+    public abstract void penalize(Player player);
 }
