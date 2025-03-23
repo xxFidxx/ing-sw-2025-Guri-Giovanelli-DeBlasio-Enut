@@ -2,10 +2,7 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.Bank.GoodsBlock;
-import it.polimi.ingsw.componentTiles.Cannon;
-import it.polimi.ingsw.componentTiles.CargoHolds;
-import it.polimi.ingsw.componentTiles.ComponentTile;
-import it.polimi.ingsw.componentTiles.Engine;
+import it.polimi.ingsw.componentTiles.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +13,7 @@ public class SpaceshipPlance {
     private ArrayList<CargoHolds> cargoHolds;
     private ArrayList<Engine> engines;
     private ArrayList<Cannon> cannons;
+    private ArrayList<Cabin>  cabins;
 
     public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot) {
     this.components = components;
@@ -53,4 +51,6 @@ public class SpaceshipPlance {
     public ArrayList<Cannon> getCannons(){
         return cannons;
     }
+
+    public ArrayList<Cabin> getCabins() { return cabins}
 }

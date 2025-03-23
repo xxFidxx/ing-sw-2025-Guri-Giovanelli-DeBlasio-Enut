@@ -28,19 +28,19 @@ public class CombatZoneCard extends AdventureCard  {
             Player minEquipPlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getNumEquip));
             minEquipPlayer.getPlaceholder().move(-lostDays);
             Player minEnginePlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getEngineStrenght));
-
+            minEnginePlayer.loseCrew(lostOther);
             Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
-            minFirePlayer.take
+            //AGGIUNGERE METODO PER GESTIRE I COLPI
 
         }
         if(type == type.LOSTGOODS){
             Player minFirePlayer = Collections.min(List.of(players), Comparator.comparing(Player::getFireStrenght));
             minFirePlayer.getPlaceholder().move(-lostDays);
             Player minEnginePlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getEngineStrenght));
-
+            minEnginePlayer.looseGoods(lostOther);
             Player minEquipPlayer = Collections.min(List.of(players), Comparator.comparingInt(Player::getNumEquip));
+            //AGGIUNGERE METODO PER GESTIRE I COLPI
 
-            minFirePlayer.looseGoods(lostOther);
         }
 
 
