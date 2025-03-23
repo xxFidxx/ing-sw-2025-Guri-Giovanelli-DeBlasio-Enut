@@ -55,4 +55,14 @@ public class SpaceshipPlance {
         // cerca tutte le cabine interconnesse
         return null;
     }
+
+    public int checkStorage(){
+        return 0;
+    }
+
+    public int countExposedConnectors(){
+        return 0;
+    }
+
+
 }

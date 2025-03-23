@@ -24,7 +24,7 @@ public class Flightplance {
     }
 
     public Optional<Player> getFirst() {
-        return Arrays.stream(game.getPlayers()).max(Comparator.comparingInt(p->p.getPlaceholder().getPosizione()));
+        return game.getPlayers().stream().max(Comparator.comparingInt(p -> p.getPlaceholder().getPosizione()));
     }
 
     public Placeholder[] getSpots() {

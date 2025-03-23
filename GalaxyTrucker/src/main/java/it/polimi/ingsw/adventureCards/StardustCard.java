@@ -1,26 +1,33 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Player;
+
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class StardustCard extends AdventureCard  {
-    private int lostDays;
 
     public StardustCard(String name, int level, int lostDays, Deck deck) {
         super(name, level,deck);
-        this.lostDays = lostDays;
     }
 
     @Override
     public void activate() {
+        ArrayList<Player> tmp = deck.getFlightplance().getGame().getPlayers();
 
+        Stack<Player> playerStack = new Stack<>();
+
+        for (Player player : tmp) {
+            playerStack.push(player);
+        }
+
+        while (!playerStack.isEmpty()) {
+            Player chosenPlayer = playerStack.pop();
+            int lost = chosenPlayer.getSpaceshipPlance().countExposedConnectors();
+
+            chosenPlayer.getPlaceholder().move(- lost);
+        }
     }
 
-    @Override
-
-
-
-
-    public int getLostDays() {
-        return lostDays;
-    }
 }

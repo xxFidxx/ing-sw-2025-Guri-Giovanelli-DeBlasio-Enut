@@ -61,9 +61,7 @@ public class Player {
             return true;
         }
 
-        public int checkStorage(){
-        return 0;
-        }
+
 
 
         // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
@@ -110,7 +108,7 @@ public class Player {
 
     public void cargoManagement(GoodsBlock[] cardReward) {
 
-        if (checkStorage()==0) {
+        if (getSpaceshipPlance().checkStorage()==0) {
             System.out.println("Not enough space");
             return;
         }
@@ -249,8 +247,8 @@ public class Player {
 
     public void looseGoods(int lostOther) {
         int actualLost = 0;
-        if(checkStorage() < lostOther)
-            actualLost = checkStorage();
+        if(getSpaceshipPlance().checkStorage() < lostOther)
+            actualLost = getSpaceshipPlance().checkStorage();
         else
             actualLost = lostOther;
 
