@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1981775-8cf6-47d9-b09e-c861bd43ae63" name="Changes" comment="aggiunto meteor swarm" />
+    <list default="true" id="e1981775-8cf6-47d9-b09e-c861bd43ae63" name="Changes" comment="aggiunto meteor swarm">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EnemyCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EpidemicCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/EpidemicCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/adventureCards/SmugglersCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/componentTiles/Cabin.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/componentTiles/Cabin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/SpaceshipPlance.java" beforeDir="false" afterPath="$PROJECT_DIR$/GalaxyTrucker/src/main/java/it/polimi/ingsw/game/SpaceshipPlance.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,7 +48,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -110,7 +119,8 @@
       <workItem from="1742162416694" duration="852000" />
       <workItem from="1742163661528" duration="398000" />
       <workItem from="1742241502801" duration="975000" />
-      <workItem from="1742657591055" duration="7969000" />
+      <workItem from="1742657591055" duration="8998000" />
+      <workItem from="1742740698300" duration="4805000" />
     </task>
     <task id="LOCAL-00001" summary="prova prima parte adventure cards">
       <option name="closed" value="true" />
@@ -136,11 +146,30 @@
       <option name="project" value="LOCAL" />
       <updated>1742664652949</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="aggiunto meteor swarm">
+      <option name="closed" value="true" />
+      <created>1742666279672</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1742666279672</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="prova prima parte adventure cards" />

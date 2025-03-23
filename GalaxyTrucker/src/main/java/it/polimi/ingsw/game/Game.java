@@ -14,12 +14,12 @@ import java.util.List;
 import static it.polimi.ingsw.game.ColorType.RED;
 
 public class Game {
-    private Player[] players;
+    private ArrayList<Player> players;
     private Timer timer;
     private Dice[] dices;
     private Flightplance plance;
 
-    public Game(Player[] player, Timer timer, Dice[] dices, Flightplance plance) {
+    public Game(ArrayList<Player> players, Timer timer, Dice[] dices, Flightplance plance) {
         this.players = players;
         this.timer = timer;
         this.dices = dices;
@@ -29,7 +29,7 @@ public class Game {
     public void Startgame() {
     }
 
-    public Player[] getPlayers() {
+    public ArrayList<Player>  getPlayers() {
         return players;
     }
 

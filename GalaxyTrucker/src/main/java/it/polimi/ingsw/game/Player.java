@@ -2,10 +2,13 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.componentTiles.Cabin;
 import it.polimi.ingsw.adventureCards.Planet;
 import it.polimi.ingsw.componentTiles.CargoHolds;
+import it.polimi.ingsw.componentTiles.Engine;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static it.polimi.ingsw.game.ColorType.RED;
 
@@ -223,6 +226,11 @@ public class Player {
         cargo1.getGoods()[j1] = cardReward[k];
         cardReward[k] = null;
 
+    }
+
+    public void askRemoveCrew(Cabin cabin) {
+        if (cabin.getCrew().isEmpty()) return;
+        // invia il prompt per rimuovere un membro dell'equipaggio della cabina
     }
 
     public Planet choosePlanet(ArrayList<Planet> planets) {
