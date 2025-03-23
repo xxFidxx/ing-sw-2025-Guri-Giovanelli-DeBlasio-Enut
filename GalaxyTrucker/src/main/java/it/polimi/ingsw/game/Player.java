@@ -81,6 +81,10 @@ public class Player {
             return sumPower;
         }
 
+        public int checkExposedConnectors(){
+        int sumExposed=0;
+
+        }
         public boolean checkExposedConnector(int n) {
             // controlla se c'è un connettore esposto li
             return true;
