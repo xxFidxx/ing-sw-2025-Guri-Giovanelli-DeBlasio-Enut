@@ -3,7 +3,9 @@ package it.polimi.ingsw.game;
 import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.adventureCards.Planet;
+import it.polimi.ingsw.componentTiles.Cabin;
 import it.polimi.ingsw.componentTiles.CargoHolds;
+import it.polimi.ingsw.componentTiles.Figure;
 
 import java.util.ArrayList;
 
@@ -61,6 +63,7 @@ public class Player {
         public int checkStorage(){
         return 0;
         }
+        public int checkCrew(){ return 0; }//CONTROLLA IL NUMERO DELL EQUIPAGGIO
 
 
         // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
@@ -255,6 +258,30 @@ public class Player {
                     System.out.println("goods index is outbound");
             } else
                 System.out.println("cargo index is outbound");
+        }
+    }
+    public void removeCrew(Cabin cabin1, int j1) {//METODO CHE TOGLIE UN MEMBRO DELL EQUIPAGGIO
+        cabin1.getCrew()[j1] = null;
+
+    }
+
+    public void loseCrew(int lostOther) {
+        int actualLost = 0;
+        if(checkCrew() < lostOther)
+            actualLost = checkCrew();
+        else
+            actualLost = lostOther;
+
+        ArrayList<Cabin> playerCrew =getSpaceshipPlance().getCabins();
+        for(int i = 0; i< actualLost; i++) {
+            int i1=0; //INDICE CABINA
+            int j1=0; //INDICE FIGURE
+            if (i1 >= 0 && i1 < playerCrew.size()) {
+                Cabin cabin1 = playerCrew.get(i1);
+                if (j1 >= 0 && j1 < cabin1.getCrew().length) {
+                    removeCrew(cabin1, j1);
+                } else System.out.println("crew index is outbound");
+            }else  System.out.println("cabin index is outbound");
         }
     }
 }

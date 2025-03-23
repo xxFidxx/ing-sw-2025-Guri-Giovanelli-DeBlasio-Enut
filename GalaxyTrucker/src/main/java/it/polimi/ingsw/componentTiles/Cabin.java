@@ -21,7 +21,7 @@ public class Cabin extends ComponentTile{
         return lifeSupportSystemColor;
     }
 
-    public ArrayList<Figure> getCrew() {
+    public Figure[] getCrew() {
         return crew;
     }
 }
