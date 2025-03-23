@@ -19,9 +19,8 @@ public class PlanetsCard extends AdventureCard {
     @Override
     public void activate() {
 
-        Game game = deck.getFlightplance().getGame();
+        Game game = deck.getFlightPlance().getGame();
         ArrayList<Player> tmp = game.getPlayers();
-        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
 
         Stack<Player> playerStack = new Stack<>();
 
@@ -31,7 +30,7 @@ public class PlanetsCard extends AdventureCard {
 
 
         while (!playerStack.isEmpty()) {
-            Player p = deck.getFlightplance().getGame().choosePlayerPlanet(this, planets, playerStack);
+            Player p = deck.getFlightPlance().getGame().choosePlayerPlanet(this, planets, playerStack);
 
             //questo adesso capita se nessuno vuole attivare o se non ci sono più pianeti in cui atterrare
             if (p == null) {
@@ -45,7 +44,7 @@ public class PlanetsCard extends AdventureCard {
                 System.out.println("No planet chosen");
             }else{
                 p.cargoManagement(chosenPlanet.getReward());
-                p.getPlaceholder().move(- lostDays);
+                deck.getFlightPlance().move(- lostDays,p);
             }
 
 

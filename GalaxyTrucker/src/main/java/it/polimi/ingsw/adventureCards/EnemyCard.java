@@ -37,7 +37,7 @@ public abstract class EnemyCard extends AdventureCard {
 
     @Override
     public void activate() {
-        ArrayList<Player> players = deck.getFlightplance().getGame().getPlayers();
+        ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
         Stack<Player> playerStack = new Stack<>();
 
         for (Player player : players) {
@@ -51,7 +51,7 @@ public abstract class EnemyCard extends AdventureCard {
             switch (out) {
                 case 1:
                     reward(fightingPlayer);
-                    fightingPlayer.getPlaceholder().move(-lostDays);
+                    deck.getFlightPlance().move(-lostDays,fightingPlayer);
                     return;
                 case -1:
                     penalize(fightingPlayer);

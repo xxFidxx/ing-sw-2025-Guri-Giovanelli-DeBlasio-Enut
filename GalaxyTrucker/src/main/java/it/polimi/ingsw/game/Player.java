@@ -68,6 +68,7 @@ public class Player {
 
 
 
+
         // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
         public int getEngineStrenght() {
             int sumPower=0;
@@ -276,5 +277,7 @@ public class Player {
         // toglie le due merci piu importanti
         // altrimenti toglie due batterie
     }
+
+
 }
 
