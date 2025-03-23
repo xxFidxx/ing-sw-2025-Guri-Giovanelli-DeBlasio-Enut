@@ -37,21 +37,21 @@ public class Flightplance {
     public void move(int num, Player chosenPlayer) {
         int extraSteps = 0;
         ArrayList<Player> Players = game.getPlayers();
+        int chosenPlayerPosition = chosenPlayer.getPlaceholder().getPosizione();
         if(num>0){
-            for(Player p : Players){
-                if(p.getPlaceholder().getPosizione() > chosenPlayer.getPlaceholder().getPosizione() + 1 && p.getPlaceholder().getPosizione() <= chosenPlayer.getPlaceholder().getPosizione() + num)
+            for(Player p : Players) {
+                int playerPosition = p.getPlaceholder().getPosizione();
+                if (playerPosition > chosenPlayerPosition && playerPosition <= chosenPlayerPosition + num)
                     extraSteps++;
-                else if(chosenPlayer.getPlaceholder().getPosizione() + num > chosenPlayer.getPlaceholder().getPosizione() + 1 && p.getPlaceholder().getPosizione() <= chosenPlayer.getPlaceholder().getPosizione())
-                    extraSteps++;
-
-
             }
         }else if(num<0){
             for(Player p : Players){
-                 if(chosenPlayer.getPlaceholder().getPosizione() + num > chosenPlayer.getPlaceholder().getPosizione() + 1 && p.getPlaceholder().getPosizione() <= chosenPlayer.getPlaceholder().getPosizione())
+                int playerPosition = p.getPlaceholder().getPosizione();
+                if(playerPosition >= chosenPlayerPosition + num && playerPosition < chosenPlayerPosition)
                     extraSteps++;
             }
-            }
+
+        }
 
         chosenPlayer.getPlaceholder().setPosizione(chosenPlayer.getPlaceholder().getPosizione() + num +extraSteps);
 
