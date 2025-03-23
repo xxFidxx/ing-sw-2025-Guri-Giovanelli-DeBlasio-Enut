@@ -67,17 +67,19 @@ public class Game {
 //    }
 
 
-    public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, int skip ) {
-        ArrayList<Player> tmp = players;
-        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = tmp.size() - 1 - skip; i >= 0; i--) {
+    public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
+        Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+
+        while (!players.isEmpty()) {
+            Player topPlayer = players.pop();
             for (Planet planet : planets) {
                 if (!planet.isBusy())
-                    if (tmp.get(i).getResponse())
-                        return tmp.get(i);
+                    if (topPlayer.getResponse())
+                        return topPlayer;
             }
 
         }
+
         return null;
     }
 }
