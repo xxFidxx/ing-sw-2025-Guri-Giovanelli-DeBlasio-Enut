@@ -243,9 +243,10 @@ public class Player {
             actualLost = lostOther;
 
         ArrayList<CargoHolds> playerCargos = getSpaceshipPlance().getCargoHolds();
-        int i1=0; // indice cargo
-        int j1=0; // indice good
+
         for(int i = 0; i< actualLost; i++) {
+            int i1=0; // indice cargo
+            int j1=0; // indice good
             if (i1 >= 0 && i1 < playerCargos.size()) {
                 CargoHolds cargo1 = playerCargos.get(i1);
                 if(j1 >= 0 && j1 < cargo1.getGoods().length) {
