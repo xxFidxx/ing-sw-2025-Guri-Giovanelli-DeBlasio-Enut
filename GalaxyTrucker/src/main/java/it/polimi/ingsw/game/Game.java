@@ -6,20 +6,17 @@ import it.polimi.ingsw.adventureCards.Planet;
 import it.polimi.ingsw.adventureCards.PlanetsCard;
 import it.polimi.ingsw.componentTiles.CargoHolds;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static it.polimi.ingsw.game.ColorType.RED;
 
 public class Game {
-    private Player[] players;
+    private ArrayList<Player> players;
     private Timer timer;
     private Dice[] dices;
     private Flightplance plance;
 
-    public Game(Player[] player, Timer timer, Dice[] dices, Flightplance plance) {
+    public Game(ArrayList<Player> players, Timer timer, Dice[] dices, Flightplance plance) {
         this.players = players;
         this.timer = timer;
         this.dices = dices;
@@ -29,7 +26,7 @@ public class Game {
     public void Startgame() {
     }
 
-    public Player[] getPlayers() {
+    public ArrayList<Player>  getPlayers() {
         return players;
     }
 
@@ -42,12 +39,12 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        Player[] tmp = players;
-        Arrays.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = tmp.length - 1; i >= 0; i--) {
-            if (card.checkCondition(tmp[i]))
-                if (tmp[i].getResponse())
-                    return tmp[i];
+        ArrayList<Player> tmp = players;
+        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        for (int i = tmp.size() - 1; i >= 0; i--) {
+            if (card.checkCondition(tmp.get(i)))
+                if (tmp.get(i).getResponse())
+                    return tmp.get(i);
         }
         return null;
     }
@@ -58,29 +55,31 @@ public class Game {
         return dice1.thr() + dice2.thr();
     }
 
-    public Player choosePlayer(AdventureCard card, int n) {
-        Player[] tmp = players;
-        Arrays.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = tmp.length - 1; i >= 0; i--) {
-            if (card.checkCondition(tmp[i]))
-                if (tmp[i].getResponse())
-                    return tmp[i];
-        }
-        return null;
-    }
+//    public Player choosePlayer(AdventureCard card, int n) {
+//        ArrayList<Player> tmp = players;
+//        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+//        for (int i = tmp.size() - 1; i >= 0; i--) {
+//            if (card.checkCondition(tmp.get(i)))
+//                if (tmp.get(i).getResponse())
+//                    return tmp.get(i);
+//        }
+//        return null;
+//    }
 
 
-    public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, int skip ) {
-        Player[] tmp = players;
-        Arrays.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = tmp.length - 1 - skip; i >= 0; i--) {
+    public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
+        Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+
+        while (!players.isEmpty()) {
+            Player topPlayer = players.pop();
             for (Planet planet : planets) {
                 if (!planet.isBusy())
-                    if (tmp[i].getResponse())
-                        return tmp[i];
+                    if (topPlayer.getResponse())
+                        return topPlayer;
             }
 
         }
+
         return null;
     }
 }

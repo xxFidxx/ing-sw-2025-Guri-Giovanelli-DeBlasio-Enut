@@ -1,11 +1,13 @@
 package it.polimi.ingsw.componentTiles;
 
+import java.util.ArrayList;
+
 public class Cabin extends ComponentTile{
     private boolean isCentral;
     private LifeSupportSystem[] lifeSupportSystemColor;
-    private Figure[] crew;
+    private ArrayList<Figure> crew;
 
-    public Cabin(ConnectorType[] connectors,Direction direction, LifeSupportSystem[] lifeSupportSystemColor, Figure[] crew) {
+    public Cabin(ConnectorType[] connectors,Direction direction, LifeSupportSystem[] lifeSupportSystemColor, ArrayList<Figure> crew) {
         super(connectors, direction);
         this.lifeSupportSystemColor = lifeSupportSystemColor;
         this.crew = crew;
@@ -19,7 +21,7 @@ public class Cabin extends ComponentTile{
         return lifeSupportSystemColor;
     }
 
-    public Figure[] getCrew() {
+    public ArrayList<Figure> getCrew() {
         return crew;
     }
 }
