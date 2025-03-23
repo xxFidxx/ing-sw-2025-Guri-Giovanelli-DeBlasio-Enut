@@ -1,6 +1,7 @@
 package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.componentTiles.Direction;
 import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.Player;
 
 public abstract class Projectile {
     private Direction direction;
@@ -10,7 +11,7 @@ public abstract class Projectile {
         this.direction = direction;
     }
 
-    public abstract void activate();
+    public abstract void activate(Player player, int position);
 
     public Direction getDirection() {
         return direction;

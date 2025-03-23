@@ -16,46 +16,13 @@ public class SmugglersCard extends EnemyCard {
         this.reward = reward;
     }
 
-    public void activate() {
-        Game game = deck.getFlightplance().getGame();
-        ArrayList<Player> tmp = game.getPlayers();
-        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-
-        Stack<Player> playerStack = new Stack<>();
-
-        for (Player player : tmp) {
-            playerStack.push(player);
-        }
-
-        while (!playerStack.isEmpty()) {
-            Player fightingPlayer = playerStack.pop();
-            int out = getFightOutcome(fightingPlayer);
-
-            switch (out) {
-                case 1:
-                    // vittoria
-                    return;
-                case -1:
-                    // perdita
-                    break;
-                case 0:
-                    // pareggio
-                    continue;
-            }
-
-        }
-
+    @Override
+    public void reward(Player player) {
+        player.cargoManagement(reward);
     }
 
-
-
-
-
-    public int getLossMalus() {
-        return lossMalus;
-    }
-
-    public GoodsBlock[] getReward() {
-        return reward;
+    @Override
+    public void penalize(Player player) {
+        player.removeMostValuableCargo();
     }
 }

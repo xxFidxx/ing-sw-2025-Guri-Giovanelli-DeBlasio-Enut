@@ -17,11 +17,11 @@ public class Player {
         private String nickname;
         private Placeholder placeholder;
         private SpaceshipPlance spaceshipPlance;
-        private ArrayList<CosmicCredit> credits;
+        private int credits;
         private int numAstronauts;
         private int numAliens;
 
-    public Player(String nickname, Placeholder placeholder, SpaceshipPlance spaceshipPlance, ArrayList<CosmicCredit> credits, int numAstronauts, int numAliens) {
+    public Player(String nickname, Placeholder placeholder, SpaceshipPlance spaceshipPlance, int credits, int numAstronauts, int numAliens) {
         this.nickname = nickname;
         this.placeholder = placeholder;
         this.spaceshipPlance = spaceshipPlance;
@@ -42,9 +42,13 @@ public class Player {
         public SpaceshipPlance getSpaceshipPlance() {
             return spaceshipPlance;
         }
-        public ArrayList<CosmicCredit> getCredits() {
+        public void setCredits(int credits) {
+            this.credits = credits;
+        }
+        public int getCredits() {
             return credits;
         }
+
         public int getNumAstronauts() {
         return numAstronauts;
         }
@@ -80,8 +84,8 @@ public class Player {
         }
 
         public int checkExposedConnectors(){
-        int sumExposed=0;
-
+            int sumExposed=0;
+            return 0;
         }
         public boolean checkExposedConnector(int n) {
             // controlla se c'è un connettore esposto li
@@ -266,6 +270,11 @@ public class Player {
             } else
                 System.out.println("cargo index is outbound");
         }
+    }
+
+    public void removeMostValuableCargo() {
+        // toglie le due merci piu importanti
+        // altrimenti toglie due batterie
     }
 }
 
