@@ -1,6 +1,7 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Player;
 
 public abstract class AdventureCard {
     private String name;
@@ -21,7 +22,7 @@ public abstract class AdventureCard {
         return level;
     }
 
-    public boolean checkCondition() {
+    public boolean checkCondition(Player p) {
         return true;
     }
 

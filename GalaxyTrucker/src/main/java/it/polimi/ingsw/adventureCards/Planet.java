@@ -5,15 +5,15 @@ import it.polimi.ingsw.Bank.GoodsBlock;
 import java.util.List;
 
 public class Planet {
-    private List<GoodsBlock> goods;
+    private GoodsBlock[] goods;
     boolean isBusy;
 
-    public Planet(List<GoodsBlock> goods, boolean isBusy) {
+    public Planet(GoodsBlock[] goods, boolean isBusy) {
         this.goods = goods;
         this.isBusy = isBusy;
     }
 
-    public List<GoodsBlock> getReward(){
+    public GoodsBlock[] getReward(){
         return goods;
     }
 

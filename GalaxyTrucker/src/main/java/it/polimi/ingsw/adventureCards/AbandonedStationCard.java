@@ -21,7 +21,6 @@ import it.polimi.ingsw.game.Player;
         @Override
         public void activate() {
             Player p = deck.getFlightplance().getGame().choosePlayer(this);
-            Game g = deck.getFlightplance().getGame();
 
 
             if (p == null) {
@@ -29,11 +28,7 @@ import it.polimi.ingsw.game.Player;
                 return;
             }
 
-            g.cargoManagement(p,reward);
-
-
-
-
+            p.cargoManagement(reward);
 
         }
 
@@ -48,6 +43,14 @@ import it.polimi.ingsw.game.Player;
 
         public GoodsBlock[] getReward() {
             return reward;
+        }
+
+        public boolean checkCondtition(Player p){
+            if(p.getNumEquip() >= requiredCrew){
+                return true;
+            }
+
+            return false;
         }
 
     }
