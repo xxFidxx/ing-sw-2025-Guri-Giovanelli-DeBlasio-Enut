@@ -4,7 +4,7 @@ public class Cannon extends ComponentTile {
     protected float power;
 
     public Cannon(ConnectorType[] connectors,Direction direction,float power) {
-        super(connectors, direction);
+        super(connectors);
         this.power = power;
     }
 

@@ -8,7 +8,7 @@ public class Cabin extends ComponentTile{
     private ArrayList<Figure> crew;
 
     public Cabin(ConnectorType[] connectors,Direction direction, LifeSupportSystem[] lifeSupportSystemColor, ArrayList<Figure> crew) {
-        super(connectors, direction);
+        super(connectors);
         this.lifeSupportSystemColor = lifeSupportSystemColor;
         this.crew = crew;
     }
@@ -21,7 +21,7 @@ public class Cabin extends ComponentTile{
         return lifeSupportSystemColor;
     }
 
-    public Figure[] getCrew() {
+    public ArrayList<Figure> getCrew() {
         return crew;
     }
 }

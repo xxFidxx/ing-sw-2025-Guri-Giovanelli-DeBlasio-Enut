@@ -7,7 +7,7 @@ public class PowerCenter extends ComponentTile {
 
 
     public PowerCenter(ConnectorType[] connectors, Direction direction, BatteryToken[] batteries) {
-        super(connectors, direction);
+        super(connectors);
         this.batteries = batteries;
     }
 

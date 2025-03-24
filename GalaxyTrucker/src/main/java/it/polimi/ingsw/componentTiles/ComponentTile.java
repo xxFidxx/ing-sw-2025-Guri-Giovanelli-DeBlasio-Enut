@@ -1,14 +1,10 @@
 package it.polimi.ingsw.componentTiles;
 
-import java.awt.*;
-
 public abstract class ComponentTile {
     private final ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
-    protected Direction direction; // reso inutile
 
-    public ComponentTile(ConnectorType[] connectors,Direction direction){
+    public ComponentTile(ConnectorType[] connectors){
         this.connectors = connectors;
-        this.direction = direction;
     }
 
     public void rotateClockwise() {
@@ -34,10 +30,6 @@ public abstract class ComponentTile {
 
     public ConnectorType[] getConnectors() {
         return connectors;
-    }
-
-    public Direction getDirection() {
-        return direction;
     }
 
 }
