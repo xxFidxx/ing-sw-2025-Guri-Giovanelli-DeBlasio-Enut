@@ -4,12 +4,10 @@ import java.awt.*;
 
 public abstract class ComponentTile {
     protected ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...// ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
-    protected Direction direction;// reso inutile
     private boolean IsWellConnected;
 
-    public ComponentTile(ConnectorType[] connectors,Direction direction, boolean isWellConnected) {
+    public ComponentTile(ConnectorType[] connectors) {
         this.connectors = connectors;
-        this.direction = direction;
         this.IsWellConnected = true;
     }
 
@@ -44,10 +42,6 @@ public abstract class ComponentTile {
 
     public ConnectorType[] getConnectors() {
         return connectors;
-    }
-
-    public Direction getDirection() {
-        return direction;
     }
 
 }
