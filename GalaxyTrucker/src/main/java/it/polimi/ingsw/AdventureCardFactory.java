@@ -1,22 +1,19 @@
 package it.polimi.ingsw;
 
-import java.io.File;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import it.polimi.ingsw.adventureCards.AdventureCard;
+
+import java.io.FileReader;
 import java.io.IOException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Type;
+import java.util.List;
 
 public class AdventureCardFactory {
-    private static final String JSON_FILE = "setup.json";
-    private static JsonNode cardData;
 
-    // Caricamento dei dati JSON una volta sola
-    static {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            cardData = objectMapper.readTree(new File(JSON_FILE));
-        } catch (IOException e) {
-            throw new RuntimeException("Errore nel caricamento del file JSON", e);
-        }
+    public static AdventureCard createCardFromJson(String filePath) {
+        return null;
     }
+}
 
 
