@@ -1,0 +1,1 @@
+Il server chiede al client di inserire un nickname, se un altro utente aveva precedentemente inserito lo stesso nome glielo richiede finché il client non inserirà un nickname valido (non ancora preso).

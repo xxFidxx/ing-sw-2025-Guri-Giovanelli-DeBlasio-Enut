@@ -14,7 +14,8 @@ public class DoubleEngine extends Engine {
     }
 
     public int getPower() {
-        return power*2;//CAMBIARE IL METODO E CHIEDERE SE SI VOGLIA USARE IL MOTORE DOPPIO
+
+        return power*2;
 
     }
 }
