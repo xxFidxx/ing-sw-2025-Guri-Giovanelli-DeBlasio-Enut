@@ -32,8 +32,8 @@ public class SpaceshipPlance {
     private void dfs(int x, int y){
         visited[x][y] = true;
         ComponentTile tile = components[x][y];
-        ConnectorType[] connectors = tile.getConnectors();
         if(tile != null) {
+            ConnectorType[] connectors = tile.getConnectors();
             tile.setWellConnected(true);
 
             //sopra destra sotto sinistra
