@@ -1,10 +1,24 @@
 package it.polimi.ingsw.componentTiles;
 
-public abstract class ComponentTile {
-    protected final ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
+import java.awt.*;
 
-    public ComponentTile(ConnectorType[] connectors){
+public abstract class ComponentTile {
+    protected ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...// ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
+    protected Direction direction;// reso inutile
+    private boolean IsWellConnected;
+
+    public ComponentTile(ConnectorType[] connectors,Direction direction, boolean isWellConnected) {
         this.connectors = connectors;
+        this.direction = direction;
+        this.IsWellConnected = true;
+    }
+
+    public boolean isWellConnected() {
+        return IsWellConnected;
+    }
+
+    public void setWellConnected(boolean wellConnected) {
+        IsWellConnected = wellConnected;
     }
 
     public void rotateClockwise() {
@@ -30,6 +44,10 @@ public abstract class ComponentTile {
 
     public ConnectorType[] getConnectors() {
         return connectors;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 
 }

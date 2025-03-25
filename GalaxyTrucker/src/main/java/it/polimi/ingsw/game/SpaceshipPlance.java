@@ -14,15 +14,50 @@ public class SpaceshipPlance {
     private ArrayList<Engine> engines;
     private ArrayList<Cannon> cannons;
     private ArrayList<Cabin> cabins;
+    private boolean[][] visited;
     private ArrayList<ShieldGenerator> shieldGenerators;
 
-    public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot) {
+    public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot,boolean[][] visited) {
     this.components = components;
     this.reserveSpot = reserveSpot;
+    this.visited = new boolean[6][4];
     }
 
-    public boolean checkCorrectness(){
+    public boolean checkCorrectness() {
+
+        dfs(2, 3); // per ora parto dal centro
         return true;
+    }
+
+    private void dfs(int x, int y){
+        visited[x][y] = true;
+        ComponentTile tile = components[x][y];
+        ConnectorType[] connectors = tile.getConnectors();
+        if(tile != null) {
+            tile.setWellConnected(true);
+
+            //sopra destra sotto sinistra
+            int[] dirx ={0, 1, 0, -1};
+            int[] diry ={1, 0, -1, 0};
+
+            for(int i = 0; i < 4; i++){
+                int x2 = x + dirx[i];
+                int y2 = y + diry[i];
+
+                ComponentTile tile2 = components[x2][y2];
+                if(tile2 !=null){
+                    ConnectorType[] connectors2 = tile2.getConnectors();
+                    for(int j = 0; j < connectors.length && tile.isWellConnected(); j++){
+                        if(connectors2[j] != connectors[j]){
+                            tile.setWellConnected(false);
+                        }
+                    }
+                }
+            }
+        }
+
+        return;
+
     }
 
     public int countAstronauts(){
