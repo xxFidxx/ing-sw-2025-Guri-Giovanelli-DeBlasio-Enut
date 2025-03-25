@@ -82,8 +82,10 @@ public class Player {
             int sumPower=0;
             for(int i=0; i < spaceshipPlance.getEngines().size(); i++){
                 if(spaceshipPlance.getEngines().get(i) instanceof DoubleEngine)
-                    if(askToUseBattery())
-                        sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();
+                    if( ((DoubleEngine) spaceshipPlance.getEngines().get(i)).isCharged())
+                        if(askToUseBattery())
+                            sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();
+                    else System.out.println("no battery available");
 
                 sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();}
             return sumPower;
