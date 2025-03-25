@@ -10,15 +10,13 @@ public class CombatZoneCard extends AdventureCard  {
     private int lostDays;
     private CombatZoneType type;
     private int lostOther;
-    private SmallCannonShot[] smallShots;
-    private BigCannonShot bigShot;
+    private Projectile[] cannons;
 
-    public CombatZoneCard(String name, int level, int lostDays, int lostOther, CannonFire[] shots, Deck deck) {
+    public CombatZoneCard(String name, int level, int lostDays, int lostOther, Projectile[] cannons, Deck deck) {
         super(name, level, deck);
         this.lostDays = lostDays;
         this.lostOther = lostOther;
-        this.smallShots = smallShots;
-        this.bigShot = bigShot;
+        this.cannons = cannons;
     }
 
     public void activate() {
@@ -31,11 +29,10 @@ public class CombatZoneCard extends AdventureCard  {
             Player minEnginePlayer =players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
             minEnginePlayer.loseCrew(lostOther);
             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
-            position = game.throwDices();
-            smallShots[0].activate(minFirePlayer,position);
-            position = game.throwDices();
-            bigShot.activate(minFirePlayer,position);
-
+            for( Projectile cannon : cannons ){
+                position = game.throwDices();
+                cannon.activate(minFirePlayer,position);
+            }
         }
         if(type == type.LOSTGOODS){
             Player minFirePlayer =players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
@@ -43,22 +40,13 @@ public class CombatZoneCard extends AdventureCard  {
             Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
             minEnginePlayer.looseGoods(lostOther);
             Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
-            for(SmallCannonShot smallShot : smallShots){
+            for( Projectile cannon : cannons ){
                 position = game.throwDices();
-                smallShot.activate(minFirePlayer,position);
+                cannon.activate(minFirePlayer,position);
             }
-            position = game.throwDices();
-            bigShot.activate(minFirePlayer,position);
         }
 
-
-
     }
-
-
-
-
-
 
     public int getLostDays() {
         return lostDays;
