@@ -20,6 +20,7 @@ public class Player {
         private int credits;
         private int numAstronauts;
         private int numAliens;
+        private Game game;
 
     public Player(String nickname, Placeholder placeholder, SpaceshipPlance spaceshipPlance, int credits, int numAstronauts, int numAliens) {
         this.nickname = nickname;
@@ -28,6 +29,7 @@ public class Player {
         this.credits = credits;
         this.numAstronauts = numAstronauts;
         this.numAliens = numAliens;
+        this.game = game;
 
     }
 
@@ -65,7 +67,11 @@ public class Player {
             return true;
         }
 
-        public int checkStorage(){
+    public Game getGame() {
+        return game;
+    }
+
+    public int checkStorage(){
         return 0;
         }
         public int checkCrew(){ return 0; }//CONTROLLA IL NUMERO DELL EQUIPAGGIO

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.componentTiles;
 
 public abstract class ComponentTile {
-    private final ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
+    protected final ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
 
     public ComponentTile(ConnectorType[] connectors){
         this.connectors = connectors;

@@ -38,6 +38,10 @@ public class Game {
         return timer;
     }
 
+    public Flightplance getFlightPlance() {
+        return plance;
+    }
+
     public Player choosePlayer(AdventureCard card) {
         ArrayList<Player> tmp = players;
         Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));

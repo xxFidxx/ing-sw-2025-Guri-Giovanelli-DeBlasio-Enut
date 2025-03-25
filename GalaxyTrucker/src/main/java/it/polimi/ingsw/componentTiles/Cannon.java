@@ -9,7 +9,7 @@ public class Cannon extends ComponentTile {
     }
 
     public float getPower() {
-        if( direction == direction.NORTH )
+        if( connectors[0] == ConnectorType.CANNON )
             return power;
         else
             return (float) (power * 0.5);
