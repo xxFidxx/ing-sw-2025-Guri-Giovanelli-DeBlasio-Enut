@@ -30,9 +30,14 @@ public class SpaceshipPlance {
     }
 
     private void dfs(int x, int y){
+
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+                components[x][y] == null || visited[x][y]) {
+            return;
+        }
+
         visited[x][y] = true;
         ComponentTile tile = components[x][y];
-        if(tile != null) {
             ConnectorType[] connectors = tile.getConnectors();
             tile.setWellConnected(true);
 
@@ -52,9 +57,11 @@ public class SpaceshipPlance {
                             tile.setWellConnected(false);
                         }
                     }
+                    if(tile.isWellConnected()){
+                        dfs(x2, y2);
+                    }
                 }
             }
-        }
 
         return;
 
