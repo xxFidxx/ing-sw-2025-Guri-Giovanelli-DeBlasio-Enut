@@ -4,7 +4,7 @@ import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
 
 public abstract class Projectile {
-    private Direction direction;
+    protected Direction direction;
     protected Game game;
 
     public Projectile(Game game, Direction direction) {

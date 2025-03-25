@@ -8,7 +8,7 @@ public class ShieldGenerator extends ComponentTile {
 
 
     // da vedere la logica cosa fa
-     public boolean checkProtection() {
+     public boolean checkProtection(Direction direction) {
          return false;
      }
 

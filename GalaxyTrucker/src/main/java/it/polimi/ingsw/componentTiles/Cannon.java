@@ -18,4 +18,9 @@ public class Cannon extends ComponentTile {
     public void setPower(float power) {
         this.power = power;
     }
+
+    public boolean checkProtection (Direction direction, int position) {
+        return false;
+    }
+
 }

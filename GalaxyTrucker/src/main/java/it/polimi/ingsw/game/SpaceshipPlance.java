@@ -14,6 +14,7 @@ public class SpaceshipPlance {
     private ArrayList<Engine> engines;
     private ArrayList<Cannon> cannons;
     private ArrayList<Cabin> cabins;
+    private ArrayList<ShieldGenerator> shieldGenerators;
 
     public SpaceshipPlance(ComponentTile[][] components, ComponentTile[] reserveSpot) {
     this.components = components;
@@ -65,4 +66,39 @@ public class SpaceshipPlance {
     }
 
 
+    public boolean checkExposedConnector(int position) {
+        return false;
+    }
+
+    public boolean getShieldActivation(Direction direction) {
+        for (ShieldGenerator shieldGenerator : shieldGenerators) {
+            if (shieldGenerator.checkProtection(direction) == true) {
+                boolean active = askActivateShield(shieldGenerator);
+                if (active) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean askActivateShield(ShieldGenerator shieldGenerator) {
+        return true;
+    }
+
+    public void takeHit(Direction direction, int position) {
+        //rimuovi componente
+    }
+
+    public boolean getCannonActivation(Direction direction, int position) {
+        for (Cannon cannon : cannons) {
+            if (cannon.checkProtection(direction, position) == true) {
+                boolean active = askActivateCannon(cannon);
+                if (active) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean askActivateCannon(Cannon cannon) {
+        return true;
+    }
 }

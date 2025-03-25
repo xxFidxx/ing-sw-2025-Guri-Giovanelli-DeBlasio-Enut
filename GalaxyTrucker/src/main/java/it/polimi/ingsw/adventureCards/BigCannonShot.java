@@ -11,6 +11,6 @@ public class BigCannonShot extends Projectile {
 
     @Override
     public void activate(Player player, int position) {
-        player.takeHit(position);
+        player.getSpaceshipPlance().takeHit(direction, position);
     }
 }

@@ -13,9 +13,9 @@ public class BigMeteor extends Projectile {
     @Override
     public void activate(Player player, int position) {
 
-        if (player.useCannon(position) == true) {
+        if (player.getSpaceshipPlance().getCannonActivation(position) == true) {
             return;
         }
-        player.takeHit(position);
+        player.getSpaceshipPlance().takeHit(direction, position);
     }
 }

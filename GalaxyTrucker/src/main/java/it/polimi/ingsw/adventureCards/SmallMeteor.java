@@ -12,12 +12,12 @@ public class SmallMeteor extends Projectile{
     @Override
     public void activate(Player player, int position) {
 
-        if (player.checkExposedConnector(position) == false) {
+        if (player.getSpaceshipPlance().checkExposedConnector(position) == false) {
             return;
         }
-        if (player.askActivateShield() == true) {
+        if (player.getSpaceshipPlance().getShieldActivation(direction) == true) {
             return;
         }
-        player.takeHit(position);
+        player.getSpaceshipPlance().takeHit(direction, position);
     }
 }
