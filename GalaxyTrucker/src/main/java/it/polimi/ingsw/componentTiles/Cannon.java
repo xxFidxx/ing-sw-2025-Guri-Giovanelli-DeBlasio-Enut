@@ -1,5 +1,6 @@
 package it.polimi.ingsw.componentTiles;
 
+
 public class Cannon extends ComponentTile {
     protected float power;
 

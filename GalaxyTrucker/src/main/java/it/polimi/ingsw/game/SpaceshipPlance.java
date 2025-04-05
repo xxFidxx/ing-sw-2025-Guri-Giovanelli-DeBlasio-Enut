@@ -28,11 +28,12 @@ public class SpaceshipPlance {
         return true;
     }
 
+    // posso anche fare una precomputazione mentre monto i pezzi
     private void dfs(int x, int y){
-        // per ciascuna casella controllo prima che sia connessa bene da tute le parti
+        // per ciascuna casella controllo prima che sia connessa bene da tutte le parti
         // poi chiamo ricorsivamente su tutte le altre direzioni
         // se devo fare il check con una cesella già visitata, la ignoro perchè ha gia fatto lei
-        // controllo cannoni
+        // controllo cannoni, se ha caselle davanti gli metto setWell connected a false e poi pure visited a true se il component != null
         // controllo engine
 
         // visita tutti le tile in profondità e dice se sono connesse bene
@@ -63,6 +64,31 @@ public class SpaceshipPlance {
                         }
                     }
                     if(tile.isWellConnected()){
+                        switch (tile) {
+                            case Cannon c -> {
+                                cannons.add(c);
+                            }
+
+                            case Engine e -> {
+                                engines.add(e);
+
+                            }case Cabin cab -> {
+                                cabins.add(cab);
+
+
+                            }case CargoHolds ch -> {
+                                cargoHolds.add(ch);
+                            }
+
+                            case ShieldGenerator sg -> {
+                                shieldGenerators.add(sg);
+                            }
+
+                            default ->{
+
+                            }
+                        }
+
                         dfs(x2, y2);
                     }
                 }
@@ -97,6 +123,7 @@ public class SpaceshipPlance {
     }
 
     public ArrayList<Engine> getEngines(){
+
         return engines;
     }
 
@@ -130,6 +157,7 @@ public class SpaceshipPlance {
         }
         return false;
     }
+
 
     private boolean askActivateShield(ShieldGenerator shieldGenerator) {
         return true;
