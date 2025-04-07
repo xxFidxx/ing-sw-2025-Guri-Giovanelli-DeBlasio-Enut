@@ -21,14 +21,13 @@ public class AbandonedShipCard extends AdventureCard {
     @Override
     public void activate(){
         Player p = deck.getFlightPlance().getGame().choosePlayer(this);
-
-
         if (p == null) {
             System.out.println("No player selected");
             return;
         }
         p.setNumEquip(p.getNumEquip() - lostCrew);
-        manageCredits(p);
+        p.setCredits(p.getCredits() + credits);
+        deck.getFlightPlance().move(-lostDays, p);
     }
 
 
@@ -40,7 +39,7 @@ public class AbandonedShipCard extends AdventureCard {
         return lostCrew;
     }
 
-    public ArrayList<CosmicCredit> getReward(){
+    public int getReward(){
         return credits;
     }
 
@@ -52,7 +51,8 @@ public class AbandonedShipCard extends AdventureCard {
         return false;
     }
 
+    /*
     public void manageCredits(Player p){
         p.setCredits(p.getCredits() + credits);
-    }
+    } */
 }

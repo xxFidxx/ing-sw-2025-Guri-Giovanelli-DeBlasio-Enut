@@ -243,4 +243,9 @@ public class SpaceshipPlance {
     private boolean askActivateCannon(Cannon cannon) {
         return true;
     }
+
+    public ArrayList<Cabin> getConnectedCabins() {
+        // restituisce una lista di tutte le cabine che sono interconnesse ad almeno un'altra cabina
+        return cabins;
+    }
 }

@@ -1,12 +1,18 @@
 package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.componentTiles.Direction;
+import it.polimi.ingsw.game.Game;
+import it.polimi.ingsw.game.Player;
 
+// va eliminata?
 public class CannonFire extends Projectile{
-    public CannonFire(Direction direction, ProjectileSize size) {
-        super(direction, size);
+    private ProjectileSize size;
+    public CannonFire(Game game, Direction direction, ProjectileSize size) {
+        super(game, direction);
+        this.size = size;
     }
 
-    public void activate() {
+    @Override
+    public void activate(Player player, int position) {
 
     }
 }

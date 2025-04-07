@@ -21,9 +21,9 @@ public class Cabin extends ComponentTile{
         return lifeSupportSystemColor;
     }
 
-    public LifeSupportSystem[] setLifeSupportSystemColor(int i, ){
+    /* public LifeSupportSystem[] setLifeSupportSystemColor(int i, ){
 
-    }
+    } */
 
     public Figure[] getFigures() {
         return figures;

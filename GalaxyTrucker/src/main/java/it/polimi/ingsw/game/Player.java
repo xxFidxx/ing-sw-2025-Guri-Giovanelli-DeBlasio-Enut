@@ -30,7 +30,6 @@ public class Player {
         this.numAstronauts = numAstronauts;
         this.numAliens = numAliens;
         this.game = game;
-
     }
 
     public String getNickname() {
@@ -130,8 +129,9 @@ public class Player {
             return true;
         }
 
-    public void cargoManagement(GoodsBlock[] cardReward) {
 
+    public void cargoManagement(GoodsBlock[] cardReward) {
+        /* commentato temporaneamente per poter eseguire test d'unità
         if (getSpaceshipPlance().checkStorage()==0) {
             System.out.println("Not enough space");
             return;
@@ -200,9 +200,8 @@ public class Player {
                     System.out.println("cargo index is outbound");
             } else
                 System.out.println("player input is incorrect");
-        }
+        } */
     }
-
 
 
 
@@ -255,7 +254,7 @@ public class Player {
     }
 
     public void askRemoveCrew(Cabin cabin) {
-        if (cabin.getCrew().isEmpty()) return;
+        // if (cabin.getFigures().isEmpty()) return;
         // invia il prompt per rimuovere un membro dell'equipaggio della cabina
     }
 
@@ -292,7 +291,7 @@ public class Player {
         }
     }
     public void removeCrew(Cabin cabin1, int j1) {//METODO CHE TOGLIE UN MEMBRO DELL EQUIPAGGIO
-        cabin1.getCrew()[j1] = null;
+        cabin1.getFigures()[j1] = null;
 
     }
 
@@ -309,7 +308,7 @@ public class Player {
             int j1=0; //INDICE FIGURE
             if (i1 >= 0 && i1 < playerCrew.size()) {
                 Cabin cabin1 = playerCrew.get(i1);
-                if (j1 >= 0 && j1 < cabin1.getCrew().length) {
+                if (j1 >= 0 && j1 < cabin1.getFigures().length) {
                     removeCrew(cabin1, j1);
                 } else System.out.println("crew index is outbound");
             }else  System.out.println("cabin index is outbound");

@@ -14,7 +14,7 @@ public class DoubleCannon extends Cannon{
 
     public float getPower() {
         if(isCharged) {
-            if (direction == direction.NORTH)
+            if ( connectors[0] == ConnectorType.CANNON )
                 return 2 * power;
             else
                 return (power);

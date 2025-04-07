@@ -17,7 +17,7 @@ public class Timer {
 
     public void update() {
         long now = System.currentTimeMillis();
-        int elapsedSeconds = (int) ((now - startTime) / 1000); /
+        int elapsedSeconds = (int) ((now - startTime) / 1000);
         time = Math.max(0, time - elapsedSeconds);
     }
 
