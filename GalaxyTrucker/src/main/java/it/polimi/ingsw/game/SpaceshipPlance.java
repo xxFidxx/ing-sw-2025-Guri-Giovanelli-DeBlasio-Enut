@@ -23,6 +23,38 @@ public class SpaceshipPlance {
         this.visited = new boolean[6][4];
     }
 
+    public void updateLists(){
+        for(int i=0; i< 6; i++){
+            for(int j = 0; j< 4; j++){
+                ComponentTile tile = components[i][j];
+                switch (tile) {
+                    case Cannon c -> {
+                        cannons.add(c);
+                    }
+
+                    case Engine e -> {
+                        engines.add(e);
+
+                    }case Cabin cab -> {
+                        cabins.add(cab);
+
+
+                    }case CargoHolds ch -> {
+                        cargoHolds.add(ch);
+                    }
+
+                    case ShieldGenerator sg -> {
+                        shieldGenerators.add(sg);
+                    }
+
+                    default ->{
+
+                    }
+                }
+            }
+        }
+    }
+
     public boolean checkCorrectness() {
         dfs(2, 3); // per ora parto dal centro
         return true;
@@ -64,30 +96,7 @@ public class SpaceshipPlance {
                         }
                     }
                     if(tile.isWellConnected()){
-                        switch (tile) {
-                            case Cannon c -> {
-                                cannons.add(c);
-                            }
 
-                            case Engine e -> {
-                                engines.add(e);
-
-                            }case Cabin cab -> {
-                                cabins.add(cab);
-
-
-                            }case CargoHolds ch -> {
-                                cargoHolds.add(ch);
-                            }
-
-                            case ShieldGenerator sg -> {
-                                shieldGenerators.add(sg);
-                            }
-
-                            default ->{
-
-                            }
-                        }
 
                         dfs(x2, y2);
                     }

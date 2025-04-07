@@ -5,12 +5,12 @@ import java.util.ArrayList;
 public class Cabin extends ComponentTile{
     private boolean isCentral;
     private LifeSupportSystem[] lifeSupportSystemColor;
-    private ArrayList<Figure> crew;
+    private Figure[] figures;;
 
     public Cabin(ConnectorType[] connectors,Direction direction, LifeSupportSystem[] lifeSupportSystemColor, ArrayList<Figure> crew) {
         super(connectors);
         this.lifeSupportSystemColor = lifeSupportSystemColor;
-        this.crew = crew;
+        figures = new Figure[1];
     }
 
     public boolean isCentral() {
@@ -21,7 +21,11 @@ public class Cabin extends ComponentTile{
         return lifeSupportSystemColor;
     }
 
-    public ArrayList<Figure> getCrew() {
-        return crew;
+    public LifeSupportSystem[] setLifeSupportSystemColor(int i, ){
+
+    }
+
+    public Figure[] getFigures() {
+        return figures;
     }
 }
