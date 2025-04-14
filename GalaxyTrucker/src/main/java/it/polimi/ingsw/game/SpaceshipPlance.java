@@ -56,12 +56,12 @@ public class SpaceshipPlance {
     }
 
     public boolean checkCorrectness() {
-        dfs(2, 3); // per ora parto dal centro
+        dfs_correctness(2, 3); // per ora parto dal centro
         return true;
     }
 
     // posso anche fare una precomputazione mentre monto i pezzi
-    private void dfs(int x, int y){
+    private void dfs_correctness(int x, int y){
         // per ciascuna casella controllo prima che sia connessa bene da tutte le parti
         // poi chiamo ricorsivamente su tutte le altre direzioni
         // se devo fare il check con una cesella già visitata, la ignoro perchè ha gia fatto lei
@@ -101,7 +101,8 @@ public class SpaceshipPlance {
                         if( tile.isWellConnected() && (!checkConnection(connectors[i], connectors2[(i+2)%4]))){
                             tile.setWellConnected(false);
                     }
-                        dfs(x2, y2);
+                        if(connectors[i] != ConnectorType.SMOOTH && connectors[(i+2)%4] != ConnectorType.SMOOTH)
+                            dfs_correctness(x2, y2);
                 }
             }
             // se entri nel ramo else vuol dire che sei nel range di un cannone o di un motore che ti ha settato a false senza visitarti oppure sei collegato
