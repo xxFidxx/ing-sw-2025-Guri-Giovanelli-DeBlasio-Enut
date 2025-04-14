@@ -20,12 +20,12 @@ public class SpaceshipPlance {
     public SpaceshipPlance(ComponentTile[][] components, ArrayList<ComponentTile> reserveSpot) {
         this.components = components;
         this.reserveSpot = reserveSpot;
-        this.visited = new boolean[6][4];
+        this.visited = new boolean[4][6];
     }
 
     public void updateLists(){
-        for(int i=0; i< 6; i++){
-            for(int j = 0; j< 4; j++){
+        for(int i=0; i< 4; i++){
+            for(int j = 0; j< 6; j++){
                 ComponentTile tile = components[i][j];
                 switch (tile) {
                     case Cannon c -> {
@@ -69,45 +69,71 @@ public class SpaceshipPlance {
         // controllo engine
 
         // visita tutti le tile in profondità e dice se sono connesse bene
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+        if (x < 0 || x >= 4 || y < 0 || y >= 6 ||
                 components[x][y] == null || visited[x][y]) {
             return;
         }
 
-        visited[x][y] = true;
         ComponentTile tile = components[x][y];
-            ConnectorType[] connectors = tile.getConnectors();
-            tile.setWellConnected(true);
+        visited[x][y] = true;
 
-            //sopra destra sotto sinistra
-            int[] dirx ={0, 1, 0, -1};
-            int[] diry ={1, 0, -1, 0};
+        //sopra destra sotto sinistra
+        int[] dirx ={0, 1, 0, -1};
+        int[] diry ={1, 0, -1, 0};
+
+        // caso deafualt, nel costruttore abbiamo WellConnected a true di deafult
+        if(tile.isWellConnected()){
+            ConnectorType[] connectors = tile.getConnectors();
 
             for(int i = 0; i < 4; i++){
                 int x2 = x + dirx[i];
                 int y2 = y + diry[i];
 
                 ComponentTile tile2 = components[x2][y2];
+
+                //controllo se il connettore è un engine puntato verso una direzione diversa da sud
+                if(i!=2 && connectors[i] == ConnectorType.ENGINE)
+                    tile.setWellConnected(false);
+
                 if(tile2 !=null){
                     ConnectorType[] connectors2 = tile2.getConnectors();
-                    for(int j = 0; j < connectors.length && tile.isWellConnected(); j++){
-                        if(!checkConnection(connectors[j], connectors2[j])){
+                        // per ogni connettore confronto quello della cella adiacente opposto
+                        if( tile.isWellConnected() && (!checkConnection(connectors[i], connectors2[(i+2)%4]))){
                             tile.setWellConnected(false);
-                        }
                     }
-                    if(tile.isWellConnected()){
-
-
                         dfs(x2, y2);
-                    }
                 }
             }
+            // se entri nel ramo else vuol dire che sei nel range di un cannone o di un motore che ti ha settato a false senza visitarti oppure sei collegato
+        }else{
+            for(int i = 0; i < 4; i++){
+                int x2 = x + dirx[i];
+                int y2 = y + diry[i];
+
+                // sappiamo che questa tile non è ben connessa, ma continuamo a visitare perchè dobbiamo visitare tutte le tiles
+                ComponentTile tile2 = components[x2][y2];
+                if(tile2 !=null){
+                    dfs(x2, y2);
+                }
+            }
+        }
+
+
     }
 
     private boolean checkConnection(ConnectorType connector, ConnectorType connector2) {
 
+
+        if(connector != ConnectorType.CANNON && connector2 != ConnectorType.CANNON)
+            return true;
+
+        if(connector != ConnectorType.ENGINE && connector2 != ConnectorType.ENGINE)
+            return true;
+
         return (connector == ConnectorType.UNIVERSAL || connector2 == ConnectorType.UNIVERSAL
                 || (connector == connector2 && (connector == ConnectorType.SINGLE || connector == ConnectorType.DOUBLE)));
+
+
     }
 
 
