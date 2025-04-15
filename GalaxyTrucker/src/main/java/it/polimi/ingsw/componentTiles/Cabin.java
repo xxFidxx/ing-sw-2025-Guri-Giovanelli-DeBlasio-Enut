@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Cabin extends ComponentTile{
     private boolean isCentral;
     private LifeSupportSystem[] lifeSupportSystemColor;
-    private Figure[] figures;;
+    private Figure[] figures;
 
     public Cabin(ConnectorType[] connectors,Direction direction, LifeSupportSystem[] lifeSupportSystemColor, ArrayList<Figure> crew) {
         super(connectors);
