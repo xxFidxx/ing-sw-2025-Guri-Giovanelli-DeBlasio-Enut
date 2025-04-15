@@ -1,5 +1,7 @@
 package it.polimi.ingsw.adventureCards;
 
+import it.polimi.ingsw.adventureCards.resources.CombatZoneType;
+import it.polimi.ingsw.adventureCards.resources.Projectile;
 import it.polimi.ingsw.game.Deck;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;

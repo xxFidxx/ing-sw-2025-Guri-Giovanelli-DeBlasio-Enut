@@ -1,8 +1,6 @@
-package it.polimi.ingsw.adventureCards;
+package it.polimi.ingsw.adventureCards.resources;
 
 import it.polimi.ingsw.Bank.GoodsBlock;
-
-import java.util.List;
 
 public class Planet {
     private GoodsBlock[] goods;

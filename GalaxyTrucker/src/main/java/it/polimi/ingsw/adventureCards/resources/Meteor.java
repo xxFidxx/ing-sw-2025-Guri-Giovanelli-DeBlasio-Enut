@@ -1,4 +1,4 @@
-package it.polimi.ingsw.adventureCards;
+package it.polimi.ingsw.adventureCards.resources;
 import it.polimi.ingsw.componentTiles.Direction;
 
 public class Meteor{
