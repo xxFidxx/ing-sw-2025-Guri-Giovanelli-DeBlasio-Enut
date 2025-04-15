@@ -1,6 +1,6 @@
 package it.polimi.ingsw.componentTiles;
 
-public abstract class ComponentTile {
+public abstract class ComponentTile{
     protected ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...// ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
     private boolean isWellConnected;
 
@@ -41,5 +41,6 @@ public abstract class ComponentTile {
     public ConnectorType[] getConnectors() {
         return connectors;
     }
+
 
 }
