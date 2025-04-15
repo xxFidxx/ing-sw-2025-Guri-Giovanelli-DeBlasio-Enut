@@ -1,6 +1,6 @@
 package it.polimi.ingsw.game;
 
-import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.bank.GoodsBlock;
 import it.polimi.ingsw.componentTiles.*;
 
 import java.util.ArrayList;
@@ -298,7 +298,7 @@ public class SpaceshipPlance {
     public void takeHit(Direction direction, int position) {
         // cammini partendo dalla casella indicata verso il centro
         // appena trovi un componente lo rimuovi
-        // aggiungere prima i check per la posizione
+
         int max_lenght = 7;
         // casella da cui partire
         int x=0, y=0;

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.Bank;
+package it.polimi.ingsw.bank;
 
 public class CosmicCredit {
     private int value;

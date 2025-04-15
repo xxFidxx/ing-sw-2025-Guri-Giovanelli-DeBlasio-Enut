@@ -1,6 +1,6 @@
 package it.polimi.ingsw.componentTiles;
 
-import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.bank.GoodsBlock;
 
 public class CargoHolds extends ComponentTile{
     private GoodsBlock[] goods;

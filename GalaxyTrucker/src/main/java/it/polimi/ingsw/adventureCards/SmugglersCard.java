@@ -1,10 +1,7 @@
 package it.polimi.ingsw.adventureCards;
-import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.bank.GoodsBlock;
 import it.polimi.ingsw.game.Deck;
-import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
-
-import java.util.*;
 
 public class SmugglersCard extends EnemyCard {
     private int lossMalus;

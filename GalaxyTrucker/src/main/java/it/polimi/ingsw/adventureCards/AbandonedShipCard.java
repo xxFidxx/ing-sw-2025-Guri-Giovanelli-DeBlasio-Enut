@@ -1,10 +1,7 @@
 package it.polimi.ingsw.adventureCards;
 
-import it.polimi.ingsw.Bank.CosmicCredit;
 import it.polimi.ingsw.game.Deck;
 import it.polimi.ingsw.game.Player;
-
-import java.util.ArrayList;
 
 public class AbandonedShipCard extends AdventureCard {
     private int lostDays;

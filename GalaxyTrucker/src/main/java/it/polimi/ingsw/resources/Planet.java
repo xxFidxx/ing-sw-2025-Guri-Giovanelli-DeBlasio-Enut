@@ -1,6 +1,6 @@
-package it.polimi.ingsw.adventureCards.resources;
+package it.polimi.ingsw.resources;
 
-import it.polimi.ingsw.Bank.GoodsBlock;
+import it.polimi.ingsw.bank.GoodsBlock;
 
 public class Planet {
     private GoodsBlock[] goods;

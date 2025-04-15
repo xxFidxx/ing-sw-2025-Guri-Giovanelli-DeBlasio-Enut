@@ -3,6 +3,7 @@ package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.game.Deck;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
+import it.polimi.ingsw.resources.Projectile;
 
 import java.util.ArrayList;
 

@@ -1,12 +1,10 @@
 package it.polimi.ingsw.game;
 
-import it.polimi.ingsw.Bank.CosmicCredit;
-import it.polimi.ingsw.Bank.GoodsBlock;
-import it.polimi.ingsw.adventureCards.Planet;
+import it.polimi.ingsw.bank.GoodsBlock;
+import it.polimi.ingsw.resources.Planet;
 import it.polimi.ingsw.componentTiles.Cabin;
 import it.polimi.ingsw.componentTiles.CargoHolds;
 import it.polimi.ingsw.componentTiles.DoubleEngine;
-import it.polimi.ingsw.componentTiles.Figure;
 
 import java.util.ArrayList;
 

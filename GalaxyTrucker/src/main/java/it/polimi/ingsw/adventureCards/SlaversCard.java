@@ -20,6 +20,6 @@ public class SlaversCard extends EnemyCard  {
 
     @Override
     public void penalize(Player player) {
-        // rinuncia all'equipaggio
+        player.loseCrew(lostCrew);
     }
 }

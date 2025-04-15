@@ -2,26 +2,39 @@ package it.polimi.ingsw.componentTiles;
 
 public class ShieldGenerator extends ComponentTile {
 
-    public ShieldGenerator(ConnectorType[] connectors,Direction direction) {
+    private boolean[] protection; // ex: [false, false, true, true]
+
+    public ShieldGenerator(ConnectorType[] connectors,boolean[] protection) {
         super(connectors);
+        this.protection = protection;
     }
 
+    public void rotateClockwise() {
+        super.rotateClockwise();
+
+        boolean last = protection[3];
+
+        for (int i = 3; i > 0; i--) {
+            protection[i] = protection[i-1];
+        }
+
+        protection[0] = last;
+    }
+
+    public void rotateCounterClockwise() {
+        super.rotateCounterClockwise();
+        boolean first = protection[0];
+
+        for (int i = 0; i < 3; i++) {
+            protection[i] = protection[i+1];
+        }
+
+        protection[3] = first;
+    }
 
     // da vedere la logica cosa fa
      public boolean checkProtection(Direction direction) {
-        if(connectors[0] == ConnectorType.SHIELD && direction == Direction.NORTH) {
-            return true;
-        }
-        if(connectors[1] == ConnectorType.SHIELD && direction == Direction.EAST) {
-            return true;
-        }
-        if(connectors[2] == ConnectorType.SHIELD && direction == Direction.SOUTH) {
-            return true;
-        }
-        if(connectors[3] == ConnectorType.SHIELD && direction == Direction.WEST) {
-            return true;
-        }
-        return false;
+        return protection[direction.ordinal()];
      }
 
 

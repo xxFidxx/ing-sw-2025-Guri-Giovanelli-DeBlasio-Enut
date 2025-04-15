@@ -1,14 +1,9 @@
 package it.polimi.ingsw.game;
 
-import it.polimi.ingsw.Bank.GoodsBlock;
 import it.polimi.ingsw.adventureCards.AdventureCard;
-import it.polimi.ingsw.adventureCards.Planet;
-import it.polimi.ingsw.adventureCards.PlanetsCard;
-import it.polimi.ingsw.componentTiles.CargoHolds;
+import it.polimi.ingsw.resources.Planet;
 
 import java.util.*;
-
-import static it.polimi.ingsw.game.ColorType.RED;
 
 public class Game {
     private ArrayList<Player> players;

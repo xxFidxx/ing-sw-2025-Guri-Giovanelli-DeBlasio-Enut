@@ -1,6 +1,6 @@
 package it.polimi.ingsw.componentTiles;
 
-import it.polimi.ingsw.Bank.BatteryToken;
+import it.polimi.ingsw.bank.BatteryToken;
 
 public class PowerCenter extends ComponentTile {
     private BatteryToken[] batteries;

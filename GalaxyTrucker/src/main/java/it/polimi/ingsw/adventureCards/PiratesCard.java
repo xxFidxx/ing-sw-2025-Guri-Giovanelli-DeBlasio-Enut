@@ -1,13 +1,15 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.game.Deck;
+import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
+import it.polimi.ingsw.resources.Projectile;
 
 public class PiratesCard extends EnemyCard {
-    private CannonFire[] shots; //liste o array?
+    private Projectile[] shots; //liste o array?
     private int reward;
 
-    public PiratesCard(String name, int level, Deck deck, int cannonStrength, int lostDays, CannonFire[] shots, int reward) {
+    public PiratesCard(String name, int level, Deck deck, int cannonStrength, int lostDays, Projectile[] shots, int reward) {
         super(name, level, deck, cannonStrength, lostDays);
         this.shots = shots;
         this.reward = reward;
@@ -20,6 +22,10 @@ public class PiratesCard extends EnemyCard {
 
     @Override
     public void penalize(Player player) {
-
+        Game game = deck.getFlightPlance().getGame();
+        int position = game.throwDices();
+        for (Projectile shot : shots) {
+            shot.activate(player, position);
+        }
     }
 }

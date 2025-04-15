@@ -1,4 +1,4 @@
-package it.polimi.ingsw.adventureCards.resources;
+package it.polimi.ingsw.resources;
 import it.polimi.ingsw.componentTiles.Direction;
 
 // va eliminata?
