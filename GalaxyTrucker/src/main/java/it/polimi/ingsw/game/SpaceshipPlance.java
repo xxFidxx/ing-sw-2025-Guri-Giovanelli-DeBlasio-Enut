@@ -20,7 +20,7 @@ public class SpaceshipPlance {
     private int nAstronauts;
     private int nBrownAliens;
     private int nPurpleAliens;
-    private int countExposedConnectors;
+    private int exposedConnectors;
 
 
 
@@ -284,38 +284,33 @@ public class SpaceshipPlance {
         return cabins;
     }
 
+    public int getExposedConnectors(){
+        return exposedConnectors;
+    }
+
+
     public int checkStorage(){
         return 0;
     }
 
     public void countExposedConnectors(){
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                ComponentTile tile = components[i][j];
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 6; x++) {
+                ComponentTile tile = components[y][x];
 
                 if (tile != null) {
-                    switch (tile) {
-                        case Cannon c -> {
-                            cannons.add(c);
-                        }
 
-                        case Engine e -> {
-                            engines.add(e);
+                    int[] dirx ={0, 1, 0, -1};
+                    int[] diry ={1, 0, -1, 0};
 
-                        }
-                        case Cabin cab -> {
-                            cabins.add(cab);
-
-                        }
-                        case CargoHolds ch -> {
-                            cargoHolds.add(ch);
-                        }
-
-                        case ShieldGenerator sg -> {
-                            shieldGenerators.add(sg);
-                        }
-
-                        default -> {
+                    ConnectorType[] connectors = tile.getConnectors();
+                    for(int i = 0; i < connectors.length; i++){
+                        if(connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE){
+                            int x2 = x + dirx[i];
+                            int y2 = y + diry[i];
+                            ComponentTile tile2 = components[y][x];
+                            if(tile2 == null)
+                                exposedConnectors++;
                         }
                     }
                 }
@@ -323,10 +318,6 @@ public class SpaceshipPlance {
         }
     }
 
-
-    public boolean checkExposedConnector(int position) {
-        return false;
-    }
 
     public boolean getShieldActivation(Direction direction) {
         for (ShieldGenerator shieldGenerator : shieldGenerators) {

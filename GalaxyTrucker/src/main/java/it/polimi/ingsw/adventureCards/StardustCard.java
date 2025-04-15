@@ -24,7 +24,7 @@ public class StardustCard extends AdventureCard  {
 
         while (!playerStack.isEmpty()) {
             Player chosenPlayer = playerStack.pop();
-            int lost = chosenPlayer.getSpaceshipPlance().countExposedConnectors();
+            int lost = chosenPlayer.getSpaceshipPlance().getExposedConnectors();
 
             deck.getFlightPlance().move(- lost,chosenPlayer);
         }
