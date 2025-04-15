@@ -44,12 +44,12 @@ public class SpaceshipPlance {
         }
     }
 
-    public void updateLists(){
-        for(int i=0; i< 4; i++){
-            for(int j = 0; j< 6; j++){
+    private void updateLists() {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
                 ComponentTile tile = components[i][j];
 
-                if(tile != null && visited[i][j]){
+                if (tile != null) {
                     switch (tile) {
                         case Cannon c -> {
                             cannons.add(c);
@@ -58,10 +58,12 @@ public class SpaceshipPlance {
                         case Engine e -> {
                             engines.add(e);
 
-                        }case Cabin cab -> {
+                        }
+                        case Cabin cab -> {
                             cabins.add(cab);
 
-                        }case CargoHolds ch -> {
+                        }
+                        case CargoHolds ch -> {
                             cargoHolds.add(ch);
                         }
 
@@ -69,12 +71,30 @@ public class SpaceshipPlance {
                             shieldGenerators.add(sg);
                         }
 
-                        default ->{
+                        default -> {
                         }
                     }
-                }else
-                    components[i][j] = null;
+                }
+            }
+        }
+    }
 
+    private void removeIslands(){
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                if(!visited[i][j]){
+                    components[i][j] = null;
+                }
+            }
+        }
+    }
+
+    public void selectPart(int iteration){
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                if(shownComponents[i][j] != iteration){
+                    components[i][j] = null;
+                }
             }
         }
     }
@@ -116,6 +136,15 @@ public class SpaceshipPlance {
 
                         if(tile2 !=null){
                             ConnectorType[] connectors2 = tile2.getConnectors();
+
+                            if(i == 2 && connectors[i] == ConnectorType.ENGINE){
+                                tile.setWellConnected(false);
+                                tile2.setWellConnected(false);
+                            }
+
+
+                            if(connectors[i] == ConnectorType.CANNON)
+                                tile2.setWellConnected(false);
                             // per ogni connettore confronto quello della cella adiacente opposto, se è gia a false perchè è engine non entro
                             if(tile.isWellConnected() && (!checkConnection(connectors[i], connectors2[(i+2)%4]))){
                                 tile.setWellConnected(false);
@@ -170,7 +199,11 @@ public class SpaceshipPlance {
 
 
                 if(tile2 !=null){
-                    dfsRemove(x2, y2,iteration);
+                    ConnectorType[] connectors2 = tile2.getConnectors();
+                    if((checkConnection(connectors[i], connectors2[(i+2)%4]))){
+                        dfsRemove(x2, y2,iteration);
+                    }
+
                 }
             }
         }
