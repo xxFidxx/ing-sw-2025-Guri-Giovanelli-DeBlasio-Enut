@@ -1,6 +1,7 @@
 package it.polimi.ingsw.adventureCards.resources;
 import it.polimi.ingsw.componentTiles.Direction;
 
+// va eliminata?
 public class Meteor{
     public Meteor(Direction direction) {
 
