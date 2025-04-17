@@ -445,5 +445,23 @@ public class SpaceshipPlance {
         return nPurpleAliens;
     }
 
+    public boolean askPlaceTile(){
+        return true;
+    }
 
+    public void placeTileReserveSpot(ComponentTile tile){
+        if(reserveSpot.size() < 2)
+            reserveSpot.add(tile);
+        else
+            System.out.println("Full reserve spot");
+    }
+
+    public void placeTileComponents(ComponentTile tile, int x, int y) {
+        if(x < 0 || x >= 6 || y < 0 || y >= 4)
+            System.out.println("Out of bounds");
+        else if(components[y][x] != null){
+            System.out.println("Spot already taken");
+        }
+        components[y][x] = tile;
+    }
 }
