@@ -290,7 +290,14 @@ public class SpaceshipPlance {
     }
 
     public int checkStorage(){
-        return 0;
+        int total = 0;
+        for(CargoHolds c : cargoHolds){
+            for(GoodsBlock block : c.getGoods()){
+                if(block!=null)
+                    total++;
+            }
+        }
+        return total;
     }
 
     public int countExposedConnectors(){
@@ -463,5 +470,10 @@ public class SpaceshipPlance {
             System.out.println("Spot already taken");
         }
         components[y][x] = tile;
+    }
+
+    public void placeReserveToComponents(ComponentTile tile, int x, int y){
+        placeTileComponents(tile, x, y);
+        reserveSpot.remove(tile);
     }
 }
