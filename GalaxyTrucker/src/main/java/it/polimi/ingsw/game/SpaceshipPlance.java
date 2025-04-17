@@ -5,6 +5,8 @@ import it.polimi.ingsw.componentTiles.*;
 
 import java.util.ArrayList;
 
+import static it.polimi.ingsw.componentTiles.AlienColor.*;
+
 public class SpaceshipPlance {
     private ComponentTile[][] components;
     private ArrayList<ComponentTile> reserveSpot;
@@ -15,6 +17,10 @@ public class SpaceshipPlance {
     private boolean[][] visited;
     private int[][] shownComponents;
     private ArrayList<ShieldGenerator> shieldGenerators;
+    private int nAstronauts;
+    private int nBrownAliens;
+    private int nPurpleAliens;
+    private int exposedConnectors;
 
 
 
@@ -24,6 +30,9 @@ public class SpaceshipPlance {
         this.reserveSpot = reserveSpot;
         this.visited = new boolean[4][6];
         this.shownComponents = new int[4][6];
+        this.nAstronauts = 0;
+        this.nBrownAliens = 0;
+        this.nPurpleAliens = 0;
     }
 
     private void initVisited(){
@@ -108,13 +117,13 @@ public class SpaceshipPlance {
     private void dfsCorrectness(int x, int y){
 
         // visita tutti le tile in profondità e dice se sono connesse bene
-        if (x < 0 || x >= 4 || y < 0 || y >= 6 ||
-                components[x][y] == null || visited[x][y]) {
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+                components[y][x] == null || visited[y][x]) {
             return;
         }
 
-        ComponentTile tile = components[x][y];
-        visited[x][y] = true;
+        ComponentTile tile = components[y][x];
+        visited[y][x] = true;
 
         //sopra destra sotto sinistra
         int[] dirx ={0, 1, 0, -1};
@@ -128,7 +137,7 @@ public class SpaceshipPlance {
                 int y2 = y + diry[i];
 
                     if(connectors[i] != ConnectorType.SMOOTH){
-                        ComponentTile tile2 = components[x2][y2];
+                        ComponentTile tile2 = components[y2][x2];
 
                         //controllo se il connettore è un engine puntato verso una direzione diversa da sud
                         if(i!=2 && connectors[i] == ConnectorType.ENGINE)
@@ -159,7 +168,7 @@ public class SpaceshipPlance {
     public void remove(int x,int y){
         initShownComponents();
         initVisited();
-        components[x][y] = null;
+        components[y][x] = null;
 
         int[] dirx ={0, 1, 0, -1};
         int[] diry ={1, 0, -1, 0};
@@ -173,15 +182,15 @@ public class SpaceshipPlance {
 
     private void dfsRemove(int x, int y, int iteration){
 
-        if (x < 0 || x >= 4 || y < 0 || y >= 6 ||
-                components[x][y] == null || visited[x][y]) {
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+                components[y][x] == null || visited[y][x]) {
             return;
         }
 
-        ComponentTile tile = components[x][y];
+        ComponentTile tile = components[y][x];
         // per ogni casella mi segno se è stata visitata e  quale iterazione (quindi troncone) appartiene
-        visited[x][y] = true;
-        shownComponents[x][y] = iteration;
+        visited[y][x] = true;
+        shownComponents[y][x] = iteration;
 
         //sopra destra sotto sinistra
         int[] dirx ={0, 1, 0, -1};
@@ -195,7 +204,7 @@ public class SpaceshipPlance {
             int y2 = y + diry[i];
 
             if(connectors[i] != ConnectorType.SMOOTH){
-                ComponentTile tile2 = components[x2][y2];
+                ComponentTile tile2 = components[y2][x2];
 
 
                 if(tile2 !=null){
@@ -234,12 +243,21 @@ public class SpaceshipPlance {
     }
 
 
-    public int countAstronauts(){
-        return 0;
-    }
-
-    public int countAliens(){
-        return 0;
+    public void countFigures(){
+        for(int i = 0; i < cabins.size(); i++) {
+            Figure[] figures = cabins.get(i).getFigures();
+            for(int j = 0; j < figures.length; j++) {
+                if(figures[j] instanceof Astronaut)
+                    nAstronauts++;
+                else{
+                    Alien alien = (Alien) figures[j];
+                    if(alien.getColor() == BROWN)
+                        nBrownAliens++;
+                    else if(alien.getColor() == PURPLE)
+                        nPurpleAliens++;
+                }
+            }
+        }
     }
 
     public void loadGoodsBlocks(GoodsBlock[] goodsBlocks){
@@ -255,7 +273,6 @@ public class SpaceshipPlance {
     }
 
     public ArrayList<Engine> getEngines(){
-
         return engines;
     }
 
@@ -267,17 +284,38 @@ public class SpaceshipPlance {
         return cabins;
     }
 
+    public int getExposedConnectors(){
+        return exposedConnectors;
+    }
+
+
     public int checkStorage(){
         return 0;
     }
 
-    public int countExposedConnectors(){
-        return 0;
-    }
+    public void countExposedConnectors(){
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 6; x++) {
+                ComponentTile tile = components[y][x];
 
+                if (tile != null) {
 
-    public boolean checkExposedConnector(int position) {
-        return false;
+                    int[] dirx ={0, 1, 0, -1};
+                    int[] diry ={1, 0, -1, 0};
+
+                    ConnectorType[] connectors = tile.getConnectors();
+                    for(int i = 0; i < connectors.length; i++){
+                        if(connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE){
+                            int x2 = x + dirx[i];
+                            int y2 = y + diry[i];
+                            ComponentTile tile2 = components[y][x];
+                            if(tile2 == null)
+                                exposedConnectors++;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public boolean getShieldActivation(Direction direction) {
@@ -298,7 +336,7 @@ public class SpaceshipPlance {
     public void takeHit(Direction direction, int position) {
         // cammini partendo dalla casella indicata verso il centro
         // appena trovi un componente lo rimuovi
-
+        // aggiungere prima i check per la posizione
         int max_lenght = 7;
         // casella da cui partire
         int x=0, y=0;
@@ -343,14 +381,10 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if (hit != null) {
+        if(hit != null){
             reserveSpot.add(hit);
-            components[y][x] = null;
+            remove(x,y);
         }
-
-        // check correctness diverso da quello iniziale
-        // qua al posto che segnalare,tolgo tutto quello che non va bene
-
     }
 
     public boolean getCannonActivation(Direction direction, int position) {
@@ -368,7 +402,31 @@ public class SpaceshipPlance {
     }
 
     public ArrayList<Cabin> getConnectedCabins() {
-        // restituisce una lista di tutte le cabine che sono interconnesse ad almeno un'altra cabina
-        return cabins;
+        int n = 0;
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 6; x++) {
+                ComponentTile tile = components[y][x];
+
+                if (tile instanceof Cabin) {
+
+                    int[] dirx = {0, 1, 0, -1};
+                    int[] diry = {1, 0, -1, 0};
+
+                    ConnectorType[] connectors = tile.getConnectors();
+                    for (int i = 0; i < connectors.length; i++) {
+                        if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
+                            int x2 = x + dirx[i];
+                            int y2 = y + diry[i];
+                            ComponentTile tile2 = components[y][x];
+                            if (tile2 == null)
+                                exposedConnectors++;
+                        }
+                    }
+                }
+            }
+
+            return cabins;
+        }
+        return null;
     }
 }
