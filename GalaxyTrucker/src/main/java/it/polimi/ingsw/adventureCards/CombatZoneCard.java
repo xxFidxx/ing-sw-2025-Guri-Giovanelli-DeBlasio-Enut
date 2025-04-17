@@ -40,7 +40,7 @@ public class CombatZoneCard extends AdventureCard  {
             Player minFirePlayer =players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
             deck.getFlightPlance().move(-lostDays,minFirePlayer);
             Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
-            minEnginePlayer.looseGoods(lostOther);
+            minEnginePlayer.getSpaceshipPlance().looseGoods(lostOther);
             Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
             for( Projectile cannon : cannons ){
                 position = game.throwDices();

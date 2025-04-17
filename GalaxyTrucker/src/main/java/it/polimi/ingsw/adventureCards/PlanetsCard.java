@@ -3,6 +3,7 @@ package it.polimi.ingsw.adventureCards;
 import it.polimi.ingsw.game.Deck;
 import it.polimi.ingsw.game.Game;
 import it.polimi.ingsw.game.Player;
+import it.polimi.ingsw.resources.Planet;
 
 import java.util.*;
 
@@ -43,7 +44,7 @@ public class PlanetsCard extends AdventureCard {
             if (chosenPlanet == null) {
                 System.out.println("No planet chosen");
             }else{
-                p.cargoManagement(chosenPlanet.getReward());
+                p.getSpaceshipPlance().cargoManagement(chosenPlanet.getReward());
                 deck.getFlightPlance().move(- lostDays,p);
             }
 

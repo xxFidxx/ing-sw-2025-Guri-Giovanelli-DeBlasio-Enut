@@ -27,7 +27,7 @@ import it.polimi.ingsw.game.Player;
                 return;
             }
 
-            p.cargoManagement(reward);
+            p.getSpaceshipPlance().cargoManagement(reward);
 
         }
 

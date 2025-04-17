@@ -15,7 +15,7 @@ public class SmugglersCard extends EnemyCard {
 
     @Override
     public void reward(Player player) {
-        player.cargoManagement(reward);
+        player.getSpaceshipPlance().cargoManagement(reward);
     }
 
     @Override
