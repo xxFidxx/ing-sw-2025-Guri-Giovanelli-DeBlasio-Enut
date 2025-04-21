@@ -1,0 +1,56 @@
+package it.polimi.ingsw.controller;
+
+import it.polimi.ingsw.controller.network.EventIstance;
+import it.polimi.ingsw.controller.network.EventListenerInterface;
+import it.polimi.ingsw.controller.network.Lobby;
+import it.polimi.ingsw.model.game.Game;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+
+public class Controller implements EventListenerInterface {
+    Game game;
+    Lobby lobby;
+    // queue of messageEvents, because you don't want the client to wait the computational time
+    private final BlockingQueue<EventIstance> queue;
+
+    public Controller() {
+        this.game = null;
+        this.queue = new LinkedBlockingQueue<>();
+        this.lobby = null;
+    }
+
+    public void addGameListener(EventListenerInterface listener) {
+        game.addEventListener(listener);
+    }
+
+    public void removeGameListener(EventListenerInterface listener) {
+        game.removeEventListener(listener);
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public void onEvent(EventIstance event) {
+        queue.add(event);
+    }
+
+    public void createLobby(int numPlayers) {
+        if(lobby !=null)
+            throw new LobbyExceptions("Lobby is already set");
+
+        if (numPlayers < 2 || numPlayers > 4)
+            throw new LobbyExceptions("Number of players must be between 2 and 4");
+
+        lobby = new Lobby(numPlayers);
+    }
+
+    public void addNickname(String nickname) throws LobbyExceptions {
+        lobby.setPlayersName(nickname);
+    }
+
+
+
+}

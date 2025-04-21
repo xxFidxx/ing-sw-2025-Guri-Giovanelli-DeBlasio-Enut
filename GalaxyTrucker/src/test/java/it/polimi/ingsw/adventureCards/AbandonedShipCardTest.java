@@ -1,9 +1,11 @@
 package it.polimi.ingsw.adventureCards;
 
-import it.polimi.ingsw.game.Deck;
-import it.polimi.ingsw.game.Flightplance;
-import it.polimi.ingsw.game.Game;
-import it.polimi.ingsw.game.Player;
+import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
+import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.game.Deck;
+import it.polimi.ingsw.model.game.Flightplance;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.Player;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class AbandonedShipCardTest {
         players.add(player);
 
         // Creo un Game fittizio che ritorna sempre questo player
-        Game game = new Game(players, null, null, null) {
+        Game game = new Game(players) {
             @Override
             public Player choosePlayer(AdventureCard c) {
                 return player;
@@ -28,7 +30,7 @@ public class AbandonedShipCardTest {
         };
 
         // Creo un Flightplance con override di move()
-        Flightplance plance = new Flightplance(null, null, game) {
+        Flightplance plance = new Flightplance(2, game) {
             private int daysMoved = 0;
 
             @Override
