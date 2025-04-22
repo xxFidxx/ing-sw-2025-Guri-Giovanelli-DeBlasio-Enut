@@ -31,8 +31,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
     }
 
     private void run() throws RemoteException {
-        this.server.connect(this);
-        this.runCli();
+        server.connect(this);
+        runCli();
     }
 
     private void runCli() throws RemoteException {

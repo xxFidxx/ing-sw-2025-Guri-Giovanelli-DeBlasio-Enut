@@ -17,7 +17,7 @@ import java.util.Map;
 public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final Controller controller;
     final List<VirtualViewRmi> clients;
-    final Map<VirtualViewRmi, String> clientbynickname;
+    final Map<VirtualViewRmi, String> clientbyNickname;
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
 
@@ -25,7 +25,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         super();
         this.controller = new Controller();
         this.clients = new ArrayList<>();
-        this.clientbynickname = new HashMap<>();
+        this.clientbyNickname = new HashMap<>();
     }
 
     public static void main(String[] args) throws RemoteException {
