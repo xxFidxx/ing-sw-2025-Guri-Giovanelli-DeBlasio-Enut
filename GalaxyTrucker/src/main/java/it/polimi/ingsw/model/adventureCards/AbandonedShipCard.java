@@ -9,7 +9,7 @@ public class AbandonedShipCard extends AdventureCard {
     private int credits;
 
     public AbandonedShipCard(String name, int level, int lostDays, int lostCrew,  int credits, Deck deck) {
-        super(name, level,deck);
+        super(name, level, deck);
         this.lostDays = lostDays;
         this.lostCrew = lostCrew;
         this.credits = credits;
@@ -22,7 +22,10 @@ public class AbandonedShipCard extends AdventureCard {
             System.out.println("No player selected");
             return;
         }
-        p.setNumEquip(p.getNumEquip() - lostCrew);
+        if(checkCondition(p))
+            p.setNumEquip(p.getNumEquip() - lostCrew);
+        else
+            p.setNumEquip(0);
         p.setCredits(p.getCredits() + credits);
         deck.getFlightPlance().move(-lostDays, p);
     }
@@ -44,12 +47,7 @@ public class AbandonedShipCard extends AdventureCard {
         if(p.getNumEquip() >= lostCrew){
             return true;
         }
-
         return false;
     }
 
-    /*
-    public void manageCredits(Player p){
-        p.setCredits(p.getCredits() + credits);
-    } */
 }

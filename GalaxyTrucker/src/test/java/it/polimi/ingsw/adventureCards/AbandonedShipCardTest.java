@@ -1,58 +1,41 @@
-package it.polimi.ingsw.adventureCards;
-
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
-import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Flightplance;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
+import static org.mockito.Mockito.*;
 import org.junit.Test;
-
-import java.util.ArrayList;
-
 import static org.junit.Assert.*;
+
 
 public class AbandonedShipCardTest {
 
     @Test
-    public void test_activate() {
-        // Setup: Creo un player reale
-        Player player = new Player("Andrea", null, null, 5, 4, 0); // credits = 5, crew = 4
-        ArrayList<Player> players = new ArrayList<>();
-        players.add(player);
+    public void testActivate() {
+        // Mocks
+        Game mockGame = mock(Game.class);
+        Flightplance mockPlance = mock(Flightplance.class);
+        Deck mockDeck = mock(Deck.class);
+        Player mockPlayer = mock(Player.class);
 
-        // Creo un Game fittizio che ritorna sempre questo player
-        Game game = new Game(players) {
-            @Override
-            public Player choosePlayer(AdventureCard c) {
-                return player;
-            }
-        };
+        // Simulazioni
+        when(mockDeck.getFlightPlance()).thenReturn(mockPlance);
+        when(mockPlance.getGame()).thenReturn(mockGame);
+        when(mockGame.choosePlayer(any())).thenReturn(mockPlayer);
 
-        // Creo un Flightplance con override di move()
-        Flightplance plance = new Flightplance(2, game) {
-            private int daysMoved = 0;
+        when(mockPlayer.getNumEquip()).thenReturn(2);
+        when(mockPlayer.getCredits()).thenReturn(3);
 
-            @Override
-            public void move(int days, Player p) {
-                daysMoved = days;
-                assertEquals(-2, days); // lostDays = 2 -> -2
-                assertEquals(player, p);
-            }
-        };
-
-        // Sistemo le dipendenze tra oggetti
-        Deck deck = new Deck(new AdventureCard[0], plance);
-
-        // Creo la carta con deck, lostDays = 2, lostCrew = 1, credits = 3
-        AbandonedShipCard card = new AbandonedShipCard("Nave", 1, 2, 1, 3, deck);
+        // Creo la carta (lostDays = 2, lostCrew = 1, credits = 3)
+        AbandonedShipCard card = new AbandonedShipCard("Nave", 1, 1, 3, 4, mockDeck);
 
         // Act
         card.activate();
 
-        // Assert finali
-        assertEquals(3, player.getNumEquip());   // 4 - 1
-        assertEquals(8, player.getCredits());    // 5 + 3
+        // Verify chiamate
+        verify(mockGame).choosePlayer(card);
+        verify(mockPlayer).setNumEquip(0);     // 2 - 3 = -1 saturato a 0
+        verify(mockPlayer).setCredits(7);      // 3 + 4 = 7
+        verify(mockPlance).move(-1, mockPlayer); // lostDays = 1
     }
-
 }
