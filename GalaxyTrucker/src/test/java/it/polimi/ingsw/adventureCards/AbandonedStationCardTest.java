@@ -19,6 +19,7 @@ public class AbandonedStationCardTest {
     private Player player;
     private SpaceshipPlance spaceshipPlance;
     private GoodsBlock[] reward;
+    AbandonedStationCard card;
 
     @Before
     public void setUp() {
@@ -37,12 +38,13 @@ public class AbandonedStationCardTest {
                 new GoodsBlock(2, ColorType.YELLOW),
                 new GoodsBlock(1, ColorType.GREEN)
         };
+
+        // creo la carta con lostDays = 1 e requiredCrew = 5
+        card = new AbandonedStationCard("Abandoned Station", 1, deck, 1, 5, reward);
     }
 
     @Test
     public void testActivate_withChosenPlayer_shouldGiveRewardAndMoveBack() {
-        AbandonedStationCard card = new AbandonedStationCard("Abandoned Station", 1, deck, 1, 1, reward);
-
         card.activate();
 
         // Verifica: assegnazione ricompensa
@@ -54,8 +56,6 @@ public class AbandonedStationCardTest {
     @Test
     public void testActivate_withNullPlayer_shouldNotDoAnything() {
         when(game.choosePlayer(any(AdventureCard.class))).thenReturn(null);
-        AbandonedStationCard card = new AbandonedStationCard("Abandoned Station", 1, deck, 1, 1, reward);
-
         card.activate();
 
         verify(spaceshipPlance, never()).cargoManagement(any());
@@ -64,19 +64,15 @@ public class AbandonedStationCardTest {
 
     @Test
     public void testCheckCondition_whenPlayerHasEnoughCrew_shouldReturnTrue() {
-        AbandonedStationCard card = new AbandonedStationCard("Abandoned Station", 1, deck, 1, 3, reward);
-
-        when(player.getNumEquip()).thenReturn(3); // Uguale a requiredCrew
+        when(player.getNumEquip()).thenReturn(5); // Uguale a requiredCrew
         assertTrue(card.checkCondition(player));
 
-        when(player.getNumEquip()).thenReturn(5); // Maggiore di requiredCrew
+        when(player.getNumEquip()).thenReturn(7); // Maggiore di requiredCrew
         assertTrue(card.checkCondition(player));
     }
 
     @Test
     public void testCheckCondition_whenPlayerHasNotEnoughCrew_shouldReturnFalse() {
-        AbandonedStationCard card = new AbandonedStationCard("Abandoned Station", 1, deck, 1, 3, reward);
-
         when(player.getNumEquip()).thenReturn(2); // Minore di requiredCrew
         assertFalse(card.checkCondition(player));
     }

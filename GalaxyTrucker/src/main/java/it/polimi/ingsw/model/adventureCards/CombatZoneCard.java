@@ -14,11 +14,12 @@ public class CombatZoneCard extends AdventureCard  {
     private int lostOther;
     private Projectile[] cannons;
 
-    public CombatZoneCard(String name, int level, int lostDays, int lostOther, Projectile[] cannons, Deck deck) {
+    public CombatZoneCard(String name, int level, int lostDays, int lostOther, Projectile[] cannons, Deck deck, CombatZoneType type) {
         super(name, level, deck);
         this.lostDays = lostDays;
         this.lostOther = lostOther;
         this.cannons = cannons;
+        this.type = type;
     }
 
     public void activate() {
@@ -33,7 +34,7 @@ public class CombatZoneCard extends AdventureCard  {
             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
             for( Projectile cannon : cannons ){
                 position = game.throwDices();
-                cannon.activate(minFirePlayer,position);
+                cannon.activate(minFirePlayer, position);
             }
         }
         if(type == type.LOSTGOODS){
@@ -44,7 +45,7 @@ public class CombatZoneCard extends AdventureCard  {
             Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
             for( Projectile cannon : cannons ){
                 position = game.throwDices();
-                cannon.activate(minFirePlayer,position);
+                cannon.activate(minEquipPlayer, position);
             }
         }
 
