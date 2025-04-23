@@ -12,8 +12,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     // metodi controller:
 
-    @Override
-    void addNickname(String nickname) throws RemoteException, LobbyExceptions;
+
+    void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions;
 
     @Override
     void createLobby(int number) throws RemoteException, LobbyExceptions;

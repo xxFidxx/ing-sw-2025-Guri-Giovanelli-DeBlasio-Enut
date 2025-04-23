@@ -8,8 +8,8 @@ public interface MessageListenerSubscriber {
 
         void removeEventListener(EventListenerInterface listener);
 
-        void notifyEventListeners(EventIstance event);
+        void notifyEventListeners(Event event);
 
-        void notifyEventListener(String identifier, EventIstance event);
+        void notifyEventListener(String identifier, Event event);
     }
 }

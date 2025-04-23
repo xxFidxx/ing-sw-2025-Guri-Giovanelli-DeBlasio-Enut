@@ -1,6 +1,6 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.controller.network.EventIstance;
+import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.model.game.Game;
@@ -13,7 +13,7 @@ public class Controller implements EventListenerInterface {
     Game game;
     Lobby lobby;
     // queue of messageEvents, because you don't want the client to wait the computational time
-    private final BlockingQueue<EventIstance> queue;
+    private final BlockingQueue<Event> queue;
 
     public Controller() {
         this.game = null;
@@ -33,7 +33,7 @@ public class Controller implements EventListenerInterface {
         this.game = game;
     }
 
-    public void onEvent(EventIstance event) {
+    public void onEvent(Event event) {
         queue.add(event);
     }
 
@@ -48,6 +48,9 @@ public class Controller implements EventListenerInterface {
     }
 
     public void addNickname(String nickname) throws LobbyExceptions {
+        if(lobby == null)
+            throw new LobbyExceptions("Not existing lobby");
+
         lobby.setPlayersName(nickname);
     }
 

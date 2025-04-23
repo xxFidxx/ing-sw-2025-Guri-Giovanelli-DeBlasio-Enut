@@ -1,7 +1,9 @@
 package it.polimi.ingsw.Rmi;
 
+import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
+import it.polimi.ingsw.controller.network.Event;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -17,9 +19,13 @@ import java.util.Map;
 public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final Controller controller;
     final List<VirtualViewRmi> clients;
-    final Map<VirtualViewRmi, String> clientbyNickname;
+    final Map<String,VirtualViewRmi> clientbyNickname;
+    GameState currentGameState = GameState.IDLE;
+
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
+    // bisogna gestire bene cosa succede in caso di disconnessione durante le chiamate ai metodi
+
 
     ServerRmi() throws RemoteException {
         super();
@@ -49,24 +55,47 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
 
-    public void addNickname(String Nickname) throws RemoteException, LobbyExceptions {
-        synchronized(controller) {
+    public void addNickname(VirtualViewRmi client, String Nickname) throws RemoteException, LobbyExceptions {
+        synchronized(controller){
             controller.addNickname(Nickname);
-            notifyAllClients();
+            // se il nome è gia presente, verrà lanciata exception e quindi non avverrà mai l'associazione client-nick
+            synchronized (clientbyNickname) {
+                clientbyNickname.put(Nickname, client);
+            }
         }
     }
 
     public void createLobby(int number) throws RemoteException, LobbyExceptions {
-        controller.createLobby(number);
+        synchronized(controller){
+            controller.createLobby(number);
+        }
+        currentGameState = GameState.LOBBY_PHASE;
     }
 
-    public void notifyAllClients() {
+    public void removeClient(VirtualViewRmi client){
+        synchronized(clients){
+            clients.remove(client);
+        }
+        synchronized (clientbyNickname){
+            clientbyNickname.values().removeIf(v -> v.equals(client));
+        }
+    }
+
+    public void notifyClient(VirtualViewRmi client,Event event){
+                try {
+                    client.showUpdate(event);
+                } catch (RemoteException e) {
+                    System.out.println("This error occurred: " + e);
+                }
+        }
+
+    public void notifyAllClients(Event event){
         synchronized (clients){
             for (VirtualViewRmi client : clients) {
                 try {
-                    client.showUpdate(11);
+                    client.showUpdate(event);
                 } catch (RemoteException e) {
-                    System.out.println("This error occured: " + e);
+                    System.out.println("This error occurred: " + e);
                 }
             }
         }
