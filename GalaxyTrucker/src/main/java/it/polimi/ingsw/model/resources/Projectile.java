@@ -8,6 +8,7 @@ public abstract class Projectile {
     protected Game game;
 
     public Projectile(Game game, Direction direction) {
+        this.game = game;
         this.direction = direction;
     }
 
