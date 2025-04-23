@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class OpenSpaceCard extends AdventureCard {
 
@@ -14,12 +16,14 @@ public class OpenSpaceCard extends AdventureCard {
     @Override
     public void activate() {
         ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
-        /* risistemarlo usando ArrayList al posto di un array normale
-        Arrays.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = players.length -1; i >= 0; i--) {
-            int power = players[i].getEngineStrenght();
-            deck.getFlightPlance().move(power, players[i]);
-        } */
+
+        players.sort(Comparator.comparingInt(p -> p.getPlaceholder().getPosizione()));
+        Collections.reverse(players);
+
+        for (Player player : players) {
+            int power = player.getEngineStrenght();
+            deck.getFlightPlance().move(power, player);
+        }
     }
 
 }
