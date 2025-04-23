@@ -22,10 +22,7 @@ public class AbandonedShipCard extends AdventureCard {
             System.out.println("No player selected");
             return;
         }
-        if(checkCondition(p))
-            p.setNumEquip(p.getNumEquip() - lostCrew);
-        else
-            p.setNumEquip(0);
+        p.setNumEquip(p.getNumEquip() - lostCrew);
         p.setCredits(p.getCredits() + credits);
         deck.getFlightPlance().move(-lostDays, p);
     }

@@ -20,21 +20,13 @@ import it.polimi.ingsw.model.game.Player;
         @Override
         public void activate() {
             Player p = deck.getFlightPlance().getGame().choosePlayer(this);
-
-
             if (p == null) {
                 System.out.println("No player selected");
                 return;
             }
-
             p.getSpaceshipPlance().cargoManagement(reward);
-
+            deck.getFlightPlance().move(-lostDays, p);
         }
-
-        private void reward(Player p){
-            // p.loadGoods()
-        }
-
 
         public int getRequiredCrew() {
             return requiredCrew;
@@ -44,11 +36,10 @@ import it.polimi.ingsw.model.game.Player;
             return reward;
         }
 
-        public boolean checkCondtition(Player p){
+        public boolean checkCondition(Player p){
             if(p.getNumEquip() >= requiredCrew){
                 return true;
             }
-
             return false;
         }
 
