@@ -2,36 +2,27 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import it.polimi.ingsw.model.game.Deck;
+import it.polimi.ingsw.model.game.Game;
 
 import java.io.FileReader;
-import java.io.Reader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
-
 public class AdventureCardFactory {
 
-    public static AdventureCard createCardFromJson(String filePath) {
-        try {
-            Gson gson = new Gson();
-            Reader reader = new FileReader(filePath);
+    public static List<AdventureCard> loadCards(String filePath, Deck deck, Game game) throws IOException {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(AdventureCard.class, new AdventureCardDeserializer(game, deck))
+                .create();
 
-            Type listType = new TypeToken<List<AdventureCard>>() {}.getType();
-            List<AdventureCard> cards = gson.fromJson(reader, listType);
-
-            for (AdventureCard card : cards) {
-                System.out.println(card);
-            }
-
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        try (FileReader reader = new FileReader(filePath)) {
+            Type cardListType = new TypeToken<List<AdventureCard>>(){}.getType();
+            return gson.fromJson(reader, cardListType);
         }
-
-        return null;
     }
 }
-
 
