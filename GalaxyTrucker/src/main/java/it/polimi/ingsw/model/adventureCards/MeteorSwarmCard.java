@@ -14,11 +14,8 @@ public class MeteorSwarmCard extends AdventureCard {
         super(name, level, deck);
         this.meteors = meteors;
     }
-    /**
-     *
-     * */
-    public void activate() {
 
+    public void activate() {
         for (Projectile meteor : meteors) {
             Game game = deck.getFlightPlance().getGame();
             int position = game.throwDices();

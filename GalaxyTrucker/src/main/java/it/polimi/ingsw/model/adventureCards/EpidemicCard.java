@@ -8,11 +8,9 @@ import it.polimi.ingsw.model.game.Player;
 import java.util.ArrayList;
 
 public class EpidemicCard extends AdventureCard  {
-    private int lostCrew;
 
-    public EpidemicCard(String name, int level, Deck deck, int lostCrew){
+    public EpidemicCard(String name, int level, Deck deck){
         super(name, level, deck);
-        this.lostCrew = lostCrew;
     }
 
     @Override
@@ -27,7 +25,4 @@ public class EpidemicCard extends AdventureCard  {
         }
     }
 
-    public int getLostCrew(){
-        return lostCrew;
-    }
 }

@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.Projectile;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard> {
@@ -80,7 +81,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
             }
             case "EpidemicCard": {
                 int lostCrew = obj.get("lostCrew").getAsInt();
-                return new EpidemicCard(name, level, deck, lostCrew);
+                return new EpidemicCard(name, level, deck);
             }
             case "MeteorSwarmCard": {
                 JsonArray mets = obj.get("meteors").getAsJsonArray();
@@ -107,14 +108,15 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
             case "PlanetsCard": {
                 int lostDays3 = obj.get("lostDays").getAsInt();
                 JsonArray pls  = obj.get("planets").getAsJsonArray();
-                Planet[] planets = new Planet[pls.size()];
+                ArrayList<Planet> planets = new ArrayList<>();
                 for (int i = 0; i < pls.size(); i++) {
                     JsonArray goodsArr = pls.get(i).getAsJsonObject().get("goods").getAsJsonArray();
                     GoodsBlock[] goods = new GoodsBlock[goodsArr.size()];
                     for (int j = 0; j < goodsArr.size(); j++) {
                         goods[j] = instantiateGoodsBlock(goodsArr.get(j).getAsJsonObject());
                     }
-                    planets[i] = new Planet(goods, false);
+                    Planet planet = new Planet(goods, false);
+                    planets.add(planet);
                 }
                 return new PlanetsCard(name, level, planets, lostDays3, deck);
             }
