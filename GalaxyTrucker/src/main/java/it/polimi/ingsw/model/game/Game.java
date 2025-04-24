@@ -12,6 +12,7 @@ public class Game {
     private Dice[] dices;
     private Flightplance plance;
     private List<EventListener> listeners = new ArrayList<>();
+    private ArrayList<String> assemblingTiles;
 
     public Game(ArrayList<String> playersName) {
         this.players = new ArrayList<>();
@@ -24,6 +25,7 @@ public class Game {
         dices[1] = new Dice();
         // gli spots dipenderanno da cosa ha deciso il player che ha creato la lobby
         this.plance = new Flightplance(playersName.size(),this);
+        this.assemblingTiles = new ArrayList<>(List.of("Tile1", "Tile2", "Tile3", "Tile4", "Tile5"));
     }
 
     public void Startgame() {
@@ -31,6 +33,10 @@ public class Game {
 
     public ArrayList<Player>  getPlayers() {
         return players;
+    }
+
+    public ArrayList<String> getAssemblingTiles() {
+        return assemblingTiles;
     }
 
     public Dice[] getDice() {

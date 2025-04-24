@@ -4,6 +4,10 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
+import it.polimi.ingsw.controller.network.data.LobbyNicks;
+import it.polimi.ingsw.controller.network.data.PickableTiles;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.game.Game;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -21,6 +25,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final List<VirtualViewRmi> clients;
     final Map<String,VirtualViewRmi> clientbyNickname;
     GameState currentGameState = GameState.IDLE;
+    private volatile boolean isLobbyCreated = false;
+    final private Object isLobbyCreatedLock;
 
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
@@ -29,9 +35,11 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     ServerRmi() throws RemoteException {
         super();
+        this.isLobbyCreatedLock = new Object();
         this.controller = new Controller();
         this.clients = new ArrayList<>();
         this.clientbyNickname = new HashMap<>();
+        this.isLobbyCreated = false;
     }
 
     public static void main(String[] args) throws RemoteException {
@@ -52,52 +60,86 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
             clients.add(client);
         }
         System.out.println("Client connected");
+
+        synchronized (isLobbyCreatedLock) {
+            if(isLobbyCreated){
+                notifyClient(client,new Event(this, GameState.LOBBY_PHASE, null));
+            }
+        }
+
     }
 
 
     public void addNickname(VirtualViewRmi client, String Nickname) throws RemoteException, LobbyExceptions {
+        ArrayList<String> nicks;
+        boolean isLobbyFull;
         synchronized(controller){
-            controller.addNickname(Nickname);
-            // se il nome è gia presente, verrà lanciata exception e quindi non avverrà mai l'associazione client-nick
-            synchronized (clientbyNickname) {
-                clientbyNickname.put(Nickname, client);
-            }
+            nicks = controller.addNickname(Nickname);
+            isLobbyFull =controller.isLobbyFull();
         }
+        System.out.println("Nickname added\n");
+        clientbyNickname.put(Nickname, client);
+
+        notifyClient(client,new Event(this, GameState.WAIT_LOBBY, new LobbyNicks(nicks)));
+        if(isLobbyFull)
+            game_init(nicks);
     }
 
-    public void createLobby(int number) throws RemoteException, LobbyExceptions {
+    public void createLobby(VirtualViewRmi client,int number) throws RemoteException, LobbyExceptions {
         synchronized(controller){
             controller.createLobby(number);
         }
+
+        System.out.println("Lobby created\n");
+
+        synchronized (isLobbyCreatedLock) {
+            isLobbyCreated = true;
+        }
+
+        // if lobby is already created, it throws exception to the caller and doesn't update anything
         currentGameState = GameState.LOBBY_PHASE;
+        notifyClient(client,new Event(this, GameState.WAIT_LOBBY, null));
     }
 
+
+    // ancora da sincronizzare con la lobby che deve rimuovere pure dal suo
     public void removeClient(VirtualViewRmi client){
         synchronized(clients){
             clients.remove(client);
+            synchronized(controller){}
         }
         synchronized (clientbyNickname){
             clientbyNickname.values().removeIf(v -> v.equals(client));
         }
     }
 
-    public void notifyClient(VirtualViewRmi client,Event event){
-                try {
-                    client.showUpdate(event);
-                } catch (RemoteException e) {
-                    System.out.println("This error occurred: " + e);
-                }
+    private void notifyClient(VirtualViewRmi client, Event event) {
+        try {
+            client.showUpdate(event);
+        } catch (RemoteException e) {
+            System.out.println("Client disconnected: " + e);
+            removeClient(client);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Thread Interrupt");
+        }
+    }
+
+    private void notifyAllClients(Event event) {
+        List<VirtualViewRmi> clientsCopy;
+        synchronized (clients) {
+            clientsCopy = new ArrayList<>(clients);
         }
 
-    public void notifyAllClients(Event event){
-        synchronized (clients){
-            for (VirtualViewRmi client : clients) {
-                try {
-                    client.showUpdate(event);
-                } catch (RemoteException e) {
-                    System.out.println("This error occurred: " + e);
-                }
-            }
+        for (VirtualViewRmi client : clientsCopy) {
+            notifyClient(client, event);
         }
+    }
+
+    public void game_init(ArrayList<String> nicks) throws RemoteException{
+        currentGameState = GameState.ASSEMBLY;
+        controller.setGame(new Game(nicks));
+        ArrayList<String> assemblingTiles = controller.getGame().getAssemblingTiles();
+        notifyAllClients(new Event(this, GameState.ASSEMBLY, new PickableTiles(assemblingTiles)));
     }
 }

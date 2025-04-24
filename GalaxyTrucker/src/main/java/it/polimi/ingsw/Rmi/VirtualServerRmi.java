@@ -16,5 +16,5 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions;
 
     @Override
-    void createLobby(int number) throws RemoteException, LobbyExceptions;
+    void createLobby(VirtualViewRmi client,int number) throws RemoteException, LobbyExceptions;
 }
