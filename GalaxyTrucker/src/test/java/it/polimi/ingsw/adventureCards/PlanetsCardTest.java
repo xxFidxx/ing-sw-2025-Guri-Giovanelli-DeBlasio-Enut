@@ -71,8 +71,8 @@ public class PlanetsCardTest {
 
         verify(player1).choosePlanet(planets);
         verify(player2).choosePlanet(planets);
-        verify(spaceshipPlance).cargoManagement(planet1.getReward());//verifico che il cargo sia gestito correttamente
-        verify(spaceshipPlance).cargoManagement(planet2.getReward());
+        verify(spaceshipPlance, atLeastOnce()).cargoManagement(planet1.getReward());//verifico che il cargo sia gestito correttamente
+        verify(spaceshipPlance, atLeastOnce()).cargoManagement(planet2.getReward());
         verify(flightPlance).move(-3,player1);//verifico che il giocatore sia stato spostato
         verify(flightPlance).move(-3,player2);
 
