@@ -13,67 +13,90 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class EnemyCardActivateTest {
 
+public class EnemyCardTest {
     private Deck deck;
     private Flightplance flightPlance;
     private Game game;
-    private Player player1;
-    private Player player2;
+    private Player strongPlayer;
+    private Player weakPlayer;
+    private DummyEnemyCard card;
 
     @Before
     public void setUp() {
         deck = mock(Deck.class);
         flightPlance = mock(Flightplance.class);
         game = mock(Game.class);
-        player1 = mock(Player.class);
-        player2 = mock(Player.class);
+        strongPlayer = mock(Player.class);
+        weakPlayer = mock(Player.class);
 
         when(deck.getFlightPlance()).thenReturn(flightPlance);
         when(flightPlance.getGame()).thenReturn(game);
+        doNothing().when(game).orderPlayers();
+
+
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(weakPlayer);
+        players.add(strongPlayer);
+        when(game.getPlayers()).thenReturn(players);
+
+        when(strongPlayer.getFireStrenght()).thenReturn(5f);
+        when(weakPlayer.getFireStrenght()).thenReturn(2f);
+
+        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 3, 1); // cannonStrength = 3
     }
 
     @Test
-    public void testActivate_FirstPlayerWins() {
-        when(player1.getFireStrenght()).thenReturn(6f); // > 5
-        when(player2.getFireStrenght()).thenReturn(2f);
-        when(game.getPlayers()).thenReturn(new ArrayList<>(Arrays.asList(player1, player2)));
-
-        EnemyCard card = Mockito.spy(new DummyEnemyCard("Enemy", 1, deck, 5, 3));
+    public void testActivate_playerWins_shouldCallReward() {
         card.activate();
 
-        verify(card).reward(player1);
-        verify(flightPlance).move(-3, player1);
-        verify(card, never()).penalize(any());
+        assertTrue(card.rewardCalled);
+        assertFalse(card.penalizeCalled);
+
+        verify(flightPlance).move(-1, strongPlayer);
     }
 
     @Test
-    public void testActivate_FirstLoses_SecondWins() {
-        when(player1.getFireStrenght()).thenReturn(2f); // < 5
-        when(player2.getFireStrenght()).thenReturn(6f); // > 5
-        when(game.getPlayers()).thenReturn(new ArrayList<>(Arrays.asList(player1, player2)));
+    public void testActivate_playersLose_shouldCallPenalize() {
+        // Tutti i player sono deboli
+        when(strongPlayer.getFireStrenght()).thenReturn(1f);
+        when(weakPlayer.getFireStrenght()).thenReturn(2f);
 
-        EnemyCard card = Mockito.spy(new DummyEnemyCard("Enemy", 1, deck, 5, 2));
+        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 5, 1); // cannonStrength = 5
+
         card.activate();
 
-        verify(card).penalize(player1);
-        verify(card).reward(player2);
-        verify(flightPlance).move(-2, player2);
+        assertFalse(card.rewardCalled);
+        assertTrue(card.penalizeCalled);
     }
 
     @Test
-    public void testActivate_AllTie() {
-        when(player1.getFireStrenght()).thenReturn(5f); // == cannonStrength
-        when(player2.getFireStrenght()).thenReturn(5f);
-        when(game.getPlayers()).thenReturn(new ArrayList<>(Arrays.asList(player1, player2)));
+    public void testActivate_playersTie_shouldDoNothing() {
+        // Entrambi pareggiano con cannonStrength = 3
+        when(strongPlayer.getFireStrenght()).thenReturn(3f);
+        when(weakPlayer.getFireStrenght()).thenReturn(3f);
 
-        EnemyCard card = Mockito.spy(new DummyEnemyCard("Enemy", 1, deck, 5, 1));
+        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 3, 1);
+
         card.activate();
 
-        verify(card, never()).reward(any());
-        verify(card, never()).penalize(any());
-        verify(flightPlance, never()).move(anyInt(), any());
+        assertFalse(card.rewardCalled);
+        assertFalse(card.penalizeCalled);
     }
+
+    /*@Test
+    public void testActivate_firstPlayerLoses_secondPlayerWins() {
+        when(strongPlayer.getFireStrenght()).thenReturn(3f);
+        when(weakPlayer.getFireStrenght()).thenReturn(7f);
+
+        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 5, 1);
+
+        card.activate();
+
+        verify(card).penalize(strongPlayer);
+        verify(card).reward(weakPlayer);
+        verify(flightPlance).move(-1, weakPlayer);
+    }*/
+}

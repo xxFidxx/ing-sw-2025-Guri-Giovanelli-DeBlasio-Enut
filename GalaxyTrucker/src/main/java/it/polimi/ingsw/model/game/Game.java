@@ -88,6 +88,9 @@ public class Game {
         return null;
     }
 
+    public void orderPlayers(){
+        Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+    }
 
     public void addEventListener(EventListenerInterface listener){
         listeners.add(listener);

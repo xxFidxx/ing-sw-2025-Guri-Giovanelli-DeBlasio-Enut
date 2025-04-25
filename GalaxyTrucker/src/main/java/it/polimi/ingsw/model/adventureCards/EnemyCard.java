@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Stack;
 
 public abstract class EnemyCard extends AdventureCard {
@@ -37,6 +39,7 @@ public abstract class EnemyCard extends AdventureCard {
 
     @Override
     public void activate() {
+        deck.getFlightPlance().getGame().orderPlayers();
         ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
         Stack<Player> playerStack = new Stack<>();
 
