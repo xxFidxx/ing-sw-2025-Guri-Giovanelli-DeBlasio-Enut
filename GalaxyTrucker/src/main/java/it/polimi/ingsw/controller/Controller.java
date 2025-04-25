@@ -55,14 +55,15 @@ public class Controller implements EventListenerInterface {
     public ArrayList<String> addNickname(String nickname) throws LobbyExceptions {
         if(lobby == null)
             throw new LobbyExceptions("Not existing lobby");
-
         lobby.setPlayersName(nickname);
-
         return lobby.getPlayersName();
     }
 
     public boolean isLobbyFull(){
         return lobby.isFull();
+    }
+
+    public void pickTile(){
     }
 
 

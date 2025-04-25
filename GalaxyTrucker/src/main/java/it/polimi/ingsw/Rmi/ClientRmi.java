@@ -46,20 +46,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
     private void run() throws RemoteException {
         server.connect(this);
         Thread eventThread = new Thread(this::handleEvents);
-        eventThread.setDaemon(true);
         eventThread.start();
         runCli();
     }
 
     private void runCli() throws RemoteException {
         while (true) {
-            synchronized (StateLock){
-                handleState();
-                System.out.print("\n> ");
-            }
-
             if (scan.hasNextLine()) {
-                String input = scan.nextLine().trim();
+                String input = scan.nextLine().trim(); // trim to remove white spaces around the string
                 synchronized (StateLock) {
                     handleInput(input);
                 }
@@ -97,10 +91,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
             }
 
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
+            case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> {
                 int tileIndex = Integer.parseInt(input);
             }
         }
+        System.out.print("\n> ");
     }
 
     private void handleState() throws RemoteException {
@@ -109,8 +105,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
             case IDLE -> System.out.print("Type 0 to create a lobby");
             case LOBBY_PHASE -> System.out.print("Type 1 to join the lobby");
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
+            case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> System.out.print("List of available tiles: ");
         }
+        System.out.print("\n> ");
     }
 
     @Override
@@ -128,7 +126,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
                         handleState();
                     }
                 showData(event.getData());
-                System.out.print("\n> ");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("\n> Event thread interrupted");
@@ -143,8 +140,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
         if(data == null)
             return;
         switch(data){
-            case PickableTiles p -> printPickableTiles(p.getTiles());
-            case LobbyNicks n ->  printLobbyNicks(n.getNicks());
+            case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
+            case PickableTiles pt -> printPickableTiles(pt.getTiles());
             default -> {}
         }
     }

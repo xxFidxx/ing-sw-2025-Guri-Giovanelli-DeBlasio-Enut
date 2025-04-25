@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.resources.Planet;
 
 import java.util.*;
@@ -12,7 +13,7 @@ public class Game {
     private Dice[] dices;
     private Flightplance plance;
     private List<EventListener> listeners = new ArrayList<>();
-    private ArrayList<String> assemblingTiles;
+    private ArrayList<ComponentTile> assemblingTiles;
 
     public Game(ArrayList<String> playersName) {
         this.players = new ArrayList<>();
@@ -23,9 +24,9 @@ public class Game {
         this.dices = new Dice[2];
         dices[0] = new Dice();
         dices[1] = new Dice();
-        // gli spots dipenderanno da cosa ha deciso il player che ha creato la lobby
+        // gli spots dipenderanno dalla lobby size
         this.plance = new Flightplance(playersName.size(),this);
-        this.assemblingTiles = new ArrayList<>(List.of("Tile1", "Tile2", "Tile3", "Tile4", "Tile5"));
+        this.assemblingTiles = new ArrayList<>(List.of(new ComponentTile(), "Tile2", "Tile3", "Tile4", "Tile5"));
     }
 
     public void Startgame() {
@@ -104,6 +105,10 @@ public class Game {
 
     public void removeEventListener(EventListenerInterface listener){
         listeners.remove(listener);
+    }
+
+    public ComponentTile pickTile(){
+
     }
 }
 

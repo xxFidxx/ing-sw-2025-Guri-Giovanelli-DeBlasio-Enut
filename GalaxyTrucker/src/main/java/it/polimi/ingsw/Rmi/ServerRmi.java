@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.LobbyNicks;
 import it.polimi.ingsw.controller.network.data.PickableTiles;
+import it.polimi.ingsw.controller.network.data.Tile;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.game.Game;
 
@@ -31,6 +32,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
     // bisogna gestire bene cosa succede in caso di disconnessione durante le chiamate ai metodi
+    // si può fare un eventcrafter invece di crare a mano gli eventi ogni volta che li mandi
 
 
     ServerRmi() throws RemoteException {
@@ -62,9 +64,10 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         System.out.println("Client connected");
 
         synchronized (isLobbyCreatedLock) {
-            if(isLobbyCreated){
+            if(isLobbyCreated)
                 notifyClient(client,new Event(this, GameState.LOBBY_PHASE, null));
-            }
+            else
+                notifyClient(client,new Event(this, GameState.IDLE, null)); // vuol dire che sei tu che devi creare la lobby
         }
 
     }
@@ -75,7 +78,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         boolean isLobbyFull;
         synchronized(controller){
             nicks = controller.addNickname(Nickname);
-            isLobbyFull =controller.isLobbyFull();
+            isLobbyFull=controller.isLobbyFull();
         }
         System.out.println("Nickname added\n");
         clientbyNickname.put(Nickname, client);
@@ -89,7 +92,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         synchronized(controller){
             controller.createLobby(number);
         }
-
         System.out.println("Lobby created\n");
 
         synchronized (isLobbyCreatedLock) {
@@ -137,9 +139,13 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     public void game_init(ArrayList<String> nicks) throws RemoteException{
+        notifyAllClients(new Event(this, GameState.GAME_INIT,null));
         currentGameState = GameState.ASSEMBLY;
         controller.setGame(new Game(nicks));
         ArrayList<String> assemblingTiles = controller.getGame().getAssemblingTiles();
         notifyAllClients(new Event(this, GameState.ASSEMBLY, new PickableTiles(assemblingTiles)));
+    }
+
+    public void pickTile(VirtualViewRmi client, int index) throws RemoteException {
     }
 }
