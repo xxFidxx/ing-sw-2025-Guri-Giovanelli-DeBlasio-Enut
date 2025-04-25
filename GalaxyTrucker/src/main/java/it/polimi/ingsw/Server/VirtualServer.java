@@ -10,5 +10,5 @@ import it.polimi.ingsw.Rmi.VirtualViewRmi;
 public interface VirtualServer {
     void addNickname(VirtualViewRmi client,String Nickname)  throws Exception;
 
-    void createLobby(int number) throws Exception;
+    void createLobby(VirtualViewRmi client, int number) throws Exception;
 }

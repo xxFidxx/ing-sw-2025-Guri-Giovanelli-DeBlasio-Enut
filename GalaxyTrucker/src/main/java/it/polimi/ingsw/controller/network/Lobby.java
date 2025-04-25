@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class Lobby {
     private ArrayList<String> playersName;
     private  int numPlayers;
+    private boolean isFull;
 
     public Lobby(int numPlayers) {
         this.playersName = new ArrayList<>();
@@ -25,6 +26,15 @@ public class Lobby {
         if (playersName.size() >= numPlayers) {
             throw new LobbyExceptions("Numero massimo di giocatori raggiunto");
         }
+
         playersName.add(name);
+
+        if(playersName.size() == numPlayers) {
+            isFull = true;
+        }
+    }
+
+    public boolean isFull() {
+        return isFull;
     }
 }

@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.model.game.Game;
 
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -33,6 +34,10 @@ public class Controller implements EventListenerInterface {
         this.game = game;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public void onEvent(Event event) {
         queue.add(event);
     }
@@ -47,13 +52,18 @@ public class Controller implements EventListenerInterface {
         lobby = new Lobby(numPlayers);
     }
 
-    public void addNickname(String nickname) throws LobbyExceptions {
+    public ArrayList<String> addNickname(String nickname) throws LobbyExceptions {
         if(lobby == null)
             throw new LobbyExceptions("Not existing lobby");
 
         lobby.setPlayersName(nickname);
+
+        return lobby.getPlayersName();
     }
 
+    public boolean isLobbyFull(){
+        return lobby.isFull();
+    }
 
 
 }

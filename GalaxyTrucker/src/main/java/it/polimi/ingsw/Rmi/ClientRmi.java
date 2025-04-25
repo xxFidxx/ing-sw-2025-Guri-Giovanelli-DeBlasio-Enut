@@ -4,6 +4,7 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.DataContainer;
+import it.polimi.ingsw.controller.network.data.LobbyNicks;
 import it.polimi.ingsw.controller.network.data.PickableTiles;
 
 import java.rmi.NotBoundException;
@@ -16,15 +17,18 @@ import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
-    final VirtualServerRmi server;
-    GameState currentState;
+    private final VirtualServerRmi server;
+    private volatile GameState currentState;
     private final LinkedBlockingQueue<Event> eventQueue;
     private final Scanner scan = new Scanner(System.in);
+    private final Object StateLock = new Object();
+
 
     public ClientRmi(VirtualServerRmi server) throws RemoteException{
         super();
         this.server = server;
         eventQueue = new LinkedBlockingQueue<>();
+        currentState = GameState.IDLE;
     }
 
     public static void main(String[] args) throws RemoteException, NotBoundException {
@@ -41,16 +45,24 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
 
     private void run() throws RemoteException {
         server.connect(this);
-        new Thread(this::handleEvents).start();
+        Thread eventThread = new Thread(this::handleEvents);
+        eventThread.setDaemon(true);
+        eventThread.start();
         runCli();
     }
 
     private void runCli() throws RemoteException {
-        while(true) {
-            System.out.print("\n> ");
-            if(scan.hasNextLine()){
+        while (true) {
+            synchronized (StateLock){
+                handleState();
+                System.out.print("\n> ");
+            }
+
+            if (scan.hasNextLine()) {
                 String input = scan.nextLine().trim();
-                handleInput(input);
+                synchronized (StateLock) {
+                    handleInput(input);
+                }
             }
         }
     }
@@ -58,22 +70,46 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
     // sono da capire dove gestire gli errori di parsing in input
     private void handleInput(String input) throws RemoteException {
         switch(currentState){
-            case LOBBY_PHASE ->{
-                System.out.print("Type 0 to create a lobby or type 1 to join the lobby");
+            case IDLE ->{
                 if (input.equals("0")) {
                     System.out.print("Enter lobby size [2-4]: ");
                     int size = Integer.parseInt(scan.nextLine());
-                    server.createLobby(size);
-                }else if (input.equals("1")) {
+                    try{
+                        server.createLobby(this,size);
+                    }catch (Exception e){
+                        System.out.print("Lobby already exists, join it:\n");
+                    }
                     System.out.print("Enter nickname: ");
-                    String name = scan.nextLine();
-                    server.addNickname(this, name);
+                    String nickname = scan.nextLine();
+                    server.addNickname(this, nickname);
+                }else{
+                    System.out.print("Not accepted input, please follow the instructions below:\n");
                 }
             }
+            case LOBBY_PHASE ->{
+                    if (input.equals("1")){
+                        System.out.print("Enter nickname: ");
+                        String nickname = scan.nextLine();
+                        server.addNickname(this, nickname);
+                    }else{
+                        System.out.print("Not accepted input, please follow the instructions below:\n");
+                    }
+            }
+
+            case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case ASSEMBLY -> {
-                System.out.print("Enter the index of the tile you want to place: ");
                 int tileIndex = Integer.parseInt(input);
             }
+        }
+    }
+
+    private void handleState() throws RemoteException {
+        System.out.print("\n");
+        switch(currentState){
+            case IDLE -> System.out.print("Type 0 to create a lobby");
+            case LOBBY_PHASE -> System.out.print("Type 1 to join the lobby");
+            case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
+            case ASSEMBLY -> System.out.print("List of available tiles: ");
         }
     }
 
@@ -82,31 +118,51 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
         eventQueue.put(event);
     }
 
-    private void handleEvents() {
-        while(true){
+    private void handleEvents(){
+        while (true) {
             try {
                 Event event = eventQueue.take();
-                currentState = event.getState();
+                    synchronized (StateLock) {
+                        currentState = event.getState();
+                        System.out.println("\n--- Game State Updated ---");
+                        handleState();
+                    }
                 showData(event.getData());
                 System.out.print("\n> ");
-            }catch(InterruptedException e){
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println("\n> Event thread interrupted");
                 return;
+            } catch (RemoteException e) {
+                System.out.println("\n> You have been disconnected");
             }
         }
     }
 
     public void showData(DataContainer data){
+        if(data == null)
+            return;
         switch(data){
             case PickableTiles p -> printPickableTiles(p.getTiles());
+            case LobbyNicks n ->  printLobbyNicks(n.getNicks());
             default -> {}
         }
     }
 
 
     public void printPickableTiles(ArrayList<String> tiles){
-        System.out.println("\n List of tiles:\n");
+        System.out.println("\n");
         for (int i= 0; i<tiles.size(); i++) {
-            System.out.println(i + ": [" + tiles.get(i) + "]\n");
+            System.out.println((i+1) + ": [" + tiles.get(i) + "]");
+        }
+
+        System.out.print("Enter the index of the tile you want to pick:\n");
+    }
+
+    public void printLobbyNicks(ArrayList<String> nicks){
+        System.out.println("\nLobby: ");
+        for(String nick : nicks){
+            System.out.printf("[%s] ",nick);
         }
     }
 }
