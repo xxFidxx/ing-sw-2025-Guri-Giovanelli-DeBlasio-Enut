@@ -11,7 +11,7 @@ public class PlanetsCard extends AdventureCard {
     private ArrayList<Planet> planets;
     private int lostDays;
 
-    public PlanetsCard(String name, int level, ArrayList<Planet> planets, int lostDays, Deck deck) {
+    public PlanetsCard(String name, int level, Planet[] planets, int lostDays, Deck deck) {
         super(name, level, deck);
         this.lostDays = lostDays;
         this.planets = planets;
@@ -58,7 +58,7 @@ public class PlanetsCard extends AdventureCard {
         return lostDays;
     }
 
-    public List<Planet> getPlanets() {
+    public ArrayList<Planet> getPlanets() {
         return planets;
     }
 

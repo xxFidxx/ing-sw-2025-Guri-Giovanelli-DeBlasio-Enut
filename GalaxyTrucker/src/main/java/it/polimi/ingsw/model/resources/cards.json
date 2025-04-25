@@ -34,8 +34,7 @@
   {
     "type": "EpidemicCard",
     "name": "Epidemic",
-    "level": 2,
-    "lostCrew": 3
+    "level": 2
   },
   {
     "type": "MeteorSwarmCard",

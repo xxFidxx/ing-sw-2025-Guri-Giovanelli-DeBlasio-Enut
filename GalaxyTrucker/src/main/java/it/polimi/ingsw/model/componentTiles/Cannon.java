@@ -22,6 +22,6 @@ public class Cannon extends ComponentTile {
 
     public boolean checkProtection (Direction direction, int position) {
         return false;
-    }
+    } //deve fare il check tipo takehit
 
 }

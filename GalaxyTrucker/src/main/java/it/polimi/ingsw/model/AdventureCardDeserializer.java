@@ -80,7 +80,6 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 return new CombatZoneCard(name, level, lostDays, lostOther, cannons, deck, combatZoneType);
             }
             case "EpidemicCard": {
-                int lostCrew = obj.get("lostCrew").getAsInt();
                 return new EpidemicCard(name, level, deck);
             }
             case "MeteorSwarmCard": {
