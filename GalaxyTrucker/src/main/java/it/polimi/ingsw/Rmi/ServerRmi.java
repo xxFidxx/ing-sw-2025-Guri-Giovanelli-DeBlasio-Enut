@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.GameState;
+import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
@@ -24,11 +25,9 @@ import java.util.Map;
 public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final Controller controller;
     final List<VirtualViewRmi> clients;
+    final Map<VirtualViewRmi, ClientListener> clientListeners;
     final Map<String,VirtualViewRmi> clientbyNickname;
-    GameState currentGameState = GameState.IDLE;
-    private volatile boolean isLobbyCreated = false;
-    final private Object isLobbyCreatedLock;
-
+    final Map<VirtualViewRmi,String> nicknamebyClient;
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
     // bisogna gestire bene cosa succede in caso di disconnessione durante le chiamate ai metodi
@@ -37,11 +36,11 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     ServerRmi() throws RemoteException {
         super();
-        this.isLobbyCreatedLock = new Object();
+        this.clientListeners = new HashMap<>();
+        this.nicknamebyClient = new HashMap<>();
         this.controller = new Controller();
         this.clients = new ArrayList<>();
         this.clientbyNickname = new HashMap<>();
-        this.isLobbyCreated = false;
     }
 
     public static void main(String[] args) throws RemoteException {
@@ -56,36 +55,28 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         System.out.println("Server bound");
     }
 
-    @Override// bisogna gestire concorrenza
+    @Override
     public void connect(VirtualViewRmi client) throws RemoteException {
         synchronized (clients) {
             clients.add(client);
         }
-        System.out.println("Client connected");
-
-        synchronized (isLobbyCreatedLock) {
-            if(isLobbyCreated)
-                notifyClient(client,new Event(this, GameState.LOBBY_PHASE, null));
-            else
-                notifyClient(client,new Event(this, GameState.IDLE, null)); // vuol dire che sei tu che devi creare la lobby
+        ClientListener clientListener = new ClientListener(client, this);
+        clientListeners.put(client, clientListener);
+        synchronized(controller){
+            controller.addEventListener(clientListener);
         }
-
+        System.out.println("Client connected");
     }
 
 
     public void addNickname(VirtualViewRmi client, String Nickname) throws RemoteException, LobbyExceptions {
-        ArrayList<String> nicks;
-        boolean isLobbyFull;
+        ClientListener clientListener = clientListeners.get(client);
         synchronized(controller){
-            nicks = controller.addNickname(Nickname);
-            isLobbyFull=controller.isLobbyFull();
+            controller.addNickname(clientListener,Nickname);
         }
         System.out.println("Nickname added\n");
         clientbyNickname.put(Nickname, client);
-
-        notifyClient(client,new Event(this, GameState.WAIT_LOBBY, new LobbyNicks(nicks)));
-        if(isLobbyFull)
-            game_init(nicks);
+        nicknamebyClient.put(client,Nickname);
     }
 
     public void createLobby(VirtualViewRmi client,int number) throws RemoteException, LobbyExceptions {
@@ -93,29 +84,20 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
             controller.createLobby(number);
         }
         System.out.println("Lobby created\n");
-
-        synchronized (isLobbyCreatedLock) {
-            isLobbyCreated = true;
-        }
-
-        // if lobby is already created, it throws exception to the caller and doesn't update anything
-        currentGameState = GameState.LOBBY_PHASE;
-        notifyClient(client,new Event(this, GameState.WAIT_LOBBY, null));
     }
 
 
-    // ancora da sincronizzare con la lobby che deve rimuovere pure dal suo
     public void removeClient(VirtualViewRmi client){
         synchronized(clients){
             clients.remove(client);
-            synchronized(controller){}
+            //synchronized(controller){}
         }
         synchronized (clientbyNickname){
             clientbyNickname.values().removeIf(v -> v.equals(client));
         }
     }
 
-    private void notifyClient(VirtualViewRmi client, Event event) {
+    public void notifyClient(VirtualViewRmi client, Event event) {
         try {
             client.showUpdate(event);
         } catch (RemoteException e) {
@@ -127,25 +109,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         }
     }
 
-    private void notifyAllClients(Event event) {
-        List<VirtualViewRmi> clientsCopy;
-        synchronized (clients) {
-            clientsCopy = new ArrayList<>(clients);
-        }
-
-        for (VirtualViewRmi client : clientsCopy) {
-            notifyClient(client, event);
-        }
-    }
-
-    public void game_init(ArrayList<String> nicks) throws RemoteException{
-        notifyAllClients(new Event(this, GameState.GAME_INIT,null));
-        currentGameState = GameState.ASSEMBLY;
-        controller.setGame(new Game(nicks));
-        ArrayList<String> assemblingTiles = controller.getGame().getAssemblingTiles();
-        notifyAllClients(new Event(this, GameState.ASSEMBLY, new PickableTiles(assemblingTiles)));
-    }
-
-    public void pickTile(VirtualViewRmi client, int index) throws RemoteException {
+    public void pickTile(VirtualViewRmi client, String id) throws RemoteException{
+        ClientListener listener = clientListeners.get(client);
+        controller.pickTile(listener, id);
     }
 }

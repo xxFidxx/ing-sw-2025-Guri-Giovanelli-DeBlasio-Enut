@@ -73,23 +73,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
                     }catch (Exception e){
                         System.out.print("Lobby already exists, join it:\n");
                     }
-                    System.out.print("Enter nickname: ");
-                    String nickname = scan.nextLine();
-                    server.addNickname(this, nickname);
                 }else{
                     System.out.print("Not accepted input, please follow the instructions below:\n");
                 }
             }
-            case LOBBY_PHASE ->{
-                    if (input.equals("1")){
-                        System.out.print("Enter nickname: ");
-                        String nickname = scan.nextLine();
-                        server.addNickname(this, nickname);
-                    }else{
-                        System.out.print("Not accepted input, please follow the instructions below:\n");
-                    }
-            }
-
+            case LOBBY_PHASE -> server.addNickname(this, input);
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> {
@@ -103,7 +91,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
         System.out.print("\n");
         switch(currentState){
             case IDLE -> System.out.print("Type 0 to create a lobby");
-            case LOBBY_PHASE -> System.out.print("Type 1 to join the lobby");
+            case LOBBY_PHASE -> System.out.print("Lobby available\nEnter nickname: ");
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> System.out.print("List of available tiles: ");
@@ -161,5 +149,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
         for(String nick : nicks){
             System.out.printf("[%s] ",nick);
         }
+        System.out.println("\n");
     }
 }

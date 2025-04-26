@@ -5,31 +5,31 @@ import it.polimi.ingsw.controller.LobbyExceptions;
 import java.util.ArrayList;
 
 public class Lobby {
-    private ArrayList<String> playersName;
+    private ArrayList<String> playersNicknames;
     private  int numPlayers;
     private boolean isFull;
 
     public Lobby(int numPlayers) {
-        this.playersName = new ArrayList<>();
+        this.playersNicknames = new ArrayList<>();
         this.numPlayers = numPlayers;
     }
 
-    public ArrayList<String> getPlayersName() {
-        return playersName;
+    public ArrayList<String> getPlayersNicknames() {
+        return playersNicknames;
     }
 
-    public void setPlayersName(String name){
-        if (playersName.contains(name)) {
+    public void setPlayersNicknames(String name){
+        if (playersNicknames.contains(name)) {
             throw new LobbyExceptions("Nome già utilizzato: " + name);
         }
 
-        if (playersName.size() >= numPlayers) {
+        if (playersNicknames.size() >= numPlayers) {
             throw new LobbyExceptions("Numero massimo di giocatori raggiunto");
         }
 
-        playersName.add(name);
+        playersNicknames.add(name);
 
-        if(playersName.size() == numPlayers) {
+        if(playersNicknames.size() == numPlayers) {
             isFull = true;
         }
     }

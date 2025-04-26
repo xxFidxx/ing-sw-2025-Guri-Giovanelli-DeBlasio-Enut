@@ -4,9 +4,9 @@ public class Engine extends ComponentTile{
 
     protected int power;
 
-    public Engine(ConnectorType[] connectors,String id, int power) {
+    public Engine(ConnectorType[] connectors,String id) {
         super(connectors,id);
-        this.power = power;
+        this.power = 1;
     }
 
     public int getPower() {

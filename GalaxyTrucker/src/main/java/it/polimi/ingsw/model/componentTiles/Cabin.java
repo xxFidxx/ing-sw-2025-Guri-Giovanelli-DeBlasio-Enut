@@ -7,7 +7,7 @@ public class Cabin extends ComponentTile{
     private LifeSupportSystem[] lifeSupportSystemColor;
     private Figure[] figures;;
 
-    public Cabin(ConnectorType[] connectors,String id, LifeSupportSystem[] lifeSupportSystemColor, ArrayList<Figure> crew) {
+    public Cabin(ConnectorType[] connectors,String id, LifeSupportSystem[] lifeSupportSystemColor) {
         super(connectors,id);
         this.lifeSupportSystemColor = lifeSupportSystemColor;
         figures = new Figure[1];

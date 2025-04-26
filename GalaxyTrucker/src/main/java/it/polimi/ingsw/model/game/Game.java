@@ -1,8 +1,6 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
-import it.polimi.ingsw.controller.network.EventListenerInterface;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.resources.Planet;
 
 import java.util.*;
@@ -12,8 +10,10 @@ public class Game {
     private Timer timer;
     private Dice[] dices;
     private Flightplance plance;
-    private List<EventListener> listeners = new ArrayList<>();
-    private ArrayList<ComponentTile> assemblingTiles;
+    private final ArrayList<String> assemblingTilesCovered;
+    // mi serve un qualcosa che associ l'id stringa Tile1 con l'id vero e proprio della TIle, una hashmap
+    private final Map<String,String> idbyCoveredId;
+    private final ArrayList<String> Tiles;
 
     public Game(ArrayList<String> playersName) {
         this.players = new ArrayList<>();
@@ -26,7 +26,12 @@ public class Game {
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
         this.plance = new Flightplance(playersName.size(),this);
-        this.assemblingTiles = new ArrayList<>(List.of(new ComponentTile(), "Tile2", "Tile3", "Tile4", "Tile5"));
+        this.assemblingTilesCovered = new ArrayList<>(List.of("Tile1", "Tile2", "Tile3", "Tile4", "Tile5"));
+        this.Tiles = new ArrayList<>(List.of("Cannon1", "Cannon2", "Cabin1", "Cabin2", "Engine1"));
+        this.idbyCoveredId = new HashMap<>();
+        for (int i = 0; i < assemblingTilesCovered.size(); i++) {
+            idbyCoveredId.put(assemblingTilesCovered.get(i), Tiles.get(i));
+        }
     }
 
     public void Startgame() {
@@ -36,8 +41,8 @@ public class Game {
         return players;
     }
 
-    public ArrayList<String> getAssemblingTiles() {
-        return assemblingTiles;
+    public ArrayList<String> getAssemblingTilesCovered() {
+        return assemblingTilesCovered;
     }
 
     public Dice[] getDice() {
@@ -99,16 +104,20 @@ public class Game {
         Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
     }
 
-    public void addEventListener(EventListenerInterface listener){
-        listeners.add(listener);
-    }
+    public boolean pickTile(Player player, String CoveredId){
+        String TileId = idbyCoveredId.get(CoveredId);
 
-    public void removeEventListener(EventListenerInterface listener){
-        listeners.remove(listener);
-    }
+        synchronized(Tiles){
+            if(!Tiles.contains(TileId))
+                return false;
+        }
 
-    public ComponentTile pickTile(){
 
+        synchronized(assemblingTilesCovered){
+            assemblingTilesCovered.remove(CoveredId);
+        }
+
+        return true;
     }
 }
 

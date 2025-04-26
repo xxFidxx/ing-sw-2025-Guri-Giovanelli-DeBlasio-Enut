@@ -4,9 +4,9 @@ public class DoubleEngine extends Engine {
     private boolean isCharged;
 
 
-    public DoubleEngine(ConnectorType[] connectors,String id, int power,boolean isCharged) {
-        super(connectors,id,power);
-        this.isCharged = isCharged;
+    public DoubleEngine(ConnectorType[] connectors,String id){
+        super(connectors,id);
+        this.isCharged = false;
     }
 
     public boolean isCharged() {
@@ -17,5 +17,9 @@ public class DoubleEngine extends Engine {
 
         return power*2;
 
+    }
+
+    public void setCharged(boolean charged) {
+        isCharged = charged;
     }
 }
