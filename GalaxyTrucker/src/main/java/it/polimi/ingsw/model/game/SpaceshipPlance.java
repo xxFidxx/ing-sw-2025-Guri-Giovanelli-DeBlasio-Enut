@@ -535,17 +535,68 @@ public class SpaceshipPlance {
         }
     }
 
-    public boolean getCannonActivation(Direction direction, int position) {
-        for (Cannon cannon : cannons) {
-            if (cannon.checkProtection(direction, position) == true) {
-                boolean active = askActivateCannon(cannon);
-                if (active) return true;
-            }
+    public boolean checkProtection (Direction direction, int position) {
+        int max_lenght = 7;
+        // casella da cui partire
+        int x=0, y=0;
+        switch (direction) {
+            case NORTH:
+                x = position - 4;
+                y = 0;
+                max_lenght = 5;
+                break;
+            case EAST:
+                x = 6;
+                y = position - 5;
+                break;
+            case SOUTH:
+                x = position - 4;
+                y = 4;
+                max_lenght = 5;
+                break;
+            case WEST:
+                x = 0;
+                y = position - 5;
+                break;
         }
+
+        ComponentTile hit = components[y][x];
+
+        for(int i = 0; i<max_lenght || hit == null; i++){
+            switch (direction) {
+                case NORTH:
+                    y += 1;
+                    break;
+                case EAST:
+                    x -= 1;
+                    break;
+                case SOUTH:
+                    y -= 1;
+                    break;
+                case WEST:
+                    x += 1;
+                    break;
+            }
+            hit = components[y][x];
+        }
+
+        if((hit != null) && (cannons.contains(hit))){
+            return true;
+        }
+
         return false;
     }
 
-    private boolean askActivateCannon(Cannon cannon) {
+    public boolean getCannonActivation(Direction direction, int position) {
+        if (checkProtection(direction, position) == true) {
+            boolean active = askActivateCannon();
+            if (active) return true;
+        }
+
+        return false;
+    }
+
+    private boolean askActivateCannon() {
         return true;
     }
 

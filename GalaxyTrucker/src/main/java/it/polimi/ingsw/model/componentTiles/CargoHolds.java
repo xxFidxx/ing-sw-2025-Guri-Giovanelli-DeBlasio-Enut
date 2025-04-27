@@ -7,9 +7,8 @@ public class CargoHolds extends ComponentTile{
     private GoodsBlock[] goods;
     private boolean isSpecial;
 
-    public CargoHolds(ConnectorType[] connectors, GoodsBlock[] goods,int id, boolean isSpecial) {
+    public CargoHolds(ConnectorType[] connectors,int id, boolean isSpecial) {
         super(connectors,id);
-        this.goods = goods;
         this.isSpecial = isSpecial;
     }
 

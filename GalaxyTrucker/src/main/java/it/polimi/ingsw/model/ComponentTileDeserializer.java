@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 public class ComponentTileDeserializer implements JsonDeserializer<ComponentTile> {
 
     private final Game game;
+    private int id = 0;
 
     public ComponentTileDeserializer(Game game) {
         this.game = game;
@@ -33,35 +34,35 @@ public class ComponentTileDeserializer implements JsonDeserializer<ComponentTile
 
         switch (type) {
             case "Cabin":
-                return new Cabin(connectors);
+                return new Cabin(connectors, id++);
             case "Cannon":
-                return new Cannon(connectors);
+                return new Cannon(connectors, id++);
             case "CargoHolds": {
                 boolean isSpecial = obj.get("isSpecial").getAsBoolean();
-                return new CargoHolds(connectors, isSpecial);
+                return new CargoHolds(connectors, id++, isSpecial);
             }
             case "DoubleCannon":
-                return new DoubleCannon(connectors);
+                return new DoubleCannon(connectors, id++);
             case "DoubleEngine":
-                return new DoubleEngine(connectors);
+                return new DoubleEngine(connectors, id++);
             case "Engine":
-                return new Engine(connectors);
+                return new Engine(connectors, id++);
             case "LifeSupportSystem": {
                 AlienColor color = AlienColor.values()[obj.get("color").getAsInt()]; //connectors[i] = ConnectorType.values()[array.get(i).getAsInt()];
-                return new LifeSupportSystem(connectors, color);
+                return new LifeSupportSystem(color, connectors, id++);
             }
             case "PowerCenter":
-                return new PowerCenter(connectors);
+                return new PowerCenter(connectors, id++);
             case "ShieldGenerator": {
                 JsonArray protArr = obj.get("protection").getAsJsonArray();
                 boolean[] protection = new boolean[4];
                 for (int i = 0; i < 4; i++) {
                     protection[i] = protArr.get(i).getAsBoolean();
                 }
-                return new ShieldGenerator(connectors, protection);
+                return new ShieldGenerator(connectors, protection, id++);
             }
             case "StructuralModule":
-                return new StructuralModule(connectors);
+                return new StructuralModule(connectors, id++);
             default:
                 throw new JsonParseException("Unknown component tile type: " + type);
         }

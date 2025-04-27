@@ -20,8 +20,6 @@ public class Cannon extends ComponentTile {
         this.power = power;
     }
 
-    public boolean checkProtection (Direction direction, int position) {
-        return false;
-    } //deve fare il check tipo takehit
+
 
 }
