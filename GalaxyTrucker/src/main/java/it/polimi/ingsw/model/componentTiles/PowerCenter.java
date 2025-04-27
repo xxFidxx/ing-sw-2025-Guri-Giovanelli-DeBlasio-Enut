@@ -6,7 +6,7 @@ public class PowerCenter extends ComponentTile {
     private BatteryToken[] batteries;
 
 
-    public PowerCenter(ConnectorType[] connectors, String id, BatteryToken[] batteries) {
+    public PowerCenter(ConnectorType[] connectors, int id, BatteryToken[] batteries) {
         super(connectors,id);
         this.batteries = batteries;
     }

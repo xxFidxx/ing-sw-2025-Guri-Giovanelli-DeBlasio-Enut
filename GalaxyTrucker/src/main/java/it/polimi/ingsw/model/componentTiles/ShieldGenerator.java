@@ -4,7 +4,7 @@ public class ShieldGenerator extends ComponentTile {
 
     private boolean[] protection; // ex: [false, false, true, true]
 
-    public ShieldGenerator(ConnectorType[] connectors,boolean[] protection, String id) {
+    public ShieldGenerator(ConnectorType[] connectors,boolean[] protection, int id) {
         super(connectors,id);
         this.protection = protection;
     }

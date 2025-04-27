@@ -4,7 +4,7 @@ public class LifeSupportSystem extends ComponentTile{
     private final AlienColor color;
 
 
-    public LifeSupportSystem(AlienColor color, ConnectorType[] connectors, String id) {
+    public LifeSupportSystem(AlienColor color, ConnectorType[] connectors, int id) {
         super(connectors,id);
         this.color = color;
     }

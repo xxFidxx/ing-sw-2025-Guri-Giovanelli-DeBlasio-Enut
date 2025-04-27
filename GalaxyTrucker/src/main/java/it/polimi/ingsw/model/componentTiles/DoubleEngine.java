@@ -4,7 +4,7 @@ public class DoubleEngine extends Engine {
     private boolean isCharged;
 
 
-    public DoubleEngine(ConnectorType[] connectors,String id){
+    public DoubleEngine(ConnectorType[] connectors,int id){
         super(connectors,id);
         this.isCharged = false;
     }

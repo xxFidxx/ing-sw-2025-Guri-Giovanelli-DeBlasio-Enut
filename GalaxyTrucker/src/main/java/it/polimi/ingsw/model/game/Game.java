@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
 import java.util.*;
@@ -104,12 +105,11 @@ public class Game {
         Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
     }
 
-    public boolean pickTile(Player player, String CoveredId){
-        String TileId = idbyCoveredId.get(CoveredId);
+    public String pickTile(String CoveredId){
 
-        synchronized(Tiles){
-            if(!Tiles.contains(TileId))
-                return false;
+        synchronized(assemblingTilesCovered){
+            if(!assemblingTilesCovered.contains(CoveredId))
+                return null;
         }
 
 
@@ -117,7 +117,55 @@ public class Game {
             assemblingTilesCovered.remove(CoveredId);
         }
 
-        return true;
+        return idbyCoveredId.get(CoveredId);
+    }
+
+    public String tiletoString(ComponentTile tile){
+        if (tile != null) {
+            switch (tile) {
+                case DoubleCannon dc -> {
+                    return "DoubleCannon";
+                }
+
+                case Cannon c-> {
+                    return "Cannon";
+                }
+
+                case DoubleEngine de -> {
+                    return "DoubleEngine";
+                }
+                case Engine e -> {
+                    return "Engine";
+                }
+                case Cabin cab -> {
+                    return "Cabin";
+                }
+                case CargoHolds ch -> {
+                    return "CargoHolds";
+                }
+
+                case ShieldGenerator sg -> {
+                    return "ShieldGenerator";
+                }
+
+                case LifeSupportSystem lfs -> {
+                    return "LifeSupportSystem";
+                }
+
+                case PowerCenter pc -> {
+                    return "PowerCenter";
+                }
+
+                case StructuralModule sm -> {
+                    return "StructuralModule";
+                }
+
+                default -> {
+                    return "notCatched in tiletoString";
+                }
+            }
+        }
+        return null;
     }
 }
 

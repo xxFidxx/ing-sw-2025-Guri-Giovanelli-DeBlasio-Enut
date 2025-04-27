@@ -3,7 +3,7 @@ package it.polimi.ingsw.model.componentTiles;
 public class DoubleCannon extends Cannon{
     private boolean isCharged;
 
-    public DoubleCannon(ConnectorType[] connectors,String id) {
+    public DoubleCannon(ConnectorType[] connectors,int id) {
         super(connectors, id);
         this.isCharged = false;
     }

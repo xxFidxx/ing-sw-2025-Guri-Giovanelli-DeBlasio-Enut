@@ -4,8 +4,7 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
-import it.polimi.ingsw.controller.network.data.LobbyNicks;
-import it.polimi.ingsw.controller.network.data.PickableTiles;
+import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
@@ -77,7 +76,7 @@ public class Controller implements EventListenerInterface {
         lobby = new Lobby(numPlayers);
 
         currentGameState = GameState.LOBBY_PHASE;
-        Event event= eventCrafter(currentGameState);
+        Event event= eventCrafter(currentGameState,null);
         notifyAllListeners(event);
     }
 
@@ -87,7 +86,7 @@ public class Controller implements EventListenerInterface {
 
 
         lobby.setPlayersNicknames(nickname);
-        Event event = eventCrafter(GameState.WAIT_LOBBY);
+        Event event = eventCrafter(GameState.WAIT_LOBBY,null);
         listener.onEvent(event);
 
         if(lobby.isFull())
@@ -96,16 +95,22 @@ public class Controller implements EventListenerInterface {
     }
 
     public void pickTile(ClientListener listener, String coveredId){
-        Player player = playerbyListener.get(listener);
-        game.pickTile(player,coveredId);
+        String TileId = game.pickTile(coveredId);
+
+        if(TileId != null)
+        listener.onEvent(eventCrafter(GameState.PICKED_TILE, TileId));
+        else{
+            listener.onEvent(eventCrafter(GameState.ROBBED_TILE, null));
+            listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
+        }
     }
 
     public void handleOnConnectState(ClientListener listener){
-        listener.onEvent(eventCrafter(currentGameState));
+        listener.onEvent(eventCrafter(currentGameState, null));
     }
 
-    public Event eventCrafter(GameState state){
-        Event event;
+    public Event eventCrafter(GameState state, Object data){
+        Event event = null;
         switch(state){
             case WAIT_LOBBY ->{
                 ArrayList<String> nicks;
@@ -121,6 +126,10 @@ public class Controller implements EventListenerInterface {
                 }
                 event = new Event(this, state, new PickableTiles(AssemblingTiles));
             }
+
+            case PICKED_TILE -> {
+                event = new Event(this, state, new PickedTile((String)data));
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -129,7 +138,7 @@ public class Controller implements EventListenerInterface {
     public void gameInit() {
 
         currentGameState = GameState.GAME_INIT;
-        notifyAllListeners(eventCrafter(currentGameState));
+        notifyAllListeners(eventCrafter(currentGameState,null));
 
         currentGameState = GameState.ASSEMBLY;
 
@@ -144,7 +153,7 @@ public class Controller implements EventListenerInterface {
             }
         }
 
-        Event event = eventCrafter(currentGameState);
+        Event event = eventCrafter(currentGameState,null);
         notifyAllListeners(event);
     }
 

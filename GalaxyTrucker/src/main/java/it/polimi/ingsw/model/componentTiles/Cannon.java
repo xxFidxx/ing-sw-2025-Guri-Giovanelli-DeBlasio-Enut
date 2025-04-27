@@ -4,7 +4,7 @@ package it.polimi.ingsw.model.componentTiles;
 public class Cannon extends ComponentTile {
     protected float power;
 
-    public Cannon(ConnectorType[] connectors,String id) {
+    public Cannon(ConnectorType[] connectors,int id) {
         super(connectors,id);
         this.power = 1.0F;
     }
