@@ -1,7 +1,8 @@
 [
   {
     "type": "Cabin",
-    "connectors": [0, 1, 2, 3]
+    "connectors": [0, 1, 2, 3],
+    "isCentral": false
   },
   {
     "type": "Cannon",

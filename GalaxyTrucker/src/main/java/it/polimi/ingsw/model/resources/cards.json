@@ -24,6 +24,7 @@
     "type": "CombatZoneCard",
     "name": "Combat Zone",
     "level": 1,
+    "combatZoneType": 0,
     "lostDays": 2,
     "lostOther": 1,
     "cannons": [

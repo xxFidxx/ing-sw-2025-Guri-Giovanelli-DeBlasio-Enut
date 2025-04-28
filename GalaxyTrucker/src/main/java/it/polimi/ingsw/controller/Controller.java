@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
@@ -94,11 +95,12 @@ public class Controller implements EventListenerInterface {
 
     }
 
-    public void pickTile(ClientListener listener, String coveredId){
-        String TileId = game.pickTile(coveredId);
+    public void pickTile(ClientListener listener, int tileId) throws LobbyExceptions {
+        Player player = playerbyListener.get(listener);
+        String tileName = game.pickTile(player,tileId);
 
-        if(TileId != null)
-        listener.onEvent(eventCrafter(GameState.PICKED_TILE, TileId));
+        if(tileName != null)
+        listener.onEvent(eventCrafter(GameState.PICKED_TILE, tileName));
         else{
             listener.onEvent(eventCrafter(GameState.ROBBED_TILE, null));
             listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
@@ -120,11 +122,11 @@ public class Controller implements EventListenerInterface {
                 event = new Event(this, state,  new LobbyNicks(nicks));
             }
             case ASSEMBLY ->{
-                ArrayList<String> AssemblingTiles;
+                Integer[] assemblingTiles;
                 synchronized(GameLock){
-                    AssemblingTiles = game.getAssemblingTilesCovered();
+                    assemblingTiles = game.getAssemblingTilesId();
                 }
-                event = new Event(this, state, new PickableTiles(AssemblingTiles));
+                event = new Event(this, state, new PickableTiles(assemblingTiles));
             }
 
             case PICKED_TILE -> {

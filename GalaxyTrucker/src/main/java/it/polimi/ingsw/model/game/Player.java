@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.DoubleEngine;
@@ -16,6 +17,7 @@ public class Player {
         private int numAstronauts;
         private int numAliens;
         private Game game;
+        private ComponentTile handTile;
 
     public Player(String nickname, Game game, int playerNumber) {
         this.nickname = nickname;
@@ -25,6 +27,7 @@ public class Player {
         this.numAstronauts = 0;
         this.numAliens = 0;
         this.game = game;
+        this.handTile = null;
     }
 
     public void setSpaceshipPlance(SpaceshipPlance spaceshipPlance) {
@@ -34,6 +37,14 @@ public class Player {
     public String getNickname() {
             return nickname;
         }
+
+    public ComponentTile getHandTile() {
+        return handTile;
+    }
+
+    public void setHandTile(ComponentTile handTile) {
+        this.handTile = handTile;
+    }
 
         public Placeholder getPlaceholder() {
             return placeholder;
