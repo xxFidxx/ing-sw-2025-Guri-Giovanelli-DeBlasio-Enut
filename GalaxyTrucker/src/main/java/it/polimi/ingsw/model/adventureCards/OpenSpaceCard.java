@@ -17,7 +17,7 @@ public class OpenSpaceCard extends AdventureCard {
     public void activate() {
         ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
 
-        players.sort(Comparator.comparingInt(p -> p.getPlaceholder().getPosizione()));
+        // players.sort(Comparator.comparingInt(p -> p.getPlaceholder().getPosizione()));
         Collections.reverse(players);
 
         for (Player player : players) {

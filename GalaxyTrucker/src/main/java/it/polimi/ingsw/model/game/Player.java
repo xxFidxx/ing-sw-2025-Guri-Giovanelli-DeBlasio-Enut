@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.componentTiles.DoubleCannon;
 import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.DoubleEngine;
@@ -26,7 +27,9 @@ public class Player {
         this.game = game;
     }
 
-
+    public void setSpaceshipPlance(SpaceshipPlance spaceshipPlance) {
+        this.spaceshipPlance = spaceshipPlance;
+    }
 
     public String getNickname() {
             return nickname;
@@ -76,20 +79,37 @@ public class Player {
         public int getEngineStrenght() {//è da vedere se controllare qui se ci sono batterie
             int sumPower=0;
             for(int i=0; i < spaceshipPlance.getEngines().size(); i++){
-                if(spaceshipPlance.getEngines().get(i) instanceof DoubleEngine)
-                    if( ((DoubleEngine) spaceshipPlance.getEngines().get(i)).isCharged())
+                if(spaceshipPlance.getEngines().get(i) instanceof DoubleEngine){
+                    if( ((DoubleEngine) spaceshipPlance.getEngines().get(i)).isCharged()){
                         if(askToUseBattery())
-                            sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();
-                    else System.out.println("no battery available");
+                            sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();}
 
-                sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();}
+                    else System.out.println("no battery available");}
+
+                else
+                    sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
+            }
+            if(spaceshipPlance.getBrownAliens() == 1 && sumPower > 0)
+                sumPower += 2;
             return sumPower;
         }
 
         public float getFireStrenght() {
             float sumPower=0;
-            for(int i=0; i < spaceshipPlance.getCannons().size(); i++)
-                sumPower = sumPower + spaceshipPlance.getCannons().get(i).getPower();
+            if(spaceshipPlance.getPurpleAliens() == 1)
+                sumPower = 2;
+            for(int i=0; i < spaceshipPlance.getCannons().size(); i++){
+                if(spaceshipPlance.getCannons().get(i) instanceof DoubleCannon){
+                    if( ((DoubleCannon) spaceshipPlance.getCannons().get(i)).isCharged()){
+                        if(askToUseBattery())
+                            sumPower=sumPower+ spaceshipPlance.getCannons().get(i).getPower();}
+                    else System.out.println("no battery available");}
+
+                else
+                    sumPower = sumPower + spaceshipPlance.getCannons().get(i).getPower();
+            }
+            if(spaceshipPlance.getPurpleAliens() == 1 && sumPower > 0)
+                sumPower += 2;
             return sumPower;
         }
 

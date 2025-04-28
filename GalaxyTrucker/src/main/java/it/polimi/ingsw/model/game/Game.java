@@ -35,6 +35,11 @@ public class Game {
         }
     }
 
+    // Setter che usi solo nei test
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
+    }
+
     public void Startgame() {
     }
 
@@ -59,12 +64,11 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        ArrayList<Player> tmp = players;
-        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = tmp.size() - 1; i >= 0; i--) {
-            if (card.checkCondition(tmp.get(i)))
-                if (tmp.get(i).getResponse())
-                    return tmp.get(i);
+        // orderPlayers();
+        for (int i = players.size() - 1; i >= 0; i--) {
+            if (card.checkCondition(players.get(i)))
+                if (players.get(i).getResponse())
+                    return players.get(i);
         }
         return null;
     }
@@ -72,18 +76,6 @@ public class Game {
     public int throwDices() {
         return dices[0].thr() + dices[1].thr();
     }
-
-//    public Player choosePlayer(AdventureCard card, int n) {
-//        ArrayList<Player> tmp = players;
-//        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-//        for (int i = tmp.size() - 1; i >= 0; i--) {
-//            if (card.checkCondition(tmp.get(i)))
-//                if (tmp.get(i).getResponse())
-//                    return tmp.get(i);
-//        }
-//        return null;
-//    }
-
 
     public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
         Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));

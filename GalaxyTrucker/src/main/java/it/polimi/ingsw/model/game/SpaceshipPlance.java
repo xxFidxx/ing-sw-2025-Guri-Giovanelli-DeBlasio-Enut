@@ -41,6 +41,14 @@ public class SpaceshipPlance {
         this.nPurpleAliens = 0;
     }
 
+    public int getBrownAliens() {
+        return this.nBrownAliens;
+    }
+
+    public int getPurpleAliens() {
+        return this.nPurpleAliens;
+    }
+
     private void initVisited(){
         // Imposta visited a false
         for (int i = 0; i < 4; i++) {

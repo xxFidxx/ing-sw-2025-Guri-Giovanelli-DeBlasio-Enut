@@ -55,5 +55,6 @@ public class Flightplance {
 
         chosenPlayer.getPlaceholder().setPosizione(chosenPlayer.getPlaceholder().getPosizione() + num +extraSteps);
 
+        game.orderPlayers();
     }
 }
