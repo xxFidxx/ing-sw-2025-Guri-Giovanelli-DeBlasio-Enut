@@ -23,8 +23,8 @@ public class Game {
         dices[0] = new Dice();
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
-        this.plance = new Flightplance(playersName.size(),this);
-
+        this.plance = new Flightplance(playersName.size(), this);
+    }
 
     // Setter che usi solo nei test
     public void setPlayers(ArrayList<Player> players) {
