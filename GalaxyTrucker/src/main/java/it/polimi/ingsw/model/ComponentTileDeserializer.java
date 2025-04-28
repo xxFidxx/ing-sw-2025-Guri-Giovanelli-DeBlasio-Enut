@@ -34,7 +34,8 @@ public class ComponentTileDeserializer implements JsonDeserializer<ComponentTile
 
         switch (type) {
             case "Cabin":
-                return new Cabin(connectors, id++);
+                boolean isCentral = obj.get("isCentral").getAsBoolean();
+                return new Cabin(connectors, isCentral, id++);
             case "Cannon":
                 return new Cannon(connectors, id++);
             case "CargoHolds": {

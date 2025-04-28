@@ -7,9 +7,10 @@ public class Cabin extends ComponentTile{
     private LifeSupportSystem[] lifeSupportSystemColor;
     private Figure[] figures;;
 
-    public Cabin(ConnectorType[] connectors,int id) {
+    public Cabin(ConnectorType[] connectors, boolean isCentral, int id) {
         super(connectors,id);
-        figures = new Figure[1];
+        this.isCentral = isCentral;
+        figures = new Figure[2];
     }
 
     public boolean isCentral() {
