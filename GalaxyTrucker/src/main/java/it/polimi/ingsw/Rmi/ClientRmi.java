@@ -1,7 +1,6 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.GameState;
-import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 
@@ -16,14 +15,14 @@ import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
-    private final ServerRmi server;
+    private final VirtualServerRmi server;
     private volatile GameState currentState;
     private final LinkedBlockingQueue<Event> eventQueue;
     private final Scanner scan = new Scanner(System.in);
     private final Object StateLock = new Object();
 
 
-    public ClientRmi(ServerRmi server) throws RemoteException{
+    public ClientRmi(VirtualServerRmi server) throws RemoteException{
         super();
         this.server = server;
         eventQueue = new LinkedBlockingQueue<>();
@@ -37,7 +36,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
         // ora l'ip è quello della macchina locale: 127.0.0.1 indirizzo local host
         Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
 
-        ServerRmi server = (ServerRmi) registry.lookup(serverName);
+        VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
         new ClientRmi(server).run();
     }
@@ -79,7 +78,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
             case LOBBY_PHASE -> server.addNickname(this, input);
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
-            case ASSEMBLY -> server.pickTile(this,input);
+            case ASSEMBLY -> server.pickTile(this,Integer.parseInt(input));
             case PICKED_TILE -> {
                 switch (input) {
                     case "0" -> System.out.print("Show spaceship\n");
@@ -137,17 +136,18 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
             return;
         switch(data){
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
-            case PickableTiles pt -> printPickableTiles(pt.getTiles());
-            case PickedTile ptl -> System.out.println(ptl.getTileid());
+            case PickableTiles pt -> printPickableTiles(pt.getTilesId());
+            case PickedTile ptl -> System.out.println(ptl.getTileName() + "\n");
             default -> {}
         }
     }
 
 
-    public void printPickableTiles(ArrayList<String> tiles){
+    public void printPickableTiles(Integer[] tiles){
         System.out.println("\n");
-        for (int i= 0; i<tiles.size(); i++) {
-            System.out.println((i+1) + ": [" + tiles.get(i) + "]");
+        for (Integer tile : tiles) {
+            if (tile != null)
+                System.out.println("[" + "Tile" + tile + "]");
         }
 
         System.out.print("Enter the index of the tile you want to pick:\n");

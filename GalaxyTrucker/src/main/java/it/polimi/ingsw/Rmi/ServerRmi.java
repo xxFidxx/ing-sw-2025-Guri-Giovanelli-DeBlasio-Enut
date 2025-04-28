@@ -1,16 +1,10 @@
 package it.polimi.ingsw.Rmi;
 
-import it.polimi.ingsw.Server.GameState;
+
 import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
-import it.polimi.ingsw.controller.network.data.LobbyNicks;
-import it.polimi.ingsw.controller.network.data.PickableTiles;
-import it.polimi.ingsw.controller.network.data.Tile;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
-import it.polimi.ingsw.model.game.Game;
-
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -109,7 +103,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         }
     }
 
-    public void pickTile(VirtualViewRmi client, String id) throws RemoteException{
+    public void pickTile(VirtualViewRmi client, int id) throws RemoteException {
         ClientListener listener = clientListeners.get(client);
         controller.pickTile(listener, id);
     }

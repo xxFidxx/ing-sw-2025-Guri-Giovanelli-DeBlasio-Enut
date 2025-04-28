@@ -11,10 +11,7 @@ public class Game {
     private Timer timer;
     private Dice[] dices;
     private Flightplance plance;
-    private final ArrayList<String> assemblingTilesCovered;
-    // mi serve un qualcosa che associ l'id stringa Tile1 con l'id vero e proprio della TIle, una hashmap
-    private final Map<String,String> idbyCoveredId;
-    private final ArrayList<String> Tiles;
+    private final ComponentTile[] assemblingTiles;
 
     public Game(ArrayList<String> playersName) {
         this.players = new ArrayList<>();
@@ -27,23 +24,43 @@ public class Game {
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
         this.plance = new Flightplance(playersName.size(),this);
-        this.assemblingTilesCovered = new ArrayList<>(List.of("Tile1", "Tile2", "Tile3", "Tile4", "Tile5"));
-        this.Tiles = new ArrayList<>(List.of("Cannon1", "Cannon2", "Cabin1", "Cabin2", "Engine1"));
-        this.idbyCoveredId = new HashMap<>();
-        for (int i = 0; i < assemblingTilesCovered.size(); i++) {
-            idbyCoveredId.put(assemblingTilesCovered.get(i), Tiles.get(i));
-        }
-    }
 
-    public void Startgame() {
+
+        // Prima definiamo i connettori per i componenti
+        ConnectorType[] cannonConnectors = {
+                ConnectorType.CANNON,   // Lato superiore
+                ConnectorType.SMOOTH,   // Lato destro
+                ConnectorType.SMOOTH,   // Lato inferiore
+                ConnectorType.SMOOTH    // Lato sinistro
+        };
+
+        ConnectorType[] cargoConnectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH
+        };
+
+// Poi creiamo l'array di ComponentTile
+        this.assemblingTiles = new ComponentTile[] {
+                new Cannon(cannonConnectors, 1),     // Cannon1
+                new Cannon(cannonConnectors, 2),     // Cannon2
+                new CargoHolds(cargoConnectors, 3, false),  // Cabin1 (non speciale)
+                new CargoHolds(cargoConnectors, 4, false),  // Cabin2 (non speciale)
+                new CargoHolds(cargoConnectors, 5, true)    // Engine1 (speciale)
+        };
     }
 
     public ArrayList<Player>  getPlayers() {
         return players;
     }
 
-    public ArrayList<String> getAssemblingTilesCovered() {
-        return assemblingTilesCovered;
+    public ComponentTile[] getAssemblingTiles(){
+        return assemblingTiles;
+    }
+
+    public Integer[] getAssemblingTilesId(){
+        return tilesToId(assemblingTiles);
     }
 
     public Dice[] getDice() {
@@ -73,17 +90,6 @@ public class Game {
         return dices[0].thr() + dices[1].thr();
     }
 
-//    public Player choosePlayer(AdventureCard card, int n) {
-//        ArrayList<Player> tmp = players;
-//        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-//        for (int i = tmp.size() - 1; i >= 0; i--) {
-//            if (card.checkCondition(tmp.get(i)))
-//                if (tmp.get(i).getResponse())
-//                    return tmp.get(i);
-//        }
-//        return null;
-//    }
-
 
     public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
         Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
@@ -105,19 +111,31 @@ public class Game {
         Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
     }
 
-    public String pickTile(String CoveredId){
+    public String pickTile(Player player, int Tileid){
 
-        synchronized(assemblingTilesCovered){
-            if(!assemblingTilesCovered.contains(CoveredId))
-                return null;
+        ComponentTile tile;
+        synchronized(assemblingTiles){
+            tile = assemblingTiles[Tileid];
         }
 
+        if(assemblingTiles[Tileid] == null )
+            return null;
 
-        synchronized(assemblingTilesCovered){
-            assemblingTilesCovered.remove(CoveredId);
+        player.setHandTile(tile);
+        assemblingTiles[Tileid] = null;
+        return tiletoString(tile);
+    }
+
+    public Integer[] tilesToId(ComponentTile[] tiles){
+        Integer[] ids = new Integer[tiles.length];
+        for(int i = 0; i < tiles.length; i++){
+            ComponentTile tile =tiles[i];
+            if(tile != null)
+            ids[i] = tiles[i].getId();
+            else
+                ids[i] = null;
         }
-
-        return idbyCoveredId.get(CoveredId);
+        return ids;
     }
 
     public String tiletoString(ComponentTile tile){
@@ -167,5 +185,7 @@ public class Game {
         }
         return null;
     }
+
+
 }
 

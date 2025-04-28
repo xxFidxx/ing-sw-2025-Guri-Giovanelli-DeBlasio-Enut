@@ -4,14 +4,14 @@ import java.io.Serializable;
 
 public class PickedTile extends DataContainer implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String tileid;
+    private String tileName;
 
-    public PickedTile(String tileid) {
+    public PickedTile(String tileName) {
         super();
-        this.tileid = tileid;
+        this.tileName = tileName;
     }
 
-    public String getTileid() {
-        return tileid;
+    public String getTileName() {
+        return tileName;
     }
 }

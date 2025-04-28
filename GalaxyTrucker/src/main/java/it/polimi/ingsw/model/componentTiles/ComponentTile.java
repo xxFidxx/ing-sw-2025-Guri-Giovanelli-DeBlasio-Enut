@@ -11,6 +11,9 @@ public abstract class ComponentTile{
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
     public boolean isWellConnected() {
         return isWellConnected;
     }
