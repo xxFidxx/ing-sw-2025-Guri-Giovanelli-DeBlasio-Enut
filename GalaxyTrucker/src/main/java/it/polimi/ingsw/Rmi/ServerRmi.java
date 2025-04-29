@@ -5,6 +5,8 @@ import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
+
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
