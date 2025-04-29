@@ -1,5 +1,6 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.Rmi.VirtualViewRmi;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
@@ -9,6 +10,7 @@ import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -157,6 +159,10 @@ public class Controller implements EventListenerInterface {
 
         Event event = eventCrafter(currentGameState,null);
         notifyAllListeners(event);
+    }
+
+    public void drawCard(ClientListener listener) throws RemoteException {
+
     }
 
 }

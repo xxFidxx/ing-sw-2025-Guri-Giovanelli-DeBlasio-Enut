@@ -9,6 +9,8 @@ public class DoubleCannon extends Cannon{
     }
 
     public boolean isCharged() {
+
+
         return isCharged;
     }
 

@@ -88,6 +88,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
                 }
             }
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case DRAW_CARD -> server.drawCard(this) ;
         }
         System.out.print("\n> ");
     }
@@ -102,6 +103,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
             case ASSEMBLY -> System.out.print("List of available tiles: ");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case DRAW_CARD -> System.out.print("You pick the Card: ");
         }
         System.out.print("\n> ");
     }

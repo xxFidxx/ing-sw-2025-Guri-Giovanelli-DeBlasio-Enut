@@ -19,4 +19,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void createLobby(VirtualViewRmi client,int number) throws RemoteException, LobbyExceptions;
 
     void pickTile(VirtualViewRmi clientRmi, int input) throws RemoteException;
+
+    void drawCard(VirtualViewRmi clientRmi) throws RemoteException;
 }
+

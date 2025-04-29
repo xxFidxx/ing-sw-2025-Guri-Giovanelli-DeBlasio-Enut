@@ -83,7 +83,7 @@ public class Player {
     public int checkStorage(){
         return 0;
         }
-        public int checkCrew(){ return 0; }//CONTROLLA IL NUMERO DELL EQUIPAGGIO
+        public int checkCrew(){ return (spaceshipPlance.getBrownAliens()+spaceshipPlance.getPurpleAliens()+ spaceshipPlance.getnAstronauts()); }//CONTROLLA IL NUMERO DELL EQUIPAGGIO
 
 
         // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
