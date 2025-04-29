@@ -24,14 +24,7 @@ public class Game {
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
         this.plance = new Flightplance(playersName.size(), this);
-    }
 
-    // Setter che usi solo nei test
-    public void setPlayers(ArrayList<Player> players) {
-        this.players = players;
-    }
-
-    public void Startgame() {
         // Prima definiamo i connettori per i componenti
         ConnectorType[] cannonConnectors = {
                 ConnectorType.CANNON,   // Lato superiore
@@ -48,13 +41,18 @@ public class Game {
         };
 
 // Poi creiamo l'array di ComponentTile
-        this.assemblingTiles = new ComponentTile[] {
+        this.assemblingTiles = new ComponentTile[]{
                 new Cannon(cannonConnectors, 0),     // Cannon1
                 new Cannon(cannonConnectors, 1),     // Cannon2
                 new CargoHolds(cargoConnectors, 2, false),  // Cabin1 (non speciale)
                 new CargoHolds(cargoConnectors, 3, false),  // Cabin2 (non speciale)
                 new CargoHolds(cargoConnectors, 4, true)    // Engine1 (speciale)
         };
+    }
+
+    // Setter che usi solo nei test
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
     }
 
     public ArrayList<Player>  getPlayers() {
