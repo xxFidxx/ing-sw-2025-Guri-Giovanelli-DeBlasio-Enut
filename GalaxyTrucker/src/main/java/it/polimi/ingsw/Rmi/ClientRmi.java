@@ -1,11 +1,13 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.GameState;
+import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 
 
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
+public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final VirtualServerRmi server;
     private volatile GameState currentState;
     private final LinkedBlockingQueue<Event> eventQueue;
@@ -68,17 +70,34 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi{
                     int size = Integer.parseInt(scan.nextLine());
                     try{
                         server.createLobby(this,size);
-                    }catch (Exception e){
+                    }catch (LobbyExceptions e){
                         System.out.print("Lobby already exists, join it:\n");
+                    } catch (RemoteException e){
+                        System.out.print("You have been disconnected:\n");
                     }
                 }else{
                     System.out.print("Not accepted input, please follow the instructions below:\n");
                 }
             }
-            case LOBBY_PHASE -> server.addNickname(this, input);
+            case LOBBY_PHASE -> {
+                try {
+                    server.addNickname(this, input);
+                } catch (LobbyExceptions e) {
+                    System.out.print("Already existent nickname, please retry with a different one\n");
+                } catch(RemoteException e){
+                    System.out.print("You have been disconnected:\n");
+                }
+            }
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
-            case ASSEMBLY -> server.pickTile(this,Integer.parseInt(input));
+
+            case ASSEMBLY ->{
+                try{
+                    server.pickTile(this,Integer.parseInt(input));
+                } catch (Exception e){
+                    System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
+                }
+            }
             case PICKED_TILE -> {
                 switch (input) {
                     case "0" -> System.out.print("Show spaceship\n");
