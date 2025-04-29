@@ -5,8 +5,7 @@ import it.polimi.ingsw.model.bank.BatteryToken;
 public class PowerCenter extends ComponentTile {
     private BatteryToken[] batteries;
 
-
-    public PowerCenter(ConnectorType[] connectors, int id) {
+    public PowerCenter(ConnectorType[] connectors, int capacity, int id) {
         super(connectors,id);
     }
 

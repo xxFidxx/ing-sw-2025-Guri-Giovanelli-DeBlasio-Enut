@@ -1,46 +1,18 @@
 [
   {
-    "type": "Cabin",
-    "connectors": [0, 1, 2, 3],
-    "isCentral": false
-  },
-  {
-    "type": "Cannon",
-    "connectors": [1, 0, 0, 0]
-  },
-  {
-    "type": "CargoHolds",
-    "connectors": [0, 1, 0, 0],
-    "isSpecial": false
-  },
-  {
-    "type": "DoubleCannon",
-    "connectors": [1, 0, 1, 0]
-  },
-  {
-    "type": "DoubleEngine",
-    "connectors": [0, 0, 0, 1]
-  },
-  {
-    "type": "Engine",
-    "connectors": [0, 0, 1, 0]
-  },
-  {
-    "type": "LifeSupportSystem",
-    "connectors": [0, 1, 0, 1],
-    "color": "green"
+  "type": "PowerCenter",
+  "connectors": [3, 1, 2, 0],
+  "capacity": 2
   },
   {
     "type": "PowerCenter",
-    "connectors": [1, 1, 0, 0]
+    "connectors": [3, 2, 0, 0],
+    "capacity": 2
   },
   {
-    "type": "ShieldGenerator",
-    "connectors": [0, 0, 1, 1],
-    "protection": [true, false, true, false]
-  },
-  {
-    "type": "StructuralModule",
-    "connectors": [0, 0, 0, 0]
+    "type": "PowerCenter",
+    "connectors": [3, 2, 1, 0],
+    "capacity": 2
   }
+
 ]

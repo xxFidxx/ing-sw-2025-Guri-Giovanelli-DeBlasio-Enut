@@ -40,7 +40,8 @@ public class ComponentTileDeserializer implements JsonDeserializer<ComponentTile
                 return new Cannon(connectors, id++);
             case "CargoHolds": {
                 boolean isSpecial = obj.get("isSpecial").getAsBoolean();
-                return new CargoHolds(connectors, id++, isSpecial);
+                int capacity = obj.get("capacity").getAsInt();
+                return new CargoHolds(connectors, id++, isSpecial, capacity);
             }
             case "DoubleCannon":
                 return new DoubleCannon(connectors, id++);
@@ -53,7 +54,8 @@ public class ComponentTileDeserializer implements JsonDeserializer<ComponentTile
                 return new LifeSupportSystem(color, connectors, id++);
             }
             case "PowerCenter":
-                return new PowerCenter(connectors, id++);
+                int capacity = obj.get("capacity").getAsInt();
+                return new PowerCenter(connectors, capacity, id++);
             case "ShieldGenerator": {
                 JsonArray protArr = obj.get("protection").getAsJsonArray();
                 boolean[] protection = new boolean[4];
