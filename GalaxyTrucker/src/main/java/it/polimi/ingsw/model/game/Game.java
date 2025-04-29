@@ -43,11 +43,11 @@ public class Game {
 
 // Poi creiamo l'array di ComponentTile
         this.assemblingTiles = new ComponentTile[] {
-                new Cannon(cannonConnectors, 1),     // Cannon1
-                new Cannon(cannonConnectors, 2),     // Cannon2
-                new CargoHolds(cargoConnectors, 3, false),  // Cabin1 (non speciale)
-                new CargoHolds(cargoConnectors, 4, false),  // Cabin2 (non speciale)
-                new CargoHolds(cargoConnectors, 5, true)    // Engine1 (speciale)
+                new Cannon(cannonConnectors, 0),     // Cannon1
+                new Cannon(cannonConnectors, 1),     // Cannon2
+                new CargoHolds(cargoConnectors, 2, false),  // Cabin1 (non speciale)
+                new CargoHolds(cargoConnectors, 3, false),  // Cabin2 (non speciale)
+                new CargoHolds(cargoConnectors, 4, true)    // Engine1 (speciale)
         };
     }
 
