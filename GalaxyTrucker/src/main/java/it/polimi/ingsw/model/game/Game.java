@@ -23,9 +23,15 @@ public class Game {
         dices[0] = new Dice();
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
-        this.plance = new Flightplance(playersName.size(),this);
+        this.plance = new Flightplance(playersName.size(), this);
+    }
 
+    // Setter che usi solo nei test
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
+    }
 
+    public void Startgame() {
         // Prima definiamo i connettori per i componenti
         ConnectorType[] cannonConnectors = {
                 ConnectorType.CANNON,   // Lato superiore
@@ -76,12 +82,11 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        ArrayList<Player> tmp = players;
-        Collections.sort(tmp, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
-        for (int i = tmp.size() - 1; i >= 0; i--) {
-            if (card.checkCondition(tmp.get(i)))
-                if (tmp.get(i).getResponse())
-                    return tmp.get(i);
+        // orderPlayers();
+        for (int i = players.size() - 1; i >= 0; i--) {
+            if (card.checkCondition(players.get(i)))
+                if (players.get(i).getResponse())
+                    return players.get(i);
         }
         return null;
     }
