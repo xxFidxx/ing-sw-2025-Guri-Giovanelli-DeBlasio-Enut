@@ -44,9 +44,9 @@ public class Game {
         this.assemblingTiles = new ComponentTile[]{
                 new Cannon(cannonConnectors, 0),     // Cannon1
                 new Cannon(cannonConnectors, 1),     // Cannon2
-                new CargoHolds(cargoConnectors, 2, false),  // Cabin1 (non speciale)
-                new CargoHolds(cargoConnectors, 3, false),  // Cabin2 (non speciale)
-                new CargoHolds(cargoConnectors, 4, true)    // Engine1 (speciale)
+                new CargoHolds(cargoConnectors, 2, false,3),  // Cabin1 (non speciale)
+                new CargoHolds(cargoConnectors, 3, false,4),  // Cabin2 (non speciale)
+                new CargoHolds(cargoConnectors, 4, true,4)    // Engine1 (speciale)
         };
     }
 
