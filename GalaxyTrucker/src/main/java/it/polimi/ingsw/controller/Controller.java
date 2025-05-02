@@ -5,7 +5,7 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
@@ -132,6 +132,9 @@ public class Controller implements EventListenerInterface {
             case PICKED_TILE -> {
                 event = new Event(this, state, new PickedTile((String)data));
             }
+            case DRAW_CARD -> {
+                event = new Event(this, state, (DataContainer) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -159,4 +162,13 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(event);
     }
 
+    public void activateCard(ClientListener listener) {
+        AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
+        String cardName = cards[0].getName();
+        int cardLevel = cards[0].getLevel();
+        Card card = new Card(cardName, cardLevel);
+
+        if(cardName != null)
+            listener.onEvent(eventCrafter(GameState.DRAW_CARD, card));
+    }
 }

@@ -109,4 +109,9 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListener listener = clientListeners.get(client);
         controller.pickTile(listener, id);
     }
+
+    public void drawCard(VirtualViewRmi client) throws RemoteException {
+        ClientListener listener = clientListeners.get(client);
+        controller.activateCard(listener);
+    }
 }

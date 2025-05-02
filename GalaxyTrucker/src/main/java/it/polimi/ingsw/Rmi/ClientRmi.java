@@ -7,7 +7,6 @@ import it.polimi.ingsw.controller.network.data.*;
 
 
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -107,6 +106,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case DRAW_CARD -> {
+                server.drawCard(this);
+            }
         }
         System.out.print("\n> ");
     }
@@ -121,6 +123,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ASSEMBLY -> System.out.print("List of available tiles: ");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case DRAW_CARD -> System.out.print("This is the card you picked:\n");
         }
         System.out.print("\n> ");
     }
@@ -157,6 +160,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
             case PickedTile ptl -> System.out.println(ptl.getTileName() + "\n");
+            case Card c -> System.out.println(c.getName() + c.getLevel() + "\n");
             default -> {}
         }
     }

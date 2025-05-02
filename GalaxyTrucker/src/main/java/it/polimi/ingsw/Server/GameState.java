@@ -16,7 +16,8 @@ public enum GameState {
     BATTERY_USAGE,
     ABANDONED_SHIP_STOP,
     ABANDONED_STATION_STOP,
-    PLANETS_STOP
+    PLANETS_STOP,
+    DRAW_CARD,
     }
 
 // flight plance
