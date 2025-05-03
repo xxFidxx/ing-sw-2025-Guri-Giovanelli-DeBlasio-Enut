@@ -15,8 +15,8 @@ public class Flightplance {
         this.spots = new Placeholder[spots];
         // mi creo delle carte finte per simulare il comportamento
         this.fakeCards = new AdventureCard[]{
-            new AbandonedShipCard("AbCard1", 2, 1, 3, 4, deck),
-            new AbandonedShipCard("AbCard2", 2, 1, 2, 3, deck),
+            new AbandonedShipCard("AbShipCard1", 2, 1, 3, 4, deck),
+            new AbandonedShipCard("AbShipCard2", 2, 1, 2, 3, deck),
             new EpidemicCard("EpCard1", 2, deck),
             new OpenSpaceCard("OpenSpaceCard", 2, deck)
         };

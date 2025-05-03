@@ -102,12 +102,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> System.out.print("Show spaceship\n");
                     case "1" -> System.out.print("Show reserve spots\n");
                     case "2" -> System.out.print("Show pickableTile\n");
+                    case "3" -> server.drawCard(this);
                     default -> System.out.print("Not accepted input, please follow the instructions below:\n");
                 }
             }
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
-            case DRAW_CARD -> {
-                server.drawCard(this);
+            case ACTIVATE_CARD -> {
+                server.activateCard(this);
             }
         }
         System.out.print("\n> ");
@@ -121,7 +122,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> System.out.print("List of available tiles: ");
-            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back\n");
+            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
             case DRAW_CARD -> System.out.print("This is the card you picked:\n");
         }
@@ -160,7 +161,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
             case PickedTile ptl -> System.out.println(ptl.getTileName() + "\n");
-            case Card c -> System.out.println(c.getName() + c.getLevel() + "\n");
+            case Card c -> System.out.println(c.getName() + ",level: " + c.getLevel() + "\n");
             default -> {}
         }
     }

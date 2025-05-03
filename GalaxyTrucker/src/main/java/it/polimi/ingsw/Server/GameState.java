@@ -18,6 +18,7 @@ public enum GameState {
     ABANDONED_STATION_STOP,
     PLANETS_STOP,
     DRAW_CARD,
+    ACTIVATE_CARD,
     }
 
 // flight plance

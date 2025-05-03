@@ -162,7 +162,7 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(event);
     }
 
-    public void activateCard(ClientListener listener) {
+    public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
         String cardName = cards[0].getName();
         int cardLevel = cards[0].getLevel();
@@ -170,5 +170,10 @@ public class Controller implements EventListenerInterface {
 
         if(cardName != null)
             listener.onEvent(eventCrafter(GameState.DRAW_CARD, card));
+    }
+
+    public void activateCard(ClientListener listener) throws LobbyExceptions {
+        AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
+        cards[0].activate();
     }
 }
