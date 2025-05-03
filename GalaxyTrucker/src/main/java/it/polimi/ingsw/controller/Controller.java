@@ -6,7 +6,6 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.componentTiles.ConnectorType;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.Game;
@@ -27,6 +26,7 @@ public class Controller implements EventListenerInterface {
     private final Object LobbyLock = new Object();
     private final Object GameLock = new Object();
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
+    final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
 
     public Controller() {
         this.game = null;
@@ -166,20 +166,20 @@ public class Controller implements EventListenerInterface {
     }
 
     public String[] tileCrafter(String name, ConnectorType[] connectors){
-        String[][] tile =  new String[2][2];
-        for(int i=0; i<2; i++){
-            ConnectorType connector = connectors[i];
-            switch(connector){
-                case ConnectorType.UNIVERSAL ->
-            }
-        }
+         char[][] tile =  new char[2][2];
+         for(int i=0; i<2; i++){
+             ConnectorType connector = connectors[i];
+             switch(connector){
+                 case ConnectorType.UNIVERSAL ->
+             }
+         }
 
     }
 
     public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
-        AdventureCard AdCard = cards[0];
-        String cardName = AdCard.getName();
+        AdventureCard adCard = cards[0];
+        String cardName = adCard.getName();
         int cardLevel = cards[0].getLevel();
         Card card = new Card(cardName, cardLevel);
 
@@ -187,8 +187,12 @@ public class Controller implements EventListenerInterface {
             listener.onEvent(eventCrafter(GameState.DRAW_CARD, card));
         // else stato partita terminata
 
-        switch(AdCard){
-            case AbandonedShipCard asc -> listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, card));
+        switch(adCard){
+            case AbandonedShipCard asc -> {
+                ClientListener l = listenerbyPlayer.get((game.choosePlayer(adCard)));
+
+                listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, card));
+            }
             default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
         }
     }
@@ -196,5 +200,14 @@ public class Controller implements EventListenerInterface {
     public void activateCard(ClientListener listener) throws LobbyExceptions {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
         cards[0].activate();
+    }
+
+    public void handleWaiters(ClientListener listener){
+        for(ClientListener l: listeners){
+            if(l == listener)
+                listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
+            else
+                listener.onEvent(eventCrafter(GameState.WAIT_STATE, null));
+        }
     }
 }

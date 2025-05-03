@@ -83,7 +83,7 @@ public class Game {
         // orderPlayers();
         for (int i = players.size() - 1; i >= 0; i--) {
             if (card.checkCondition(players.get(i)))
-                if (players.get(i).getResponse())
+                if (!players.get(i).getResponse())
                     return players.get(i);
         }
         return null;

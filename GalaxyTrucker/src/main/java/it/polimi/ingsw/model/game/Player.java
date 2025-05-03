@@ -18,6 +18,7 @@ public class Player {
         private int numAliens;
         private Game game;
         private ComponentTile handTile;
+        private boolean Response;
 
     public Player(String nickname, Game game, int playerNumber) {
         this.nickname = nickname;
@@ -28,6 +29,7 @@ public class Player {
         this.numAliens = 0;
         this.game = game;
         this.handTile = null;
+        this.Response = false;
     }
 
     public void setSpaceshipPlance(SpaceshipPlance spaceshipPlance) {
@@ -73,7 +75,10 @@ public class Player {
         public void setNumAliens(int n){ numAliens = n; }
         public void setNumAstronauts(int n){ numAstronauts = n; }
         public boolean getResponse() {
-            return true;
+            return Response;
+        }
+        public void setResponse(boolean response) {
+            Response = response;
         }
 
     public Game getGame() {
