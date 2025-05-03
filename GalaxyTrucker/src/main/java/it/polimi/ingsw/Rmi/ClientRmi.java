@@ -94,7 +94,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 try{
                     server.pickTile(this,Integer.parseInt(input));
                 } catch (Exception e){
-                    System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
+                    System.out.print("You have been disconnected:");
                 }
             }
             case PICKED_TILE -> {
@@ -159,7 +159,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         switch(data){
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
-            case PickedTile ptl -> System.out.println(ptl.getTileName() + "\n");
+            case PickedTile ptl -> System.out.println(ptl.getName() + "\n");
             case Card c -> System.out.println(c.getName() + c.getLevel() + "\n");
             default -> {}
         }

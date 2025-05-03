@@ -39,6 +39,14 @@ public class SpaceshipPlance {
         this.nAstronauts = 0;
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;
+
+        ConnectorType[] cannonConnectors = {
+                ConnectorType.UNIVERSAL,   // Lato superiore
+                ConnectorType.UNIVERSAL,   // Lato destro
+                ConnectorType.UNIVERSAL,   // Lato inferiore
+                ConnectorType.UNIVERSAL    // Lato sinistro
+        };
+        components[2][3] = new Cabin(cannonConnectors,true,-1);
     }
 
     public int getBrownAliens() {
@@ -47,6 +55,17 @@ public class SpaceshipPlance {
 
     public int getPurpleAliens() {
         return this.nPurpleAliens;
+    }
+
+    private boolean edgeCases(int y, int x) {
+        if (y == 0) { // First row: exclude columns 0 and 5
+            return x == 0 || x == 5;
+        } else if (y == 1) { // Second row: exclude column 5
+            return x == 5;
+        } else if (y == 3) { // Last row: exclude columns 0 and 5
+            return x == 0 || x == 5;
+        }
+        return false;
     }
 
     private void initVisited(){
@@ -131,7 +150,7 @@ public class SpaceshipPlance {
     private void dfsCorrectness(int x, int y){
 
         // visita tutti le tile in profondità e dice se sono connesse bene
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x) ||
                 components[y][x] == null || visited[y][x]) {
             return;
         }
@@ -196,7 +215,7 @@ public class SpaceshipPlance {
 
     private void dfsRemove(int x, int y, int iteration){
 
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x) ||
                 components[y][x] == null || visited[y][x]) {
             return;
         }
@@ -660,7 +679,7 @@ public class SpaceshipPlance {
     }
 
     public void placeTileComponents(ComponentTile tile, int x, int y) {
-        if(x < 0 || x >= 6 || y < 0 || y >= 4)
+        if(x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x))
             System.out.println("Out of bounds");
         else if(components[y][x] != null){
             System.out.println("Spot already taken");
