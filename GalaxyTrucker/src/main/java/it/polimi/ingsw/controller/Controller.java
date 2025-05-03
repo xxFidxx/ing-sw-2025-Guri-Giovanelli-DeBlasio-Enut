@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.componentTiles.ConnectorType;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
@@ -177,12 +178,19 @@ public class Controller implements EventListenerInterface {
 
     public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
-        String cardName = cards[0].getName();
+        AdventureCard AdCard = cards[0];
+        String cardName = AdCard.getName();
         int cardLevel = cards[0].getLevel();
         Card card = new Card(cardName, cardLevel);
 
         if(cardName != null)
             listener.onEvent(eventCrafter(GameState.DRAW_CARD, card));
+        // else stato partita terminata
+
+        switch(AdCard){
+            case AbandonedShipCard asc -> listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, card));
+            default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
+        }
     }
 
     public void activateCard(ClientListener listener) throws LobbyExceptions {

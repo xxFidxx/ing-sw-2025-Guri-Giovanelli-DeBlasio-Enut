@@ -161,8 +161,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
             case PickedTile ptl -> System.out.println(ptl.getName() + "\n");
-            case Card c -> System.out.println(c.getName() + c.getLevel() + "\n");
-            case PickedTile ptl -> System.out.println(ptl.getTileName() + "\n");
             case Card c -> System.out.println(c.getName() + ",level: " + c.getLevel() + "\n");
             default -> {}
         }

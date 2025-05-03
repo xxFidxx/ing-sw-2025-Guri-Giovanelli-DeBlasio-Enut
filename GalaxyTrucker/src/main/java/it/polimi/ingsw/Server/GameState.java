@@ -19,6 +19,7 @@ public enum GameState {
     PLANETS_STOP,
     DRAW_CARD,
     ACTIVATE_CARD,
+    CHOOSE_PLAYER,
     }
 
 // flight plance
