@@ -5,6 +5,8 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.componentTiles.ConnectorType;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
@@ -160,6 +162,17 @@ public class Controller implements EventListenerInterface {
 
         Event event = eventCrafter(currentGameState,null);
         notifyAllListeners(event);
+    }
+
+    public String[] tileCrafter(String name, ConnectorType[] connectors){
+        String[][] tile =  new String[2][2];
+        for(int i=0; i<2; i++){
+            ConnectorType connector = connectors[i];
+            switch(connector){
+                case ConnectorType.UNIVERSAL ->
+            }
+        }
+
     }
 
     public void drawCard(ClientListener listener) {
