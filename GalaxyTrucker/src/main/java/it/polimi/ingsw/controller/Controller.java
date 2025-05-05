@@ -6,7 +6,7 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
-import it.polimi.ingsw.model.componentTiles.ConnectorType;
+import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
@@ -101,10 +101,13 @@ public class Controller implements EventListenerInterface {
 
     public void pickTile(ClientListener listener, int tileId) throws LobbyExceptions {
         Player player = playerbyListener.get(listener);
-        String tileName = game.pickTile(player,tileId);
+        ComponentTile tile = game.pickTile(player,tileId);
 
-        if(tileName != null)
-        listener.onEvent(eventCrafter(GameState.PICKED_TILE, tileName));
+        if(tile != null){
+            String tileName = tiletoString(tile);
+            ConnectorType[] connectors = tile.getConnectors();
+            listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tileName,connectors)));
+        }
         else{
             listener.onEvent(eventCrafter(GameState.ROBBED_TILE, null));
             listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
@@ -134,7 +137,7 @@ public class Controller implements EventListenerInterface {
             }
 
             case PICKED_TILE -> {
-                event = new Event(this, state, new PickedTile((String)data));
+                event = new Event(this, state, (PickedTile)data);
             }
             case DRAW_CARD -> {
                 event = new Event(this, state, (DataContainer) data);
@@ -188,6 +191,54 @@ public class Controller implements EventListenerInterface {
          }
     }
 
+    private String tiletoString(ComponentTile tile){
+        if (tile != null) {
+            switch (tile) {
+                case DoubleCannon dc -> {
+                    return "DoubleCannon";
+                }
+
+                case Cannon c-> {
+                    return "Cannon";
+                }
+
+                case DoubleEngine de -> {
+                    return "DoubleEngine";
+                }
+                case Engine e -> {
+                    return "Engine";
+                }
+                case Cabin cab -> {
+                    return "Cabin";
+                }
+                case CargoHolds ch -> {
+                    return "CargoHolds";
+                }
+
+                case ShieldGenerator sg -> {
+                    return "ShieldGenerator";
+                }
+
+                case LifeSupportSystem lfs -> {
+                    return "LifeSupportSystem";
+                }
+
+                case PowerCenter pc -> {
+                    return "PowerCenter";
+                }
+
+                case StructuralModule sm -> {
+                    return "StructuralModule";
+                }
+
+                default -> {
+                    return "not Catched in tiletoString";
+                }
+            }
+        }
+        return null;
+    }
+
     public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
         AdventureCard adCard = cards[0];
@@ -202,8 +253,9 @@ public class Controller implements EventListenerInterface {
 
         switch(adCard){
             case AbandonedShipCard asc -> {
-                ClientListener l = listenerbyPlayer.get((game.choosePlayer(adCard)));
-                    if(l!=null)
+                Player p = (game.choosePlayer(adCard));
+                ClientListener l = listenerbyPlayer.get(p);
+                    if(p!=null)
                         handleWaiters(l);
                         // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
                     else{
@@ -250,5 +302,20 @@ public class Controller implements EventListenerInterface {
     public void checkStorage(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         game.checkStorage(player);
+    }
+
+    public void addGood(ClientListener listener,int cargoIndex, int goodIndex, int rewardIndex) {
+        Player player = playerbyListener.get(listener);
+        game.addGood(player,cargoIndex,goodIndex,rewardIndex);
+    }
+
+    public void swapGoods(ClientListener listener,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+        Player player = playerbyListener.get(listener);
+        game.swapGoods(player,cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
+    }
+
+    public void removeGood(ClientListener listener, int cargoIndex, int goodIndex) {
+        Player player = playerbyListener.get(listener);
+        game.removeGood(player,cargoIndex,goodIndex,goodIndex);
     }
 }

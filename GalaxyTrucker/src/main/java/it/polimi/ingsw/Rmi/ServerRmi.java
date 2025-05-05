@@ -133,17 +133,20 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void addGood(int cargoIndex, int goodIndex, int rewardIndex) {
-
+    public void addGood(VirtualViewRmi client,int cargoIndex, int goodIndex, int rewardIndex) {
+        ClientListener listener = clientListeners.get(client);
+        controller.addGood(listener,cargoIndex,goodIndex,rewardIndex);
     }
 
     @Override
-    public void swapGoods(int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
-
+    public void swapGoods(VirtualViewRmi client,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+        ClientListener listener = clientListeners.get(client);
+        controller.swapGoods(listener,cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
     }
 
     @Override
-    public void removeGood(int cargoIndex, int goodIndex) {
-
+    public void removeGood(VirtualViewRmi client,int cargoIndex, int goodIndex) {
+        ClientListener listener = clientListeners.get(client);
+        controller.removeGood(listener, cargoIndex, goodIndex);
     }
 }

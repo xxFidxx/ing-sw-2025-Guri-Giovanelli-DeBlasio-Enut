@@ -299,7 +299,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
+    public void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
 
         if (cargoIndex1 >= 0 && cargoIndex1 < cargoHolds.size() && cargoIndex2 >= 0 && cargoIndex2 < cargoHolds.size()) {
 
@@ -323,7 +323,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void handleRemove(int cargoIndex,int goodIndex) throws CargoManagementException{
+    public void handleRemove(int cargoIndex, int goodIndex) throws CargoManagementException{
 
         if (cargoIndex >= 0 && cargoIndex < cargoHolds.size()) {
             CargoHolds cargo1 = cargoHolds.get(cargoIndex);
@@ -335,7 +335,7 @@ public class SpaceshipPlance {
             throw new CargoManagementException("cargo index is outbound");
     }
 
-    private void handleAdd(GoodsBlock[] cardReward,int cargoIndex,int goodIndex,int rewardIndex) throws CargoManagementException{
+    public void handleAdd(GoodsBlock[] cardReward,int cargoIndex,int goodIndex,int rewardIndex) throws CargoManagementException{
 
         if(cargoIndex >= 0 && cargoIndex < cargoHolds.size()) {
             CargoHolds cargo1 = cargoHolds.get(cargoIndex);
