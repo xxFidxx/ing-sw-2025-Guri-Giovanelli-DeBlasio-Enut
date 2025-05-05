@@ -44,9 +44,9 @@ public class Game {
         this.assemblingTiles = new ComponentTile[]{
                 new Cannon(cannonConnectors, 0),     // Cannon1
                 new Cannon(cannonConnectors, 1),     // Cannon2
-                new CargoHolds(cargoConnectors, 2, false),  // Cabin1 (non speciale)
-                new CargoHolds(cargoConnectors, 3, false),  // Cabin2 (non speciale)
-                new CargoHolds(cargoConnectors, 4, true)    // Engine1 (speciale)
+                new CargoHolds(cargoConnectors, 2, false,3),  // Cabin1 (non speciale)
+                new CargoHolds(cargoConnectors, 3, false,4),  // Cabin2 (non speciale)
+                new CargoHolds(cargoConnectors, 4, true,4)    // Engine1 (speciale)
         };
     }
 
@@ -80,10 +80,11 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        // orderPlayers();
+        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+
         for (int i = players.size() - 1; i >= 0; i--) {
             if (card.checkCondition(players.get(i)))
-                if (players.get(i).getResponse())
+                if (!players.get(i).hasResponded())
                     return players.get(i);
         }
         return null;
@@ -95,13 +96,13 @@ public class Game {
 
 
     public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
-        Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
 
         while (!players.isEmpty()) {
             Player topPlayer = players.pop();
             for (Planet planet : planets) {
                 if (!planet.isBusy())
-                    if (topPlayer.getResponse())
+                    if (topPlayer.hasResponded())
                         return topPlayer;
             }
 
@@ -182,7 +183,7 @@ public class Game {
                 }
 
                 default -> {
-                    return "notCatched in tiletoString";
+                    return "not Catched in tiletoString";
                 }
             }
         }
@@ -190,5 +191,14 @@ public class Game {
     }
 
 
+    public void resetResponded() {
+        for(Player p: players){
+            p.setResponded(false);
+        }
+    }
+
+    public void checkStorage(Player player) throws CargoManagementException {
+        player.getSpaceshipPlance().checkStorage();
+    }
 }
 

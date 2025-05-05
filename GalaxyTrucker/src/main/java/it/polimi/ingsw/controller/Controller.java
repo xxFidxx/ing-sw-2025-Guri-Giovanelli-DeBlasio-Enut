@@ -1,16 +1,16 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.Rmi.VirtualViewRmi;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
+import it.polimi.ingsw.model.componentTiles.ConnectorType;
+import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -26,6 +26,8 @@ public class Controller implements EventListenerInterface {
     private final Object LobbyLock = new Object();
     private final Object GameLock = new Object();
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
+    final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
+    final Map <ClientListener, Boolean> isDonecrafting  = new HashMap<>();
 
     public Controller() {
         this.game = null;
@@ -134,6 +136,9 @@ public class Controller implements EventListenerInterface {
             case PICKED_TILE -> {
                 event = new Event(this, state, new PickedTile((String)data));
             }
+            case DRAW_CARD -> {
+                event = new Event(this, state, (DataContainer) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -151,9 +156,21 @@ public class Controller implements EventListenerInterface {
 
         ArrayList<Player> players= game.getPlayers();
 
-        synchronized(playerbyListener){
-            for(int i=0; i<players.size(); i++){
+        synchronized(playerbyListener) {
+            for (int i = 0; i < players.size(); i++) {
                 playerbyListener.put(listeners.get(i), players.get(i));
+            }
+        }
+
+        synchronized(listenerbyPlayer) {
+            for (int i = 0; i < listenerbyPlayer.size(); i++) {
+                listenerbyPlayer.put(players.get(i), listeners.get(i));
+            }
+        }
+
+        synchronized(isDonecrafting){
+            for(int i=0; i<isDonecrafting.size(); i++){
+                isDonecrafting.put(listeners.get(i), false);
             }
         }
 
@@ -161,8 +178,77 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(event);
     }
 
-    public void drawCard(ClientListener listener) throws RemoteException {
-
+    public String[] tileCrafter(String name, ConnectorType[] connectors){
+         char[][] tile =  new char[2][2];
+         for(int i=0; i<2; i++){
+             ConnectorType connector = connectors[i];
+             switch(connector){
+                 case ConnectorType.UNIVERSAL ->
+             }
+         }
     }
 
+    public void drawCard(ClientListener listener) {
+        AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
+        AdventureCard adCard = cards[0];
+        String cardName = adCard.getName();
+        int cardLevel = cards[0].getLevel();
+        Card card = new Card(cardName, cardLevel);
+
+        if(cardName != null)
+            notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
+        else
+            notifyAllListeners(eventCrafter(GameState.END_GAME, null));
+
+        switch(adCard){
+            case AbandonedShipCard asc -> {
+                ClientListener l = listenerbyPlayer.get((game.choosePlayer(adCard)));
+                    if(l!=null)
+                        handleWaiters(l);
+                        // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
+                    else{
+                        notifyAllListeners(eventCrafter(GameState.NONE_ACTIVATE, null));
+                        game.resetResponded();
+                    }
+            }
+            default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
+        }
+    }
+
+    public void activateCard(ClientListener listener) throws LobbyExceptions {
+        AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
+        cards[0].activate();
+    }
+
+    public void handleWaiters(ClientListener listener){
+        for(ClientListener l: listeners){
+            if(l == listener)
+                listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
+            else
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        }
+    }
+
+    public void playerIsDoneCrafting(ClientListener listener) throws Exception {
+        if(isDonecrafting.get(listener))
+            throw new Exception ("The player was already done crafting!\n");
+
+        synchronized(isDonecrafting){
+            isDonecrafting.replace(listener,true);
+        }
+
+        synchronized(isDonecrafting){
+            if(!isDonecrafting.containsValue(false))
+               handleCraftingEnded();
+        }
+    }
+
+    public void handleCraftingEnded(){
+        notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
+    }
+
+    public void checkStorage(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        game.checkStorage(player);
+    }
 }

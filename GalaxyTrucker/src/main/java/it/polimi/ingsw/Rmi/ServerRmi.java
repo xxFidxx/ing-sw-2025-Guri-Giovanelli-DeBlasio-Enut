@@ -5,8 +5,8 @@ import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
+import it.polimi.ingsw.model.game.CargoManagementException;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -110,14 +110,40 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.pickTile(listener, id);
     }
 
-    @Override
     public void drawCard(VirtualViewRmi client) throws RemoteException {
         ClientListener listener = clientListeners.get(client);
         controller.drawCard(listener);
     }
 
+    public void activateCard(VirtualViewRmi client) throws RemoteException {
+        ClientListener listener = clientListeners.get(client);
+        controller.activateCard(listener);
+    }
 
+    @Override
+    public void endCrafting(VirtualViewRmi client) throws Exception {
+        ClientListener listener = clientListeners.get(client);
+        controller.playerIsDoneCrafting(listener);
+    }
 
+    @Override
+    public void checkStorage(VirtualViewRmi client) throws CargoManagementException {
+        ClientListener listener = clientListeners.get(client);
+        controller.checkStorage(listener);
+    }
 
+    @Override
+    public void addGood(int cargoIndex, int goodIndex, int rewardIndex) {
 
+    }
+
+    @Override
+    public void swapGoods(int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+
+    }
+
+    @Override
+    public void removeGood(int cargoIndex, int goodIndex) {
+
+    }
 }

@@ -4,10 +4,10 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.model.game.CargoManagementException;
 
 
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -31,7 +31,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         currentState = GameState.IDLE;
     }
 
-    public static void main(String[] args) throws RemoteException, NotBoundException {
+    public static void main(String[] args) throws Exception {
         final String serverName = "ServerRmi";
 
         // qua c'è da metterci come primo argomento identificativo registro , visto che voglio testare sulla mia macchina
@@ -43,14 +43,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         new ClientRmi(server).run();
     }
 
-    private void run() throws RemoteException {
+    private void run() throws Exception {
         server.connect(this);
         Thread eventThread = new Thread(this::handleEvents);
         eventThread.start();
         runCli();
     }
 
-    private void runCli() throws RemoteException {
+    private void runCli() throws Exception {
         while (true) {
             if (scan.hasNextLine()) {
                 String input = scan.nextLine().trim(); // trim to remove white spaces around the string
@@ -62,40 +62,41 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     }
 
     // sono da capire dove gestire gli errori di parsing in input
-    private void handleInput(String input) throws RemoteException {
-        switch(currentState){
-            case IDLE ->{
+    private void handleInput(String input) throws Exception {
+        switch (currentState) {
+            case IDLE -> {
                 if (input.equals("0")) {
                     System.out.print("Enter lobby size [2-4]: ");
-                    int size = Integer.parseInt(scan.nextLine());
-                    try{
-                        server.createLobby(this,size);
-                    }catch (LobbyExceptions e){
-                        System.out.print("Lobby already exists, join it:\n");
-                    } catch (RemoteException e){
-                        System.out.print("You have been disconnected:\n");
+                    try {
+                        int size = Integer.parseInt(scan.nextLine());
+                        try {
+                            server.createLobby(this, size);
+                        } catch (Exception e) {
+                            System.out.print(e.getMessage() + "\n");
+                        }
+
+                    } catch (NumberFormatException e) {
+                        System.out.print(e.getMessage() + "\n");
                     }
-                }else{
+                } else {
                     System.out.print("Not accepted input, please follow the instructions below:\n");
                 }
             }
             case LOBBY_PHASE -> {
                 try {
                     server.addNickname(this, input);
-                } catch (LobbyExceptions e) {
-                    System.out.print("Already existent nickname, please retry with a different one\n");
-                } catch(RemoteException e){
-                    System.out.print("You have been disconnected:\n");
+                } catch (Exception e) {
+                    System.out.print(e.getMessage() + "\n");
                 }
             }
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
 
-            case ASSEMBLY ->{
-                try{
-                    server.pickTile(this,Integer.parseInt(input));
-                } catch (Exception e){
-                    System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
+            case ASSEMBLY -> {
+                try {
+                    server.pickTile(this, Integer.parseInt(input));
+                } catch (Exception e) {
+                    System.out.print(e.getMessage() + "\n");
                 }
             }
             case PICKED_TILE -> {
@@ -103,11 +104,106 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> System.out.print("Show spaceship\n");
                     case "1" -> System.out.print("Show reserve spots\n");
                     case "2" -> System.out.print("Show pickableTile\n");
-                    default -> System.out.print("Not accepted input, please follow the instructions below:\n");
+                    case "3" -> server.drawCard(this);
+                    case "4" -> {
+                        try {
+                            server.endCrafting(this);
+                        } catch (Exception e) {
+                            System.out.print(e.getMessage() + "\n");
+                        }
+                    }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
-            case DRAW_CARD -> server.drawCard(this) ;
+            case DRAW_CARD ->
+                    System.out.print("If you are the leader you will have to choose what to do, else just wait the players ahead are done!\n");
+            case ACTIVATE_CARD -> {
+                server.activateCard(this);
+            }
+
+            case CARGO_MANAGEMENT -> {
+                switch (input) {
+                    case "0" -> {
+                        System.out.print("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
+                        String inputLine = scan.nextLine();
+
+                        try {
+                            String[] parts = inputLine.split(" ");
+                            if (parts.length != 3) {
+                                System.out.println("Wrong input. You need 3 numbers divided by a space \n");
+                                System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+                                break;
+                            }
+
+                            int cargoIndex = Integer.parseInt(parts[0]);
+                            int goodIndex = Integer.parseInt(parts[1]);
+                            int rewardIndex = Integer.parseInt(parts[2]);
+
+                            server.addGood(cargoIndex, goodIndex, rewardIndex);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                            System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end  Cargo Management\n");
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                    case "1" -> {
+                        System.out.print("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
+                        String inputLine = scan.nextLine();
+
+                        try {
+                            String[] parts = inputLine.split(" ");
+                            if (parts.length != 4) {
+                                System.out.println("Wrong input. You need 4 numbers divided by a space\n");
+                                System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end  Cargo Management\n");
+                                break;
+                            }
+
+                            int cargoIndex1 = Integer.parseInt(parts[0]);
+                            int cargoIndex2 = Integer.parseInt(parts[1]);
+                            int goodIndex1 = Integer.parseInt(parts[2]);
+                            int goodIndex2 = Integer.parseInt(parts[3]);
+
+                            server.swapGoods(cargoIndex1, cargoIndex2, goodIndex1, goodIndex2);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                            System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                    case "2" -> {
+                        System.out.print("Insert: cargoIndex goodIndex (es. 0 1): ");
+                        String inputLine = scan.nextLine();
+
+                        try {
+                            String[] parts = inputLine.split(" ");
+                            if (parts.length != 2) {
+                                System.out.println("Wrong input. You need 2 numbers divided by a space \n");
+                                System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+                                break;
+                            }
+
+                            int cargoIndex = Integer.parseInt(parts[0]);
+                            int goodIndex = Integer.parseInt(parts[1]);
+
+                            server.removeGood(cargoIndex, goodIndex);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                            System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                            System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+                        }
+                    }
+
+                    case "3" -> {
+                        System.out.print("Cargo management ended:\n");
+                    }
+                    default -> System.out.print("Not accepted input, please try again:\n");
+                }
+            }
         }
         System.out.print("\n> ");
     }
@@ -120,9 +216,17 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> System.out.print("List of available tiles: ");
-            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back\n");
+            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
-            case DRAW_CARD -> System.out.print("You pick the Card: ");
+            case DRAW_CARD -> System.out.print("This is the drawn card:\n");
+            case CARGO_MANAGEMENT -> {
+                try{
+                    server.checkStorage(this);
+                    System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
+                } catch (Exception e){
+                    System.out.print(e.getMessage());
+                }
+            }
         }
         System.out.print("\n> ");
     }
@@ -158,7 +262,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         switch(data){
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
-            case PickedTile ptl -> System.out.println(ptl.getTileName() + "\n");
+            case PickedTile ptl -> System.out.println(ptl.getName() + "\n");
+            case Card c -> System.out.println(c.getName() + ",level: " + c.getLevel() + "\n");
             default -> {}
         }
     }

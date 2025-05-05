@@ -1,21 +1,33 @@
 package it.polimi.ingsw.model.game;
+import it.polimi.ingsw.model.adventureCards.*;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
 
 public class Flightplance {
     private Placeholder[] spots;
-    private Deck[] decks;
+    private Deck deck;
     private Game game;
+    private AdventureCard[] fakeCards;
 
     public Flightplance(int spots, Game game) {
         this.spots = new Placeholder[spots];
-        this.decks = new Deck[2];
+        // mi creo delle carte finte per simulare il comportamento
+        this.fakeCards = new AdventureCard[]{
+            new AbandonedShipCard("AbShipCard1", 2, 1, 3, 4, deck),
+            new AbandonedShipCard("AbShipCard2", 2, 1, 2, 3, deck),
+            new EpidemicCard("EpCard1", 2, deck),
+            new OpenSpaceCard("OpenSpaceCard", 2, deck)
+        };
+
+        this.deck = new Deck(fakeCards, this);
         this.game = game;
+
     }
 
-    public Deck[] getDecks() {
-        return decks;
+    public Deck getDeck() {
+        return deck;
     }
 
     public Optional<Player> getNext(Player player) {
