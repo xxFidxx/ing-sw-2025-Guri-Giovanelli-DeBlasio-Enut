@@ -136,4 +136,14 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void addGood(int cargoIndex, int goodIndex, int rewardIndex) {
 
     }
+
+    @Override
+    public void swapGoods(int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+
+    }
+
+    @Override
+    public void removeGood(int cargoIndex, int goodIndex) {
+
+    }
 }
