@@ -4,7 +4,9 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.game.CargoManagementException;
+import it.polimi.ingsw.model.resources.GoodsContainer;
 
 
 import java.rmi.NotBoundException;
@@ -59,6 +61,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 synchronized (StateLock) {
                     handleInput(input);
                 }
+            }
+            case CARGO_VIEW -> {
+                System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
             }
         }
     }
@@ -125,6 +130,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
 
             case CARGO_MANAGEMENT -> {
+                System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
+            }
+
+            case CARGO_VIEW -> {
                 switch (input) {
                     case "0" -> {
                         System.out.print("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
@@ -232,7 +241,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CARGO_MANAGEMENT -> {
                 try{
                     server.checkStorage(this);
-                    System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
                 } catch (Exception e){
                     System.out.print(e.getMessage());
                 }
@@ -278,8 +286,28 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
             case PickedTile ptl -> System.out.println(ptl.getName() + "\n");
             case Card c -> System.out.println(c.getName() + ",level: " + c.getLevel() + "\n");
+            case Cargos c -> printCargos(c.getCargos());
             default -> {}
         }
+    }
+
+    private void printCargos(ArrayList<GoodsContainer> cargos){
+        System.out.print("Here are the cargos you can choose from: the cargo number 0 is the reward one\n> ");
+        for(int i = 0; i < cargos.size(); i++){
+            GoodsBlock[] blocks = cargos.get(i).getGoods();
+            String isSpecial;
+            if(cargos.get(i).isSpecial())
+                isSpecial = "Special";
+            else
+                isSpecial = "";
+
+            System.out.printf(isSpecial + i + ": ");
+            for(int j = 0; j < blocks.length; j++){
+                System.out.printf("["+ blocks[j].getValue() + "] ");
+            }
+            System.out.print("  ");
+        }
+        System.out.println("\n");
     }
 
 

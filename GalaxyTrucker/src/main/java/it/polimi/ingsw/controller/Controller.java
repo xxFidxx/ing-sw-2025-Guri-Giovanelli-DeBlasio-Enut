@@ -6,14 +6,20 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
+
+import static it.polimi.ingsw.Server.GameState.CARGO_MANAGEMENT;
 
 
 public class Controller implements EventListenerInterface {
@@ -121,7 +127,7 @@ public class Controller implements EventListenerInterface {
     }
 
     public Event eventCrafter(GameState state, Object data){
-        Event event = null;
+        Event event;
         switch(state){
             case WAIT_LOBBY ->{
                 ArrayList<String> nicks;
@@ -265,7 +271,7 @@ public class Controller implements EventListenerInterface {
                         // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
                     else{
                         notifyAllListeners(eventCrafter(GameState.NONE_ACTIVATE, null));
-                        game.resetResponded();
+                        game.endTurn();
                     }
             }
             // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
@@ -305,9 +311,27 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
     }
 
-    public void checkStorage(ClientListener listener) {
+    public void checkStorage(ClientListener listener) throws CargoManagementException {
         Player player = playerbyListener.get(listener);
-        game.checkStorage(player);
+        if(game.checkStorage(player)){
+            ArrayList<CargoHolds> playerCargos = player.getSpaceshipPlance().getCargoHolds();
+            GoodsBlock[] playerReward = player.getReward();
+            // Creazione della lista di GoodsContainer
+            ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
+
+            goodsContainers.add(new GoodsContainer(playerReward, false));
+
+            for (CargoHolds cargo : playerCargos) {
+                GoodsBlock[] goods = cargo.getGoods();
+                goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial()));
+            }
+
+            player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
+            listener.onEvent(new Event(this,GameState.CARGO_VIEW,new Cargos(goodsContainers)));
+        }else
+            // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        throw new CargoManagementException("You got 0 storage space, you can't manage any good");
     }
 
     public void addGood(ClientListener listener,int cargoIndex, int goodIndex, int rewardIndex) {
@@ -322,7 +346,7 @@ public class Controller implements EventListenerInterface {
 
     public void removeGood(ClientListener listener, int cargoIndex, int goodIndex) {
         Player player = playerbyListener.get(listener);
-        game.removeGood(player,cargoIndex,goodIndex,goodIndex);
+        game.removeGood(player,cargoIndex,goodIndex);
     }
 
     public void acceptCard() {

@@ -24,7 +24,7 @@ public enum GameState {
     MANAGE_CARD,
     NONE_ACTIVATE,
     CRAFTING_ENDED,
-    END_GAME
+    CARGO_VIEW, END_GAME
     }
 
 // flight plance
