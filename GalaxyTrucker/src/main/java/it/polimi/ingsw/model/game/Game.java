@@ -115,7 +115,7 @@ public class Game {
         Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
     }
 
-    public String pickTile(Player player, int Tileid){
+    public ComponentTile pickTile(Player player, int Tileid){
 
         ComponentTile tile;
         synchronized(assemblingTiles){
@@ -127,7 +127,7 @@ public class Game {
 
         player.setHandTile(tile);
         assemblingTiles[Tileid] = null;
-        return tiletoString(tile);
+        return tile;
     }
 
     public Integer[] tilesToId(ComponentTile[] tiles){
@@ -142,54 +142,6 @@ public class Game {
         return ids;
     }
 
-    public String tiletoString(ComponentTile tile){
-        if (tile != null) {
-            switch (tile) {
-                case DoubleCannon dc -> {
-                    return "DoubleCannon";
-                }
-
-                case Cannon c-> {
-                    return "Cannon";
-                }
-
-                case DoubleEngine de -> {
-                    return "DoubleEngine";
-                }
-                case Engine e -> {
-                    return "Engine";
-                }
-                case Cabin cab -> {
-                    return "Cabin";
-                }
-                case CargoHolds ch -> {
-                    return "CargoHolds";
-                }
-
-                case ShieldGenerator sg -> {
-                    return "ShieldGenerator";
-                }
-
-                case LifeSupportSystem lfs -> {
-                    return "LifeSupportSystem";
-                }
-
-                case PowerCenter pc -> {
-                    return "PowerCenter";
-                }
-
-                case StructuralModule sm -> {
-                    return "StructuralModule";
-                }
-
-                default -> {
-                    return "not Catched in tiletoString";
-                }
-            }
-        }
-        return null;
-    }
-
 
     public void resetResponded() {
         for(Player p: players){
@@ -199,6 +151,18 @@ public class Game {
 
     public void checkStorage(Player player) throws CargoManagementException {
         player.getSpaceshipPlance().checkStorage();
+    }
+
+    public void swapGoods(Player player, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+        player.getSpaceshipPlance().handleAdd(cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
+    }
+
+    public void addGood(Player player, int cargoIndex, int goodIndex, int rewardIndex) {
+        player.getSpaceshipPlance().handleSwap(cargoIndex,goodIndex,rewardIndex);
+    }
+
+    public void removeGood(Player player, int cargoIndex, int goodIndex, int goodIndex1) {
+        player.getSpaceshipPlance().handleRemove(cargoIndex,goodIndex);
     }
 }
 

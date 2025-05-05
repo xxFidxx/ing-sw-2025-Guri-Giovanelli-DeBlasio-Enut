@@ -140,7 +140,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             int goodIndex = Integer.parseInt(parts[1]);
                             int rewardIndex = Integer.parseInt(parts[2]);
 
-                            server.addGood(cargoIndex, goodIndex, rewardIndex);
+                            server.addGood(this,cargoIndex, goodIndex, rewardIndex);
                         } catch (NumberFormatException e) {
                             System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
                             System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end  Cargo Management\n");
@@ -165,7 +165,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             int goodIndex1 = Integer.parseInt(parts[2]);
                             int goodIndex2 = Integer.parseInt(parts[3]);
 
-                            server.swapGoods(cargoIndex1, cargoIndex2, goodIndex1, goodIndex2);
+                            server.swapGoods(this,cargoIndex1, cargoIndex2, goodIndex1, goodIndex2);
                         } catch (NumberFormatException e) {
                             System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
                             System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
@@ -188,7 +188,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             int cargoIndex = Integer.parseInt(parts[0]);
                             int goodIndex = Integer.parseInt(parts[1]);
 
-                            server.removeGood(cargoIndex, goodIndex);
+                            server.removeGood(this,cargoIndex, goodIndex);
                         } catch (NumberFormatException e) {
                             System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
                             System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
