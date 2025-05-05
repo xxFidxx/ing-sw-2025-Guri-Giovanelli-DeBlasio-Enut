@@ -27,6 +27,7 @@ public class Controller implements EventListenerInterface {
     private final Object GameLock = new Object();
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
+    final Map <ClientListener, Boolean> isDonecrafting  = new HashMap<>();
 
     public Controller() {
         this.game = null;
@@ -155,9 +156,21 @@ public class Controller implements EventListenerInterface {
 
         ArrayList<Player> players= game.getPlayers();
 
-        synchronized(playerbyListener){
-            for(int i=0; i<players.size(); i++){
+        synchronized(playerbyListener) {
+            for (int i = 0; i < players.size(); i++) {
                 playerbyListener.put(listeners.get(i), players.get(i));
+            }
+        }
+
+        synchronized(listenerbyPlayer) {
+            for (int i = 0; i < listenerbyPlayer.size(); i++) {
+                listenerbyPlayer.put(players.get(i), listeners.get(i));
+            }
+        }
+
+        synchronized(isDonecrafting){
+            for(int i=0; i<isDonecrafting.size(); i++){
+                isDonecrafting.put(listeners.get(i), false);
             }
         }
 
@@ -173,7 +186,6 @@ public class Controller implements EventListenerInterface {
                  case ConnectorType.UNIVERSAL ->
              }
          }
-
     }
 
     public void drawCard(ClientListener listener) {
@@ -184,14 +196,20 @@ public class Controller implements EventListenerInterface {
         Card card = new Card(cardName, cardLevel);
 
         if(cardName != null)
-            listener.onEvent(eventCrafter(GameState.DRAW_CARD, card));
-        // else stato partita terminata
+            notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
+        else
+            notifyAllListeners(eventCrafter(GameState.END_GAME, null));
 
         switch(adCard){
             case AbandonedShipCard asc -> {
                 ClientListener l = listenerbyPlayer.get((game.choosePlayer(adCard)));
-
-                listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, card));
+                    if(l!=null)
+                        handleWaiters(l);
+                        // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
+                    else{
+                        notifyAllListeners(eventCrafter(GameState.NONE_ACTIVATE, null));
+                        game.resetResponded();
+                    }
             }
             default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
         }
@@ -207,7 +225,30 @@ public class Controller implements EventListenerInterface {
             if(l == listener)
                 listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
             else
-                listener.onEvent(eventCrafter(GameState.WAIT_STATE, null));
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
         }
+    }
+
+    public void playerIsDoneCrafting(ClientListener listener) throws Exception {
+        if(isDonecrafting.get(listener))
+            throw new Exception ("The player was already done crafting!\n");
+
+        synchronized(isDonecrafting){
+            isDonecrafting.replace(listener,true);
+        }
+
+        synchronized(isDonecrafting){
+            if(!isDonecrafting.containsValue(false))
+               handleCraftingEnded();
+        }
+    }
+
+    public void handleCraftingEnded(){
+        notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
+    }
+
+    public void checkStorage(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        game.checkStorage(player);
     }
 }

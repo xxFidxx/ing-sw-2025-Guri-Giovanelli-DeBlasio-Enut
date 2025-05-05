@@ -20,6 +20,10 @@ public enum GameState {
     DRAW_CARD,
     ACTIVATE_CARD,
     CHOOSE_PLAYER,
+    WAIT_PLAYER,
+    NONE_ACTIVATE,
+    CRAFTING_ENDED,
+    END_GAME
     }
 
 // flight plance

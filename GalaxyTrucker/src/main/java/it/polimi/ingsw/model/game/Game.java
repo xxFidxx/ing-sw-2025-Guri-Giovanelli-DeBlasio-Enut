@@ -80,10 +80,11 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        // orderPlayers();
+        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+
         for (int i = players.size() - 1; i >= 0; i--) {
             if (card.checkCondition(players.get(i)))
-                if (!players.get(i).getResponse())
+                if (!players.get(i).hasResponded())
                     return players.get(i);
         }
         return null;
@@ -95,13 +96,13 @@ public class Game {
 
 
     public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
-        Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
 
         while (!players.isEmpty()) {
             Player topPlayer = players.pop();
             for (Planet planet : planets) {
                 if (!planet.isBusy())
-                    if (topPlayer.getResponse())
+                    if (topPlayer.hasResponded())
                         return topPlayer;
             }
 
@@ -182,7 +183,7 @@ public class Game {
                 }
 
                 default -> {
-                    return "notCatched in tiletoString";
+                    return "not Catched in tiletoString";
                 }
             }
         }
@@ -190,5 +191,14 @@ public class Game {
     }
 
 
+    public void resetResponded() {
+        for(Player p: players){
+            p.setResponded(false);
+        }
+    }
+
+    public void checkStorage(Player player) throws CargoManagementException {
+        player.getSpaceshipPlance().checkStorage();
+    }
 }
 

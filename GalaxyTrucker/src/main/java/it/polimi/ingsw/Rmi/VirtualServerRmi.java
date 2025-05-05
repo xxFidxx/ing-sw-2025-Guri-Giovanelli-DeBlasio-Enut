@@ -23,4 +23,14 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void drawCard(VirtualViewRmi clientRmi) throws RemoteException;
 
     void activateCard(VirtualViewRmi clientRmi) throws RemoteException;
+
+    void checkStorage(VirtualViewRmi clientRmi) throws Exception;
+
+    void endCrafting(VirtualViewRmi clientRmi) throws Exception;
+
+    void addGood(int cargoIndex, int goodIndex, int rewardIndex);
+
+    void swapGoods(int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2);
+
+    void removeGood(int cargoIndex, int goodIndex);
 }

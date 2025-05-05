@@ -45,7 +45,7 @@ public class GameTest {
         when(card.checkCondition(player2)).thenReturn(true);
         when(card.checkCondition(player3)).thenReturn(false);
 
-        when(player2.getResponse()).thenReturn(true);
+        when(player2.hasResponded()).thenReturn(true);
 
         Player chosen = game.choosePlayer(card);
 
@@ -68,7 +68,7 @@ public class GameTest {
     public void testChoosePlayer_PlayerSatisfiesButRespondsNo() {
         // Player1 soddisfa la condizione ma risponde no
         when(card.checkCondition(player1)).thenReturn(true);
-        when(player1.getResponse()).thenReturn(false);
+        when(player1.hasResponded()).thenReturn(false);
 
         when(card.checkCondition(player2)).thenReturn(false);
         when(card.checkCondition(player3)).thenReturn(false);
@@ -82,12 +82,12 @@ public class GameTest {
     public void testChoosePlayer_LastPlayerChosen() {
         // Simuliamo che player1 e player3 soddisfano entrambi la condizione
         when(card.checkCondition(player1)).thenReturn(true);
-        when(player1.getResponse()).thenReturn(true);
+        when(player1.hasResponded()).thenReturn(true);
 
         when(card.checkCondition(player2)).thenReturn(false);
 
         when(card.checkCondition(player3)).thenReturn(true);
-        when(player3.getResponse()).thenReturn(true);
+        when(player3.hasResponded()).thenReturn(true);
 
         // Poiché si itera dall'ultimo verso il primo, deve scegliere player3
         Player chosen = game.choosePlayer(card);

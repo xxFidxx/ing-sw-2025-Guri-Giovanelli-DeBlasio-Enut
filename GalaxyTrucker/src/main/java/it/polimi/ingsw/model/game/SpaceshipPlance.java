@@ -221,7 +221,7 @@ public class SpaceshipPlance {
         }
 
         ComponentTile tile = components[y][x];
-        // per ogni casella mi segno se è stata visitata e  quale iterazione (quindi troncone) appartiene
+        // per ogni casella mi segno se è stata visitata e quale iterazione (quindi troncone) appartiene
         visited[y][x] = true;
         shownComponents[y][x] = iteration;
 
@@ -293,78 +293,67 @@ public class SpaceshipPlance {
         }
     }
 
-    public void cargoManagement(GoodsBlock[] cardReward) {
-
-        if (checkStorage()==0) {
-            System.out.println("Not enough space");
-            return;
+    public void checkStorage() throws CargoManagementException {
+        if (getStorage() == 0) {
+            throw new CargoManagementException("You got 0 storage space, you can't manage any good");
         }
+    }
 
-        ArrayList<CargoHolds> playerCargos = getCargoHolds();
+    private void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
 
+        if (cargoIndex1 >= 0 && cargoIndex1 < cargoHolds.size() && cargoIndex2 >= 0 && cargoIndex2 < cargoHolds.size()) {
 
-        if /*QUA DOVREBBE ESSERCI UN WHILE MA MI DAVA ERRORE DI SINTASSI PER LA CONDIZIONE DEL WHILE QUINDI HO MESSO UN IF*/("player is done" == "false") {
+            CargoHolds cargo1 = cargoHolds.get(cargoIndex1);
+            CargoHolds cargo2 = cargoHolds.get(cargoIndex2);
 
-            int i1 = 0; // cargo index
-            int i2 = 0;
-            int j1 = 0; // good index
-            int j2 = 0;
-            int k = 0; //card reward's good index
-
-            if ("player input is swap" == "true") {
-
-
-                if (i1 >= 0 && i1 < playerCargos.size() && i2 >= 0 && i2 < playerCargos.size()) {
-
-                    CargoHolds cargo1 = playerCargos.get(i1);
-                    CargoHolds cargo2 = playerCargos.get(i2);
-
-                    if (j1 >= 0 && j1 < cargo1.getGoods().length && j2 >= 0 && j2 < cargo2.getGoods().length) {
-                        GoodsBlock good1 = cargo1.getGoods()[j1];
-                        GoodsBlock good2 = cargo2.getGoods()[j2];
+            if (goodIndex1 >= 0 && goodIndex1 < cargo1.getGoods().length && goodIndex2 >= 0 && goodIndex2 < cargo2.getGoods().length) {
+                GoodsBlock good1 = cargo1.getGoods()[goodIndex1];
+                GoodsBlock good2 = cargo2.getGoods()[goodIndex2];
 
 
-                        if (checkSpecialGoods(cargo1,cargo2,good1,good2))
-                            swapGoods(cargo1, cargo2, j1, j2);
-                    } else {
-                        System.out.println("At least one goods index is outbound");
-                    }
+                if (checkSpecialGoods(cargo1,cargo2,good1,good2))
+                    swapGoods(cargo1, cargo2, goodIndex1, goodIndex2);
+                else
+                    throw new CargoManagementException("Can't put a Red block in grey cargo");
+            } else {
+                throw new CargoManagementException("At least one goods index is outbound");
+            }
+        } else {
+            throw new CargoManagementException("At least one cargo index is outbound");
+        }
+    }
 
+    private void handleRemove(int cargoIndex,int goodIndex) throws CargoManagementException{
 
+        if (cargoIndex >= 0 && cargoIndex < cargoHolds.size()) {
+            CargoHolds cargo1 = cargoHolds.get(cargoIndex);
+            if(goodIndex >= 0 && goodIndex < cargo1.getGoods().length) {
+                removeGoods(cargo1, goodIndex);
+            }else
+                throw new CargoManagementException("goods index is outbound");
+        } else
+            throw new CargoManagementException("cargo index is outbound");
+    }
+
+    private void handleAdd(GoodsBlock[] cardReward,int cargoIndex,int goodIndex,int rewardIndex) throws CargoManagementException{
+
+        if(cargoIndex >= 0 && cargoIndex < cargoHolds.size()) {
+            CargoHolds cargo1 = cargoHolds.get(cargoIndex);
+            if(goodIndex >= 0 && goodIndex < cargo1.getGoods().length && rewardIndex>=0 && rewardIndex < cardReward.length) {
+                GoodsBlock good1 = cargo1.getGoods()[goodIndex];
+                GoodsBlock good2 = cardReward[rewardIndex];
+                if (good1 == null) {
+                    if (checkSpecialGoods(cargo1,good2))
+                        addGoods(cargo1,cardReward,goodIndex,rewardIndex);
+                    else
+                        throw new CargoManagementException("Can't put a Red block in grey cargo");
                 } else {
-                    System.out.println("At least one cargo index is outbound");
-
+                    throw new CargoManagementException("You can't add a good on a busy spot");
                 }
-            } else if ("player input is remove" == "true") {
-                if (i1 >= 0 && i1 < playerCargos.size()) {
-                    CargoHolds cargo1 = playerCargos.get(i1);
-                    if(j1 >= 0 && j1 < cargo1.getGoods().length) {
-                        removeGoods(cargo1, j1);
-                    }else
-                        System.out.println("goods index is outbound");
-                } else
-                    System.out.println("cargo index is outbound");
-
-            } else if ("player input is addNickname" == "true") {
-                if(i1 >= 0 && i1 < playerCargos.size()) {
-                    CargoHolds cargo1 = playerCargos.get(i1);
-                    if(j1 >= 0 && j1 < cargo1.getGoods().length && k>=0 && k < cardReward.length) {
-                        GoodsBlock good1 = cargo1.getGoods()[j1];
-                        GoodsBlock good2 = cardReward[k];
-                        if (good1 == null) {
-                            if (checkSpecialGoods(cargo1,good2))
-                                addGoods(cargo1,cardReward,j1,k);
-                        } else {
-                            System.out.println("You can't addNickname on a busy spot");
-
-                        }
-                    }else
-                        System.out.println("At least one goods index is outbound");
-                }else
-                    System.out.println("cargo index is outbound");
-            } else
-                System.out.println("player input is incorrect");
-        }
+            }else
+                throw new CargoManagementException("At least one goods index is outbound");
+        }else
+            throw new CargoManagementException("cargo index is outbound");
     }
 
     private void swapGoods(CargoHolds cargo1, CargoHolds cargo2, int j1, int j2) {
@@ -379,24 +368,19 @@ public class SpaceshipPlance {
     }
 
     private boolean checkSpecialGoods(CargoHolds cargo1, CargoHolds cargo2, GoodsBlock good1, GoodsBlock good2) {
+        if ((good1.getType() == RED && !cargo2.isSpecial()) || (good2.getType() == RED && !cargo1.isSpecial()))
+            return false;
 
-        if ((good1.getType() == RED && !cargo2.isSpecial()) || (good2.getType() == RED && !cargo1.isSpecial())) {
-            System.out.println("Can't put a Red block in grey cargo");
-            return true;
-
-        }
-        return false;
+        return true;
 
     }
 
     private boolean checkSpecialGoods(CargoHolds cargo, GoodsBlock good) {
 
-        if ((good.getType() == RED && !cargo.isSpecial())) {
-            System.out.println("Can't put a Red block in grey cargo");
-            return true;
+        if ((good.getType() == RED && !cargo.isSpecial()))
+            return false;
 
-        }
-        return false;
+        return true;
 
     }
 
@@ -412,8 +396,8 @@ public class SpaceshipPlance {
 
     public void looseGoods(int lostOther) {
         int actualLost = 0;
-        if(checkStorage() < lostOther)
-            actualLost = checkStorage();
+        if(getStorage() < lostOther)
+            actualLost = getStorage();
         else
             actualLost = lostOther;
 
@@ -453,7 +437,7 @@ public class SpaceshipPlance {
         return cabins;
     }
 
-    public int checkStorage(){
+    public int getStorage(){
         int total = 0;
         for(CargoHolds c : cargoHolds){
             for(GoodsBlock block : c.getGoods()){
@@ -639,7 +623,7 @@ public class SpaceshipPlance {
 
                     ConnectorType[] connectors = tile.getConnectors();
                     for(int i = 0; i < connectors.length; i++){
-                        // se da quel lato c'è un connettore singolo/doppio/universale vuol dire che è collegato a un'altra casella. Controllo che sia anch'essa una nave
+                        // Se da quel lato c'è un connettore singolo/doppio/universale vuol dire che è collegato a un'altra casella. Controllo che sia anch'essa una nave
                         if(connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE){
                             int x2 = x + dirx[i];
                             int y2 = y + diry[i];

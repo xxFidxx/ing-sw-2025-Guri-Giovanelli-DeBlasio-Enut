@@ -1,10 +1,7 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.model.componentTiles.DoubleCannon;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
-import it.polimi.ingsw.model.componentTiles.Cabin;
-import it.polimi.ingsw.model.componentTiles.DoubleEngine;
 
 import java.util.ArrayList;
 
@@ -18,7 +15,7 @@ public class Player {
         private int numAliens;
         private Game game;
         private ComponentTile handTile;
-        private boolean Response;
+        private boolean responded;
 
     public Player(String nickname, Game game, int playerNumber) {
         this.nickname = nickname;
@@ -29,7 +26,7 @@ public class Player {
         this.numAliens = 0;
         this.game = game;
         this.handTile = null;
-        this.Response = false;
+        this.responded = false;
     }
 
     public void setSpaceshipPlance(SpaceshipPlance spaceshipPlance) {
@@ -74,34 +71,34 @@ public class Player {
         public void setNumEquip(int n){ numAstronauts = n; }
         public void setNumAliens(int n){ numAliens = n; }
         public void setNumAstronauts(int n){ numAstronauts = n; }
-        public boolean getResponse() {
-            return Response;
+        public boolean hasResponded() {
+            return responded;
         }
-        public void setResponse(boolean response) {
-            Response = response;
+        public void setResponded(boolean responded) {
+            this.responded = responded;
         }
 
     public Game getGame() {
         return game;
     }
 
-    public int checkStorage(){
-        return 0;
-        }
         public int checkCrew(){ return 0; }//CONTROLLA IL NUMERO DELL EQUIPAGGIO
 
 
         // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
         public int getEngineStrenght() {//è da vedere se controllare qui se ci sono batterie
             int sumPower=0;
+
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // bisogna fare uno stato nel client dove si danno tutti gli engines e si chiede quanti di questi si vuole caricare prima di chiamare questo metodo
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             for(int i=0; i < spaceshipPlance.getEngines().size(); i++){
-                if(spaceshipPlance.getEngines().get(i) instanceof DoubleEngine){
-                    if( ((DoubleEngine) spaceshipPlance.getEngines().get(i)).isCharged()){
-                        if(askToUseBattery())
-                            sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();}
-
-                    else System.out.println("no battery available");}
-
+                Engine e = spaceshipPlance.getEngines().get(i);
+                if(e instanceof DoubleEngine){
+                    if(((DoubleEngine) e).isCharged())
+                            sumPower=sumPower+ spaceshipPlance.getEngines().get(i).getPower();
+                }
                 else
                     sumPower = sumPower + spaceshipPlance.getEngines().get(i).getPower();
             }
@@ -112,8 +109,11 @@ public class Player {
 
         public float getFireStrenght() {
             float sumPower=0;
-            if(spaceshipPlance.getPurpleAliens() == 1)
-                sumPower = 2;
+
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // bisogna fare uno stato nel client dove si danno tutti gli engines e si chiede quanti di questi si vuole caricare prima di chiamare questo metodo
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             for(int i=0; i < spaceshipPlance.getCannons().size(); i++){
                 if(spaceshipPlance.getCannons().get(i) instanceof DoubleCannon){
                     if( ((DoubleCannon) spaceshipPlance.getCannons().get(i)).isCharged()){
@@ -169,7 +169,7 @@ public class Player {
     public Planet choosePlanet(ArrayList<Planet> planets) {
         for (Planet planet : planets) {
             if (!planet.isBusy())
-                if (getResponse())
+                if (hasResponded())
                     return planet;
         }
 
