@@ -21,6 +21,7 @@ public enum GameState {
     ACTIVATE_CARD,
     CHOOSE_PLAYER,
     WAIT_PLAYER,
+    MANAGE_CARD,
     NONE_ACTIVATE,
     CRAFTING_ENDED,
     END_GAME

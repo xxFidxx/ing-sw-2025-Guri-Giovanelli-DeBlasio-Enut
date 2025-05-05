@@ -80,7 +80,7 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        // players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
 
         for (int i = players.size() - 1; i >= 0; i--) {
             if (card.checkCondition(players.get(i)))

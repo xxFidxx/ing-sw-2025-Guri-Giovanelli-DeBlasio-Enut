@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static it.polimi.ingsw.Server.GameState.CHOOSE_PLAYER;
+
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final VirtualServerRmi server;
     private volatile GameState currentState;
@@ -204,6 +206,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
+            case CHOOSE_PLAYER -> {
+                switch (input) {
+                    case "0" -> server.acceptCard();
+                    case "1" -> server.rejectCard();
+                }
+                server.hasResponded(this);
+            }
+            case MANAGE_CARD -> server.manageCard();
         }
         System.out.print("\n> ");
     }
@@ -227,6 +237,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     System.out.print(e.getMessage());
                 }
             }
+            case CHOOSE_PLAYER -> System.out.print("Type 0 to activate the card, 1 to reject the card\n");
+            case ACTIVATE_CARD -> System.out.print("Card activated\n");
+            case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player");
+            case MANAGE_CARD -> System.out.print("Card management activated\n");
         }
         System.out.print("\n> ");
     }

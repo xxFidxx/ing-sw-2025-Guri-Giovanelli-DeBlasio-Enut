@@ -28,11 +28,13 @@ public class Controller implements EventListenerInterface {
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <ClientListener, Boolean> isDonecrafting  = new HashMap<>();
+    private AdventureCard currentAdventureCard;
 
     public Controller() {
         this.game = null;
         this.queue = new LinkedBlockingQueue<>();
         this.lobby = null;
+        this.currentAdventureCard = null;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -241,19 +243,22 @@ public class Controller implements EventListenerInterface {
 
     public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
-        AdventureCard adCard = cards[0];
-        String cardName = adCard.getName();
-        int cardLevel = cards[0].getLevel();
+        currentAdventureCard = cards[0];
+        // AdventureCard adCard = cards[0];
+        String cardName = currentAdventureCard.getName();
+        int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
 
-        if(cardName != null)
+        if (cardName != null)
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
         else
             notifyAllListeners(eventCrafter(GameState.END_GAME, null));
+    }
 
-        switch(adCard){
+    public void manageCard(){
+        switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
-                Player p = (game.choosePlayer(adCard));
+                Player p = (game.choosePlayer(currentAdventureCard));
                 ClientListener l = listenerbyPlayer.get(p);
                     if(p!=null)
                         handleWaiters(l);
@@ -263,7 +268,8 @@ public class Controller implements EventListenerInterface {
                         game.resetResponded();
                     }
             }
-            default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
+            // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
+            default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }
 
@@ -317,5 +323,19 @@ public class Controller implements EventListenerInterface {
     public void removeGood(ClientListener listener, int cargoIndex, int goodIndex) {
         Player player = playerbyListener.get(listener);
         game.removeGood(player,cargoIndex,goodIndex,goodIndex);
+    }
+
+    public void acceptCard() {
+        game.resetResponded();
+        notifyAllListeners(eventCrafter(GameState.ACTIVATE_CARD, null));
+    }
+
+    public void rejectCard() {
+        notifyAllListeners(eventCrafter(GameState.MANAGE_CARD, null));
+    }
+
+    public void hasResponded(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        player.setResponded(true);
     }
 }

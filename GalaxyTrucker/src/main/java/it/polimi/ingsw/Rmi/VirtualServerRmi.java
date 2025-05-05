@@ -33,4 +33,12 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void swapGoods(VirtualViewRmi clientRmi,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2);
 
     void removeGood(VirtualViewRmi clientRmi,int cargoIndex, int goodIndex);
+
+    void acceptCard() throws RemoteException;
+
+    void rejectCard() throws RemoteException;
+
+    void manageCard() throws RemoteException;
+
+    void hasResponded(VirtualViewRmi clientRmi) throws RemoteException;
 }
