@@ -1,15 +1,12 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.GameState;
-import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
-import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static it.polimi.ingsw.Server.GameState.CHOOSE_PLAYER;
 
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final VirtualServerRmi server;
@@ -222,6 +217,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "1" -> server.rejectCard();
                 }
             }
+
             case END_CARD -> server.endCard(this);
         }
         System.out.print("\n> ");
@@ -252,6 +248,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ACTIVATE_CARD -> System.out.print("Card activated\n");
             case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player\n");
             case MANAGE_CARD -> System.out.print("Card management activated\n");
+            case MOVE_PLAYER -> System.out.print("Move players\n");
         }
         System.out.print("\n> ");
     }
@@ -293,6 +290,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
             case DataString ds -> System.out.println(ds.getText());
+            case MovePlayerData mpd -> System.out.println("You moved " + mpd.getSteps() + " steps.");
             default -> {}
         }
     }

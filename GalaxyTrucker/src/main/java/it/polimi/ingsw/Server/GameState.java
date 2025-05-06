@@ -30,11 +30,12 @@ public enum GameState {
     PLAYER_COLOR,
     END_CARD,
     SHOW_PLAYER,
-    END_GAME
+    END_GAME,
+    MOVE_PLAYER,
     }
-    IDLE,LOBBY_PHASE,WAIT_LOBBY,GAME_INIT, ASSEMBLY, PICKED_TILE,ROBBED_TILE, WAIT_ASSEMBLY, DRAW_CARD,PLACE_CARD
 
-}
+
+
 
 // flight plance
 // cargo management, crew management
