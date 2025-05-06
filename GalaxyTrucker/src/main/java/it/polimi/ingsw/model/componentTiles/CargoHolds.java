@@ -2,6 +2,8 @@ package it.polimi.ingsw.model.componentTiles;
 
 import it.polimi.ingsw.model.bank.GoodsBlock;
 
+import java.util.Arrays;
+
 public class CargoHolds extends ComponentTile{
     private int id;
     private GoodsBlock[] goods;
@@ -20,4 +22,8 @@ public class CargoHolds extends ComponentTile{
         return isSpecial;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + "isSpecial=" + isSpecial + "goods=" + Arrays.toString(goods);
+    }
 }

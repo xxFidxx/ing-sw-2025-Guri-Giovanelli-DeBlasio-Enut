@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.componentTiles;
 
+import java.util.Arrays;
+
 public class ShieldGenerator extends ComponentTile {
 
     private boolean[] protection; // ex: [false, false, true, true]
@@ -39,5 +41,10 @@ public class ShieldGenerator extends ComponentTile {
 
     public boolean[] getProtection() {
         return protection;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "protection=" + Arrays.toString(protection);
     }
 }

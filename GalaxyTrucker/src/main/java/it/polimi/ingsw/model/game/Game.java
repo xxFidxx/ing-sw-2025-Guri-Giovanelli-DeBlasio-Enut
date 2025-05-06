@@ -85,9 +85,12 @@ public class Game {
         // players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
 
         for (int i = players.size() - 1; i >= 0; i--) {
-            if (card.checkCondition(players.get(i)))
+            System.out.println("Check Condition:\n" + card.checkCondition(players.get(i)));
+            if (card.checkCondition(players.get(i))) {
+                System.out.println("Has responded:\n" + !players.get(i).hasResponded());
                 if (!players.get(i).hasResponded())
                     return players.get(i);
+            }
         }
         return null;
     }

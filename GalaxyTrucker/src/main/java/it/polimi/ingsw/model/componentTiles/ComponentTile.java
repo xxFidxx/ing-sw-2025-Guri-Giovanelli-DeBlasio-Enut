@@ -51,10 +51,8 @@ public abstract class ComponentTile{
 
     @Override
     public String toString() {
-        return  tiletoString(this) + "{" +
-                ", connectors=" + Arrays.toString(connectors) +
-                ", isWellConnected=" + isWellConnected +
-                '}';
+        return  tiletoString(this) + ": " +
+                "connectors=" + Arrays.toString(connectors) + " ";
     }
 
     private String tiletoString(ComponentTile tile){

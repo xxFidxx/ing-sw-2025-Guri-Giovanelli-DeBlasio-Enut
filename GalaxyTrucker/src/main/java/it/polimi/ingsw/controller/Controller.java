@@ -16,6 +16,7 @@ import it.polimi.ingsw.model.resources.TileSymbols;
 import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -116,6 +117,7 @@ public class Controller implements EventListenerInterface {
         if(tile != null){
             String tileName = tiletoString(tile);
             ConnectorType[] connectors = tile.getConnectors();
+            printSpaceship(listener);
             listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tileName,connectors)));
         }
         else{
@@ -144,6 +146,10 @@ public class Controller implements EventListenerInterface {
                     assemblingTiles = game.getAssemblingTilesId();
                 }
                 event = new Event(this, state, new PickableTiles(assemblingTiles));
+            }
+
+            case SHOW_SHIP -> {
+                event = new Event(this, state, (DataString) data);
             }
 
             case PICKED_TILE -> {
@@ -185,7 +191,7 @@ public class Controller implements EventListenerInterface {
         }
 
         synchronized(listenerbyPlayer) {
-            for (int i = 0; i < listenerbyPlayer.size(); i++) {
+            for (int i = 0; i < listeners.size(); i++) {
                 listenerbyPlayer.put(players.get(i), listeners.get(i));
             }
         }
@@ -322,8 +328,10 @@ public class Controller implements EventListenerInterface {
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
 
-        if (cardName != null)
+        if (cardName != null) {
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
+            manageCard();
+        }
         else
             notifyAllListeners(eventCrafter(GameState.END_GAME, null));
     }
@@ -332,14 +340,16 @@ public class Controller implements EventListenerInterface {
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
                 Player p = (game.choosePlayer(currentAdventureCard));
+                System.out.println(p);
                 ClientListener l = listenerbyPlayer.get(p);
-                    if(p!=null)
-                        handleWaiters(l);
-                        // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
-                    else{
-                        notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                        game.endTurn();
-                    }
+                System.out.println(l);
+                if(p!=null)
+                    handleWaiters(l);
+                    // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
+                else{
+                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                    game.endTurn();
+                }
             }
             // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
@@ -354,10 +364,15 @@ public class Controller implements EventListenerInterface {
 
     public void handleWaiters(ClientListener listener){
         for(ClientListener l: listeners){
-            if(l == listener)
-                listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
-            else
-                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            if(l == listener) {
+                l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
+                Player p = playerbyListener.get(l);
+                p.setResponded(true);
+            }
+            else {
+                System.out.println(l);
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }
         }
     }
 
@@ -467,15 +482,15 @@ public class Controller implements EventListenerInterface {
 
     public void rejectCard() {
         notifyAllListeners(eventCrafter(GameState.MANAGE_CARD, null));
-    }
-
-    public void hasResponded(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
-        player.setResponded(true);
+        manageCard();
     }
 
     public void printSpaceship(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
+        for (ClientListener c: listeners) {
+            Player player = playerbyListener.get(c);
+            DataString ds = new DataString(player.getSpaceshipPlance().toString());
+            listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
+        }
     }
 
     public void endCard(ClientListener listener) {
