@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
@@ -682,7 +683,68 @@ public class SpaceshipPlance {
     }
 
 
-    public boolean checkExposedConnector(int position) {
+    public boolean checkExposedConnector(Direction direction, int position) {
+        int max_lenght = 7;
+        // casella da cui partire
+        int x=0, y=0;
+        switch (direction) {
+            case NORTH:
+                x = position - 4;
+                y = 0;
+                max_lenght = 5;
+                break;
+            case EAST:
+                x = 6;
+                y = position - 5;
+                break;
+            case SOUTH:
+                x = position - 4;
+                y = 4;
+                max_lenght = 5;
+                break;
+            case WEST:
+                x = 0;
+                y = position - 5;
+                break;
+        }
+
+        ComponentTile hit = components[y][x];
+
+        for(int i = 0; i<max_lenght || hit == null; i++){
+            switch (direction) {
+                case NORTH:
+                    y += 1;
+                    break;
+                case EAST:
+                    x -= 1;
+                    break;
+                case SOUTH:
+                    y -= 1;
+                    break;
+                case WEST:
+                    x += 1;
+                    break;
+            }
+            hit = components[y][x];
+        }
+
+        ArrayList<ConnectorType> disallowedConnectors = new ArrayList<>(Arrays.asList(ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL));
+
+        if((hit != null) && (disallowedConnectors.contains(hit.getConnectors()[direction.ordinal()]))){
+            return true;
+        }
+
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "SpaceshipPlance{" +
+                "components=" + Arrays.toString(components) +
+                ", reserveSpot=" + reserveSpot +
+                ", nAstronauts=" + nAstronauts +
+                ", nBrownAliens=" + nBrownAliens +
+                ", nPurpleAliens=" + nPurpleAliens +
+                '}';
     }
 }

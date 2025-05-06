@@ -25,7 +25,7 @@ public class Game {
         dices[0] = new Dice();
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
-        this.plance = new Flightplance(playersName.size(), this);
+        this.plance = new Flightplance(playersName.size(), this, players);
 
         // Prima definiamo i connettori per i componenti
         ConnectorType[] cannonConnectors = {

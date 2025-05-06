@@ -15,6 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -62,9 +63,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     handleInput(input);
                 }
             }
-            case CARGO_VIEW -> {
-                System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
-            }
         }
     }
 
@@ -83,10 +81,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         }
 
                     } catch (NumberFormatException e) {
-                        System.out.print(e.getMessage() + "\n");
+                        System.out.print("Error" + e.getMessage() + " please type a number \n");
                     }
                 } else {
-                    System.out.print("Not accepted input, please follow the instructions below:\n");
+                    System.out.print("Not accepted input, please follow type an accepted lobby size:\n");
                 }
             }
             case LOBBY_PHASE -> {
@@ -108,7 +106,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case PICKED_TILE -> {
                 switch (input) {
-                    case "0" -> System.out.print("Show spaceship\n");
+                    case "0" -> server.printSpaceship(this); //System.out.print("Show spaceship\n");
                     case "1" -> System.out.print("Show reserve spots\n");
                     case "2" -> System.out.print("Show pickableTile\n");
                     case "3" -> server.drawCard(this);
@@ -116,7 +114,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         try {
                             server.endCrafting(this);
                         } catch (Exception e) {
-                            System.out.print(e.getMessage() + "\n");
+                            System.out.print(" error" + e.getMessage() + "\n");
                         }
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
@@ -238,6 +236,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ASSEMBLY -> System.out.print("List of available tiles: ");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case TURN_START -> System.out.print("Here is the flight plance\n");
             case DRAW_CARD -> System.out.print("This is the drawn card:\n");
             case CARGO_MANAGEMENT -> {
                 try{
@@ -246,9 +245,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     System.out.print(e.getMessage());
                 }
             }
+            case CARGO_VIEW -> System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.print("Type 0 to activate the card, 1 to reject the card\n");
             case ACTIVATE_CARD -> System.out.print("Card activated\n");
-            case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player");
+            case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player\n");
             case MANAGE_CARD -> System.out.print("Card management activated\n");
         }
         System.out.print("\n> ");
@@ -288,6 +288,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PickedTile ptl -> System.out.println(ptl.getName() + "\n");
             case Card c -> System.out.println(c.getName() + ",level: " + c.getLevel() + "\n");
             case Cargos c -> printCargos(c.getCargos());
+            case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
+            case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
             default -> {}
         }
     }

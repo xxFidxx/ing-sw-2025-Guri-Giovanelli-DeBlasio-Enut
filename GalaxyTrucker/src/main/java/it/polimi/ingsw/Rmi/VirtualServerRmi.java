@@ -28,11 +28,11 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void endCrafting(VirtualViewRmi clientRmi) throws Exception;
 
-    void addGood(VirtualViewRmi clientRmi,int cargoIndex, int goodIndex, int rewardIndex);
+    void addGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex, int rewardIndex) throws RemoteException;
 
-    void swapGoods(VirtualViewRmi clientRmi,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2);
+    void swapGoods(VirtualViewRmi clientRmi, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) throws RemoteException;
 
-    void removeGood(VirtualViewRmi clientRmi,int cargoIndex, int goodIndex);
+    void removeGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
 
     void acceptCard() throws RemoteException;
 
@@ -41,6 +41,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void manageCard() throws RemoteException;
 
     void hasResponded(VirtualViewRmi clientRmi) throws RemoteException;
+
+    void printSpaceship(VirtualViewRmi clientRmi) throws RemoteException;
 
     void endCard(VirtualViewRmi clientRmi) throws RemoteException;
 }

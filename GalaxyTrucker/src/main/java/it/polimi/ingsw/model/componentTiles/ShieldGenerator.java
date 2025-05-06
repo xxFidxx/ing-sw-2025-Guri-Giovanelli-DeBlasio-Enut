@@ -37,6 +37,7 @@ public class ShieldGenerator extends ComponentTile {
         return protection[direction.ordinal()];
      }
 
-
-
+    public boolean[] getProtection() {
+        return protection;
+    }
 }
