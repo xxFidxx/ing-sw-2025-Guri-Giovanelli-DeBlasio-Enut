@@ -9,6 +9,7 @@ public enum GameState {
     PICKED_TILE,
     ROBBED_TILE,
     WAIT_ASSEMBLY,
+    SHOW_SHIP,
     PICK_CARD,
     PLACE_CARD,
     CARGO_MANAGEMENT,
