@@ -40,8 +40,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void manageCard() throws RemoteException;
 
-    void hasResponded(VirtualViewRmi clientRmi) throws RemoteException;
-
     void printSpaceship(VirtualViewRmi clientRmi) throws RemoteException;
 
     void endCard(VirtualViewRmi clientRmi) throws RemoteException;

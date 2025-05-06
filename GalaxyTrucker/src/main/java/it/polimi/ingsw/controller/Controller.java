@@ -185,7 +185,7 @@ public class Controller implements EventListenerInterface {
         }
 
         synchronized(listenerbyPlayer) {
-            for (int i = 0; i < listenerbyPlayer.size(); i++) {
+            for (int i = 0; i < listeners.size(); i++) {
                 listenerbyPlayer.put(players.get(i), listeners.get(i));
             }
         }
@@ -322,8 +322,10 @@ public class Controller implements EventListenerInterface {
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
 
-        if (cardName != null)
+        if (cardName != null) {
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
+            manageCard();
+        }
         else
             notifyAllListeners(eventCrafter(GameState.END_GAME, null));
     }
@@ -332,14 +334,16 @@ public class Controller implements EventListenerInterface {
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
                 Player p = (game.choosePlayer(currentAdventureCard));
+                System.out.println(p);
                 ClientListener l = listenerbyPlayer.get(p);
-                    if(p!=null)
-                        handleWaiters(l);
-                        // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
-                    else{
-                        notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                        game.endTurn();
-                    }
+                System.out.println(l);
+                if(p!=null)
+                    handleWaiters(l);
+                    // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
+                else{
+                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                    game.endTurn();
+                }
             }
             // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
@@ -354,10 +358,15 @@ public class Controller implements EventListenerInterface {
 
     public void handleWaiters(ClientListener listener){
         for(ClientListener l: listeners){
-            if(l == listener)
-                listener.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
-            else
-                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            if(l == listener) {
+                l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
+                Player p = playerbyListener.get(l);
+                p.setResponded(true);
+            }
+            else {
+                System.out.println(l);
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }
         }
     }
 
@@ -467,11 +476,7 @@ public class Controller implements EventListenerInterface {
 
     public void rejectCard() {
         notifyAllListeners(eventCrafter(GameState.MANAGE_CARD, null));
-    }
-
-    public void hasResponded(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
-        player.setResponded(true);
+        manageCard();
     }
 
     public void printSpaceship(ClientListener listener) {
