@@ -2,6 +2,8 @@ package it.polimi.ingsw.model.componentTiles;
 
 import it.polimi.ingsw.model.bank.BatteryToken;
 
+import java.util.Arrays;
+
 public class PowerCenter extends ComponentTile {
     private BatteryToken[] batteries;
 
@@ -15,5 +17,10 @@ public class PowerCenter extends ComponentTile {
 
     public void setBatteries(BatteryToken[] batteries){
         this.batteries = batteries;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "batteries=" + Arrays.toString(batteries);
     }
 }

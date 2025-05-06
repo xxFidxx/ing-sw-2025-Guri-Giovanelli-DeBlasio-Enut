@@ -30,10 +30,10 @@ public class SpaceshipPlance {
 
 
     public SpaceshipPlance() {
-        this.components = new ComponentTile[4][6];
+        this.components = new ComponentTile[5][7];
         this.reserveSpot = new ArrayList<>();
-        this.visited = new boolean[4][6];
-        this.shownComponents = new int[4][6];
+        this.visited = new boolean[5][7];
+        this.shownComponents = new int[5][7];
         this.exposedConnectors = 0;
         this.shieldGenerators = new ArrayList<>();
         this.cannons = new ArrayList<>();
@@ -739,12 +739,15 @@ public class SpaceshipPlance {
 
     @Override
     public String toString() {
-        return "SpaceshipPlance{" +
-                "components=" + Arrays.toString(components) +
-                ", reserveSpot=" + reserveSpot +
-                ", nAstronauts=" + nAstronauts +
-                ", nBrownAliens=" + nBrownAliens +
-                ", nPurpleAliens=" + nPurpleAliens +
-                '}';
+        String result = "";
+
+        for (int i = 0; i < components.length; i++) {
+            for (int j = 0; j < components[0].length; j++) {
+                result += components[i][j] + ", ";
+            }
+            result += "\n";
+        }
+
+        return result;
     }
 }

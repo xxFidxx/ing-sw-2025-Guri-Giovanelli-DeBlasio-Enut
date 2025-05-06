@@ -117,6 +117,7 @@ public class Controller implements EventListenerInterface {
         if(tile != null){
             String tileName = tiletoString(tile);
             ConnectorType[] connectors = tile.getConnectors();
+            printSpaceship(listener);
             listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tileName,connectors)));
         }
         else{
@@ -486,7 +487,7 @@ public class Controller implements EventListenerInterface {
 
     public void printSpaceship(ClientListener listener) {
         for (ClientListener c: listeners) {
-            Player player = playerbyListener.get(listener);
+            Player player = playerbyListener.get(c);
             DataString ds = new DataString(player.getSpaceshipPlance().toString());
             listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
         }
