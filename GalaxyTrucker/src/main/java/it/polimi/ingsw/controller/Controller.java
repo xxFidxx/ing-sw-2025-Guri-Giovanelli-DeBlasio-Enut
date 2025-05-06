@@ -16,6 +16,7 @@ import it.polimi.ingsw.model.resources.TileSymbols;
 import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -144,6 +145,10 @@ public class Controller implements EventListenerInterface {
                     assemblingTiles = game.getAssemblingTilesId();
                 }
                 event = new Event(this, state, new PickableTiles(assemblingTiles));
+            }
+
+            case SHOW_SHIP -> {
+                event = new Event(this, state, (DataString) data);
             }
 
             case PICKED_TILE -> {
@@ -480,7 +485,11 @@ public class Controller implements EventListenerInterface {
     }
 
     public void printSpaceship(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
+        for (ClientListener c: listeners) {
+            Player player = playerbyListener.get(listener);
+            DataString ds = new DataString(player.getSpaceshipPlance().toString());
+            listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
+        }
     }
 
     public void endCard(ClientListener listener) {

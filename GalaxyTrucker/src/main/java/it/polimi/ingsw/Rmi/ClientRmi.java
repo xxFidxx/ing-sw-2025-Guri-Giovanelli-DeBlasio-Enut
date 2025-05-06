@@ -106,7 +106,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case PICKED_TILE -> {
                 switch (input) {
-                    case "0" -> server.printSpaceship(this); //System.out.print("Show spaceship\n");
+                    case "0" -> System.out.print("Show spaceship\n");
                     case "1" -> System.out.print("Show reserve spots\n");
                     case "2" -> System.out.print("Show pickableTile\n");
                     case "3" -> server.drawCard(this);
@@ -119,6 +119,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
+            }
+            case SHOW_SHIP -> {
+                System.out.print("Not accepted input, please try again:\n");
             }
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
             case DRAW_CARD ->
@@ -234,6 +237,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ASSEMBLY -> System.out.print("List of available tiles: ");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case SHOW_SHIP -> System.out.print("Here is your spaceship\n");
             case TURN_START -> System.out.print("Here is the flight plance\n");
             case DRAW_CARD -> System.out.print("This is the drawn card:\n");
             case CARGO_MANAGEMENT -> {
@@ -288,6 +292,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case Cargos c -> printCargos(c.getCargos());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
+            case DataString ds -> System.out.println(ds);
             default -> {}
         }
     }
