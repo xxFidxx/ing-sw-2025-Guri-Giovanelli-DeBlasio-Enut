@@ -33,7 +33,7 @@ public class AdventureCardFactory {
         // Assuming you have constructors or instances of Deck and Game ready
         ArrayList<String> names = new ArrayList<>(List.of("a", "b"));
         Game game = new Game(names);     // Replace with appropriate constructor or initialization
-        Flightplance flightplance = new Flightplance(4, game);
+        Flightplance flightplance = new Flightplance(4, game, null);
         Deck deck = new Deck(null, flightplance);     // Replace with appropriate constructor or initialization
 
         try {

@@ -13,6 +13,7 @@ import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.resources.TileSymbols;
+import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.*;
@@ -151,6 +152,12 @@ public class Controller implements EventListenerInterface {
             case DRAW_CARD -> {
                 event = new Event(this, state, (DataContainer) data);
             }
+
+            case PLAYER_COLOR -> event = new Event(this, state, new PlayerColor((String)data));
+
+            case TURN_START -> {
+                event = new Event(this, state, new BoardView((String[])data));
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -165,8 +172,8 @@ public class Controller implements EventListenerInterface {
 
         ArrayList<String> nicks = lobby.getPlayersNicknames();
         game = new Game(nicks);
-
         ArrayList<Player> players= game.getPlayers();
+
 
         synchronized(playerbyListener) {
             for (int i = 0; i < players.size(); i++) {
@@ -180,9 +187,9 @@ public class Controller implements EventListenerInterface {
             }
         }
 
-        synchronized(isDonecrafting){
-            for(int i=0; i<isDonecrafting.size(); i++){
-                isDonecrafting.put(listeners.get(i), false);
+        synchronized (isDonecrafting) {
+            for (ClientListener l : listeners) {
+                isDonecrafting.put(l, false);
             }
         }
 
@@ -351,21 +358,65 @@ public class Controller implements EventListenerInterface {
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
-        if(isDonecrafting.get(listener))
-            throw new Exception ("The player was already done crafting!\n");
+        if (isDonecrafting.get(listener))
+            throw new Exception("The player was already done crafting!\n");
 
-        synchronized(isDonecrafting){
-            isDonecrafting.replace(listener,true);
+        int pos;
+        synchronized (isDonecrafting) {
+            isDonecrafting.replace(listener, true);
+            synchronized (GameLock) {
+                pos = isDonecrafting.keySet().size();
+
+                for (Boolean done : isDonecrafting.values()) {
+                    if (done) {
+                        pos--;
+                    }
+                }
+            }
         }
 
-        synchronized(isDonecrafting){
-            if(!isDonecrafting.containsValue(false))
-               handleCraftingEnded();
+        Flightplance flightPlance = game.getFlightPlance();
+        Player p = playerbyListener.get(listener);
+        flightPlance.getPlaceholderByPlayer(p).setPosizione(pos);
+        String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
+        listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor));
+
+        synchronized (isDonecrafting) {
+            if (!isDonecrafting.containsValue(false))
+                handleCraftingEnded();
+            else
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
         }
     }
 
     public void handleCraftingEnded(){
+
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
+        String[] boardView = handleBoardView();
+        notifyAllListeners(eventCrafter(GameState.TURN_START, boardView));
+    }
+
+    private String[] handleBoardView() {
+
+        Flightplance flightPlance = game.getFlightPlance();
+        Placeholder[] placeHolders = flightPlance.getSpots();
+
+        String[] boardView = new String[18];
+        Arrays.fill(boardView, "[]");
+
+
+        // 3) Li “sparo” nella board in base alla loro posizione
+        for (Placeholder p : placeHolders) {
+            int pos = (p.getPosizione() % 18);
+            if (pos < 0) {
+                throw new IllegalStateException(
+                        "Placeholder in posizione negativa: " + pos);
+            }
+            // prendo solo la prima lettera di ogni enum
+            boardView[pos] = ("[" +p.getColor().name().charAt(0) + "]");
+
+        }
+        return boardView;
     }
 
     public void checkStorage(ClientListener listener) throws CargoManagementException {
