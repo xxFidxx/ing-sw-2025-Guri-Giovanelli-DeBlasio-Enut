@@ -108,7 +108,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case PICKED_TILE -> {
                 switch (input) {
-                    case "0" -> System.out.print("Show spaceship\n");
+                    case "0" -> server.printSpaceship(this); //System.out.print("Show spaceship\n");
                     case "1" -> System.out.print("Show reserve spots\n");
                     case "2" -> System.out.print("Show pickableTile\n");
                     case "3" -> server.drawCard(this);

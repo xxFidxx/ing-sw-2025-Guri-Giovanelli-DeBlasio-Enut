@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.resources.TileSymbols;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.*;
@@ -189,14 +190,70 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(event);
     }
 
-    public String[] tileCrafter(String name, ConnectorType[] connectors){
-         char[][] tile =  new char[2][2];
-         for(int i=0; i<2; i++){
-             ConnectorType connector = connectors[i];
-             switch(connector){
-                 case ConnectorType.UNIVERSAL ->
-             }
-         }
+
+    public char[][] tileCrafter(ComponentTile tile){
+        char[][] lines = new char[3][3];
+
+        // angoli sempre uguali
+        lines[0][0] = '┌';
+        lines[0][2] = '┐';
+        lines[2][0] = '└';
+        lines[2][2] = '┘';
+
+        // centro
+        char center = TileSymbols.ASCII_TILE_SYMBOLS.get(tiletoString(tile));
+
+        // connettori
+        ConnectorType[] connectors = tile.getConnectors();
+        lines[0][1] = connectorToChar(connectors[0]);
+        lines[1][0] = connectorToChar(connectors[1]);
+        lines[1][2] = connectorToChar(connectors[2]);
+        lines[2][1] = connectorToChar(connectors[3]);
+
+        // scudo
+        if (tile instanceof ShieldGenerator) {
+            boolean[] protection = ((ShieldGenerator) tile).getProtection();
+            if (protection[0] && protection[1]) {
+                lines[0][2] = 'S';
+            }
+            else if (protection[1] && protection[2]) {
+                lines[2][2] = 'S';
+            }
+            else if (protection[2] && protection[3]) {
+                lines[2][0] = 'S';
+            }
+            else {
+                lines[0][0] = 'S';
+            }
+        }
+
+        return lines;
+    }
+
+    private char connectorToChar(ConnectorType ct) {
+        switch (ct){
+            case UNIVERSAL -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("universal");
+            }
+            case SINGLE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("single");
+            }
+            case DOUBLE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("double");
+            }
+            case SMOOTH -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("smooth");
+            }
+            case CANNON -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("cannon");
+            }
+            case ENGINE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("engine");
+            }
+            default -> {
+                return '?';
+            }
+        }
     }
 
     private String tiletoString(ComponentTile tile){
@@ -361,5 +418,9 @@ public class Controller implements EventListenerInterface {
     public void hasResponded(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         player.setResponded(true);
+    }
+
+    public void printSpaceship(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
     }
 }

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.componentTiles;
 
+import java.util.Arrays;
+
 public abstract class ComponentTile{
     private int id;
     protected ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...// ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
@@ -47,5 +49,59 @@ public abstract class ComponentTile{
         return connectors;
     }
 
+    @Override
+    public String toString() {
+        return  tiletoString(this) + "{" +
+                ", connectors=" + Arrays.toString(connectors) +
+                ", isWellConnected=" + isWellConnected +
+                '}';
+    }
 
+    private String tiletoString(ComponentTile tile){
+        if (tile != null) {
+            switch (tile) {
+                case DoubleCannon dc -> {
+                    return "DoubleCannon";
+                }
+
+                case Cannon c-> {
+                    return "Cannon";
+                }
+
+                case DoubleEngine de -> {
+                    return "DoubleEngine";
+                }
+                case Engine e -> {
+                    return "Engine";
+                }
+                case Cabin cab -> {
+                    return "Cabin";
+                }
+                case CargoHolds ch -> {
+                    return "CargoHolds";
+                }
+
+                case ShieldGenerator sg -> {
+                    return "ShieldGenerator";
+                }
+
+                case LifeSupportSystem lfs -> {
+                    return "LifeSupportSystem";
+                }
+
+                case PowerCenter pc -> {
+                    return "PowerCenter";
+                }
+
+                case StructuralModule sm -> {
+                    return "StructuralModule";
+                }
+
+                default -> {
+                    return "not Catched in tiletoString";
+                }
+            }
+        }
+        return null;
+    }
 }
