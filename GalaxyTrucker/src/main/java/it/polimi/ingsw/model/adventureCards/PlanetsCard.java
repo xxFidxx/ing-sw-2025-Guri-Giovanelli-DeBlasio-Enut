@@ -44,7 +44,7 @@ public class PlanetsCard extends AdventureCard {
             if (chosenPlanet == null) {
                 System.out.println("No planet chosen");
             }else{
-                p.getSpaceshipPlance().cargoManagement(chosenPlanet.getReward());
+                //p.getSpaceshipPlance().cargoManagement(chosenPlanet.getReward());
                 deck.getFlightPlance().move(- lostDays,p);
             }
         }

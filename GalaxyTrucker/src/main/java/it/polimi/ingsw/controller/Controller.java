@@ -6,14 +6,22 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.resources.TileSymbols;
+import it.polimi.ingsw.model.game.*;
+import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
+
+import static it.polimi.ingsw.Server.GameState.CARGO_MANAGEMENT;
 
 
 public class Controller implements EventListenerInterface {
@@ -28,11 +36,13 @@ public class Controller implements EventListenerInterface {
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <ClientListener, Boolean> isDonecrafting  = new HashMap<>();
+    private AdventureCard currentAdventureCard;
 
     public Controller() {
         this.game = null;
         this.queue = new LinkedBlockingQueue<>();
         this.lobby = null;
+        this.currentAdventureCard = null;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -119,7 +129,7 @@ public class Controller implements EventListenerInterface {
     }
 
     public Event eventCrafter(GameState state, Object data){
-        Event event = null;
+        Event event;
         switch(state){
             case WAIT_LOBBY ->{
                 ArrayList<String> nicks;
@@ -142,6 +152,12 @@ public class Controller implements EventListenerInterface {
             case DRAW_CARD -> {
                 event = new Event(this, state, (DataContainer) data);
             }
+
+            case PLAYER_COLOR -> event = new Event(this, state, new PlayerColor((String)data));
+
+            case TURN_START -> {
+                event = new Event(this, state, new BoardView((String[])data));
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -156,8 +172,8 @@ public class Controller implements EventListenerInterface {
 
         ArrayList<String> nicks = lobby.getPlayersNicknames();
         game = new Game(nicks);
-
         ArrayList<Player> players= game.getPlayers();
+
 
         synchronized(playerbyListener) {
             for (int i = 0; i < players.size(); i++) {
@@ -171,9 +187,9 @@ public class Controller implements EventListenerInterface {
             }
         }
 
-        synchronized(isDonecrafting){
-            for(int i=0; i<isDonecrafting.size(); i++){
-                isDonecrafting.put(listeners.get(i), false);
+        synchronized (isDonecrafting) {
+            for (ClientListener l : listeners) {
+                isDonecrafting.put(l, false);
             }
         }
 
@@ -181,14 +197,70 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(event);
     }
 
-    public String[] tileCrafter(String name, ConnectorType[] connectors){
-         char[][] tile =  new char[2][2];
-         for(int i=0; i<2; i++){
-             ConnectorType connector = connectors[i];
-             switch(connector){
-                 case ConnectorType.UNIVERSAL ->
-             }
-         }
+
+    public char[][] tileCrafter(ComponentTile tile){
+        char[][] lines = new char[3][3];
+
+        // angoli sempre uguali
+        lines[0][0] = '┌';
+        lines[0][2] = '┐';
+        lines[2][0] = '└';
+        lines[2][2] = '┘';
+
+        // centro
+        char center = TileSymbols.ASCII_TILE_SYMBOLS.get(tiletoString(tile));
+
+        // connettori
+        ConnectorType[] connectors = tile.getConnectors();
+        lines[0][1] = connectorToChar(connectors[0]);
+        lines[1][0] = connectorToChar(connectors[1]);
+        lines[1][2] = connectorToChar(connectors[2]);
+        lines[2][1] = connectorToChar(connectors[3]);
+
+        // scudo
+        if (tile instanceof ShieldGenerator) {
+            boolean[] protection = ((ShieldGenerator) tile).getProtection();
+            if (protection[0] && protection[1]) {
+                lines[0][2] = 'S';
+            }
+            else if (protection[1] && protection[2]) {
+                lines[2][2] = 'S';
+            }
+            else if (protection[2] && protection[3]) {
+                lines[2][0] = 'S';
+            }
+            else {
+                lines[0][0] = 'S';
+            }
+        }
+
+        return lines;
+    }
+
+    private char connectorToChar(ConnectorType ct) {
+        switch (ct){
+            case UNIVERSAL -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("universal");
+            }
+            case SINGLE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("single");
+            }
+            case DOUBLE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("double");
+            }
+            case SMOOTH -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("smooth");
+            }
+            case CANNON -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("cannon");
+            }
+            case ENGINE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("engine");
+            }
+            default -> {
+                return '?';
+            }
+        }
     }
 
     private String tiletoString(ComponentTile tile){
@@ -241,29 +313,33 @@ public class Controller implements EventListenerInterface {
 
     public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
-        AdventureCard adCard = cards[0];
-        String cardName = adCard.getName();
-        int cardLevel = cards[0].getLevel();
+        currentAdventureCard = cards[0];
+        // AdventureCard adCard = cards[0];
+        String cardName = currentAdventureCard.getName();
+        int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
 
-        if(cardName != null)
+        if (cardName != null)
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
         else
             notifyAllListeners(eventCrafter(GameState.END_GAME, null));
+    }
 
-        switch(adCard){
+    public void manageCard(){
+        switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
-                Player p = (game.choosePlayer(adCard));
+                Player p = (game.choosePlayer(currentAdventureCard));
                 ClientListener l = listenerbyPlayer.get(p);
                     if(p!=null)
                         handleWaiters(l);
                         // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
                     else{
                         notifyAllListeners(eventCrafter(GameState.NONE_ACTIVATE, null));
-                        game.resetResponded();
+                        game.endTurn();
                     }
             }
-            default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
+            // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
+            default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }
 
@@ -282,26 +358,88 @@ public class Controller implements EventListenerInterface {
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
-        if(isDonecrafting.get(listener))
-            throw new Exception ("The player was already done crafting!\n");
+        if (isDonecrafting.get(listener))
+            throw new Exception("The player was already done crafting!\n");
 
-        synchronized(isDonecrafting){
-            isDonecrafting.replace(listener,true);
+        int pos;
+        synchronized (isDonecrafting) {
+            isDonecrafting.replace(listener, true);
+            synchronized (GameLock) {
+                pos = isDonecrafting.keySet().size();
+
+                for (Boolean done : isDonecrafting.values()) {
+                    if (done) {
+                        pos--;
+                    }
+                }
+            }
         }
 
-        synchronized(isDonecrafting){
-            if(!isDonecrafting.containsValue(false))
-               handleCraftingEnded();
+        Flightplance flightPlance = game.getFlightPlance();
+        Player p = playerbyListener.get(listener);
+        flightPlance.getPlaceholderByPlayer(p).setPosizione(pos);
+        String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
+        listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor));
+
+        synchronized (isDonecrafting) {
+            if (!isDonecrafting.containsValue(false))
+                handleCraftingEnded();
+            else
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
         }
     }
 
     public void handleCraftingEnded(){
+
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
+        String[] boardView = handleBoardView();
+        notifyAllListeners(eventCrafter(GameState.TURN_START, boardView));
     }
 
-    public void checkStorage(ClientListener listener) {
+    private String[] handleBoardView() {
+
+        Flightplance flightPlance = game.getFlightPlance();
+        Placeholder[] placeHolders = flightPlance.getSpots();
+
+        String[] boardView = new String[18];
+        Arrays.fill(boardView, "[]");
+
+
+        // 3) Li “sparo” nella board in base alla loro posizione
+        for (Placeholder p : placeHolders) {
+            int pos = (p.getPosizione() % 18);
+            if (pos < 0) {
+                throw new IllegalStateException(
+                        "Placeholder in posizione negativa: " + pos);
+            }
+            // prendo solo la prima lettera di ogni enum
+            boardView[pos] = ("[" +p.getColor().name().charAt(0) + "]");
+
+        }
+        return boardView;
+    }
+
+    public void checkStorage(ClientListener listener) throws CargoManagementException {
         Player player = playerbyListener.get(listener);
-        game.checkStorage(player);
+        if(game.checkStorage(player)){
+            ArrayList<CargoHolds> playerCargos = player.getSpaceshipPlance().getCargoHolds();
+            GoodsBlock[] playerReward = player.getReward();
+            // Creazione della lista di GoodsContainer
+            ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
+
+            goodsContainers.add(new GoodsContainer(playerReward, false));
+
+            for (CargoHolds cargo : playerCargos) {
+                GoodsBlock[] goods = cargo.getGoods();
+                goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial()));
+            }
+
+            player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
+            listener.onEvent(new Event(this,GameState.CARGO_VIEW,new Cargos(goodsContainers)));
+        }else
+            // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        throw new CargoManagementException("You got 0 storage space, you can't manage any good");
     }
 
     public void addGood(ClientListener listener,int cargoIndex, int goodIndex, int rewardIndex) {
@@ -316,6 +454,24 @@ public class Controller implements EventListenerInterface {
 
     public void removeGood(ClientListener listener, int cargoIndex, int goodIndex) {
         Player player = playerbyListener.get(listener);
-        game.removeGood(player,cargoIndex,goodIndex,goodIndex);
+        game.removeGood(player,cargoIndex,goodIndex);
+    }
+
+    public void acceptCard() {
+        game.resetResponded();
+        notifyAllListeners(eventCrafter(GameState.ACTIVATE_CARD, null));
+    }
+
+    public void rejectCard() {
+        notifyAllListeners(eventCrafter(GameState.MANAGE_CARD, null));
+    }
+
+    public void hasResponded(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        player.setResponded(true);
+    }
+
+    public void printSpaceship(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
     }
 }

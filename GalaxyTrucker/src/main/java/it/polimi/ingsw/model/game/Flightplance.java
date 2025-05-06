@@ -1,18 +1,26 @@
 package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.model.adventureCards.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 
 public class Flightplance {
     private Placeholder[] spots;
     private Deck deck;
     private Game game;
     private AdventureCard[] fakeCards;
+    private Map<Player, Placeholder> placeholderByPlayer; // Mappa giocatore -> placeholder
 
-    public Flightplance(int spots, Game game) {
+    public Flightplance(int spots, Game game, ArrayList<Player> players) {
         this.spots = new Placeholder[spots];
+        this.placeholderByPlayer = new HashMap<>();
+
+        // Crea un placeholder per ogni giocatore e associalo al colore
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            Placeholder placeholder = new Placeholder(i);
+            placeholderByPlayer.put(player, placeholder);
+            this.spots[i] = placeholder;
+        }
         // mi creo delle carte finte per simulare il comportamento
         this.fakeCards = new AdventureCard[]{
             new AbandonedShipCard("AbShipCard1", 2, 1, 3, 4, deck),
@@ -24,6 +32,10 @@ public class Flightplance {
         this.deck = new Deck(fakeCards, this);
         this.game = game;
 
+    }
+
+    public Placeholder getPlaceholderByPlayer(Player player) {
+        return placeholderByPlayer.get(player);
     }
 
     public Deck getDeck() {

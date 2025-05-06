@@ -24,7 +24,7 @@ import it.polimi.ingsw.model.game.Player;
                 System.out.println("No player selected");
                 return;
             }
-            p.getSpaceshipPlance().cargoManagement(reward);
+            //p.getSpaceshipPlance().cargoManagement(reward);
             deck.getFlightPlance().move(-lostDays, p);
         }
 

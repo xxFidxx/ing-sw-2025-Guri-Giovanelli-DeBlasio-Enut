@@ -2,8 +2,10 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
+import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
@@ -22,6 +24,7 @@ public class SpaceshipPlance {
     private int nBrownAliens;
     private int nPurpleAliens;
     private int exposedConnectors;
+    private ArrayList<GoodsContainer> goodsContainers;
 
 
 
@@ -39,6 +42,7 @@ public class SpaceshipPlance {
         this.nAstronauts = 0;
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;
+        this.goodsContainers = new ArrayList<>();
 
         ConnectorType[] cannonConnectors = {
                 ConnectorType.UNIVERSAL,   // Lato superiore
@@ -47,6 +51,10 @@ public class SpaceshipPlance {
                 ConnectorType.UNIVERSAL    // Lato sinistro
         };
         components[2][3] = new Cabin(cannonConnectors,true,-1);
+    }
+
+    public void setGoodsContainers(ArrayList<GoodsContainer> goodsContainers){
+        this.goodsContainers = goodsContainers;
     }
 
     public int getBrownAliens() {
@@ -293,18 +301,17 @@ public class SpaceshipPlance {
         }
     }
 
-    public void checkStorage() throws CargoManagementException {
-        if (getStorage() == 0) {
-            throw new CargoManagementException("You got 0 storage space, you can't manage any good");
-        }
+    public boolean checkStorage() {
+        return getStorage() != 0;
     }
 
     public void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
 
+
         if (cargoIndex1 >= 0 && cargoIndex1 < cargoHolds.size() && cargoIndex2 >= 0 && cargoIndex2 < cargoHolds.size()) {
 
-            CargoHolds cargo1 = cargoHolds.get(cargoIndex1);
-            CargoHolds cargo2 = cargoHolds.get(cargoIndex2);
+            GoodsContainer cargo1 = goodsContainers.get(cargoIndex1);
+            GoodsContainer cargo2 = goodsContainers.get(cargoIndex2);
 
             if (goodIndex1 >= 0 && goodIndex1 < cargo1.getGoods().length && goodIndex2 >= 0 && goodIndex2 < cargo2.getGoods().length) {
                 GoodsBlock good1 = cargo1.getGoods()[goodIndex1];
@@ -323,10 +330,10 @@ public class SpaceshipPlance {
         }
     }
 
-    public void handleRemove(int cargoIndex, int goodIndex) throws CargoManagementException{
+    public void handleRemove( int cargoIndex, int goodIndex) throws CargoManagementException{
 
-        if (cargoIndex >= 0 && cargoIndex < cargoHolds.size()) {
-            CargoHolds cargo1 = cargoHolds.get(cargoIndex);
+        if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
+            GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
             if(goodIndex >= 0 && goodIndex < cargo1.getGoods().length) {
                 removeGoods(cargo1, goodIndex);
             }else
@@ -337,8 +344,8 @@ public class SpaceshipPlance {
 
     public void handleAdd(GoodsBlock[] cardReward,int cargoIndex,int goodIndex,int rewardIndex) throws CargoManagementException{
 
-        if(cargoIndex >= 0 && cargoIndex < cargoHolds.size()) {
-            CargoHolds cargo1 = cargoHolds.get(cargoIndex);
+        if(cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
+            GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
             if(goodIndex >= 0 && goodIndex < cargo1.getGoods().length && rewardIndex>=0 && rewardIndex < cardReward.length) {
                 GoodsBlock good1 = cargo1.getGoods()[goodIndex];
                 GoodsBlock good2 = cardReward[rewardIndex];
@@ -356,7 +363,7 @@ public class SpaceshipPlance {
             throw new CargoManagementException("cargo index is outbound");
     }
 
-    private void swapGoods(CargoHolds cargo1, CargoHolds cargo2, int j1, int j2) {
+    private void swapGoods(GoodsContainer cargo1, GoodsContainer cargo2, int j1, int j2) {
 
         GoodsBlock[] goods1 = cargo1.getGoods();
         GoodsBlock[] goods2 = cargo2.getGoods();
@@ -367,7 +374,7 @@ public class SpaceshipPlance {
 
     }
 
-    private boolean checkSpecialGoods(CargoHolds cargo1, CargoHolds cargo2, GoodsBlock good1, GoodsBlock good2) {
+    private boolean checkSpecialGoods(GoodsContainer cargo1, GoodsContainer cargo2, GoodsBlock good1, GoodsBlock good2) {
         if ((good1.getType() == RED && !cargo2.isSpecial()) || (good2.getType() == RED && !cargo1.isSpecial()))
             return false;
 
@@ -375,7 +382,7 @@ public class SpaceshipPlance {
 
     }
 
-    private boolean checkSpecialGoods(CargoHolds cargo, GoodsBlock good) {
+    private boolean checkSpecialGoods(GoodsContainer cargo, GoodsBlock good) {
 
         if ((good.getType() == RED && !cargo.isSpecial()))
             return false;
@@ -384,12 +391,11 @@ public class SpaceshipPlance {
 
     }
 
-    private void removeGoods(CargoHolds cargo1, int j1) {
+    private void removeGoods(GoodsContainer cargo1, int j1) {
         cargo1.getGoods()[j1] = null;
-
     }
 
-    private void addGoods(CargoHolds cargo1,GoodsBlock[] cardReward,int j1, int k) {
+    private void addGoods(GoodsContainer cargo1,GoodsBlock[] cardReward,int j1, int k){
         cargo1.getGoods()[j1] = cardReward[k];
         cardReward[k] = null;
     }
@@ -401,13 +407,13 @@ public class SpaceshipPlance {
         else
             actualLost = lostOther;
 
-        ArrayList<CargoHolds> playerCargos = getCargoHolds();
+        ArrayList<GoodsContainer> playerCargos = goodsContainers;
 
         for(int i = 0; i< actualLost; i++) {
             int i1=0; // indice cargo
             int j1=0; // indice good
             if (i1 >= 0 && i1 < playerCargos.size()) {
-                CargoHolds cargo1 = playerCargos.get(i1);
+                GoodsContainer cargo1 = playerCargos.get(i1);
                 if(j1 >= 0 && j1 < cargo1.getGoods().length) {
                     removeGoods(cargo1, j1);
                 }else
@@ -677,7 +683,68 @@ public class SpaceshipPlance {
     }
 
 
-    public boolean checkExposedConnector(int position) {
+    public boolean checkExposedConnector(Direction direction, int position) {
+        int max_lenght = 7;
+        // casella da cui partire
+        int x=0, y=0;
+        switch (direction) {
+            case NORTH:
+                x = position - 4;
+                y = 0;
+                max_lenght = 5;
+                break;
+            case EAST:
+                x = 6;
+                y = position - 5;
+                break;
+            case SOUTH:
+                x = position - 4;
+                y = 4;
+                max_lenght = 5;
+                break;
+            case WEST:
+                x = 0;
+                y = position - 5;
+                break;
+        }
+
+        ComponentTile hit = components[y][x];
+
+        for(int i = 0; i<max_lenght || hit == null; i++){
+            switch (direction) {
+                case NORTH:
+                    y += 1;
+                    break;
+                case EAST:
+                    x -= 1;
+                    break;
+                case SOUTH:
+                    y -= 1;
+                    break;
+                case WEST:
+                    x += 1;
+                    break;
+            }
+            hit = components[y][x];
+        }
+
+        ArrayList<ConnectorType> disallowedConnectors = new ArrayList<>(Arrays.asList(ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL));
+
+        if((hit != null) && (disallowedConnectors.contains(hit.getConnectors()[direction.ordinal()]))){
+            return true;
+        }
+
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "SpaceshipPlance{" +
+                "components=" + Arrays.toString(components) +
+                ", reserveSpot=" + reserveSpot +
+                ", nAstronauts=" + nAstronauts +
+                ", nBrownAliens=" + nBrownAliens +
+                ", nPurpleAliens=" + nPurpleAliens +
+                '}';
     }
 }

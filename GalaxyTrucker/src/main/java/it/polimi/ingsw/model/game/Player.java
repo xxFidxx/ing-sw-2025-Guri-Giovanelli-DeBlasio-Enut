@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
@@ -16,6 +17,7 @@ public class Player {
         private Game game;
         private ComponentTile handTile;
         private boolean responded;
+        private GoodsBlock[] reward;
 
     public Player(String nickname, Game game, int playerNumber) {
         this.nickname = nickname;
@@ -27,10 +29,19 @@ public class Player {
         this.game = game;
         this.handTile = null;
         this.responded = false;
+        this.reward = null;
     }
 
     public void setSpaceshipPlance(SpaceshipPlance spaceshipPlance) {
         this.spaceshipPlance = spaceshipPlance;
+    }
+
+    public GoodsBlock[] getReward(){
+        return reward;
+    }
+
+    public void setReward(GoodsBlock[] reward) {
+        this.reward = reward;
     }
 
     public String getNickname() {

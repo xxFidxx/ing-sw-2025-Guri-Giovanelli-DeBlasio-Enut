@@ -1,10 +1,12 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Game {
     private ArrayList<Player> players;
@@ -23,7 +25,7 @@ public class Game {
         dices[0] = new Dice();
         dices[1] = new Dice();
         // gli spots dipenderanno dalla lobby size
-        this.plance = new Flightplance(playersName.size(), this);
+        this.plance = new Flightplance(playersName.size(), this, players);
 
         // Prima definiamo i connettori per i componenti
         ConnectorType[] cannonConnectors = {
@@ -80,7 +82,7 @@ public class Game {
     }
 
     public Player choosePlayer(AdventureCard card) {
-        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        // players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
 
         for (int i = players.size() - 1; i >= 0; i--) {
             if (card.checkCondition(players.get(i)))
@@ -149,20 +151,36 @@ public class Game {
         }
     }
 
-    public void checkStorage(Player player) throws CargoManagementException {
-        player.getSpaceshipPlance().checkStorage();
+    public boolean checkStorage(Player player) throws CargoManagementException {
+        if(player.getSpaceshipPlance().checkStorage()){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     public void swapGoods(Player player, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
-        player.getSpaceshipPlance().handleAdd(cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
+        player.getSpaceshipPlance().handleSwap(cargoIndex1,cargoIndex2,goodIndex1, goodIndex2);
     }
+
 
     public void addGood(Player player, int cargoIndex, int goodIndex, int rewardIndex) {
-        player.getSpaceshipPlance().handleSwap(cargoIndex,goodIndex,rewardIndex);
+        player.getSpaceshipPlance().handleAdd(player.getReward(),cargoIndex,goodIndex,rewardIndex);
     }
 
-    public void removeGood(Player player, int cargoIndex, int goodIndex, int goodIndex1) {
+    public void removeGood(Player player, int cargoIndex, int goodIndex) {
         player.getSpaceshipPlance().handleRemove(cargoIndex,goodIndex);
+    }
+
+    public void endTurn(){
+        resetResponded();
+        resetRewards();
+    }
+
+    private void resetRewards() {
+        for(Player p: players){
+            p.setReward(null);
+        }
     }
 }
 
