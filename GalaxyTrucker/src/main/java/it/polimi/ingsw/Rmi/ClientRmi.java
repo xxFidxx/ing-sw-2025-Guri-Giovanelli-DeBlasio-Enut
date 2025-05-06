@@ -221,6 +221,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 server.hasResponded(this);
             }
             case MANAGE_CARD -> server.manageCard();
+            case END_CARD -> server.endCard(this);
         }
         System.out.print("\n> ");
     }
