@@ -150,6 +150,9 @@ public class Controller implements EventListenerInterface {
             case DRAW_CARD -> {
                 event = new Event(this, state, (DataContainer) data);
             }
+            case SHOW_PLAYER -> {
+                event = new Event(this, state, (PlayerInfo) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -270,8 +273,7 @@ public class Controller implements EventListenerInterface {
                         handleWaiters(l);
                         // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
                     else{
-                        notifyAllListeners(eventCrafter(GameState.NONE_ACTIVATE, null));
-                        game.endTurn();
+                        notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     }
             }
             // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
@@ -282,6 +284,7 @@ public class Controller implements EventListenerInterface {
     public void activateCard(ClientListener listener) throws LobbyExceptions {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
         cards[0].activate();
+        notifyAllListeners(eventCrafter(GameState.END_CARD, null));
     }
 
     public void handleWaiters(ClientListener listener){
@@ -350,7 +353,7 @@ public class Controller implements EventListenerInterface {
     }
 
     public void acceptCard() {
-        game.resetResponded();
+        // game.resetResponded();
         notifyAllListeners(eventCrafter(GameState.ACTIVATE_CARD, null));
     }
 
@@ -361,5 +364,25 @@ public class Controller implements EventListenerInterface {
     public void hasResponded(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         player.setResponded(true);
+    }
+
+    public void endCard(ClientListener listener) {
+        game.endTurn();
+        Player player = playerbyListener.get(listener);
+        ArrayList<Player> players = game.getPlayers();
+        String nick=null;
+        int pos, cred, astr, al;
+        pos=cred=astr=al=0;
+        for(Player p: players){
+            if(p == player){
+                nick = p.getNickname();
+                pos = p.getPlaceholder().getPosizione();
+                cred = p.getCredits();
+                astr = p.getNumAstronauts();
+                al = p.getNumAliens();
+                PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
+                listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
+            }
+        }
     }
 }
