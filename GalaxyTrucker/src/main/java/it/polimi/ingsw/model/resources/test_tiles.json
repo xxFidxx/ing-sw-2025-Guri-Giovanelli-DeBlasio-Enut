@@ -5,8 +5,8 @@
     "isCentral": false
   },
   {
-    "type": "Cannon",
-    "connectors": [1, 0, 0, 0]
+    "type": "DoubleCannon",
+    "connectors": [1, 0, 1, 0]
   },
   {
     "type": "CargoHolds",
