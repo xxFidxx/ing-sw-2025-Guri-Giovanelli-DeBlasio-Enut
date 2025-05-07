@@ -18,4 +18,10 @@ public abstract class Projectile {
         return direction;
     }
 
+    @Override
+    public String toString() {
+        return "Projectile{" +
+                "direction=" + direction +
+                '}';
+    }
 }

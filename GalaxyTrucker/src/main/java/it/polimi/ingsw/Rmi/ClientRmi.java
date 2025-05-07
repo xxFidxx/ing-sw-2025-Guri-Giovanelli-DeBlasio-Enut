@@ -245,7 +245,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case MANAGE_CARD -> System.out.print("It's next player turn to choice\n");
             case END_CARD -> System.out.print("End card\n");
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
-            case MANAGE_CARD -> System.out.print("Card management activated\n");
+            //case MANAGE_CARD -> System.out.print("Card management activated\n");
             case MOVE_PLAYER -> System.out.print("Move players\n");
         }
         System.out.print("\n> ");
@@ -287,7 +287,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case Cargos c -> printCargos(c.getCargos());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
-            case DataString ds -> System.out.println(ds);
+            //case DataString ds -> System.out.println(ds);
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
             case MovePlayerData mpd -> System.out.println("You moved " + mpd.getSteps() + " steps.");

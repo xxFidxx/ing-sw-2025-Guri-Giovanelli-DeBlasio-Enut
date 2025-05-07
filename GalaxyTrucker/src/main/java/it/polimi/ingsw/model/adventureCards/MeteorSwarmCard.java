@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.resources.Projectile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MeteorSwarmCard extends AdventureCard {
     private Projectile[] meteors;
@@ -24,5 +25,12 @@ public class MeteorSwarmCard extends AdventureCard {
                 meteor.activate(player, position);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "MeteorSwarmCard{" +
+                "meteors=" + Arrays.toString(meteors) +
+                '}';
     }
 }

@@ -6,8 +6,8 @@ public class GoodsBlock {
     private int value;
     private ColorType type;
 
-    public GoodsBlock(int value, ColorType type) {
-        this.value = value;
+    public GoodsBlock(ColorType type) {
+        this.value = type.ordinal()+1; // blue (= 0) + 1 = 1 (valore giusto)
         this.type = type;
     }
     public int getValue() {
@@ -16,5 +16,12 @@ public class GoodsBlock {
 
     public ColorType getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        return "GoodsBlock{" +
+                "type=" + type +
+                '}';
     }
 }

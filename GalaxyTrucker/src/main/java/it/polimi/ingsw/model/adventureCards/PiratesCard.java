@@ -5,6 +5,8 @@ import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.resources.Projectile;
 
+import java.util.Arrays;
+
 public class PiratesCard extends EnemyCard {
     private Projectile[] shots; //liste o array?
     private int reward;
@@ -27,5 +29,13 @@ public class PiratesCard extends EnemyCard {
         for (Projectile shot : shots) {
             shot.activate(player, position);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "PiratesCard{" +
+                "shots=" + Arrays.toString(shots) +
+                ", reward=" + reward +
+                '}';
     }
 }

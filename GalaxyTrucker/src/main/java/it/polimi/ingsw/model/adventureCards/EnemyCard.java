@@ -67,4 +67,12 @@ public abstract class EnemyCard extends AdventureCard {
 
     public abstract void reward(Player player);
     public abstract void penalize(Player player);
+
+    @Override
+    public String toString() {
+        return "EnemyCard{" +
+                "cannonStrength=" + cannonStrength +
+                ", lostDays=" + lostDays +
+                '}';
+    }
 }

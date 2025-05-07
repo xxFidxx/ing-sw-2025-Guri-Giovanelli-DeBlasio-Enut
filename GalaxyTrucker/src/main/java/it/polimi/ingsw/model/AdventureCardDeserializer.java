@@ -28,10 +28,10 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
         int typeCode = p.get("type").getAsInt();
         Direction dir = Direction.values()[ p.get("direction").getAsInt() ];
         switch (typeCode) {
-            case 0: return new BigCannonShot(game, dir);
-            case 1: return new SmallCannonShot(game, dir);
-            case 2: return new BigMeteor(game, dir);
-            case 3: return new SmallMeteor(game, dir);
+            case 0: return new SmallCannonShot(game, dir);
+            case 1: return new BigCannonShot(game, dir);
+            case 2: return new SmallMeteor(game, dir);
+            case 3: return new BigMeteor(game, dir);
             default: throw new JsonParseException("Unknown projectile type: " + typeCode);
         }
     }
@@ -39,8 +39,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
     private GoodsBlock instantiateGoodsBlock(JsonObject g) {
         int typeCode = g.get("type").getAsInt();
         ColorType ct = ColorType.values()[ typeCode ];
-        int value  = g.get("value").getAsInt();
-        return new GoodsBlock(value, ct);
+        return new GoodsBlock(ct);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 JsonArray rewArr = obj.get("reward").getAsJsonArray();
                 GoodsBlock[] reward = new GoodsBlock[rewArr.size()];
                 for (int i = 0; i < rewArr.size(); i++) {
-                    reward[i] = instantiateGoodsBlock(rewArr.get(i).getAsJsonObject());
+                    reward[i] = new GoodsBlock(ColorType.values()[rewArr.get(i).getAsInt()]);
                 }
                 return new AbandonedStationCard(name, level, deck, lostDays, requiredCrew, reward);
             }
@@ -109,10 +108,10 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 JsonArray pls  = obj.get("planets").getAsJsonArray();
                 ArrayList<Planet> planets = new ArrayList<>();
                 for (int i = 0; i < pls.size(); i++) {
-                    JsonArray goodsArr = pls.get(i).getAsJsonObject().get("goods").getAsJsonArray();
+                    JsonArray goodsArr = pls.get(i).getAsJsonArray();
                     GoodsBlock[] goods = new GoodsBlock[goodsArr.size()];
                     for (int j = 0; j < goodsArr.size(); j++) {
-                        goods[j] = instantiateGoodsBlock(goodsArr.get(j).getAsJsonObject());
+                        goods[j] = new GoodsBlock(ColorType.values()[goodsArr.get(j).getAsInt()]);
                     }
                     Planet planet = new Planet(goods, false);
                     planets.add(planet);
@@ -134,7 +133,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 JsonArray rewArr = obj.get("reward").getAsJsonArray();
                 GoodsBlock[] reward3 = new GoodsBlock[rewArr.size()];
                 for (int i = 0; i < rewArr.size(); i++) {
-                    reward3[i] = instantiateGoodsBlock(rewArr.get(i).getAsJsonObject());
+                    reward3[i] = new GoodsBlock(ColorType.values()[rewArr.get(i).getAsInt()]);
                 }
                 return new SmugglersCard(name, level, deck, cannonStrength, lostDays, lossMalus, reward3);
             }

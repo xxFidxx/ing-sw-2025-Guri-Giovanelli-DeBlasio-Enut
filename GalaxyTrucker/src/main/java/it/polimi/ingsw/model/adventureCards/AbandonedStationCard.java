@@ -4,7 +4,9 @@ import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Player;
 
-    public class AbandonedStationCard extends AdventureCard {
+import java.util.Arrays;
+
+public class AbandonedStationCard extends AdventureCard {
         private int lostDays;
         private int requiredCrew;
         private GoodsBlock[] reward;
@@ -43,4 +45,12 @@ import it.polimi.ingsw.model.game.Player;
             return false;
         }
 
+    @Override
+    public String toString() {
+        return "AbandonedStationCard{" +
+                "lostDays=" + lostDays +
+                ", requiredCrew=" + requiredCrew +
+                ", reward=" + Arrays.toString(reward) +
+                '}';
     }
+}

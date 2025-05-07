@@ -85,9 +85,11 @@
   {
     "type": "SlaversCard",
     "name": "Slavers",
-    "level": 3,
-    "lostCrew": 4,
-    "reward": 100
+    "level": 2,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
   },
   {
     "type": "SmugglersCard",

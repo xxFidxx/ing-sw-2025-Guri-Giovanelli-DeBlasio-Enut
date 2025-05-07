@@ -9,9 +9,9 @@ public class Deck {
     public Deck(AdventureCard[] cards, Flightplance flightplance) {
         this.cards = cards;
         this.flightplance = flightplance;
-        for(AdventureCard ac : cards ) {
-            ac.setDeck(this);
-        }
+//        for(AdventureCard ac : cards ) {
+//            ac.setDeck(this);
+//        }
     }
 
     public AdventureCard[] getCards() {
