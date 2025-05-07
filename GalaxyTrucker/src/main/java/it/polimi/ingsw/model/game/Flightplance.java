@@ -3,7 +3,7 @@ import it.polimi.ingsw.model.adventureCards.*;
 
 import java.util.*;
 
-public class Flightplance {
+public class  Flightplance {
     private Placeholder[] spots;
     private Deck deck;
     private Game game;

@@ -30,8 +30,12 @@ public enum GameState {
     PLAYER_COLOR,
     END_CARD,
     SHOW_PLAYER,
-    END_GAME
+    END_GAME,
+    MOVE_PLAYER,
     }
+
+
+
 
 // flight plance
 // cargo management, crew management

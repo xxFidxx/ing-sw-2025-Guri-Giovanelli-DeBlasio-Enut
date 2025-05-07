@@ -8,4 +8,9 @@ public class LifeSupportSystem extends ComponentTile{
         super(connectors,id);
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "color=" + color;
+    }
 }

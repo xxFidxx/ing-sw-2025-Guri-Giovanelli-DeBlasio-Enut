@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
+import it.polimi.ingsw.model.adventureCards.OpenSpaceCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
@@ -16,13 +17,9 @@ import it.polimi.ingsw.model.resources.TileSymbols;
 import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
-
-import static it.polimi.ingsw.Server.GameState.CARGO_MANAGEMENT;
 
 
 public class Controller implements EventListenerInterface {
@@ -117,6 +114,7 @@ public class Controller implements EventListenerInterface {
         if(tile != null){
             String tileName = tiletoString(tile);
             ConnectorType[] connectors = tile.getConnectors();
+            printSpaceship(listener);
             listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tileName,connectors)));
         }
         else{
@@ -347,6 +345,18 @@ public class Controller implements EventListenerInterface {
                     game.endTurn();
                 }
             }
+            case OpenSpaceCard osc ->{
+                    osc.activate();
+                    for (Player player : game.getPlayers()) {
+                        ClientListener l = listenerbyPlayer.get(player);
+                        int n_move =player.getEngineStrenght();
+                        l.onEvent(eventCrafter(GameState.MOVE_PLAYER, n_move));
+                    }
+
+
+
+
+            }
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }
@@ -485,7 +495,7 @@ public class Controller implements EventListenerInterface {
 
     public void printSpaceship(ClientListener listener) {
         for (ClientListener c: listeners) {
-            Player player = playerbyListener.get(listener);
+            Player player = playerbyListener.get(c);
             DataString ds = new DataString(player.getSpaceshipPlance().toString());
             listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
         }
