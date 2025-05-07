@@ -155,7 +155,7 @@ public class Controller implements EventListenerInterface {
                 event = new Event(this, state, (PickedTile)data);
             }
             case DRAW_CARD -> {
-                event = new Event(this, state, (DataContainer) data);
+                event = new Event(this, state, (Card) data);
             }
 
             case PLAYER_COLOR -> event = new Event(this, state, new PlayerColor((String)data));
@@ -322,7 +322,6 @@ public class Controller implements EventListenerInterface {
     public void drawCard(ClientListener listener) {
         AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
         currentAdventureCard = cards[0];
-        // AdventureCard adCard = cards[0];
         String cardName = currentAdventureCard.getName();
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
@@ -339,9 +338,7 @@ public class Controller implements EventListenerInterface {
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
                 Player p = (game.choosePlayer(currentAdventureCard));
-                System.out.println(p);
                 ClientListener l = listenerbyPlayer.get(p);
-                System.out.println(l);
                 if(p!=null)
                     handleWaiters(l);
                     // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
@@ -350,15 +347,17 @@ public class Controller implements EventListenerInterface {
                     game.endTurn();
                 }
             }
-            // default -> listener.onEvent(eventCrafter(GameState.ACTIVATE_CARD, card));
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }
 
-    public void activateCard(ClientListener listener) throws LobbyExceptions {
-        AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
-        cards[0].activate();
+    public void activateAbandonedShipCard(ClientListener listener) throws LobbyExceptions {
+        Player p = playerbyListener.get(listener);
+        AbandonedShipCard currentAbandonedShipCard = (AbandonedShipCard) currentAdventureCard;
+        currentAbandonedShipCard.setActivatedPlayer(p);
+        currentAdventureCard.activate();
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+        endCard(listener);
     }
 
     public void handleWaiters(ClientListener listener){
@@ -369,7 +368,6 @@ public class Controller implements EventListenerInterface {
                 p.setResponded(true);
             }
             else {
-                System.out.println(l);
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
@@ -475,8 +473,9 @@ public class Controller implements EventListenerInterface {
         game.removeGood(player,cargoIndex,goodIndex);
     }
 
-    public void acceptCard() {
+    public void acceptCard(ClientListener listener) {
         notifyAllListeners(eventCrafter(GameState.ACTIVATE_CARD, null));
+        activateAbandonedShipCard(listener);
     }
 
     public void rejectCard() {
@@ -496,16 +495,13 @@ public class Controller implements EventListenerInterface {
         game.endTurn();
         Player player = playerbyListener.get(listener);
         ArrayList<Player> players = game.getPlayers();
-        String nick=null;
-        int pos, cred, astr, al;
-        pos=cred=astr=al=0;
         for(Player p: players){
             if(p == player){
-                nick = p.getNickname();
-                pos = p.getPlaceholder().getPosizione();
-                cred = p.getCredits();
-                astr = p.getNumAstronauts();
-                al = p.getNumAliens();
+                String nick = p.getNickname();
+                int pos = p.getPlaceholder().getPosizione();
+                int cred = p.getCredits();
+                int astr = p.getNumAstronauts();
+                int al = p.getNumAliens();
                 PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
                 listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
             }

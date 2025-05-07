@@ -126,9 +126,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
             case DRAW_CARD ->
                     System.out.print("If you are the leader you will have to choose what to do, else just wait the players ahead are done!\n");
-            case ACTIVATE_CARD -> {
-                server.activateCard(this);
-            }
 
             case CARGO_MANAGEMENT -> {
                 System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
@@ -218,11 +215,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CHOOSE_PLAYER -> {
                 switch (input) {
-                    case "0" -> server.acceptCard();
+                    case "0" -> server.acceptCard(this);
                     case "1" -> server.rejectCard();
                 }
             }
-            case END_CARD -> server.endCard(this);
         }
         System.out.print("\n> ");
     }
@@ -251,7 +247,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_PLAYER -> System.out.print("Type 0 to activate the card, 1 to reject the card\n");
             case ACTIVATE_CARD -> System.out.print("Card activated\n");
             case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player\n");
-            case MANAGE_CARD -> System.out.print("Card management activated\n");
+            case MANAGE_CARD -> System.out.print("It's next player turn to choice\n");
+            case END_CARD -> System.out.print("End card\n");
+            case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
         }
         System.out.print("\n> ");
     }
@@ -293,6 +291,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
             case DataString ds -> System.out.println(ds);
+            case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             default -> {}
         }
     }

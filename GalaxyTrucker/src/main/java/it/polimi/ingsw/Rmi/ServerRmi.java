@@ -115,11 +115,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.drawCard(listener);
     }
 
-    public void activateCard(VirtualViewRmi client) throws RemoteException {
-        ClientListener listener = clientListeners.get(client);
-        controller.activateCard(listener);
-    }
-
     @Override
     public void endCrafting(VirtualViewRmi client) throws Exception {
         ClientListener listener = clientListeners.get(client);
@@ -151,20 +146,15 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void acceptCard() throws RemoteException {
-        controller.acceptCard();
+    public void acceptCard(VirtualViewRmi client) throws RemoteException {
+        ClientListener listener = clientListeners.get(client);
+        controller.acceptCard(listener);
     }
 
     @Override
     public void rejectCard() throws RemoteException{
         controller.rejectCard();
     }
-
-    @Override
-    public void manageCard() throws RemoteException {
-        controller.manageCard();
-    }
-
 
 //    @Override
 //    public void printSpaceship(VirtualViewRmi client) {

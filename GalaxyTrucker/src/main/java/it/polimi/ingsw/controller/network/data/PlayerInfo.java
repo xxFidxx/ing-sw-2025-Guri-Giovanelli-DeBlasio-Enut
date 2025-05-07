@@ -23,4 +23,24 @@ public class PlayerInfo extends DataContainer implements Serializable {
         this.numAstronauts = numAstronauts;
         this.numAliens = numAliens;
     }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public int getNumAstronauts() {
+        return numAstronauts;
+    }
+
+    public int getNumAliens() {
+        return numAliens;
+    }
 }

@@ -22,6 +22,10 @@ public abstract class AdventureCard {
         return level;
     }
 
+    public void setDeck(Deck deck) {
+        this.deck = deck;
+    }
+
     public boolean checkCondition(Player p) {
         return true;
     }
