@@ -75,7 +75,7 @@
     "type": "CombatZoneCard",
     "name": "Combat Zone",
     "level": 1,
-    "combatZoneType": 0, //lost crew
+    "combatZoneType": 0,
     "lostDays": 3,
     "lostOther": 2,
     "cannons": [
