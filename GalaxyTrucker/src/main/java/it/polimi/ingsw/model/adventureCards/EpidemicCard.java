@@ -13,6 +13,10 @@ public class EpidemicCard extends AdventureCard  {
         super(name, level, deck);
     }
 
+    public EpidemicCard(String name, int level){
+        super(name, level);
+    }
+
     @Override
     public void activate(){
         // toglie un membro da ogni cabina interconnessa

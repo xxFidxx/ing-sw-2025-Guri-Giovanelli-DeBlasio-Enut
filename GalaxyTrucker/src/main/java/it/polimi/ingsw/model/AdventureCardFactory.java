@@ -20,7 +20,7 @@ import java.util.List;
 
 public class AdventureCardFactory {
 
-    public static List<AdventureCard> loadCards(Deck deck, Game game) throws IOException {
+    public static List<AdventureCard> loadCards(Game game) throws IOException {
         try {
             URL resourceUrl = Main.class.getClassLoader().getResource("cards.json");
             if (resourceUrl == null) {
@@ -29,7 +29,7 @@ public class AdventureCardFactory {
             String filePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
 
             Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(AdventureCard.class, new AdventureCardDeserializer(game, deck))
+                    .registerTypeAdapter(AdventureCard.class, new AdventureCardDeserializer(game))
                     .create();
 
             try (FileReader reader = new FileReader(filePath)) {
@@ -50,11 +50,9 @@ public class AdventureCardFactory {
 
         ArrayList<String> names = new ArrayList<>(List.of("a", "b"));
         Game game = new Game(names);
-        Flightplance flightplance = game.getFlightPlance();
-        Deck deck = new Deck(null, flightplance);
 
         try {
-            List<AdventureCard> cards = AdventureCardFactory.loadCards(deck, game);
+            List<AdventureCard> cards = AdventureCardFactory.loadCards(game);
 
             for (AdventureCard card : cards) {
                 System.out.println(card);

@@ -34,6 +34,13 @@ public class  Flightplance {
 //        catch (Exception e) {  // Cattura tutte le eccezioni
 //            System.err.println("Fallback a carte fake: " + e.getMessage());
 //        }
+
+        try {
+            List<AdventureCard> cards = AdventureCardFactory.loadCards(this.game);
+        }
+        catch (Exception e) {
+            System.err.println("Failed to load cards: " + e.getMessage());
+        }
     }
 
     public Placeholder getPlaceholderByPlayer(Player player) {

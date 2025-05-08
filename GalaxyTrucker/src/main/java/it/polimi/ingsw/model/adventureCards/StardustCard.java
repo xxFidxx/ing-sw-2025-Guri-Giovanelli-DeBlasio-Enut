@@ -12,6 +12,10 @@ public class StardustCard extends AdventureCard  {
         super(name, level,deck);
     }
 
+    public StardustCard(String name, int level, int lostDays) {
+        super(name, level);
+    }
+
     @Override
     public void activate() {
         ArrayList<Player> tmp = deck.getFlightPlance().getGame().getPlayers();

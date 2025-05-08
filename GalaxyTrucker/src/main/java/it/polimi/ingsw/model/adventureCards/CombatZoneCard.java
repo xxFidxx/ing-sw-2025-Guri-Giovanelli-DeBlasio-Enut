@@ -22,6 +22,14 @@ public class CombatZoneCard extends AdventureCard  {
         this.type = type;
     }
 
+    public CombatZoneCard(String name, int level, int lostDays, int lostOther, Projectile[] cannons, CombatZoneType type) {
+        super(name, level);
+        this.lostDays = lostDays;
+        this.lostOther = lostOther;
+        this.cannons = cannons;
+        this.type = type;
+    }
+
     public void activate() {
         ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
         Game game = deck.getFlightPlance().getGame();

@@ -16,6 +16,13 @@ public class AbandonedShipCard extends AdventureCard {
         this.credits = credits;
     }
 
+    public AbandonedShipCard(String name, int level, int lostDays, int lostCrew,  int credits) {
+        super(name, level);
+        this.lostDays = lostDays;
+        this.lostCrew = lostCrew;
+        this.credits = credits;
+    }
+
     public void activate(){
         activatedPlayer.setNumEquip(activatedPlayer.getNumEquip() - lostCrew);
         activatedPlayer.setCredits(activatedPlayer.getCredits() + credits);

@@ -13,6 +13,12 @@ public class SlaversCard extends EnemyCard  {
         this.reward = reward;
     }
 
+    public SlaversCard(String name, int level, int cannonStrength, int lostDays, int lostCrew, int reward) {
+        super(name, level, cannonStrength, lostDays);
+        this.lostCrew = lostCrew;
+        this.reward = reward;
+    }
+
     @Override
     public void reward(Player player) {
         player.setCredits(player.getCredits() + reward);

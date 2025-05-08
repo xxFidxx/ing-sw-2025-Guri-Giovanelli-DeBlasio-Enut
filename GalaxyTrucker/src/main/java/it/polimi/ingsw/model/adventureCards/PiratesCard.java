@@ -17,6 +17,12 @@ public class PiratesCard extends EnemyCard {
         this.reward = reward;
     }
 
+    public PiratesCard(String name, int level, int cannonStrength, int lostDays, Projectile[] shots, int reward) {
+        super(name, level, cannonStrength, lostDays);
+        this.shots = shots;
+        this.reward = reward;
+    }
+
     @Override
     public void reward(Player player) {
         player.setCredits(player.getCredits() + reward);

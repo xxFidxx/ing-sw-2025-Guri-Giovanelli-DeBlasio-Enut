@@ -17,6 +17,12 @@ public class PlanetsCard extends AdventureCard {
         this.planets = planets;
     }
 
+    public PlanetsCard(String name, int level, ArrayList<Planet> planets, int lostDays) {
+        super(name, level);
+        this.lostDays = lostDays;
+        this.planets = planets;
+    }
+
     @Override
     public void activate() {
 

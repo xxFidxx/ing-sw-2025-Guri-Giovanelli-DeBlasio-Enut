@@ -16,11 +16,9 @@ import java.util.Arrays;
 
 public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard> {
 
-    private final Deck deck;
     private final Game game;
 
-    public AdventureCardDeserializer(Game game, Deck deck) {
-        this.deck = deck;
+    public AdventureCardDeserializer(Game game) {
         this.game = game;
     }
 
@@ -36,12 +34,6 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
         }
     }
 
-    private GoodsBlock instantiateGoodsBlock(JsonObject g) {
-        int typeCode = g.get("type").getAsInt();
-        ColorType ct = ColorType.values()[ typeCode ];
-        return new GoodsBlock(ct);
-    }
-
     @Override
     public AdventureCard deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
@@ -55,7 +47,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 int lostDays = obj.get("lostDays").getAsInt();
                 int lostCrew = obj.get("lostCrew").getAsInt();
                 int credits  = obj.get("credits").getAsInt();
-                return new AbandonedShipCard(name, level, lostDays, lostCrew, credits, deck);
+                return new AbandonedShipCard(name, level, lostDays, lostCrew, credits);
             }
             case "AbandonedStationCard": {
                 int lostDays      = obj.get("lostDays").getAsInt();
@@ -65,7 +57,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 for (int i = 0; i < rewArr.size(); i++) {
                     reward[i] = new GoodsBlock(ColorType.values()[rewArr.get(i).getAsInt()]);
                 }
-                return new AbandonedStationCard(name, level, deck, lostDays, requiredCrew, reward);
+                return new AbandonedStationCard(name, level, lostDays, requiredCrew, reward);
             }
             case "CombatZoneCard": {
                 int lostDays    = obj.get("lostDays").getAsInt();
@@ -76,10 +68,10 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 for (int i = 0; i < cans.size(); i++) {
                     cannons[i] = instantiateProjectile(cans.get(i).getAsJsonObject());
                 }
-                return new CombatZoneCard(name, level, lostDays, lostOther, cannons, deck, combatZoneType);
+                return new CombatZoneCard(name, level, lostDays, lostOther, cannons, combatZoneType);
             }
             case "EpidemicCard": {
-                return new EpidemicCard(name, level, deck);
+                return new EpidemicCard(name, level);
             }
             case "MeteorSwarmCard": {
                 JsonArray mets = obj.get("meteors").getAsJsonArray();
@@ -87,10 +79,10 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 for (int i = 0; i < mets.size(); i++) {
                     meteors[i] = instantiateProjectile(mets.get(i).getAsJsonObject());
                 }
-                return new MeteorSwarmCard(name, level, meteors, deck);
+                return new MeteorSwarmCard(name, level, meteors);
             }
             case "OpenSpaceCard": {
-                return new OpenSpaceCard(name, level, deck);
+                return new OpenSpaceCard(name, level);
             }
             case "PiratesCard": {
                 int cannonStrength = obj.get("cannonStrength").getAsInt();
@@ -101,7 +93,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                     shots[i] = instantiateProjectile(shotsArr.get(i).getAsJsonObject());
                 }
                 int rewardPirates = obj.get("reward").getAsInt();
-                return new PiratesCard(name, level, deck, cannonStrength, lostDays2, shots, rewardPirates);
+                return new PiratesCard(name, level, cannonStrength, lostDays2, shots, rewardPirates);
             }
             case "PlanetsCard": {
                 int lostDays3 = obj.get("lostDays").getAsInt();
@@ -116,7 +108,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                     Planet planet = new Planet(goods, false);
                     planets.add(planet);
                 }
-                return new PlanetsCard(name, level, planets, lostDays3, deck);
+                return new PlanetsCard(name, level, planets, lostDays3);
             }
             case "SlaversCard": {
                 int lostCrew2 = obj.get("lostCrew").getAsInt();
@@ -124,7 +116,7 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 int reward2   = obj.get("reward").getAsInt();
                 int cannonStrength = obj.get("cannonStrength").getAsInt();
 
-                return new SlaversCard(name, level, deck, cannonStrength, lostDays2, lostCrew2, reward2);
+                return new SlaversCard(name, level, cannonStrength, lostDays2, lostCrew2, reward2);
             }
             case "SmugglersCard": {
                 int lossMalus = obj.get("lossMalus").getAsInt();
@@ -135,11 +127,11 @@ public class AdventureCardDeserializer implements JsonDeserializer<AdventureCard
                 for (int i = 0; i < rewArr.size(); i++) {
                     reward3[i] = new GoodsBlock(ColorType.values()[rewArr.get(i).getAsInt()]);
                 }
-                return new SmugglersCard(name, level, deck, cannonStrength, lostDays, lossMalus, reward3);
+                return new SmugglersCard(name, level, cannonStrength, lostDays, lossMalus, reward3);
             }
             case "StardustCard": {
                 int lostDays4 = obj.get("lostDays").getAsInt();
-                return new StardustCard(name, level, lostDays4, deck);
+                return new StardustCard(name, level, lostDays4);
             }
             default:
                 throw new JsonParseException("Unknown card type: " + type);

@@ -14,6 +14,11 @@ public abstract class AdventureCard {
         this.deck = deck;
     }
 
+    public AdventureCard(String name, int level) {
+        this.name = name;
+        this.level = level;
+    }
+
     public String getName() {
         return name;
     }

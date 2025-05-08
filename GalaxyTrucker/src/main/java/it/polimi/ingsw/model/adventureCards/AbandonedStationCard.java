@@ -19,6 +19,13 @@ public class AbandonedStationCard extends AdventureCard {
             this.reward = reward;
         }
 
+        public AbandonedStationCard(String name, int level, int lostDays, int requiredCrew, GoodsBlock[] reward) {
+            super(name, level);
+            this.lostDays = lostDays;
+            this.requiredCrew = requiredCrew;
+            this.reward = reward;
+        }
+
         @Override
         public void activate() {
             Player p = deck.getFlightPlance().getGame().choosePlayer(this);

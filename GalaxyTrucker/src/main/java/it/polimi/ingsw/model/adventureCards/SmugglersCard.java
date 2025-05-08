@@ -15,6 +15,12 @@ public class SmugglersCard extends EnemyCard {
         this.reward = reward;
     }
 
+    public SmugglersCard(String name, int level, int cannonStrength, int lostDays, int lossMalus, GoodsBlock[] reward) {
+        super(name, level, cannonStrength, lostDays);
+        this.lossMalus = lossMalus;
+        this.reward = reward;
+    }
+
     @Override
     public void reward(Player player) {
         //player.getSpaceshipPlance().cargoManagement(reward);

@@ -13,6 +13,10 @@ public class OpenSpaceCard extends AdventureCard {
         super(name, level, deck);
     }
 
+    public OpenSpaceCard(String name, int level) {
+        super(name, level);
+    }
+
     @Override
     public void activate() {
         ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
