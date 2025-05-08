@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.ComponentTileFactory;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
@@ -13,7 +14,7 @@ public class Game {
     private Timer timer;
     private Dice[] dices;
     private Flightplance plance;
-    private final ComponentTile[] assemblingTiles;
+    private ComponentTile[] assemblingTiles;
 
     public Game(ArrayList<String> playersName) {
         this.players = new ArrayList<>();
@@ -43,13 +44,20 @@ public class Game {
         };
 
 // Poi creiamo l'array di ComponentTile
-        this.assemblingTiles = new ComponentTile[]{
-                new Cannon(cannonConnectors, 0),     // Cannon1
-                new Cannon(cannonConnectors, 1),     // Cannon2
-                new CargoHolds(cargoConnectors, 2, false,3),  // Cabin1 (non speciale)
-                new CargoHolds(cargoConnectors, 3, false,4),  // Cabin2 (non speciale)
-                new CargoHolds(cargoConnectors, 4, true,4)    // Engine1 (speciale)
-        };
+//        this.assemblingTiles = new ComponentTile[]{
+//                new Cannon(cannonConnectors, 0),     // Cannon1
+//                new Cannon(cannonConnectors, 1),     // Cannon2
+//                new CargoHolds(cargoConnectors, 2, false,3),  // Cabin1 (non speciale)
+//                new CargoHolds(cargoConnectors, 3, false,4),  // Cabin2 (non speciale)
+//                new CargoHolds(cargoConnectors, 4, true,4)    // Engine1 (speciale)
+//        };
+
+        try {
+            this.assemblingTiles = ComponentTileFactory.loadTiles(this).toArray(ComponentTile[]::new);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Setter che usi solo nei test
@@ -142,7 +150,6 @@ public class Game {
         }
         return ids;
     }
-
 
     public void resetResponded() {
         for(Player p: players){
