@@ -3,6 +3,7 @@ import it.polimi.ingsw.model.AdventureCardFactory;
 import it.polimi.ingsw.model.adventureCards.*;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 public class  Flightplance {
@@ -23,10 +24,15 @@ public class  Flightplance {
             this.spots[i] = placeholder;
         }
         try {
-            List<AdventureCard> cards = AdventureCardFactory.loadCards("cards.json", this.deck, this.game);
+            List<AdventureCard> cards = AdventureCardFactory.loadCards(
+                    "C:\\Users\\fidel\\OneDrive\\Desktop\\Ing Software\\ing-sw-2025-Guri-Giovanelli-DeBlasio-Enut\\GalaxyTrucker\\src\\main\\resources\\cards.json",
+                    null,
+                    this.game
+            );
             this.deck = new Deck(cards, this);
-        } catch (IOException e) {
-            System.err.println("Failed to load cards from file: " + e.getMessage());
+        }
+        catch (Exception e) {  // Cattura tutte le eccezioni
+            System.err.println("Fallback a carte fake: " + e.getMessage());
         }
     }
 
