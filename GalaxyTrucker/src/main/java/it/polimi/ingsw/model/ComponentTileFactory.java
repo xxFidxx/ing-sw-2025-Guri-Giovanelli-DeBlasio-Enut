@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,14 +21,27 @@ import java.util.List;
 
 public class ComponentTileFactory {
 
-    public static List<ComponentTile> loadTiles(String filePath, Game game) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(ComponentTile.class, new ComponentTileDeserializer(game))
-                .create();
+    public static List<ComponentTile> loadTiles(Game game) throws IOException, URISyntaxException {
+        URL resourceUrl = Main.class.getClassLoader().getResource("tiles.json");
+        if (resourceUrl == null) {
+            throw new FileNotFoundException("tiles.json not found in classpath");
+        }
+        try {
+            String filePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
 
-        try (FileReader reader = new FileReader(filePath)) {
-            Type tileListType = new TypeToken<List<ComponentTile>>(){}.getType();
-            return gson.fromJson(reader, tileListType);
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(ComponentTile.class, new ComponentTileDeserializer(game))
+                    .create();
+
+            try (FileReader reader = new FileReader(filePath)) {
+                Type tileListType = new TypeToken<List<ComponentTile>>(){}.getType();
+                return gson.fromJson(reader, tileListType);
+            }
+
+        } catch (URISyntaxException e) {
+            System.err.println("Failed to load tiles: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -37,13 +51,7 @@ public class ComponentTileFactory {
         Game game = new Game(names);
 
         try {
-            URL resourceUrl = Main.class.getClassLoader().getResource("tiles.json");
-            if (resourceUrl == null) {
-                throw new FileNotFoundException("tiles.json not found in classpath");
-            }
-            String filePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
-
-            List<ComponentTile> tiles = ComponentTileFactory.loadTiles(filePath, game);
+            List<ComponentTile> tiles = ComponentTileFactory.loadTiles(game);
 
             for (ComponentTile tile : tiles) {
                 System.out.println(tile);

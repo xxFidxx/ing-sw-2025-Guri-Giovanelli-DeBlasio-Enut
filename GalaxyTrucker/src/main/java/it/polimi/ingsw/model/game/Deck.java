@@ -11,9 +11,9 @@ public class Deck {
     public Deck(List<AdventureCard> cards, Flightplance flightplance) {
         this.cards = cards;
         this.flightplance = flightplance;
-        for(AdventureCard ac : cards ) {
-           ac.setDeck(this);
-       }
+//        for(AdventureCard ac : cards ) {
+//           ac.setDeck(this);
+//       }
     }
 
     public List<AdventureCard> getCards() {

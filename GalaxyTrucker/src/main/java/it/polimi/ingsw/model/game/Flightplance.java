@@ -23,17 +23,17 @@ public class  Flightplance {
             placeholderByPlayer.put(player, placeholder);
             this.spots[i] = placeholder;
         }
-        try {
-            List<AdventureCard> cards = AdventureCardFactory.loadCards(
-                    "C:\\Users\\fidel\\OneDrive\\Desktop\\Ing Software\\ing-sw-2025-Guri-Giovanelli-DeBlasio-Enut\\GalaxyTrucker\\src\\main\\resources\\cards.json",
-                    null,
-                    this.game
-            );
-            this.deck = new Deck(cards, this);
-        }
-        catch (Exception e) {  // Cattura tutte le eccezioni
-            System.err.println("Fallback a carte fake: " + e.getMessage());
-        }
+//        try {
+//            List<AdventureCard> cards = AdventureCardFactory.loadCards(
+//                    "C:\\Users\\fidel\\OneDrive\\Desktop\\Ing Software\\ing-sw-2025-Guri-Giovanelli-DeBlasio-Enut\\GalaxyTrucker\\src\\main\\resources\\cards.json",
+//                    null,
+//                    this.game
+//            );
+//            this.deck = new Deck(cards, this);
+//        }
+//        catch (Exception e) {  // Cattura tutte le eccezioni
+//            System.err.println("Fallback a carte fake: " + e.getMessage());
+//        }
     }
 
     public Placeholder getPlaceholderByPlayer(Player player) {

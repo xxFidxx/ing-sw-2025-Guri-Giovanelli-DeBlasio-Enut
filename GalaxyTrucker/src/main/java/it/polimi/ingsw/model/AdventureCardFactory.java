@@ -20,15 +20,30 @@ import java.util.List;
 
 public class AdventureCardFactory {
 
-    public static List<AdventureCard> loadCards(String filePath, Deck deck, Game game) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(AdventureCard.class, new AdventureCardDeserializer(game, deck))
-                .create();
+    public static List<AdventureCard> loadCards(Deck deck, Game game) throws IOException {
+        try {
+            URL resourceUrl = Main.class.getClassLoader().getResource("cards.json");
+            if (resourceUrl == null) {
+                throw new FileNotFoundException("cards.json not found in classpath");
+            }
+            String filePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
 
-        try (FileReader reader = new FileReader(filePath)) {
-            Type cardListType = new TypeToken<List<AdventureCard>>(){}.getType();
-            return gson.fromJson(reader, cardListType);
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(AdventureCard.class, new AdventureCardDeserializer(game, deck))
+                    .create();
+
+            try (FileReader reader = new FileReader(filePath)) {
+                Type cardListType = new TypeToken<List<AdventureCard>>(){}.getType();
+                return gson.fromJson(reader, cardListType);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Failed to load cards: " + e.getMessage());
+            e.printStackTrace();
+
         }
+
+        return null;
     }
 
     public static void main(String[] args) {
@@ -39,13 +54,7 @@ public class AdventureCardFactory {
         Deck deck = new Deck(null, flightplance);
 
         try {
-            URL resourceUrl = Main.class.getClassLoader().getResource("cards.json");
-            if (resourceUrl == null) {
-                throw new FileNotFoundException("cards.json not found in classpath");
-            }
-            String filePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
-
-            List<AdventureCard> cards = AdventureCardFactory.loadCards(filePath, deck, game);
+            List<AdventureCard> cards = AdventureCardFactory.loadCards(deck, game);
 
             for (AdventureCard card : cards) {
                 System.out.println(card);

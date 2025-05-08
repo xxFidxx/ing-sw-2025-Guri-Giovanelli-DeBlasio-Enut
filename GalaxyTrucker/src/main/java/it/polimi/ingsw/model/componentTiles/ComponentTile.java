@@ -52,7 +52,7 @@ public abstract class ComponentTile{
     @Override
     public String toString() {
         return  tiletoString(this) + ": " +
-                "connectors=" + Arrays.toString(connectors) + " ";
+                "connectors=" + Arrays.toString(connectors) + " id=" + id + " ";
     }
 
     private String tiletoString(ComponentTile tile){
