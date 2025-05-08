@@ -2,19 +2,21 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 
+import java.util.List;
+
 public class Deck {
-    private AdventureCard[] cards;
+    private List<AdventureCard> cards;
     private Flightplance flightplance;
 
-    public Deck(AdventureCard[] cards, Flightplance flightplance) {
+    public Deck(List<AdventureCard> cards, Flightplance flightplance) {
         this.cards = cards;
         this.flightplance = flightplance;
-//        for(AdventureCard ac : cards ) {
-//            ac.setDeck(this);
-//        }
+        for(AdventureCard ac : cards ) {
+           ac.setDeck(this);
+       }
     }
 
-    public AdventureCard[] getCards() {
+    public List<AdventureCard> getCards() {
         return cards;
     }
 

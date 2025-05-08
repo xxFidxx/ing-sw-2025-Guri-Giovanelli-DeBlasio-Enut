@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
+import it.polimi.ingsw.model.adventureCards.AbandonedStationCard;
 import it.polimi.ingsw.model.adventureCards.OpenSpaceCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
@@ -318,8 +319,10 @@ public class Controller implements EventListenerInterface {
     }
 
     public void drawCard(ClientListener listener) {
-        AdventureCard[] cards = game.getFlightPlance().getDeck().getCards();
-        currentAdventureCard = cards[0];
+        System.out.println("Deck: " + game.getFlightPlance().getDeck());
+        System.out.println("Cards: " + game.getFlightPlance().getDeck().getCards());
+        List<AdventureCard> cards = game.getFlightPlance().getDeck().getCards();
+        currentAdventureCard = cards.getFirst();
         String cardName = currentAdventureCard.getName();
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
@@ -330,6 +333,7 @@ public class Controller implements EventListenerInterface {
         }
         else
             notifyAllListeners(eventCrafter(GameState.END_GAME, null));
+        cards.remove(currentAdventureCard);
     }
 
     public void manageCard(){
@@ -341,6 +345,17 @@ public class Controller implements EventListenerInterface {
                     handleWaiters(l);
                     // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
                 else{
+                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                    game.endTurn();
+                }
+            }
+            case AbandonedStationCard asc -> {
+                Player p = (game.choosePlayer(currentAdventureCard));
+                ClientListener l = listenerbyPlayer.get(p);
+                if(p!=null)
+                    handleWaiters(l);
+                    // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
+                else {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     game.endTurn();
                 }
