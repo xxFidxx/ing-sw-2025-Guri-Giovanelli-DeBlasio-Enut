@@ -116,7 +116,7 @@ public class Controller implements EventListenerInterface {
             String tileName = tiletoString(tile);
             ConnectorType[] connectors = tile.getConnectors();
             printSpaceship(listener);
-            listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tileName,connectors)));
+            listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
         }
         else{
             listener.onEvent(eventCrafter(GameState.ROBBED_TILE, null));
