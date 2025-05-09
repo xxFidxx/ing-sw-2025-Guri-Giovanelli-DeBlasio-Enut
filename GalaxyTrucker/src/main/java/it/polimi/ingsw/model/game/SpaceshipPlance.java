@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
+import it.polimi.ingsw.model.resources.TileSymbols;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,12 +76,12 @@ public class SpaceshipPlance {
     }
 
     private boolean edgeCases(int y, int x) {
-        if (y == 0) { // First row: exclude columns 0 and 5
-            return x == 0 || x == 5;
-        } else if (y == 1) { // Second row: exclude column 5
-            return x == 5;
-        } else if (y == 3) { // Last row: exclude columns 0 and 5
-            return x == 0 || x == 5;
+        if (y == 0) {
+            return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
+        } else if (y == 1) {
+            return x == 0 || x == 6;
+        } else if (y == 4) {
+            return x == 3;
         }
         return false;
     }
@@ -677,13 +678,14 @@ public class SpaceshipPlance {
             System.out.println("Full reserve spot");
     }
 
-    public void placeTileComponents(ComponentTile tile, int x, int y) {
+    public boolean placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
         if(x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x))
-            System.out.println("Out of bounds");
+            return false;
         else if(components[y][x] != null){
-            System.out.println("Spot already taken");
+            return false;
         }
         components[y][x] = tile;
+        return true;
     }
 
     public void placeReserveToComponents(ComponentTile tile, int x, int y){
@@ -758,5 +760,161 @@ public class SpaceshipPlance {
         }
 
         return result;
+    }
+
+    public String tileGridToString() {
+        int rows = this.components.length;
+        int cols = this.components[0].length;
+        StringBuilder result = new StringBuilder();
+
+        result.append('\n');
+
+        for (int tileRow = 0; tileRow < rows; tileRow++) {
+            for (int line = 0; line < 3; line++) {
+                for (int tileCol = 0; tileCol < cols; tileCol++) {
+                    char[][] tileChars = tileCrafter(this.components[tileRow][tileCol]);
+                    if (edgeCases(tileRow, tileCol)) {result.append("   ");}
+                    else {
+                        for (int c = 0; c < 3; c++) {
+                            result.append(tileChars[line][c]);
+                        }
+                    }
+                }
+                result.append('\n'); // End of one horizontal line across tile row
+            }
+        }
+
+        return result.toString();
+    }
+
+    private char[][] tileCrafter(ComponentTile tile){
+        char[][] lines = {
+                {'┌', '-', '┐'},
+                {'|', ' ', '|'},
+                {'└', '-', '┘'}
+        };
+
+        if (tile == null) return lines;
+
+        // centro
+        char center = TileSymbols.ASCII_TILE_SYMBOLS.get(tiletoString(tile));
+        lines[1][1] = center;
+
+        // connettori
+        ConnectorType[] connectors = tile.getConnectors();
+        lines[0][1] = connectorToChar(connectors[0]);
+        lines[1][2] = connectorToChar(connectors[1]);
+        lines[2][1] = connectorToChar(connectors[2]);
+        lines[1][0] = connectorToChar(connectors[3]);
+
+        // scudo
+        if (tile instanceof ShieldGenerator) {
+            boolean[] protection = ((ShieldGenerator) tile).getProtection();
+            if (protection[0] && protection[1]) {
+                lines[0][2] = 'S';
+            }
+            else if (protection[1] && protection[2]) {
+                lines[2][2] = 'S';
+            }
+            else if (protection[2] && protection[3]) {
+                lines[2][0] = 'S';
+            }
+            else {
+                lines[0][0] = 'S';
+            }
+        }
+
+        return lines;
+    }
+
+    private char connectorToChar(ConnectorType ct) {
+        switch (ct){
+            case UNIVERSAL -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("universal");
+            }
+            case SINGLE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("single");
+            }
+            case DOUBLE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("double");
+            }
+            case SMOOTH -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("smooth");
+            }
+            case CANNON -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("cannon");
+            }
+            case ENGINE -> {
+                return TileSymbols.CONNECTOR_SYMBOLS.get("engine");
+            }
+            default -> {
+                return '?';
+            }
+        }
+    }
+
+    private String tiletoString(ComponentTile tile) {
+        if (tile != null) {
+            switch (tile) {
+                case DoubleCannon dc -> {
+                    return "DoubleCannon";
+                }
+
+                case Cannon c -> {
+                    return "Cannon";
+                }
+
+                case DoubleEngine de -> {
+                    return "DoubleEngine";
+                }
+                case Engine e -> {
+                    return "Engine";
+                }
+                case Cabin cab -> {
+                    return "Cabin";
+                }
+                case CargoHolds ch -> {
+                    return "CargoHolds";
+                }
+
+                case ShieldGenerator sg -> {
+                    return "ShieldGenerator";
+                }
+
+                case LifeSupportSystem lfs -> {
+                    return "LifeSupportSystem";
+                }
+
+                case PowerCenter pc -> {
+                    return "PowerCenter";
+                }
+
+                case StructuralModule sm -> {
+                    return "StructuralModule";
+                }
+
+                default -> {
+                    return "not Catched in tiletoString";
+                }
+            }
+        }
+        return null;
+    }
+
+    public String reserveSpotToString() {
+        StringBuilder result = new StringBuilder();
+
+        // For each of the 3 lines in a 3×3 tile
+        for (int line = 0; line < 3; line++) {
+            for (ComponentTile tile : this.reserveSpot) {
+                char[][] tileChars = tileCrafter(tile);
+                for (int c = 0; c < 3; c++) {
+                    result.append(tileChars[line][c]);
+                }
+            }
+            result.append('\n');
+        }
+
+        return result.toString();
     }
 }
