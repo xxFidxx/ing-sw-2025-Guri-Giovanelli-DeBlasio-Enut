@@ -76,12 +76,12 @@ public class SpaceshipPlance {
     }
 
     private boolean edgeCases(int y, int x) {
-        if (y == 0) { // First row: exclude columns 0 and 5
-            return x == 0 || x == 5;
-        } else if (y == 1) { // Second row: exclude column 5
-            return x == 5;
-        } else if (y == 3) { // Last row: exclude columns 0 and 5
-            return x == 0 || x == 5;
+        if (y == 0) {
+            return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
+        } else if (y == 1) {
+            return x == 0 || x == 6;
+        } else if (y == 4) {
+            return x == 3;
         }
         return false;
     }
@@ -773,8 +773,11 @@ public class SpaceshipPlance {
             for (int line = 0; line < 3; line++) {
                 for (int tileCol = 0; tileCol < cols; tileCol++) {
                     char[][] tileChars = tileCrafter(this.components[tileRow][tileCol]);
-                    for (int c = 0; c < 3; c++) {
-                        result.append(tileChars[line][c]);
+                    if (edgeCases(tileRow, tileCol)) {result.append("   ");}
+                    else {
+                        for (int c = 0; c < 3; c++) {
+                            result.append(tileChars[line][c]);
+                        }
                     }
                 }
                 result.append('\n'); // End of one horizontal line across tile row
@@ -800,9 +803,9 @@ public class SpaceshipPlance {
         // connettori
         ConnectorType[] connectors = tile.getConnectors();
         lines[0][1] = connectorToChar(connectors[0]);
-        lines[1][0] = connectorToChar(connectors[1]);
-        lines[1][2] = connectorToChar(connectors[2]);
-        lines[2][1] = connectorToChar(connectors[3]);
+        lines[1][2] = connectorToChar(connectors[1]);
+        lines[2][1] = connectorToChar(connectors[2]);
+        lines[1][0] = connectorToChar(connectors[3]);
 
         // scudo
         if (tile instanceof ShieldGenerator) {
@@ -896,5 +899,22 @@ public class SpaceshipPlance {
             }
         }
         return null;
+    }
+
+    public String reserveSpotToString() {
+        StringBuilder result = new StringBuilder();
+
+        // For each of the 3 lines in a 3×3 tile
+        for (int line = 0; line < 3; line++) {
+            for (ComponentTile tile : this.reserveSpot) {
+                char[][] tileChars = tileCrafter(tile);
+                for (int c = 0; c < 3; c++) {
+                    result.append(tileChars[line][c]);
+                }
+            }
+            result.append('\n');
+        }
+
+        return result.toString();
     }
 }
