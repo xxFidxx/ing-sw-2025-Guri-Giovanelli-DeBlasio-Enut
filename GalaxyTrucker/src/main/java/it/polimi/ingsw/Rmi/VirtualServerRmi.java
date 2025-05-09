@@ -40,7 +40,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException;
 
-    void charge(VirtualViewRmi clientRmi) throws RemoteException;
+    void charge(VirtualViewRmi clientRmi, int i) throws RemoteException;
 
     void reserve() throws RemoteException;
 }

@@ -173,7 +173,7 @@ public class Controller implements EventListenerInterface {
             case SHOW_PLAYER -> {
                 event = new Event(this, state, (PlayerInfo) data);
             }
-            case CHOOSE_PLAYER -> {
+            case CHOOSE_BATTERY -> {
                 event = new Event(this, state, (DoubleEngineNumber) data);
             }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
@@ -351,6 +351,8 @@ public class Controller implements EventListenerInterface {
                 if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     game.endTurn();
+                    ClientListener cl = listeners.getLast();
+                    drawCard(cl);
                     return;
                 }
                 currentPlayer = players.getLast();
@@ -381,7 +383,11 @@ public class Controller implements EventListenerInterface {
             case OpenSpaceCard osc ->{
                 if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                    game.endTurn();
+                    for(ClientListener cl : listeners){
+                        endCard(cl);
+                    }
+                    /*ClientListener cl = listeners.getLast();
+                    drawCard(cl);*/
                     return;
                 }
                 currentPlayer = players.getLast();
@@ -394,7 +400,11 @@ public class Controller implements EventListenerInterface {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersBattery(l, numDE);
                 }
-
+                OpenSpaceCard currentOpenSpaceCard = (OpenSpaceCard) currentAdventureCard;
+                currentOpenSpaceCard.setActivatedPlayer(currentPlayer);
+                currentAdventureCard.activate();
+                players.remove(currentPlayer);
+                manageCard();
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
@@ -407,6 +417,7 @@ public class Controller implements EventListenerInterface {
         currentAdventureCard.activate();
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
         endCard(listener);
+        drawCard(listener);
     }
 
     public void handleWaitersPlayer(ClientListener listener){
@@ -425,11 +436,8 @@ public class Controller implements EventListenerInterface {
     public void handleWaitersBattery(ClientListener listener, int numDE){
         for(ClientListener l: listeners){
             if(l == listener) {
-                for(int i=0; i<numDE; i++) {
-                    DoubleEngineNumber den = new DoubleEngineNumber(i);
-                    l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
-
-                }
+                DoubleEngineNumber den = new DoubleEngineNumber(numDE);
+                l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
             }
             else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -572,7 +580,22 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-    public void charge(ClientListener listener) {
-
+    public void charge(ClientListener listener, int i) throws ControllerExceptions {
+        Player player = playerbyListener.get(listener);
+        ArrayList<Engine> engines = player.getSpaceshipPlance().getEngines();
+        ArrayList<DoubleEngine> doubleEngines = new ArrayList<>();
+        for(Engine e: engines){
+            if(e instanceof DoubleEngine)
+                doubleEngines.add((DoubleEngine) e);
+        }
+        if(i < 0)
+            return;
+        else if(i > doubleEngines.size())
+            throw new ControllerExceptions("You selected too many engines");
+        else {
+            for(int j=0; j<i; j++){
+                doubleEngines.get(j).setCharged(true);
+            }
+        }
     }
 }

@@ -242,12 +242,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
             case CHOOSE_BATTERY -> {
-                switch (input) {
-                    case "0" -> {
-                        server.charge(this);
-                    }
-                    case "1" -> server.reserve();
-                }
+                int numDE = Integer.parseInt(input);
+                server.charge(this, numDE);
             }
         }
         System.out.print("\n> ");
@@ -280,7 +276,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case MANAGE_CARD -> System.out.print("It's next player turn to choice\n");
             case END_CARD -> System.out.print("End card\n");
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
-            case CHOOSE_BATTERY -> System.out.print("Type 0 to use the battery, 1 to reserve it\n");
+            case CHOOSE_BATTERY -> System.out.print("How many double engines do you want to use? ");
         }
         System.out.print("\n> ");
     }
@@ -324,7 +320,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             //case DataString ds -> System.out.println(ds);
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
-            case DoubleEngineNumber den -> System.out.println(den.getNum());
+            case DoubleEngineNumber den -> System.out.println("You have " + den.getNum() + " double engines \n");
             default -> {}
         }
     }

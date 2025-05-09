@@ -8,6 +8,11 @@
     "credits": 2
   },
   {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 1
+  },
+  {
     "type": "SlaversCard",
     "name": "Slavers",
     "level": 1,
@@ -43,11 +48,6 @@
     "name": "Stardust",
     "level": 1,
     "lostDays": 1
-  },
-  {
-    "type": "OpenSpaceCard",
-    "name": "Open Space",
-    "level": 1
   },
   {
     "type": "MeteorSwarmCard",

@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
@@ -38,7 +39,15 @@ public class SpaceshipPlance {
         this.shieldGenerators = new ArrayList<>();
         this.cannons = new ArrayList<>();
         this.cabins = new ArrayList<>();
-        this.engines = new ArrayList<>();
+        // ci creiamo un arraylist di engines per simulare open space card
+        this.engines = new ArrayList<>(List.of(
+                new DoubleEngine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 1),
+                new DoubleEngine(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 2),
+                new Engine(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 3),
+                new Engine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL}, 4),
+                new Engine(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.DOUBLE, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 5)
+        ));
+
         this.nAstronauts = 0;
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;
