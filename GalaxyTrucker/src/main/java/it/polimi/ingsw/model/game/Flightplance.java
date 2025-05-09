@@ -36,7 +36,7 @@ public class  Flightplance {
 //        }
 
         try {
-            List<AdventureCard> cards = AdventureCardFactory.loadCards(this.game);
+            AdventureCardFactory.loadCards(this.game);
         }
         catch (Exception e) {
             System.err.println("Failed to load cards: " + e.getMessage());
