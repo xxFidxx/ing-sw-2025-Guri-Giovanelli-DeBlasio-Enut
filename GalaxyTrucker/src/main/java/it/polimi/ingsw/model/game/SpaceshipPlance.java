@@ -678,14 +678,13 @@ public class SpaceshipPlance {
             System.out.println("Full reserve spot");
     }
 
-    public boolean placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
+    public void placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
         if(x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x))
-            return false;
+            throw new SpaceShipPlanceException("Outbound index");
         else if(components[y][x] != null){
-            return false;
+            throw new SpaceShipPlanceException("Already busy spot");
         }
         components[y][x] = tile;
-        return true;
     }
 
     public void placeReserveToComponents(ComponentTile tile, int x, int y){
