@@ -35,14 +35,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     public static void main(String[] args) throws Exception {
         final String serverName = "ServerRmi";
 
-        // qua c'è da metterci come primo argomento identificativo registro , visto che voglio testare sulla mia macchina
+        // qua c'è da metterci come primo argomento identificativo registro, visto che voglio testare sulla mia macchina
         // ora l'ip è quello della macchina locale: 127.0.0.1 indirizzo local host
         Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
-
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
         new ClientRmi(server).run();
     }
+
 
     private void run() throws Exception {
         server.connect(this);

@@ -121,6 +121,7 @@ public class Controller implements EventListenerInterface {
         ComponentTile tile =player.getHandTile();
         player.getSpaceshipPlance().placeTileComponents(tile,xIndex,yIndex);
         printSpaceship(listener);
+        listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
     }
 
     public void pickTile(ClientListener listener, int tileId) throws LobbyExceptions {
@@ -342,7 +343,7 @@ public class Controller implements EventListenerInterface {
         String cardName = currentAdventureCard.getName();
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
-        setPlayers(game.getPlayers());
+        players = new ArrayList<>(game.getPlayers());
         if (cardName != null) {
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
             manageCard();
