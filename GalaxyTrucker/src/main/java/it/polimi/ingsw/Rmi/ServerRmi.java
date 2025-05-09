@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.model.game.CargoManagementException;
+import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -164,8 +165,9 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
 
     @Override
-    public void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException {
-
+    public void addTile(VirtualViewRmi client, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException {
+        ClientListener listener = clientListeners.get(client);
+        controller.addTile(listener,xIndex,yIndex);
     }
 
     @Override

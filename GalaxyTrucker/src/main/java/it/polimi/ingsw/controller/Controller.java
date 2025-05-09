@@ -116,6 +116,13 @@ public class Controller implements EventListenerInterface {
 
     }
 
+    public void addTile(ClientListener listener, int xIndex, int yIndex) throws SpaceShipPlanceException {
+        Player player = playerbyListener.get(listener);
+        ComponentTile tile =player.getHandTile();
+        player.getSpaceshipPlance().placeTileComponents(tile,xIndex,yIndex);
+        printSpaceship(listener);
+    }
+
     public void pickTile(ClientListener listener, int tileId) throws LobbyExceptions {
         Player player = playerbyListener.get(listener);
         ComponentTile tile = game.pickTile(player,tileId);
@@ -123,7 +130,7 @@ public class Controller implements EventListenerInterface {
         if(tile != null){
             String tileName = tiletoString(tile);
             ConnectorType[] connectors = tile.getConnectors();
-            printSpaceship(listener);
+            printSpaceshipAll();
             listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
         }
         else{
@@ -555,12 +562,18 @@ public class Controller implements EventListenerInterface {
         manageCard();
     }
 
-    public void printSpaceship(ClientListener listener) {
+    public void printSpaceshipAll() {
         for (ClientListener c: listeners) {
             Player player = playerbyListener.get(c);
             DataString ds = new DataString(player.getSpaceshipPlance().tileGridToString());
-            listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
+            c.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
         }
+    }
+
+    public void printSpaceship(ClientListener listener) {
+            Player player = playerbyListener.get(listener);
+            DataString ds = new DataString(player.getSpaceshipPlance().tileGridToString());
+            listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
     }
 
     public void endCard(ClientListener listener) {

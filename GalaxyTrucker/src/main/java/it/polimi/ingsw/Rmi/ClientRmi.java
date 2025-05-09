@@ -4,6 +4,7 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
+import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 
 
@@ -123,9 +124,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     System.out.println("Wrong input. You need 2 numbers divided by a space \n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
+                            } catch (SpaceShipPlanceException e) {
+                                System.out.println("SpaceShipPlanceException error " + e.getMessage());
+                            } catch (RemoteException e) {
+                            System.out.println("RemoteException error " + e.getMessage());
                             }
+
+
                         }
                     }
                     case "1" -> System.out.print("Show reserve spots\n");

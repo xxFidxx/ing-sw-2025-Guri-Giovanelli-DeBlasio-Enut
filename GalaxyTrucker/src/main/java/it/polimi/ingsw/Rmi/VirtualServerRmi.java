@@ -2,6 +2,7 @@ package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.VirtualServer;
 import it.polimi.ingsw.controller.LobbyExceptions;
+import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -38,7 +39,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     //void printSpaceship(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException;
+    void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException;
 
     void charge(VirtualViewRmi clientRmi, int i) throws RemoteException;
 
