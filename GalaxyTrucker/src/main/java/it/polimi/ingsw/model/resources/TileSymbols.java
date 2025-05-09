@@ -19,6 +19,7 @@ public class TileSymbols {
         ASCII_TILE_SYMBOLS.put("ShieldGenerator", 'G');
         ASCII_TILE_SYMBOLS.put("CargoHolds", 'H');
         ASCII_TILE_SYMBOLS.put("BatteryHolds", 'T');
+        ASCII_TILE_SYMBOLS.put("PowerCenter", 'T');
 
         CONNECTOR_SYMBOLS.put("universal", '┼'); // All directions
         CONNECTOR_SYMBOLS.put("single", '─');    // Horizontal single line
