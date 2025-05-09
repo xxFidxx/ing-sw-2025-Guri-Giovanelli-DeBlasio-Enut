@@ -383,6 +383,7 @@ public class Controller implements EventListenerInterface {
             case OpenSpaceCard osc ->{
                 if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                    System.out.println("Vado in end card \n");
                     for(ClientListener cl : listeners){
                         endCard(cl);
                     }
@@ -400,11 +401,6 @@ public class Controller implements EventListenerInterface {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersBattery(l, numDE);
                 }
-                OpenSpaceCard currentOpenSpaceCard = (OpenSpaceCard) currentAdventureCard;
-                currentOpenSpaceCard.setActivatedPlayer(currentPlayer);
-                currentAdventureCard.activate();
-                players.remove(currentPlayer);
-                manageCard();
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
@@ -442,6 +438,18 @@ public class Controller implements EventListenerInterface {
             else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
+        }
+    }
+
+    public void fromChargeToManage(){
+        System.out.println("Current Player \n" + currentPlayer);
+        if(currentPlayer.hasResponded()){
+            OpenSpaceCard currentOpenSpaceCard = (OpenSpaceCard) currentAdventureCard;
+            currentOpenSpaceCard.setActivatedPlayer(currentPlayer);
+            currentAdventureCard.activate();
+            System.out.println("Ho attivato la carta \n");
+            players.remove(currentPlayer);
+            manageCard();
         }
     }
 
@@ -565,9 +573,13 @@ public class Controller implements EventListenerInterface {
 
     public void endCard(ClientListener listener) {
         game.endTurn();
+        System.out.println("Listener -> Player \n");
         Player player = playerbyListener.get(listener);
+        System.out.println("Player: \n" + player);
+        System.out.println("Players: \n" + game.getPlayers());
         ArrayList<Player> players = game.getPlayers();
         for(Player p: players){
+            System.out.println("Player nel for: \n" + p);
             if(p == player){
                 String nick = p.getNickname();
                 int pos = p.getPlaceholder().getPosizione();
@@ -575,6 +587,7 @@ public class Controller implements EventListenerInterface {
                 int astr = p.getNumAstronauts();
                 int al = p.getNumAliens();
                 PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
+                System.out.println("Vado in show player \n");
                 listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
             }
         }
@@ -582,20 +595,30 @@ public class Controller implements EventListenerInterface {
 
     public void charge(ClientListener listener, int i) throws ControllerExceptions {
         Player player = playerbyListener.get(listener);
+        System.out.println("Player in charge \n" + player);
+        player.setResponded(true);
         ArrayList<Engine> engines = player.getSpaceshipPlance().getEngines();
         ArrayList<DoubleEngine> doubleEngines = new ArrayList<>();
         for(Engine e: engines){
             if(e instanceof DoubleEngine)
                 doubleEngines.add((DoubleEngine) e);
         }
-        if(i < 0)
-            return;
-        else if(i > doubleEngines.size())
-            throw new ControllerExceptions("You selected too many engines");
+        if(i < 0) {
+            /*DoubleEngineNumber den = new DoubleEngineNumber(i);
+            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));*/
+            throw new ControllerExceptions("You have to select a positive number of double engines");
+        }
+        else if(i > doubleEngines.size()) {
+            /*DoubleEngineNumber den = new DoubleEngineNumber(i);
+            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));*/
+            throw new ControllerExceptions("You selected too many double engines");
+        }
         else {
             for(int j=0; j<i; j++){
+                System.out.println("Carico i double engines \n");
                 doubleEngines.get(j).setCharged(true);
             }
+            fromChargeToManage();
         }
     }
 }
