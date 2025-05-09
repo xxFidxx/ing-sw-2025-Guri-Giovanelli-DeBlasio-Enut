@@ -89,14 +89,12 @@ public class Game {
         return plance;
     }
 
-    public Player choosePlayer(AdventureCard card) {
-        for (int i = players.size() - 1; i >= 0; i--) {
-            if (card.checkCondition(players.get(i))) {
-                if (!players.get(i).hasResponded())
-                    return players.get(i);
-            }
+    public boolean choosePlayer(AdventureCard card, Player player) {
+            if (card.checkCondition(player)) {
+                if (!player.hasResponded())
+                    return true;
         }
-        return null;
+        return false;
     }
 
     public int throwDices() {

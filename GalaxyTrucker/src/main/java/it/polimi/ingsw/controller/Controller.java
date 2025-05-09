@@ -36,12 +36,20 @@ public class Controller implements EventListenerInterface {
     final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <ClientListener, Boolean> isDonecrafting  = new HashMap<>();
     private AdventureCard currentAdventureCard;
+    private Player currentPlayer;
+    private ArrayList<Player> players;
 
     public Controller() {
         this.game = null;
         this.queue = new LinkedBlockingQueue<>();
         this.lobby = null;
         this.currentAdventureCard = null;
+        this.currentPlayer = null;
+        this.players = null;
+    }
+
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -164,6 +172,9 @@ public class Controller implements EventListenerInterface {
             }
             case SHOW_PLAYER -> {
                 event = new Event(this, state, (PlayerInfo) data);
+            }
+            case CHOOSE_PLAYER -> {
+                event = new Event(this, state, (DoubleEngineNumber) data);
             }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
@@ -319,14 +330,12 @@ public class Controller implements EventListenerInterface {
     }
 
     public void drawCard(ClientListener listener) {
-        System.out.println("Deck: " + game.getFlightPlance().getDeck());
-        System.out.println("Cards: " + game.getFlightPlance().getDeck().getCards());
         List<AdventureCard> cards = game.getFlightPlance().getDeck().getCards();
         currentAdventureCard = cards.getFirst();
         String cardName = currentAdventureCard.getName();
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
-
+        setPlayers(game.getPlayers());
         if (cardName != null) {
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
             manageCard();
@@ -339,37 +348,52 @@ public class Controller implements EventListenerInterface {
     public void manageCard(){
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
-                Player p = (game.choosePlayer(currentAdventureCard));
-                ClientListener l = listenerbyPlayer.get(p);
-                if(p!=null)
-                    handleWaiters(l);
-                    // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
-                else{
+                if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     game.endTurn();
+                    return;
+                }
+                currentPlayer = players.getLast();
+                if (game.choosePlayer(currentAdventureCard, currentPlayer)) {
+                    ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    handleWaitersPlayer(l);
+                } else {
+                    players.remove(currentPlayer);
+                    manageCard();
                 }
             }
-            case AbandonedStationCard asc -> {
-                Player p = (game.choosePlayer(currentAdventureCard));
-                ClientListener l = listenerbyPlayer.get(p);
-                if(p!=null)
-                    handleWaiters(l);
-                    // se choosePlayer da' null vuol dire che ha finito i players a cui chiedere
-                else {
+            /*case AbandonedStationCard asc -> {
+                if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     game.endTurn();
+                    return;
                 }
-            }
+                currentPlayer = players.getLast();
+                if (game.choosePlayer(currentAdventureCard, currentPlayer)) {
+                    ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    handleWaitersPlayer(l);
+                } else {
+                    players.remove(currentPlayer);
+                    manageCard();
+                }
+            }*/
+
             case OpenSpaceCard osc ->{
-                    osc.activate();
-                    for (Player player : game.getPlayers()) {
-                        ClientListener l = listenerbyPlayer.get(player);
-                        int n_move =player.getEngineStrenght();
-                        l.onEvent(eventCrafter(GameState.MOVE_PLAYER, n_move));
-                    }
-
-
-
+                if (players.isEmpty()) {
+                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                    game.endTurn();
+                    return;
+                }
+                currentPlayer = players.getLast();
+                int numDE = 0;
+                for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
+                    if(e instanceof DoubleEngine)
+                        numDE ++;
+                }
+                if(numDE > 0) {
+                    ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    handleWaitersBattery(l, numDE);
+                }
 
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
@@ -385,12 +409,27 @@ public class Controller implements EventListenerInterface {
         endCard(listener);
     }
 
-    public void handleWaiters(ClientListener listener){
+    public void handleWaitersPlayer(ClientListener listener){
         for(ClientListener l: listeners){
             if(l == listener) {
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
                 Player p = playerbyListener.get(l);
                 p.setResponded(true);
+            }
+            else {
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }
+        }
+    }
+
+    public void handleWaitersBattery(ClientListener listener, int numDE){
+        for(ClientListener l: listeners){
+            if(l == listener) {
+                for(int i=0; i<numDE; i++) {
+                    DoubleEngineNumber den = new DoubleEngineNumber(i);
+                    l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
+
+                }
             }
             else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -531,5 +570,9 @@ public class Controller implements EventListenerInterface {
                 listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
             }
         }
+    }
+
+    public void charge(ClientListener listener) {
+
     }
 }

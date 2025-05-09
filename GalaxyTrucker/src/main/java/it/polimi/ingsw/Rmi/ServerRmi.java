@@ -162,14 +162,20 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 //        controller.printSpaceship(listener);
 //    }
 
-    @Override
-    public void endCard(VirtualViewRmi client) throws RemoteException {
-        ClientListener listener = clientListeners.get(client);
-        controller.endCard(listener);
-    }
 
     @Override
     public void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException {
+
+    }
+
+    @Override
+    public void charge(VirtualViewRmi client) throws RemoteException {
+        ClientListener listener = clientListeners.get(client);
+        controller.charge(listener);
+    }
+
+    @Override
+    public void reserve() throws RemoteException{
 
     }
 }

@@ -30,8 +30,8 @@ public enum GameState {
     PLAYER_COLOR,
     END_CARD,
     SHOW_PLAYER,
+    CHOOSE_BATTERY,
     END_GAME,
-    MOVE_PLAYER,
     }
 
 

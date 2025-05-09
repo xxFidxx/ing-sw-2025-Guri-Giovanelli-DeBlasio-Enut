@@ -28,13 +28,13 @@ public class AbandonedStationCard extends AdventureCard {
 
         @Override
         public void activate() {
-            Player p = deck.getFlightPlance().getGame().choosePlayer(this);
+            /*Player p = deck.getFlightPlance().getGame().choosePlayer(this);
             if (p == null) {
                 System.out.println("No player selected");
                 return;
             }
-            //p.getSpaceshipPlance().cargoManagement(reward);
-            deck.getFlightPlance().move(-lostDays, p);
+            p.getSpaceshipPlance().cargoManagement(reward);
+            deck.getFlightPlance().move(-lostDays, p);*/
         }
 
         public int getRequiredCrew() {
