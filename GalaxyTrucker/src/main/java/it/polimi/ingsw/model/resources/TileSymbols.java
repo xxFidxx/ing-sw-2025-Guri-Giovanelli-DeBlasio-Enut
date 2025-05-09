@@ -12,7 +12,7 @@ public class TileSymbols {
         ASCII_TILE_SYMBOLS.put("DoubleCannon", 'D');
         ASCII_TILE_SYMBOLS.put("Engine", 'E');
         ASCII_TILE_SYMBOLS.put("DoubleEngine", 'F');
-        ASCII_TILE_SYMBOLS.put("Cabin", 'A');
+        ASCII_TILE_SYMBOLS.put("Cabin", 'K');
         ASCII_TILE_SYMBOLS.put("CentralCabin", 'B');
         ASCII_TILE_SYMBOLS.put("StructuralModule", 'S');
         ASCII_TILE_SYMBOLS.put("LifeSupportSystem", 'L');

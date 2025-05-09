@@ -558,7 +558,7 @@ public class Controller implements EventListenerInterface {
     public void printSpaceship(ClientListener listener) {
         for (ClientListener c: listeners) {
             Player player = playerbyListener.get(c);
-            DataString ds = new DataString(player.getSpaceshipPlance().toString());
+            DataString ds = new DataString(player.getSpaceshipPlance().tileGridToString());
             listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
         }
     }
