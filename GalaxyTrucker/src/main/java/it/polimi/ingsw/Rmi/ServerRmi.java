@@ -176,4 +176,9 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.charge(listener, i);
     }
 
+    @Override
+    public void putTileBack(VirtualViewRmi client) throws RemoteException {
+        ClientListener listener = clientListeners.get(client);
+        controller.putTileBack(listener);
+    }
 }

@@ -115,8 +115,12 @@ public class Controller implements EventListenerInterface {
     public void addTile(ClientListener listener, int xIndex, int yIndex) throws SpaceShipPlanceException {
         Player player = playerbyListener.get(listener);
         ComponentTile tile =player.getHandTile();
-        player.getSpaceshipPlance().placeTileComponents(tile,xIndex,yIndex);
-        printSpaceship(listener);
+        try {
+            player.getSpaceshipPlance().placeTileComponents(tile,xIndex,yIndex);
+        } finally {
+            printSpaceship(listener);
+            listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
+        }
     }
 
     public void pickTile(ClientListener listener, int tileId) throws LobbyExceptions {
@@ -623,5 +627,14 @@ public class Controller implements EventListenerInterface {
             }
             fromChargeToManage();
         }
+    }
+
+    public void putTileBack(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        ComponentTile tile = player.getHandTile();
+        ComponentTile[] tiles = game.getAssemblingTiles();
+        tiles[tile.getId()] = tile;
+        player.setHandTile(null);
+        listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
     }
 }

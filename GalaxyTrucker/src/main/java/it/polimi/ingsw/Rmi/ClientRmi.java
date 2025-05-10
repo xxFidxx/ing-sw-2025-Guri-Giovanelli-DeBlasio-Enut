@@ -35,14 +35,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     public static void main(String[] args) throws Exception {
         final String serverName = "ServerRmi";
 
-        // qua c'è da metterci come primo argomento identificativo registro , visto che voglio testare sulla mia macchina
+        // qua c'è da metterci come primo argomento identificativo registro, visto che voglio testare sulla mia macchina
         // ora l'ip è quello della macchina locale: 127.0.0.1 indirizzo local host
         Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
-
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
         new ClientRmi(server).run();
     }
+
 
     private void run() throws Exception {
         server.connect(this);
@@ -118,8 +118,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     int xIndex = Integer.parseInt(parts[0]);
                                     int yIndex = Integer.parseInt(parts[1]);
 
-                                    server.addTile(this, xIndex, yIndex);
-                                    inputValid = true;
+                                    try {
+                                        server.addTile(this, xIndex, yIndex);
+                                        inputValid = true;
+                                    }catch(SpaceShipPlanceException e) {
+                                        System.out.println(e.getMessage() + ",please try again with valid coordinates");
+                                    }
                                 }else
                                     System.out.println("Wrong input. You need 2 numbers divided by a space \n");
                             } catch (NumberFormatException e) {
@@ -134,7 +138,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         }
                     }
                     case "1" -> System.out.print("Show reserve spots\n");
-                    case "2" -> System.out.print("Show pickableTile\n");
+                    case "2" -> server.putTileBack(this);
                     case "3" -> server.drawCard(this);
                     case "4" -> {
                         try {
