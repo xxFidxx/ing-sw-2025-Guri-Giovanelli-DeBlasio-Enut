@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.GameState;
+import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
@@ -99,10 +100,18 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
 
             case ASSEMBLY -> {
-                try {
-                    server.pickTile(this, Integer.parseInt(input));
-                } catch (Exception e) {
-                    System.out.print("Error " + e.getMessage() + "\n");
+                if(input.equals("-1")){
+                    try {
+                        server.endCrafting(this);
+                    } catch (Exception e) {
+                        System.out.print("Error " + e.getMessage() + "\n");
+                    }
+                }else{
+                    try {
+                        server.pickTile(this, Integer.parseInt(input));
+                    } catch (Exception e) {
+                        System.out.print("Error " + e.getMessage() + "\n");
+                    }
                 }
             }
             case PICKED_TILE -> {
@@ -141,13 +150,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "1" -> System.out.print("Show reserve spots\n");
                     case "2" -> server.putTileBack(this);
                     case "3" -> server.drawCard(this);
-                    case "4" -> {
-                        try {
-                            server.endCrafting(this);
-                        } catch (Exception e) {
-                            System.out.print("Error " + e.getMessage() + "\n");
-                        }
-                    }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
@@ -255,9 +257,24 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 int numDE = Integer.parseInt(input);
                 server.charge(this, numDE);
             }
+            // fai in modo che dopo il crafting partono tutte le carte
             case CHOOSE_PLANETS -> {
-                int numP = Integer.parseInt(input);
-                server.choosePlanets(this,numP);
+                switch (input) {
+                    case "0" -> server.manageCard();
+                    case "1"->{
+                        boolean inputValid = false;
+                        while (!inputValid) {
+                            System.out.print("Insert planet index (from 0 to 3): ");
+                            try {
+                                int numP = Integer.parseInt(input);
+                                server.choosePlanets(this, numP);
+                                inputValid = true;
+                            } catch (ControllerExceptions e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+                }
             }
         }
         System.out.print("\n> ");
@@ -291,7 +308,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case END_CARD -> System.out.print("End card\n");
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.print("How many double engines do you want to use? ");
-            case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or Type the number of the planet on which you want to land")
+            case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or 1 to land on one of the planets");
 
         }
         System.out.print("\n> ");
@@ -385,7 +402,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("[" + "Tile" + tile + "]");
         }
 
-        System.out.print("Enter the index of the tile you want to pick:\n");
+        System.out.print("Enter the index of the tile you want to pick or type -1 to end crafting:\n");
     }
 
     public void printLobbyNicks(ArrayList<String> nicks){

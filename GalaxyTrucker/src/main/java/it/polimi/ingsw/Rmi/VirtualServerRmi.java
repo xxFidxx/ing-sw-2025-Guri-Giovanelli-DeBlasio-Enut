@@ -46,4 +46,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void putTileBack(VirtualViewRmi client) throws RemoteException;
 
     void choosePlanets(VirtualViewRmi clientRmi, int i)throws RemoteException;
+
+    void manageCard() throws RemoteException;
 }

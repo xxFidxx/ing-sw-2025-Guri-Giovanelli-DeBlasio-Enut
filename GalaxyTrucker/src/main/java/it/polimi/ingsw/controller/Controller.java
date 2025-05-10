@@ -128,7 +128,7 @@ public class Controller implements EventListenerInterface {
         if(tile != null){
             String tileName = tiletoString(tile);
             ConnectorType[] connectors = tile.getConnectors();
-            printSpaceshipAll();
+            printSpaceship(listener);
             listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
         }
         else{
@@ -337,7 +337,7 @@ public class Controller implements EventListenerInterface {
         return null;
     }
 
-    public void drawCard(ClientListener listener) {
+    public void drawCard() {
         List<AdventureCard> cards = game.getFlightPlance().getDeck().getCards();
         currentAdventureCard = cards.getFirst();
         String cardName = currentAdventureCard.getName();
@@ -360,7 +360,7 @@ public class Controller implements EventListenerInterface {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     game.endTurn();
                     ClientListener cl = listeners.getLast();
-                    drawCard(cl);
+                    drawCard();
                     return;
                 }
                 currentPlayer = players.getLast();
@@ -434,7 +434,7 @@ public class Controller implements EventListenerInterface {
         currentAdventureCard.activate();
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
         endCard(listener);
-        drawCard(listener);
+        drawCard();
     }
     private void activateAbandonedStationCard(ClientListener listener) {
         Player p = playerbyListener.get(listener);
@@ -478,7 +478,8 @@ public class Controller implements EventListenerInterface {
             if(l == listener) {
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS,currentPlanetsCard.getPlanets()));
-            }
+            }else
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
         }
 
     }
@@ -530,6 +531,7 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
         String[] boardView = handleBoardView();
         notifyAllListeners(eventCrafter(GameState.TURN_START, boardView));
+        drawCard();
     }
 
     private String[] handleBoardView() {
@@ -673,15 +675,17 @@ public class Controller implements EventListenerInterface {
         Player player = playerbyListener.get(listener);
         PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
         ArrayList<Planet> planets = currentPlanetsCard.getPlanets();
-        if(i==0){
-            manageCard();
-        }
-        if(i<0 || i>planets.size()){
+
+        if(i<0 || i>planets.size() - 1){
             listener.onEvent(eventCrafter(GameState.CHOOSE_PLANETS,planets));
             throw new ControllerExceptions("You selected a wrong planet number");
         }
         else {
-            planets.get(i).setBusy(true);
+            Planet planet = planets.get(i);
+            planet.setBusy(true);
+            player.setReward(planet.getReward());
+            game.getFlightPlance().move(- currentPlanetsCard.getLostDays(),player);
+            currentPlanetsCard.activate();
             listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT,null));
         }
 

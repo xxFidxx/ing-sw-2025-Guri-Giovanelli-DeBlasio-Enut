@@ -103,17 +103,11 @@ public class Game {
 
 
     public boolean choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets,Player player) {
-
-
-
             for (Planet planet : planets) {
                 if (!planet.isBusy())
                     if (!player.hasResponded())
                         return true;
             }
-
-
-
         return false;
     }
 
