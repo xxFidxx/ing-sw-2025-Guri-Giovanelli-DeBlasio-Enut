@@ -181,4 +181,10 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListener listener = clientListeners.get(client);
         controller.putTileBack(listener);
     }
+    @Override
+    public void choosePlanets(VirtualViewRmi clientRmi, int i)throws RemoteException{
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.choosePlanets(listener,i);
+    }
 }
+

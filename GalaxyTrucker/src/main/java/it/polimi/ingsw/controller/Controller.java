@@ -5,15 +5,13 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
-import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
-import it.polimi.ingsw.model.adventureCards.AbandonedStationCard;
-import it.polimi.ingsw.model.adventureCards.OpenSpaceCard;
+import it.polimi.ingsw.model.adventureCards.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
-import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.TileSymbols;
 import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -182,6 +180,9 @@ public class Controller implements EventListenerInterface {
             }
             case CHOOSE_BATTERY -> {
                 event = new Event(this, state, (DoubleEngineNumber) data);
+            }
+            case CHOOSE_PLANETS -> {
+                event = new Event(this, state,(PlanetsBlock) data);
             }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
@@ -371,7 +372,7 @@ public class Controller implements EventListenerInterface {
                     manageCard();
                 }
             }
-            /*case AbandonedStationCard asc -> {
+            case AbandonedStationCard asc -> {
                 if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                     game.endTurn();
@@ -385,7 +386,7 @@ public class Controller implements EventListenerInterface {
                     players.remove(currentPlayer);
                     manageCard();
                 }
-            }*/
+            }
 
             case OpenSpaceCard osc ->{
                 if (players.isEmpty()) {
@@ -408,9 +409,23 @@ public class Controller implements EventListenerInterface {
                     handleWaitersBattery(l, numDE);
                 }
             }
+            case PlanetsCard pc -> {
+                if (players.isEmpty()) {
+                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                }
+                currentPlayer = players.getLast();
+                PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
+                if (game.choosePlayerPlanet(currentAdventureCard,currentPlanetsCard.getPlanets(),currentPlayer)) {
+                    ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    handleWaitersPlanets(l);
+
+                }
+            }
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }
+
+
 
     public void activateAbandonedShipCard(ClientListener listener) throws LobbyExceptions {
         Player p = playerbyListener.get(listener);
@@ -421,6 +436,18 @@ public class Controller implements EventListenerInterface {
         endCard(listener);
         drawCard(listener);
     }
+    private void activateAbandonedStationCard(ClientListener listener) {
+        Player p = playerbyListener.get(listener);
+        AbandonedStationCard currentAbandonedStationCard = (AbandonedStationCard) currentAdventureCard;
+        currentAbandonedStationCard.setActivatedPlayer(p);
+        currentAdventureCard.activate();
+        listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
+        //endCard(listener);
+        //drawCard(listener);
+    }
+
+
+
 
     public void handleWaitersPlayer(ClientListener listener){
         for(ClientListener l: listeners){
@@ -445,6 +472,15 @@ public class Controller implements EventListenerInterface {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
+    }
+    private void handleWaitersPlanets(ClientListener listener) {
+        for(ClientListener l: listeners){
+            if(l == listener) {
+                PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
+                l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS,currentPlanetsCard.getPlanets()));
+            }
+        }
+
     }
 
     public void fromChargeToManage(){
@@ -559,7 +595,11 @@ public class Controller implements EventListenerInterface {
 
     public void acceptCard(ClientListener listener) {
         notifyAllListeners(eventCrafter(GameState.ACTIVATE_CARD, null));
-        activateAbandonedShipCard(listener);
+        switch (currentAdventureCard) {
+            case AbandonedShipCard asc -> activateAbandonedShipCard(listener);
+            case AbandonedStationCard asc -> activateAbandonedStationCard(listener);
+            default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+        }
     }
 
     public void rejectCard() {
@@ -629,6 +669,26 @@ public class Controller implements EventListenerInterface {
         }
     }
 
+    public void choosePlanets(ClientListener listener, int i) {
+        Player player = playerbyListener.get(listener);
+        PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
+        ArrayList<Planet> planets = currentPlanetsCard.getPlanets();
+        if(i==0){
+            manageCard();
+        }
+        if(i<0 || i>planets.size()){
+            listener.onEvent(eventCrafter(GameState.CHOOSE_PLANETS,planets));
+            throw new ControllerExceptions("You selected a wrong planet number");
+        }
+        else {
+            planets.get(i).setBusy(true);
+            listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT,null));
+        }
+
+
+
+    }
+
     public void putTileBack(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         ComponentTile tile = player.getHandTile();
@@ -637,4 +697,7 @@ public class Controller implements EventListenerInterface {
         player.setHandTile(null);
         listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
     }
+
+
 }
+

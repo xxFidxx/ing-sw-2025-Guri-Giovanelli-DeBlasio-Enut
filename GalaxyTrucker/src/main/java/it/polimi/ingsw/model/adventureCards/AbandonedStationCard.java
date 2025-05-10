@@ -10,6 +10,7 @@ public class AbandonedStationCard extends AdventureCard {
         private int lostDays;
         private int requiredCrew;
         private GoodsBlock[] reward;
+        private Player activatedPlayer;
 
 
         public AbandonedStationCard(String name, int level, Deck deck, int lostDays, int requiredCrew, GoodsBlock[] reward) {
@@ -25,16 +26,15 @@ public class AbandonedStationCard extends AdventureCard {
             this.requiredCrew = requiredCrew;
             this.reward = reward;
         }
+    public void setActivatedPlayer(Player activatedPlayer) {
+        this.activatedPlayer = activatedPlayer;
+    }
 
         @Override
         public void activate() {
-            /*Player p = deck.getFlightPlance().getGame().choosePlayer(this);
-            if (p == null) {
-                System.out.println("No player selected");
-                return;
-            }
-            p.getSpaceshipPlance().cargoManagement(reward);
-            deck.getFlightPlance().move(-lostDays, p);*/
+
+            activatedPlayer.setReward(reward);
+            deck.getFlightPlance().move(-lostDays, activatedPlayer);
         }
 
         public int getRequiredCrew() {

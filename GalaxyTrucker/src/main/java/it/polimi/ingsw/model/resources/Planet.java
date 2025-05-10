@@ -27,4 +27,8 @@ public class Planet {
                 "goods=" + Arrays.toString(goods) +
                 '}';
     }
+    public void setBusy(boolean busy) {
+        isBusy = busy;
+
+    }
 }

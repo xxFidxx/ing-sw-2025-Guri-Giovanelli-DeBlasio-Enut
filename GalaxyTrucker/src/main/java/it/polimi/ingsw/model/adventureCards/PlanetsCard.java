@@ -71,6 +71,8 @@ public class PlanetsCard extends AdventureCard {
         return !planets.stream().allMatch(Planet::isBusy);
     }
 
+
+
     @Override
     public String toString() {
         return "PlanetsCard{" +

@@ -102,20 +102,19 @@ public class Game {
     }
 
 
-    public Player choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets, Stack<Player> players ) {
-        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+    public boolean choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets,Player player) {
 
-        while (!players.isEmpty()) {
-            Player topPlayer = players.pop();
+
+
             for (Planet planet : planets) {
                 if (!planet.isBusy())
-                    if (topPlayer.hasResponded())
-                        return topPlayer;
+                    if (!player.hasResponded())
+                        return true;
             }
 
-        }
 
-        return null;
+
+        return false;
     }
 
     public void orderPlayers(){

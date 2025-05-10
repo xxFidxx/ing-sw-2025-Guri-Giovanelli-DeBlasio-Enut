@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
+import it.polimi.ingsw.model.resources.Planet;
 
 
 import java.rmi.RemoteException;
@@ -254,6 +255,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 int numDE = Integer.parseInt(input);
                 server.charge(this, numDE);
             }
+            case CHOOSE_PLANETS -> {
+                int numP = Integer.parseInt(input);
+                server.choosePlanets(this,numP);
+            }
         }
         System.out.print("\n> ");
     }
@@ -286,6 +291,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case END_CARD -> System.out.print("End card\n");
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.print("How many double engines do you want to use? ");
+            case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or Type the number of the planet on which you want to land")
+
         }
         System.out.print("\n> ");
     }
@@ -330,8 +337,25 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
             case DoubleEngineNumber den -> System.out.println("You have " + den.getNum() + " double engines \n");
+            case PlanetsBlock pb -> printPlanets(pb.getPlanets());
             default -> {}
         }
+    }
+
+    private void printPlanets(ArrayList<Planet> planets) {
+        System.out.print("Here are the planets you can choose from:\n");
+        for (int i = 0; i < planets.size(); i++) {
+            System.out.println("planet : " + (i+1)  );
+            if(planets.get(i).isBusy()){
+                System.out.print(" Busy " );
+            }else{
+                GoodsBlock[] blocks = planets.get(i).getReward();
+                for(int j = 0; j < blocks.length; j++){
+                System.out.printf(" ["+ blocks[j].getValue() + "] ");
+                }
+                System.out.print("\n");}
+        }
+        System.out.print("\n");
     }
 
     private void printCargos(ArrayList<GoodsContainer> cargos){

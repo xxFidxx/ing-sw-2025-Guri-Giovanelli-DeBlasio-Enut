@@ -21,6 +21,7 @@ public enum GameState {
     DRAW_CARD,
     ACTIVATE_CARD,
     CHOOSE_PLAYER,
+    CHOOSE_PLANETS,
     WAIT_PLAYER,
     MANAGE_CARD,
     NONE_ACTIVATE,
