@@ -48,10 +48,6 @@ public class Controller implements EventListenerInterface {
         this.players = null;
     }
 
-    public void setPlayers(ArrayList<Player> players) {
-        this.players = players;
-    }
-
     public void addEventListener(ClientListener listener) {
         synchronized (listeners) {
             listeners.add(listener);
@@ -342,7 +338,7 @@ public class Controller implements EventListenerInterface {
         String cardName = currentAdventureCard.getName();
         int cardLevel = currentAdventureCard.getLevel();
         Card card = new Card(cardName, cardLevel);
-        setPlayers(game.getPlayers());
+        players = new ArrayList<>(game.getPlayers());
         if (cardName != null) {
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
             manageCard();
@@ -390,7 +386,6 @@ public class Controller implements EventListenerInterface {
             case OpenSpaceCard osc ->{
                 if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                    System.out.println("Vado in end card \n");
                     for(ClientListener cl : listeners){
                         endCard(cl);
                     }
@@ -449,12 +444,10 @@ public class Controller implements EventListenerInterface {
     }
 
     public void fromChargeToManage(){
-        System.out.println("Current Player \n" + currentPlayer);
         if(currentPlayer.hasResponded()){
             OpenSpaceCard currentOpenSpaceCard = (OpenSpaceCard) currentAdventureCard;
             currentOpenSpaceCard.setActivatedPlayer(currentPlayer);
             currentAdventureCard.activate();
-            System.out.println("Ho attivato la carta \n");
             players.remove(currentPlayer);
             manageCard();
         }
@@ -586,13 +579,9 @@ public class Controller implements EventListenerInterface {
 
     public void endCard(ClientListener listener) {
         game.endTurn();
-        System.out.println("Listener -> Player \n");
         Player player = playerbyListener.get(listener);
-        System.out.println("Player: \n" + player);
-        System.out.println("Players: \n" + game.getPlayers());
         ArrayList<Player> players = game.getPlayers();
         for(Player p: players){
-            System.out.println("Player nel for: \n" + p);
             if(p == player){
                 String nick = p.getNickname();
                 int pos = p.getPlaceholder().getPosizione();
@@ -600,7 +589,6 @@ public class Controller implements EventListenerInterface {
                 int astr = p.getNumAstronauts();
                 int al = p.getNumAliens();
                 PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
-                System.out.println("Vado in show player \n");
                 listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
             }
         }
@@ -608,22 +596,24 @@ public class Controller implements EventListenerInterface {
 
     public void charge(ClientListener listener, int i) throws ControllerExceptions {
         Player player = playerbyListener.get(listener);
-        System.out.println("Player in charge \n" + player);
         player.setResponded(true);
         ArrayList<Engine> engines = player.getSpaceshipPlance().getEngines();
         ArrayList<DoubleEngine> doubleEngines = new ArrayList<>();
+        int num = 0;
         for(Engine e: engines){
-            if(e instanceof DoubleEngine)
+            if(e instanceof DoubleEngine) {
+                num++;
                 doubleEngines.add((DoubleEngine) e);
+            }
         }
         if(i < 0) {
-            /*DoubleEngineNumber den = new DoubleEngineNumber(i);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));*/
+            DoubleEngineNumber den = new DoubleEngineNumber(num);
+            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
             throw new ControllerExceptions("You have to select a positive number of double engines");
         }
         else if(i > doubleEngines.size()) {
-            /*DoubleEngineNumber den = new DoubleEngineNumber(i);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));*/
+            DoubleEngineNumber den = new DoubleEngineNumber(num);
+            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
             throw new ControllerExceptions("You selected too many double engines");
         }
         else {

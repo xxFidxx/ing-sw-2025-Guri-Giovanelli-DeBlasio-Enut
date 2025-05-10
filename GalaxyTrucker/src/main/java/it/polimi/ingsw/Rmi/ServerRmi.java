@@ -176,8 +176,4 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.charge(listener, i);
     }
 
-    @Override
-    public void reserve() throws RemoteException{
-
-    }
 }
