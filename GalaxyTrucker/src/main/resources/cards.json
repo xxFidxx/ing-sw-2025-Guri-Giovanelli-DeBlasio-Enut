@@ -13,6 +13,18 @@
     "level": 1
   },
   {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 3,
+    "planets": [
+      [3, 1, 0, 0, 0],
+      [3, 2, 0, 0],
+      [3, 0, 0, 0],
+      [3, 1]
+    ]
+  },
+  {
     "type": "SlaversCard",
     "name": "Slavers",
     "level": 1,
@@ -57,18 +69,6 @@
       { "type": 3, "direction": 0 },
       { "type": 2, "direction": 3 },
       { "type": 2, "direction": 1 }
-    ]
-  },
-  {
-    "type": "PlanetsCard",
-    "name": "Planets",
-    "level": 1,
-    "lostDays": 3,
-    "planets": [
-      [3, 1, 0, 0, 0],
-      [3, 2, 0, 0],
-      [3, 0, 0, 0],
-      [3, 1]
     ]
   },
   {

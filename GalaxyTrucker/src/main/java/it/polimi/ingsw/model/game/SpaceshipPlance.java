@@ -13,15 +13,15 @@ import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
 
 public class SpaceshipPlance {
-    private ComponentTile[][] components;
-    private ArrayList<ComponentTile> reserveSpot;
-    private ArrayList<CargoHolds> cargoHolds;
-    private ArrayList<Engine> engines;
-    private ArrayList<Cannon> cannons;
-    private ArrayList<Cabin> cabins;
+    private final ComponentTile[][] components;
+    private final ArrayList<ComponentTile> reserveSpot;
+    private final ArrayList<CargoHolds> cargoHolds;
+    private final ArrayList<Engine> engines;
+    private final ArrayList<Cannon> cannons;
+    private final ArrayList<Cabin> cabins;
     private boolean[][] visited;
     private int[][] shownComponents;
-    private ArrayList<ShieldGenerator> shieldGenerators;
+    private final ArrayList<ShieldGenerator> shieldGenerators;
     private int nAstronauts;
     private int nBrownAliens;
     private int nPurpleAliens;
@@ -40,6 +40,7 @@ public class SpaceshipPlance {
         this.shieldGenerators = new ArrayList<>();
         this.cannons = new ArrayList<>();
         this.cabins = new ArrayList<>();
+        this.cargoHolds = new ArrayList<>();
         // ci creiamo un arraylist di engines per simulare open space card
         this.engines = new ArrayList<>(List.of(
                 new DoubleEngine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 1),
@@ -104,7 +105,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void updateLists() {
+    public void updateLists() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 ComponentTile tile = components[i][j];
