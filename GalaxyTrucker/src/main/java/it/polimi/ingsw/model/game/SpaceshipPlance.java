@@ -923,4 +923,8 @@ public class SpaceshipPlance {
 
         return result.toString();
     }
+
+    public ArrayList<ComponentTile> getReserveSpot() {
+        return reserveSpot;
+    }
 }

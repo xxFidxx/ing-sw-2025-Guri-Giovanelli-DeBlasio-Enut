@@ -123,7 +123,13 @@ public class Controller implements EventListenerInterface {
 
     public void pickTile(ClientListener listener, int tileId) throws LobbyExceptions {
         Player player = playerbyListener.get(listener);
-        ComponentTile tile = game.pickTile(player,tileId);
+        ComponentTile tile;
+
+        if (tileId >= 1000) {
+            tile = game.pickTileReserveSpot(player, tileId - 1000);
+        } else {
+            tile = game.pickTile(player,tileId);
+        }
 
         if(tile != null){
             String tileName = tiletoString(tile);
@@ -773,10 +779,25 @@ public class Controller implements EventListenerInterface {
     public void addReserveSpot(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         ComponentTile tile = player.getHandTile();
-        player.getSpaceshipPlance().addReserveSpot(tile);
-        player.setHandTile(null);
+
+        if (player.getSpaceshipPlance().getReserveSpot().size() >= 2) {
+            putTileBack(listener);
+        }
+        else {
+            player.getSpaceshipPlance().addReserveSpot(tile);
+            player.setHandTile(null);
+            printSpaceship(listener);
+            listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
+        }
+
+    }
+
+    public void rotateClockwise(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        ComponentTile tile = player.getHandTile();
+        tile.rotateClockwise();
         printSpaceship(listener);
-        listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
+        listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
     }
 
 }
