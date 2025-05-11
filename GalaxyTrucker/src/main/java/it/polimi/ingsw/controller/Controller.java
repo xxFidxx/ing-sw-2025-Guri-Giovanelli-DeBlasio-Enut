@@ -624,7 +624,8 @@ public class Controller implements EventListenerInterface {
 
     public void printSpaceship(ClientListener listener) {
             Player player = playerbyListener.get(listener);
-            DataString ds = new DataString(player.getSpaceshipPlance().tileGridToString());
+            String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToString();
+            DataString ds = new DataString(complete_ship);
             listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
     }
 
@@ -707,5 +708,13 @@ public class Controller implements EventListenerInterface {
     }
 
 
+    public void addReserveSpot(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        ComponentTile tile = player.getHandTile();
+        player.getSpaceshipPlance().addReserveSpot(tile);
+        player.setHandTile(null);
+        printSpaceship(listener);
+        listener.onEvent(eventCrafter(GameState.ASSEMBLY, null));
+    }
 }
 

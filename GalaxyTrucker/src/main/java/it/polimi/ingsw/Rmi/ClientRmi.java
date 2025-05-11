@@ -149,7 +149,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
                         }
                     }
-                    case "1" -> System.out.print("Show reserve spots\n");
+                    case "1" -> server.addReserveSpot(this);
                     case "2" -> server.putTileBack(this);
                     case "3" -> server.drawCard(this);
                     default -> System.out.print("Not accepted input, please try again:\n");

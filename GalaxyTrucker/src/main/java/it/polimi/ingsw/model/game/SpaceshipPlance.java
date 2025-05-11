@@ -105,6 +105,10 @@ public class SpaceshipPlance {
         }
     }
 
+    public void addReserveSpot(ComponentTile c) {
+        this.reserveSpot.add(c);
+    }
+
     public void updateLists() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
@@ -903,6 +907,8 @@ public class SpaceshipPlance {
 
     public String reserveSpotToString() {
         StringBuilder result = new StringBuilder();
+
+        result.append('\n');
 
         // For each of the 3 lines in a 3×3 tile
         for (int line = 0; line < 3; line++) {

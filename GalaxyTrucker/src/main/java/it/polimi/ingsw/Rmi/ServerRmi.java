@@ -191,5 +191,13 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void manageCard() throws RemoteException {
         controller.manageCard();
     }
+
+    @Override
+    public void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException
+    {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.addReserveSpot(listener);
+    }
+
 }
 
