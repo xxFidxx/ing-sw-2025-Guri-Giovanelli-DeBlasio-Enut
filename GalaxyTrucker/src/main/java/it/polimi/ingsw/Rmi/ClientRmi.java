@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
+import it.polimi.ingsw.model.componentTiles.DoubleCannon;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.Planet;
@@ -277,6 +278,32 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                 }
             }
+            case CHOOSE_CANNON -> {
+                switch (input) {
+                    case "0" -> server.manageCard();
+                    case "1"-> {
+                        ArrayList<Integer> chosenIndices = new ArrayList<>();;
+                        boolean inputValid = false;
+                        while (!inputValid) {
+                            String line = scan.nextLine();
+                            String[] parts = line.trim().split("\\s+");
+                            inputValid = true;
+                            for (String part : parts) {
+                                try {
+                                    int index = Integer.parseInt(part);
+                                    chosenIndices.add(index);
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Invalid number: " + part);
+                                    inputValid = false;
+                                    break;
+                                }
+                            }
+                            if(inputValid)
+                                server.chargeCannons(this, chosenIndices);
+                        }
+                    }
+                }
+            }
             case CHOOSE_PLANETS -> {
                 switch (input) {
                     case "0" -> server.manageCard();
@@ -285,8 +312,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         while (!inputValid) {
                             try {
                                 System.out.print("Insert planet index (from 0 to 3): ");
-                                String inputLine = scan.nextLine();
-                                int numP = Integer.parseInt(inputLine);
                                 int numP = Integer.parseInt(scan.nextLine());
                                 server.choosePlanets(this, numP);
                                 inputValid = true;
@@ -335,7 +360,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.print("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or 1 to land on one of the planets");
-
+            case CHOOSE_CANNON -> System.out.print("Type 0 to not use double cannons or 1 to use them");
         }
         System.out.print("\n> ");
     }
@@ -383,6 +408,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case DoubleCannonNumber den -> System.out.println("You have " + den.getNum() + " double cannons \n");
             case PlanetsBlock pb -> printPlanets(pb.getPlanets());
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strenght, " + "You have " + es.getPlayerStrenght() + " fire strenght without double cannons \n" );
+            case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             default -> {}
         }
     }
@@ -401,6 +427,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.print("\n");}
         }
         System.out.print("\n");
+    }
+
+    private void printDoubleCannons(ArrayList<DoubleCannon> doubleCannons) {
+        System.out.print("Here are the double cannons you can choose from:\n");
+        for (int i = 0; i < doubleCannons.size(); i++) {
+            System.out.println("DoubleCannon: " + i + ", power: ");
+            float power = doubleCannons.get(i).getPower();
+            System.out.println(power + "\n");
+        }
     }
 
     private void printCargos(ArrayList<GoodsContainer> cargos){

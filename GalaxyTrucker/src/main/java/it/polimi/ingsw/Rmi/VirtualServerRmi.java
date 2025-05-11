@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 public interface VirtualServerRmi extends Remote, VirtualServer {
 
@@ -48,4 +49,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void manageCard() throws RemoteException;
 
     void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException ;
+
+    void chargeCannons(VirtualViewRmi clientRmi, ArrayList<Integer> chosenIndices) throws RemoteException;
 }

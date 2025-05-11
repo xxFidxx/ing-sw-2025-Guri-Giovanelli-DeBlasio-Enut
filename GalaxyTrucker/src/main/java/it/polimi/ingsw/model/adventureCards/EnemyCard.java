@@ -11,6 +11,7 @@ import java.util.Stack;
 public abstract class EnemyCard extends AdventureCard {
     private int cannonStrength;
     private int lostDays;
+    private Player activatedPlayer;
 
     public EnemyCard(String name, int level, Deck deck, int cannonStrength, int lostDays) {
         super(name, level, deck);
@@ -32,7 +33,11 @@ public abstract class EnemyCard extends AdventureCard {
         return lostDays;
     }
 
-    protected int getFightOutcome(Player player) {
+    public void setActivatedPlayer(Player activatedPlayer) {
+        this.activatedPlayer = activatedPlayer;
+    }
+
+    public int getFightOutcome(Player player) {
         // -1 vince il nemico
         // 0 pareggio
         // 1 vince il giocatore
@@ -45,29 +50,18 @@ public abstract class EnemyCard extends AdventureCard {
 
     @Override
     public void activate() {
-        deck.getFlightPlance().getGame().orderPlayers();
-        ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
-        Stack<Player> playerStack = new Stack<>();
+        int out = getFightOutcome(activatedPlayer);
 
-        for (Player player : players) {
-            playerStack.push(player);
-        }
-
-        while (!playerStack.isEmpty()) {
-            Player fightingPlayer = playerStack.pop();
-            int out = getFightOutcome(fightingPlayer);
-
-            switch (out) {
-                case 1:
-                    reward(fightingPlayer);
-                    deck.getFlightPlance().move(-lostDays,fightingPlayer);
-                    return;
-                case -1:
-                    penalize(fightingPlayer);
-                    break;
-                case 0:
-                    continue;
-            }
+        switch (out) {
+            case 1:
+                reward(activatedPlayer);
+                deck.getFlightPlance().move(-lostDays,activatedPlayer);
+                return;
+            case -1:
+                penalize(activatedPlayer);
+                break;
+            case 0:
+                //continue;
         }
     }
 

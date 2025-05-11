@@ -102,12 +102,11 @@ public class Game {
     }
 
 
-    public boolean choosePlayerPlanet(AdventureCard card,ArrayList<Planet> planets,Player player) {
-            for (Planet planet : planets) {
-                if (!planet.isBusy())
-                    if (!player.hasResponded())
-                        return true;
-            }
+    public boolean freePlanets(AdventureCard card, ArrayList<Planet> planets) {
+        for (Planet planet : planets) {
+            if (!planet.isBusy())
+                return true;
+        }
         return false;
     }
 
@@ -164,7 +163,29 @@ public class Game {
     public void endTurn(){
         resetResponded();
         resetRewards();
+        resetDoubleCannons();
+        resetDoubleEngines();
         orderPlayers();
+    }
+
+    private void resetDoubleCannons() {
+        for(Player p: players){
+            ArrayList<Cannon> cannons = p.getSpaceshipPlance().getCannons();
+            for(Cannon c: cannons){
+                if(c instanceof DoubleCannon)
+                    ((DoubleCannon) c).setCharged(false);
+            }
+        }
+    }
+
+    private void resetDoubleEngines() {
+        for(Player p: players){
+            ArrayList<Engine> engines = p.getSpaceshipPlance().getEngines();
+            for(Engine e: engines){
+                if(e instanceof DoubleEngine)
+                    ((DoubleEngine) e).setCharged(false);
+            }
+        }
     }
 
     private void resetRewards() {
