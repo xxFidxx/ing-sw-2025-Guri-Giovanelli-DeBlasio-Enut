@@ -86,7 +86,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         }
                     }
                 } else {
-                    System.out.print("Not accepted input, please type an accepted lobby size:\n");
+                    System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case LOBBY_PHASE -> {
@@ -105,12 +105,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         server.endCrafting(this);
                     } catch (Exception e) {
                         System.out.print("Error " + e.getMessage() + "\n");
+                        e.printStackTrace();
                     }
                 }else{
                     try {
                         server.pickTile(this, Integer.parseInt(input));
                     } catch (Exception e) {
                         System.out.print("Error " + e.getMessage() + "\n");
+                        e.printStackTrace();
                     }
                 }
             }
@@ -147,7 +149,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
                         }
                     }
-                    case "1" -> System.out.print("Show reserve spots\n");
+                    case "1" -> server.addReserveSpot(this);
                     case "2" -> server.putTileBack(this);
                     case "3" -> server.drawCard(this);
                     default -> System.out.print("Not accepted input, please try again:\n");
@@ -168,10 +170,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 switch (input) {
                     case "0" -> {
                         boolean inputValid = false;
-                        System.out.print("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
-                        String inputLine = scan.nextLine();
-
                         while (!inputValid) {
+                            System.out.print("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
+                            String inputLine = scan.nextLine();
                             try {
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length == 3) {
@@ -192,11 +193,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                     case "1" -> {
                         boolean inputValid = false;
-                        System.out.print("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
-                        String inputLine = scan.nextLine();
 
                         while(!inputValid){
                             try {
+                                System.out.print("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
+                                String inputLine = scan.nextLine();
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length == 4) {
 
@@ -218,10 +219,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                     case "2" -> {
                         boolean inputValid = false;
-                        System.out.print("Insert: cargoIndex goodIndex (es. 0 1): ");
-                        String inputLine = scan.nextLine();
 
                         while(!inputValid){
+                            System.out.print("Insert: cargoIndex goodIndex (es. 0 1): ");
+                            String inputLine = scan.nextLine();
                             try {
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length != 2) {
@@ -276,23 +277,30 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                 }
             }
-            // fai in modo che dopo il crafting partono tutte le carte
             case CHOOSE_PLANETS -> {
                 switch (input) {
                     case "0" -> server.manageCard();
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert planet index (from 0 to 3): ");
                             try {
+                                System.out.print("Insert planet index (from 0 to 3): ");
+                                String inputLine = scan.nextLine();
+                                int numP = Integer.parseInt(inputLine);
                                 int numP = Integer.parseInt(scan.nextLine());
                                 server.choosePlanets(this, numP);
                                 inputValid = true;
                             } catch (ControllerExceptions e) {
                                 System.out.println(e.getMessage());
+                                e.printStackTrace();
+                            } catch (NumberFormatException e) {
+                            System.out.print("Error " + e.getMessage() + " please type a number \n");
+                            } catch (Exception e) {
+                                System.out.println("Error " + e.getMessage());
                             }
                         }
                     }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
         }
@@ -317,6 +325,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     server.checkStorage(this);
                 } catch (Exception e){
                     System.out.print("Error " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
             case CARGO_VIEW -> System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");

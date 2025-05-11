@@ -2,9 +2,11 @@ package it.polimi.ingsw.model.resources;
 
 import it.polimi.ingsw.model.bank.GoodsBlock;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Planet {
+public class Planet implements Serializable{
+    private static final long serialVersionUID = 1L;
     private GoodsBlock[] goods;
     boolean isBusy;
 

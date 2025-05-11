@@ -112,7 +112,7 @@ public class Game {
     }
 
     public void orderPlayers(){
-        Collections.sort(players, Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
     }
 
     public ComponentTile pickTile(Player player, int Tileid){
@@ -148,14 +148,6 @@ public class Game {
         }
     }
 
-    public boolean checkStorage(Player player) throws CargoManagementException {
-        if(player.getSpaceshipPlance().checkStorage()){
-            return true;
-        }else {
-            return false;
-        }
-    }
-
     public void swapGoods(Player player, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
         player.getSpaceshipPlance().handleSwap(cargoIndex1,cargoIndex2,goodIndex1, goodIndex2);
     }
@@ -172,6 +164,7 @@ public class Game {
     public void endTurn(){
         resetResponded();
         resetRewards();
+        orderPlayers();
     }
 
     private void resetRewards() {

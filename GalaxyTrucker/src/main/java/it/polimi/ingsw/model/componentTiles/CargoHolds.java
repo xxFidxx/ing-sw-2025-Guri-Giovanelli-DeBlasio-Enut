@@ -5,17 +5,24 @@ import it.polimi.ingsw.model.bank.GoodsBlock;
 import java.util.Arrays;
 
 public class CargoHolds extends ComponentTile{
-    private int id;
     private GoodsBlock[] goods;
     private boolean isSpecial;
 
-    public CargoHolds(ConnectorType[] connectors,int id, boolean isSpecial, int capacity) {
+    public CargoHolds(ConnectorType[] connectors, int id, boolean isSpecial, int capacity) {
         super(connectors,id);
         this.isSpecial = isSpecial;
+        goods = new GoodsBlock[capacity];
+
+        for(int i = 0; i < capacity; i++)
+            goods[i] = null;
     }
 
     public GoodsBlock[] getGoods() {
         return goods;
+    }
+
+    public int getCapacity() {
+        return goods.length;
     }
 
     public boolean isSpecial() {
