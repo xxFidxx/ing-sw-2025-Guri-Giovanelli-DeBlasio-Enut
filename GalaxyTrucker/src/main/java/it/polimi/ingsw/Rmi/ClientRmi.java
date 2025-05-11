@@ -152,6 +152,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "1" -> server.addReserveSpot(this);
                     case "2" -> server.putTileBack(this);
                     case "3" -> server.drawCard(this);
+                    case "5" -> server.rotateClockwise(this);
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
@@ -286,7 +287,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             try {
                                 System.out.print("Insert planet index (from 0 to 3): ");
                                 String inputLine = scan.nextLine();
-                                int numP = Integer.parseInt(inputLine);
+                                //int numP = Integer.parseInt(inputLine);
                                 int numP = Integer.parseInt(scan.nextLine());
                                 server.choosePlanets(this, numP);
                                 inputValid = true;
@@ -315,7 +316,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
             case ASSEMBLY -> System.out.print("List of available tiles: ");
-            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting\n");
+            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
             case SHOW_SHIP -> System.out.print("Here is your spaceship\n");
             case TURN_START -> System.out.print("Here is the flight plance\n");

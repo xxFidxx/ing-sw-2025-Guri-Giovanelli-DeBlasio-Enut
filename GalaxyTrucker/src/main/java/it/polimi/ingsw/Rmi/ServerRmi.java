@@ -194,5 +194,10 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.addReserveSpot(listener);
     }
 
+    @Override
+    public void rotateClockwise(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.rotateClockwise(listener);
+    }
 }
 

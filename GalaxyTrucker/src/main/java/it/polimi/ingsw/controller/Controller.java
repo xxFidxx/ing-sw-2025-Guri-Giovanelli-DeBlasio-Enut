@@ -749,5 +749,13 @@ public class Controller implements EventListenerInterface {
         }
 
     }
+
+    public void rotateClockwise(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        ComponentTile tile = player.getHandTile();
+        tile.rotateClockwise();
+        printSpaceship(listener);
+        listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
+    }
 }
 
