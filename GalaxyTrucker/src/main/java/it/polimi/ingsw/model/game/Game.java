@@ -130,6 +130,20 @@ public class Game {
         return tile;
     }
 
+    public ComponentTile pickTileReserveSpot(Player player, int Tileid){
+
+        ComponentTile tile;
+        tile = player.getSpaceshipPlance().getReserveSpot().get(Tileid);
+
+        if(tile == null )
+            return null;
+
+        player.setHandTile(tile);
+        tile = player.getSpaceshipPlance().getReserveSpot().remove(Tileid);
+
+        return tile;
+    }
+
     public Integer[] tilesToId(ComponentTile[] tiles){
         Integer[] ids = new Integer[tiles.length];
         for(int i = 0; i < tiles.length; i++){
