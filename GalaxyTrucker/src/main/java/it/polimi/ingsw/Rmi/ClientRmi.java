@@ -86,7 +86,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         }
                     }
                 } else {
-                    System.out.print("Not accepted input, please type an accepted lobby size:\n");
+                    System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case LOBBY_PHASE -> {
@@ -273,9 +273,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             } catch (ControllerExceptions e) {
                                 System.out.println(e.getMessage());
                                 e.printStackTrace();
+                            } catch (NumberFormatException e) {
+                            System.out.print("Error " + e.getMessage() + " please type a number \n");
+                            } catch (Exception e) {
+                                System.out.println("Error " + e.getMessage());
                             }
                         }
                     }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
         }

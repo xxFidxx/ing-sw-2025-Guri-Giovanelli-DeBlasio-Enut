@@ -317,7 +317,7 @@ public class SpaceshipPlance {
     }
 
     public boolean checkStorage() {
-        return getStorage() != 0;
+        return !cargoHolds.isEmpty();
     }
 
     public void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
@@ -461,8 +461,8 @@ public class SpaceshipPlance {
     public int getStorage(){
         int total = 0;
         for(CargoHolds c : cargoHolds){
-            for(GoodsBlock block : c.getGoods()){
-                if(block!=null)
+            for(GoodsBlock block: c.getGoods()) {
+                if(block != null)
                     total++;
             }
         }
