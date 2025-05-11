@@ -126,12 +126,11 @@ public class Player {
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             for(int i=0; i < spaceshipPlance.getCannons().size(); i++){
-                if(spaceshipPlance.getCannons().get(i) instanceof DoubleCannon){
-                    if( ((DoubleCannon) spaceshipPlance.getCannons().get(i)).isCharged()){
-                        if(askToUseBattery())
-                            sumPower=sumPower+ spaceshipPlance.getCannons().get(i).getPower();}
-                    else System.out.println("no battery available");}
-
+                Cannon c = spaceshipPlance.getCannons().get(i);
+                if(c instanceof DoubleCannon) {
+                    if (((DoubleCannon) c).isCharged())
+                        sumPower = sumPower + spaceshipPlance.getCannons().get(i).getPower();
+                }
                 else
                     sumPower = sumPower + spaceshipPlance.getCannons().get(i).getPower();
             }

@@ -10,6 +10,8 @@ import java.util.*;
 public class PlanetsCard extends AdventureCard {
     private ArrayList<Planet> planets;
     private int lostDays;
+    private Player activatedPlayer;
+    private Planet chosenPlanet;
 
     public PlanetsCard(String name, int level, ArrayList<Planet> planets, int lostDays, Deck deck) {
         super(name, level, deck);
@@ -23,8 +25,19 @@ public class PlanetsCard extends AdventureCard {
         this.planets = planets;
     }
 
+    public void setActivatedPlayer(Player activatedPlayer) {
+        this.activatedPlayer = activatedPlayer;
+    }
+
+    public void setChosenPlanet(Planet chosenPlanet) {
+        this.chosenPlanet = chosenPlanet;
+    }
+
     @Override
     public void activate() {
+
+        activatedPlayer.setReward(chosenPlanet.getReward());
+        deck.getFlightPlance().move(-lostDays, activatedPlayer);
 
 //        Game game = deck.getFlightPlance().getGame();
 //        ArrayList<Player> tmp = game.getPlayers();

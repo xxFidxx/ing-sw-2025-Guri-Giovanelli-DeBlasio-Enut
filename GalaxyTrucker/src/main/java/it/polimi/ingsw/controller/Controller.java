@@ -184,6 +184,12 @@ public class Controller implements EventListenerInterface {
             case CHOOSE_PLANETS -> {
                 event = new Event(this, state,(PlanetsBlock) data);
             }
+            case SHOW_ENEMY -> {
+                event = new Event(this, state, (EnemyStrenght) data);
+            }
+            case CHOOSE_CANNON -> {
+                event = new Event(this, state, (DoubleCannonNumber) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -401,14 +407,33 @@ public class Controller implements EventListenerInterface {
                 currentPlayer = players.getLast();
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
-                    if(e instanceof DoubleEngine)
-                        numDE ++;
+                    if(e instanceof DoubleEngine) {
+                        numDE++;
+                    }
                 }
                 if(numDE > 0) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersBattery(l, numDE);
+                } else {
+                    fromChargeToManage();
                 }
             }
+
+            case SlaversCard sl -> {
+                if (players.isEmpty() /*|| nemico sconfitto*/) {
+                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                }
+                currentPlayer = players.getLast();
+                int numDC = 0;
+                for(Cannon c : currentPlayer.getSpaceshipPlance().getCannons()) {
+                    if(c instanceof DoubleCannon) {
+                        numDC++;
+                    }
+                }
+                ClientListener l = listenerbyPlayer.get(currentPlayer);
+                handleWaitersBattery(l, numDC);
+            }
+
             case PlanetsCard pc -> {
                 if (players.isEmpty()) {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
@@ -421,6 +446,7 @@ public class Controller implements EventListenerInterface {
 
                 }
             }
+
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }
@@ -462,11 +488,24 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-    public void handleWaitersBattery(ClientListener listener, int numDE){
+    public void handleWaitersBattery(ClientListener listener, int num){
         for(ClientListener l: listeners){
             if(l == listener) {
-                DoubleEngineNumber den = new DoubleEngineNumber(numDE);
-                l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
+                switch(currentAdventureCard) {
+                    case OpenSpaceCard osc -> {
+                        DoubleEngineNumber den = new DoubleEngineNumber(num);
+                        l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
+                    }
+                    case SlaversCard sc -> {
+                        SlaversCard currentSlaversCard = (SlaversCard) currentAdventureCard;
+                        float playerFire = currentPlayer.getFireStrenght();
+                        EnemyStrenght es = new EnemyStrenght(currentSlaversCard.getCannonStrength(), playerFire);
+                        l.onEvent(eventCrafter(GameState.SHOW_ENEMY, es));
+                        DoubleCannonNumber dcn = new DoubleCannonNumber(num);
+                        l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcn));
+                    }
+                    default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+                }
             }
             else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -485,13 +524,11 @@ public class Controller implements EventListenerInterface {
     }
 
     public void fromChargeToManage(){
-        if(currentPlayer.hasResponded()){
-            OpenSpaceCard currentOpenSpaceCard = (OpenSpaceCard) currentAdventureCard;
-            currentOpenSpaceCard.setActivatedPlayer(currentPlayer);
-            currentAdventureCard.activate();
-            players.remove(currentPlayer);
-            manageCard();
-        }
+        OpenSpaceCard currentOpenSpaceCard = (OpenSpaceCard) currentAdventureCard;
+        currentOpenSpaceCard.setActivatedPlayer(currentPlayer);
+        currentAdventureCard.activate();
+        players.remove(currentPlayer);
+        manageCard();
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
@@ -596,17 +633,11 @@ public class Controller implements EventListenerInterface {
     }
 
     public void acceptCard(ClientListener listener) {
-        notifyAllListeners(eventCrafter(GameState.ACTIVATE_CARD, null));
         switch (currentAdventureCard) {
             case AbandonedShipCard asc -> activateAbandonedShipCard(listener);
             case AbandonedStationCard asc -> activateAbandonedStationCard(listener);
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
-    }
-
-    public void rejectCard() {
-        notifyAllListeners(eventCrafter(GameState.MANAGE_CARD, null));
-        manageCard();
     }
 
     public void printSpaceshipAll() {
@@ -642,29 +673,18 @@ public class Controller implements EventListenerInterface {
 
     public void charge(ClientListener listener, int i) throws ControllerExceptions {
         Player player = playerbyListener.get(listener);
-        player.setResponded(true);
         ArrayList<Engine> engines = player.getSpaceshipPlance().getEngines();
         ArrayList<DoubleEngine> doubleEngines = new ArrayList<>();
-        int num = 0;
         for(Engine e: engines){
             if(e instanceof DoubleEngine) {
-                num++;
                 doubleEngines.add((DoubleEngine) e);
             }
         }
-        if(i < 0) {
-            DoubleEngineNumber den = new DoubleEngineNumber(num);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
-            throw new ControllerExceptions("You have to select a positive number of double engines");
-        }
-        else if(i > doubleEngines.size()) {
-            DoubleEngineNumber den = new DoubleEngineNumber(num);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
-            throw new ControllerExceptions("You selected too many double engines");
+        if(i < 0 || i > doubleEngines.size()) {
+            throw new ControllerExceptions("You selected a wrong double engines number");
         }
         else {
             for(int j=0; j<i; j++){
-                System.out.println("Carico i double engines \n");
                 doubleEngines.get(j).setCharged(true);
             }
             fromChargeToManage();
@@ -676,21 +696,20 @@ public class Controller implements EventListenerInterface {
         PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
         ArrayList<Planet> planets = currentPlanetsCard.getPlanets();
 
-        if(i<0 || i>planets.size() - 1){
-            listener.onEvent(eventCrafter(GameState.CHOOSE_PLANETS,planets));
+        if(i<0 || i>planets.size() - 1 ){
             throw new ControllerExceptions("You selected a wrong planet number");
+        }
+        else if(planets.get(i).isBusy()) {
+            throw new ControllerExceptions("The chosen planet is busy");
         }
         else {
             Planet planet = planets.get(i);
             planet.setBusy(true);
-            player.setReward(planet.getReward());
-            game.getFlightPlance().move(- currentPlanetsCard.getLostDays(),player);
+            currentPlanetsCard.setActivatedPlayer(player);
+            currentPlanetsCard.setChosenPlanet(planet);
             currentPlanetsCard.activate();
             listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT,null));
         }
-
-
-
     }
 
     public void putTileBack(ClientListener listener) {

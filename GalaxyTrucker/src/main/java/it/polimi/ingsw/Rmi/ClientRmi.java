@@ -250,12 +250,31 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_PLAYER -> {
                 switch (input) {
                     case "0" -> server.acceptCard(this);
-                    case "1" -> server.rejectCard();
+                    case "1" -> server.manageCard();
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case CHOOSE_BATTERY -> {
-                int numDE = Integer.parseInt(input);
-                server.charge(this, numDE);
+                switch (input) {
+                    case "0" -> server.manageCard();
+                    case "1"->{
+                        boolean inputValid = false;
+                        while (!inputValid) {
+                            System.out.print("Insert the number of double engines to charge: ");
+                            try {
+                                int numDE = Integer.parseInt(scan.nextLine());
+                                server.charge(this, numDE);
+                                inputValid = true;
+                            } catch (ControllerExceptions e) {
+                                System.out.println(e.getMessage());
+                            } catch (NumberFormatException e) {
+                                System.out.print("Error " + e.getMessage() + " please type a number \n");
+                            } catch (Exception e) {
+                                System.out.println("Error " + e.getMessage());
+                            }
+                        }
+                    }
+                }
             }
             // fai in modo che dopo il crafting partono tutte le carte
             case CHOOSE_PLANETS -> {
@@ -266,7 +285,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         while (!inputValid) {
                             System.out.print("Insert planet index (from 0 to 3): ");
                             try {
-                                int numP = Integer.parseInt(input);
+                                int numP = Integer.parseInt(scan.nextLine());
                                 server.choosePlanets(this, numP);
                                 inputValid = true;
                             } catch (ControllerExceptions e) {
@@ -302,12 +321,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CARGO_VIEW -> System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.print("Type 0 to activate the card, 1 to reject the card\n");
-            case ACTIVATE_CARD -> System.out.print("Card activated\n");
             case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player\n");
-            case MANAGE_CARD -> System.out.print("It's next player turn to choice\n");
             case END_CARD -> System.out.print("End card\n");
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
-            case CHOOSE_BATTERY -> System.out.print("How many double engines do you want to use? ");
+            case CHOOSE_BATTERY -> System.out.print("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or 1 to land on one of the planets");
 
         }
@@ -346,7 +363,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
             case PickedTile ptl -> System.out.println(ptl.getDescription());
-            case Card c -> System.out.println(c.getName() + ",level: " + c.getLevel() + "\n");
+            case Card c -> System.out.println("Card: " + c.getName() + ",level: " + c.getLevel() + "\n");
             case Cargos c -> printCargos(c.getCargos());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
@@ -354,7 +371,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
             case DoubleEngineNumber den -> System.out.println("You have " + den.getNum() + " double engines \n");
+            case DoubleCannonNumber den -> System.out.println("You have " + den.getNum() + " double cannons \n");
             case PlanetsBlock pb -> printPlanets(pb.getPlanets());
+            case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strenght, " + "You have " + es.getPlayerStrenght() + " fire strenght without double cannons \n" );
             default -> {}
         }
     }
@@ -362,7 +381,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private void printPlanets(ArrayList<Planet> planets) {
         System.out.print("Here are the planets you can choose from:\n");
         for (int i = 0; i < planets.size(); i++) {
-            System.out.println("planet : " + (i+1)  );
+            System.out.println("planet : " + i  );
             if(planets.get(i).isBusy()){
                 System.out.print(" Busy " );
             }else{

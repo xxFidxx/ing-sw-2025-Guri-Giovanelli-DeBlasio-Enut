@@ -19,11 +19,9 @@ public enum GameState {
     ABANDONED_STATION_STOP,
     PLANETS_STOP,
     DRAW_CARD,
-    ACTIVATE_CARD,
     CHOOSE_PLAYER,
     CHOOSE_PLANETS,
     WAIT_PLAYER,
-    MANAGE_CARD,
     NONE_ACTIVATE,
     CRAFTING_ENDED,
     CARGO_VIEW,
@@ -31,7 +29,9 @@ public enum GameState {
     PLAYER_COLOR,
     END_CARD,
     SHOW_PLAYER,
+    SHOW_ENEMY,
     CHOOSE_BATTERY,
+    CHOOSE_CANNON,
     END_GAME,
     }
 

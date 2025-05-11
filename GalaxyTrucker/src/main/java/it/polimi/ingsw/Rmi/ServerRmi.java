@@ -152,11 +152,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.acceptCard(listener);
     }
 
-    @Override
-    public void rejectCard() throws RemoteException{
-        controller.rejectCard();
-    }
-
 //    @Override
 //    public void printSpaceship(VirtualViewRmi client) {
 //        ClientListener listener = clientListeners.get(client);
