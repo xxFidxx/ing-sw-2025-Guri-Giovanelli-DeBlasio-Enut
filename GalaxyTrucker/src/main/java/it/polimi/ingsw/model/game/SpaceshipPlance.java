@@ -110,6 +110,11 @@ public class SpaceshipPlance {
     }
 
     public void updateLists() {
+        cannons.clear();
+        //engines.clear();
+        cabins.clear();
+        cargoHolds.clear();
+        shieldGenerators.clear();
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 ComponentTile tile = components[i][j];
@@ -322,8 +327,8 @@ public class SpaceshipPlance {
 
     public void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
 
-
-        if (cargoIndex1 >= 0 && cargoIndex1 < cargoHolds.size() && cargoIndex2 >= 0 && cargoIndex2 < cargoHolds.size()) {
+        // il +1 è dato dal fatto che noi in posizione 0 simuliamo avere i rewards
+        if (cargoIndex1 >= 0 && cargoIndex1 < goodsContainers.size() && cargoIndex2 >= 0 && cargoIndex2 < goodsContainers.size()) {
 
             GoodsContainer cargo1 = goodsContainers.get(cargoIndex1);
             GoodsContainer cargo2 = goodsContainers.get(cargoIndex2);

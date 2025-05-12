@@ -50,6 +50,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException ;
 
+    void endCargoManagement(VirtualViewRmi clientRmi) throws RemoteException ;
+
     void chargeCannons(VirtualViewRmi clientRmi, ArrayList<Integer> chosenIndices) throws RemoteException;
 
     void rotateClockwise(VirtualViewRmi clientRmi) throws RemoteException;

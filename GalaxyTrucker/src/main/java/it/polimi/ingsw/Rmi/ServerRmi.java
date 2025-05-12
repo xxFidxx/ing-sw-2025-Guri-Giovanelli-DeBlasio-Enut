@@ -194,6 +194,12 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
+    public void endCargoManagement(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.endCargoManagement(listener);
+    }
+
+    @Override
     public void chargeCannons(VirtualViewRmi clientRmi, ArrayList<Integer> chosenIndices) throws RemoteException{
         ClientListener listener = clientListeners.get(clientRmi);
         controller.chargeCannons(listener, chosenIndices);
