@@ -416,6 +416,9 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = players.getFirst();
+                if(currentPlayer.hasResponded()){
+                    fromChargeToManage();
+                }
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
                     if(e instanceof DoubleEngine) {
@@ -423,6 +426,7 @@ public class Controller implements EventListenerInterface {
                     }
                 }
                 if(numDE > 0) {
+                    currentPlayer.setResponded(true);
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersBattery(l, numDE);
                 } else {
@@ -446,8 +450,10 @@ public class Controller implements EventListenerInterface {
                     notifyAllListeners(eventCrafter(GameState.END_CARD, null));
                 }
                 currentPlayer = players.getFirst();
+
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard,currentPlanetsCard.getPlanets())) {
+
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersPlanets(l);
                 } else {
