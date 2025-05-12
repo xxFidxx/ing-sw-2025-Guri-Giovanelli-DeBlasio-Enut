@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
+import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.Planet;
@@ -106,14 +107,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         server.endCrafting(this);
                     } catch (Exception e) {
                         System.out.print("Error " + e.getMessage() + "\n");
-                        e.printStackTrace();
                     }
                 }else{
                     try {
                         server.pickTile(this, Integer.parseInt(input));
                     } catch (Exception e) {
                         System.out.print("Error " + e.getMessage() + "\n");
-                        e.printStackTrace();
                     }
                 }
             }
@@ -245,6 +244,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
 
                     case "3" -> {
+                        server.endCargoManagement(this);
                         System.out.print("Cargo management ended:\n");
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
@@ -318,11 +318,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 inputValid = true;
                             } catch (ControllerExceptions e) {
                                 System.out.println(e.getMessage());
-                                e.printStackTrace();
                             } catch (NumberFormatException e) {
                             System.out.print("Error " + e.getMessage() + " please type a number \n");
-                            } catch (Exception e) {
+                            } catch (CargoManagementException e) {
+                                System.out.println(e.getMessage());
+                                inputValid = true;
+                            }catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -351,7 +354,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     server.checkStorage(this);
                 } catch (Exception e){
                     System.out.print("Error " + e.getMessage());
-                    e.printStackTrace();
                 }
             }
             case CARGO_VIEW -> System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
@@ -417,10 +419,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private void printPlanets(ArrayList<Planet> planets) {
         System.out.print("Here are the planets you can choose from:\n");
         for (int i = 0; i < planets.size(); i++) {
-            System.out.println("planet : " + i  );
             if(planets.get(i).isBusy()){
-                System.out.print(" Busy " );
+                System.out.println("Busy planet : " + i  );
             }else{
+                System.out.println("Planet : " + i  );
                 GoodsBlock[] blocks = planets.get(i).getReward();
                 for(int j = 0; j < blocks.length; j++){
                 System.out.printf(" ["+ blocks[j].getValue() + "] ");
@@ -428,6 +430,35 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.print("\n");}
         }
         System.out.print("\n");
+    }
+
+    private void printCargos(ArrayList<GoodsContainer> cargos) {
+        System.out.println("Here are the cargos you can choose from: (cargo number 0 is the reward one)");
+        System.out.println("--------------------------------------------------");
+
+        for (int i = 0; i < cargos.size(); i++) {
+            GoodsContainer container = cargos.get(i);
+            GoodsBlock[] blocks = container.getGoods();
+
+            if(i==0){
+                String header = String.format("%sReward Cargo %d:",
+                        container.isSpecial() ? "Special " : "", i);
+                System.out.print(header);
+            }else {
+                String header = String.format("%sCargo %d:",
+                        container.isSpecial() ? "Special " : "", i);
+                System.out.print(header);
+            }
+            for (GoodsBlock block : blocks) {
+                String blockValue = (block != null) ?
+                        String.valueOf(block.getValue()) : " ";
+                System.out.printf(" [%2s]", blockValue);
+            }
+
+            System.out.println();
+        }
+        System.out.println("--------------------------------------------------");
+        System.out.println();
     }
 
     private void printDoubleCannons(ArrayList<DoubleCannon> doubleCannons) {
@@ -439,24 +470,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
     }
 
-    private void printCargos(ArrayList<GoodsContainer> cargos){
-        System.out.print("Here are the cargos you can choose from: the cargo number 0 is the reward one\n> ");
-        for(int i = 0; i < cargos.size(); i++){
-            GoodsBlock[] blocks = cargos.get(i).getGoods();
-            String isSpecial;
-            if(cargos.get(i).isSpecial())
-                isSpecial = "Special";
-            else
-                isSpecial = "";
-
-            System.out.printf(isSpecial + i + ": ");
-            for(int j = 0; j < blocks.length; j++){
-                System.out.printf("["+ blocks[j].getValue() + "] ");
-            }
-            System.out.print("  ");
-        }
-        System.out.println("\n");
-    }
 
 
     public void printPickableTiles(Integer[] tiles){

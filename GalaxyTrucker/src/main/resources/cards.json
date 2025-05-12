@@ -13,15 +13,6 @@
     "level": 1
   },
   {
-    "type": "SlaversCard",
-    "name": "Slavers",
-    "level": 1,
-    "cannonStrength": 6,
-    "lostDays": 1,
-    "lostCrew": 3,
-    "reward": 5
-  },
-  {
     "type": "PlanetsCard",
     "name": "Planets",
     "level": 1,
@@ -32,6 +23,15 @@
       [3, 0, 0, 0],
       [3, 1]
     ]
+  },
+  {
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 1,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
   },
   {
     "type": "SmugglersCard",
