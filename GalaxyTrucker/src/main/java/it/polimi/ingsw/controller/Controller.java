@@ -196,6 +196,13 @@ public class Controller implements EventListenerInterface {
             case CHOOSE_CANNON -> {
                 event = new Event(this, state, (DoubleCannonList) data);
             }
+            case ADJUST_SHIP -> {
+                event = new Event(this, state, (DataString) data);
+            }
+
+            case SELECT_SHIP -> {
+                event = new Event(this, state, (DataString) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -603,12 +610,19 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-    public void handleCraftingEnded(){
+    public void handleCraftingEnded() {
 
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
         String[] boardView = handleBoardView();
-        notifyAllListeners(eventCrafter(GameState.TURN_START, boardView));
-        drawCard();
+        players = game.getPlayers();
+        for (Player p : players) {
+            ClientListener l = listenerbyPlayer.get(p);
+            if (p.getSpaceshipPlance().checkCorrectness())
+                l.onEvent(eventCrafter(GameState.TURN_START, boardView));
+            else{
+                printSpaceshipAdjustment(l);
+            }
+        }
     }
 
     private String[] handleBoardView() {
@@ -642,7 +656,7 @@ public class Controller implements EventListenerInterface {
             // Creazione della lista di GoodsContainer
             ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
 
-            goodsContainers.add(new GoodsContainer(playerReward, false));
+            goodsContainers.add(new GoodsContainer(playerReward, true));
 
             for (CargoHolds cargo : playerCargos) {
                 GoodsBlock[] goods = cargo.getGoods();
@@ -697,6 +711,13 @@ public class Controller implements EventListenerInterface {
             String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToString();
             DataString ds = new DataString(complete_ship);
             listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
+    }
+
+    public void printSpaceshipAdjustment(ClientListener listener) {
+            Player player = playerbyListener.get(listener);
+            String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringAdjustments();
+            DataString ds = new DataString(complete_ship);
+            listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds));
     }
 
     public void endCard(ClientListener listener) {
@@ -827,5 +848,27 @@ public class Controller implements EventListenerInterface {
         listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
     }
 
+    public void removeAdjust(ClientListener listener, int xIndex, int yIndex) {
+        Player player = playerbyListener.get(listener);
+        int stumps = player.getSpaceshipPlance().remove(xIndex, yIndex);
+
+        if(stumps > 1)
+            printSpaceship(listener);
+        else
+            printSpaceshipParts(listener);
+    }
+
+    private void printSpaceshipParts(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+            String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringParts();
+            DataString ds = new DataString(complete_ship);
+            listener.onEvent(eventCrafter(GameState.SELECT_SHIP, ds));
+    }
+
+    public void selectShipPart(ClientListener listener, int part) {
+        Player player = playerbyListener.get(listener);
+        player.getSpaceshipPlance().selectPart(part);
+        printSpaceship(listener);
+    }
 }
 

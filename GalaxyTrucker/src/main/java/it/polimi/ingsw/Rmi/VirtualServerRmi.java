@@ -22,7 +22,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void pickTile(VirtualViewRmi clientRmi, int input) throws RemoteException;
 
-    void drawCard(VirtualViewRmi clientRmi) throws RemoteException;
+    void drawCard() throws RemoteException;
 
     void checkStorage(VirtualViewRmi clientRmi) throws Exception;
 
@@ -55,4 +55,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void chargeCannons(VirtualViewRmi clientRmi, ArrayList<Integer> chosenIndices) throws RemoteException;
 
     void rotateClockwise(VirtualViewRmi clientRmi) throws RemoteException;
+
+    void removeAdjust(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException;
+
+    void selectShipPart(VirtualViewRmi clientRmi, int part) throws RemoteException;
 }

@@ -29,8 +29,6 @@ public class SpaceshipPlance {
     private ArrayList<GoodsContainer> goodsContainers;
 
 
-
-
     public SpaceshipPlance() {
         this.components = new ComponentTile[5][7];
         this.reserveSpot = new ArrayList<>();
@@ -61,10 +59,10 @@ public class SpaceshipPlance {
                 ConnectorType.UNIVERSAL,   // Lato inferiore
                 ConnectorType.UNIVERSAL    // Lato sinistro
         };
-        components[2][3] = new Cabin(cannonConnectors,true,-1);
+        components[2][3] = new Cabin(cannonConnectors, true, -1);
     }
 
-    public void setGoodsContainers(ArrayList<GoodsContainer> goodsContainers){
+    public void setGoodsContainers(ArrayList<GoodsContainer> goodsContainers) {
         this.goodsContainers = goodsContainers;
     }
 
@@ -87,7 +85,7 @@ public class SpaceshipPlance {
         return false;
     }
 
-    private void initVisited(){
+    private void initVisited() {
         // Imposta visited a false
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
@@ -96,7 +94,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void initShownComponents(){
+    private void initShownComponents() {
         // Imposta shownComponents a -1
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
@@ -149,20 +147,20 @@ public class SpaceshipPlance {
         }
     }
 
-    private void removeIslands(){
+    private void removeIslands() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
-                if(!visited[i][j]){
+                if (!visited[i][j]) {
                     components[i][j] = null;
                 }
             }
         }
     }
 
-    public void selectPart(int iteration){
+    public void selectPart(int iteration) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
-                if(shownComponents[i][j] != iteration){
+                if (shownComponents[i][j] != iteration) {
                     components[i][j] = null;
                 }
             }
@@ -171,15 +169,31 @@ public class SpaceshipPlance {
 
     public boolean checkCorrectness() {
         initVisited();
-        dfsCorrectness(2, 3); // per ora parto dal centro
-        return true;
+        dfsCorrectness(3, 2); // per ora parto dal centro
+        removeIslands();
+        boolean correct = true;
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                ComponentTile tile = components[i][j];
+                if (tile != null) {
+                    if (!tile.isWellConnected()) {
+                        correct = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return correct;
     }
 
-    private void dfsCorrectness(int x, int y){
+    private void dfsCorrectness(int x, int y) {
 
         // visita tutti le tile in profondità e dice se sono connesse bene
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x) ||
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
                 components[y][x] == null || visited[y][x]) {
+            System.out.println("x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y, x) ||\n" +
+                    "                components[y][x] == null || visited[y][x])");
             return;
         }
 
@@ -187,65 +201,70 @@ public class SpaceshipPlance {
         visited[y][x] = true;
 
         //sopra destra sotto sinistra
-        int[] dirx ={0, 1, 0, -1};
-        int[] diry ={1, 0, -1, 0};
+        int[] dirx = {0, 1, 0, -1};
+        int[] diry = {-1, 0, 1, 0};
 
-        // caso deafualt, nel costruttore abbiamo WellConnected a true di deafult
+        // caso default, nel costruttore abbiamo WellConnected a true di default
         ConnectorType[] connectors = tile.getConnectors();
 
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             int x2 = x + dirx[i];
             int y2 = y + diry[i];
 
-            if(connectors[i] != ConnectorType.SMOOTH){
+            if (connectors[i] != ConnectorType.SMOOTH) {
                 ComponentTile tile2 = components[y2][x2];
 
                 //controllo se il connettore è un engine puntato verso una direzione diversa da sud
-                if(i!=2 && connectors[i] == ConnectorType.ENGINE)
+                if (i != 2 && connectors[i] == ConnectorType.ENGINE)
                     tile.setWellConnected(false);
 
-                if(tile2 !=null){
+                if (tile2 != null) {
                     ConnectorType[] connectors2 = tile2.getConnectors();
 
-                    if(i == 2 && connectors[i] == ConnectorType.ENGINE){
+                    if (i == 2 && connectors[i] == ConnectorType.ENGINE) {
                         tile.setWellConnected(false);
                         tile2.setWellConnected(false);
                     }
 
 
-                    if(connectors[i] == ConnectorType.CANNON)
+                    if (connectors[i] == ConnectorType.CANNON)
                         tile2.setWellConnected(false);
                     // per ogni connettore confronto quello della cella adiacente opposto, se è gia a false perchè è engine non entro
-                    if(tile.isWellConnected() && (!checkConnection(connectors[i], connectors2[(i+2)%4]))){
+                    if (tile.isWellConnected() && (checkConnection(connectors[i], connectors2[(i + 2) % 4]))) {
                         tile.setWellConnected(false);
                     }
                     dfsCorrectness(x2, y2);
                 }
-            }
+                else
+                    System.out.println("else (tile2 != null) {");
+            }else
+                System.out.println("else (connectors[i] != ConnectorType.SMOOTH) {");
         }
     }
 
 
-    public void remove(int x,int y){
+    public int remove(int x, int y) {
         initShownComponents();
         initVisited();
         components[y][x] = null;
-
-        int[] dirx ={0, 1, 0, -1};
-        int[] diry ={1, 0, -1, 0};
+        int realIterations = 0;
+        int[] dirx = {0, 1, 0, -1};
+        int[] diry = {1, 0, -1, 0};
 
         // fai partire il dfs dalle 4 caselle adiacenti al pezzo rimosso
-        for(int i=0; i< 4; i++){
-            dfsRemove(x + dirx[i] ,y + diry[i],i);
+        for (int i = 0; i < 4; i++) {
+            realIterations += dfsRemove(x + dirx[i], y + diry[i], i);
         }
+
+        return realIterations;
     }
 
 
-    private void dfsRemove(int x, int y, int iteration){
+    private int dfsRemove(int x, int y, int iteration) {
 
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x) ||
+        if (x < 0 || x > 6 || y < 0 || y > 4 ||
                 components[y][x] == null || visited[y][x]) {
-            return;
+            return 0;
         }
 
         ComponentTile tile = components[y][x];
@@ -254,57 +273,64 @@ public class SpaceshipPlance {
         shownComponents[y][x] = iteration;
 
         //sopra destra sotto sinistra
-        int[] dirx ={0, 1, 0, -1};
-        int[] diry ={1, 0, -1, 0};
+        int[] dirx = {0, 1, 0, -1};
+        int[] diry = {1, 0, -1, 0};
 
-        // caso deafualt, nel costruttore abbiamo WellConnected a true di deafult
+        // caso default, nel costruttore abbiamo WellConnected a true di default
         ConnectorType[] connectors = tile.getConnectors();
 
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             int x2 = x + dirx[i];
             int y2 = y + diry[i];
 
-            if(connectors[i] != ConnectorType.SMOOTH){
+            if (connectors[i] != ConnectorType.SMOOTH) {
                 ComponentTile tile2 = components[y2][x2];
 
 
-                if(tile2 !=null){
+                if (tile2 != null) {
                     ConnectorType[] connectors2 = tile2.getConnectors();
-                    if((checkConnection(connectors[i], connectors2[(i+2)%4]))){
-                        dfsRemove(x2, y2,iteration);
+                    if ((checkConnection(connectors[i], connectors2[(i + 2) % 4]))) {
+                        dfsRemove(x2, y2, iteration);
                     }
 
                 }
             }
         }
+        return 1;
     }
 
 
     private boolean checkConnection(ConnectorType connector, ConnectorType connector2) {
 
 
-        if(connector == ConnectorType.CANNON || connector2 == ConnectorType.CANNON)
+        if (connector == ConnectorType.CANNON || connector2 == ConnectorType.CANNON)
             return false;
 
-        if(connector == ConnectorType.ENGINE || connector2 == ConnectorType.ENGINE)
+        if (connector == ConnectorType.ENGINE || connector2 == ConnectorType.ENGINE)
             return false;
 
         // se c'è un universale ora è sicuramente true perchè abbiamo già controllato cannoni ed engine
-        if(connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH)
+        if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH){
+            System.out.println("if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH)");
             return true;
+        }
 
-        if(connector == ConnectorType.SINGLE && connector2 == ConnectorType.SINGLE)
+        if (connector == ConnectorType.SINGLE && connector2 == ConnectorType.SINGLE){
+            System.out.println("if (connector == ConnectorType.SINGLE && connector2 != ConnectorType.SINGLE)");
             return true;
+        }
 
-        if(connector == ConnectorType.DOUBLE && connector2 == ConnectorType.DOUBLE)
+        if (connector == ConnectorType.DOUBLE && connector2 == ConnectorType.DOUBLE){
+            System.out.println("if (connector == ConnectorType.DOUBLE && connector2 != ConnectorType.DOUBLE)");
             return true;
+        }
 
 
         return false;
     }
 
 
-    public void countFigures(){
+    public void countFigures() {
         for (Cabin cabin : cabins) {
             Figure[] figures = cabin.getFigures();
             for (Figure figure : figures) {
@@ -325,7 +351,7 @@ public class SpaceshipPlance {
         return !cargoHolds.isEmpty();
     }
 
-    public void handleSwap(int cargoIndex1,int cargoIndex2,int goodIndex1,int goodIndex2) throws CargoManagementException{
+    public void handleSwap(int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) throws CargoManagementException {
 
         // il +1 è dato dal fatto che noi in posizione 0 simuliamo avere i rewards
         if (cargoIndex1 >= 0 && cargoIndex1 < goodsContainers.size() && cargoIndex2 >= 0 && cargoIndex2 < goodsContainers.size()) {
@@ -338,7 +364,7 @@ public class SpaceshipPlance {
                 GoodsBlock good2 = cargo2.getGoods()[goodIndex2];
 
 
-                if (checkSpecialGoods(cargo1,cargo2,good1,good2))
+                if (checkSpecialGoods(cargo1, cargo2, good1, good2))
                     swapGoods(cargo1, cargo2, goodIndex1, goodIndex2);
                 else
                     throw new CargoManagementException("Can't put a Red block in grey cargo");
@@ -350,36 +376,36 @@ public class SpaceshipPlance {
         }
     }
 
-    public void handleRemove( int cargoIndex, int goodIndex) throws CargoManagementException{
+    public void handleRemove(int cargoIndex, int goodIndex) throws CargoManagementException {
 
         if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
             GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
-            if(goodIndex >= 0 && goodIndex < cargo1.getGoods().length) {
+            if (goodIndex >= 0 && goodIndex < cargo1.getGoods().length) {
                 removeGoods(cargo1, goodIndex);
-            }else
+            } else
                 throw new CargoManagementException("goods index is outbound");
         } else
             throw new CargoManagementException("cargo index is outbound");
     }
 
-    public void handleAdd(GoodsBlock[] cardReward,int cargoIndex,int goodIndex,int rewardIndex) throws CargoManagementException{
+    public void handleAdd(GoodsBlock[] cardReward, int cargoIndex, int goodIndex, int rewardIndex) throws CargoManagementException {
 
-        if(cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
+        if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
             GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
-            if(goodIndex >= 0 && goodIndex < cargo1.getGoods().length && rewardIndex>=0 && rewardIndex < cardReward.length) {
+            if (goodIndex >= 0 && goodIndex < cargo1.getGoods().length && rewardIndex >= 0 && rewardIndex < cardReward.length) {
                 GoodsBlock good1 = cargo1.getGoods()[goodIndex];
                 GoodsBlock good2 = cardReward[rewardIndex];
                 if (good1 == null) {
-                    if (checkSpecialGoods(cargo1,good2))
-                        addGoods(cargo1,cardReward,goodIndex,rewardIndex);
+                    if (checkSpecialGoods(cargo1, good2))
+                        addGoods(cargo1, cardReward, goodIndex, rewardIndex);
                     else
                         throw new CargoManagementException("Can't put a Red block in grey cargo");
                 } else {
                     throw new CargoManagementException("You can't add a good on a busy spot");
                 }
-            }else
+            } else
                 throw new CargoManagementException("At least one goods index is outbound");
-        }else
+        } else
             throw new CargoManagementException("cargo index is outbound");
     }
 
@@ -395,7 +421,7 @@ public class SpaceshipPlance {
     }
 
     private boolean checkSpecialGoods(GoodsContainer cargo1, GoodsContainer cargo2, GoodsBlock good1, GoodsBlock good2) {
-        if ((good1.getType() == RED && !cargo2.isSpecial()) || (good2.getType() == RED && !cargo1.isSpecial()))
+        if ((((good1 != null) && good1.getType() == RED && !cargo2.isSpecial())) || (((good2 != null) && good2.getType() == RED && !cargo1.isSpecial())))
             return false;
 
         return true;
@@ -408,54 +434,53 @@ public class SpaceshipPlance {
             return false;
 
         return true;
-
     }
 
     private void removeGoods(GoodsContainer cargo1, int j1) {
         cargo1.getGoods()[j1] = null;
     }
 
-    private void addGoods(GoodsContainer cargo1,GoodsBlock[] cardReward,int j1, int k){
+    private void addGoods(GoodsContainer cargo1, GoodsBlock[] cardReward, int j1, int k) {
         cargo1.getGoods()[j1] = cardReward[k];
         cardReward[k] = null;
     }
 
     public void looseGoods(int lostOther) {
         int actualLost = 0;
-        if(getStorage() < lostOther)
+        if (getStorage() < lostOther)
             actualLost = getStorage();
         else
             actualLost = lostOther;
 
         ArrayList<GoodsContainer> playerCargos = goodsContainers;
 
-        for(int i = 0; i< actualLost; i++) {
-            int i1=0; // indice cargo
-            int j1=0; // indice good
+        for (int i = 0; i < actualLost; i++) {
+            int i1 = 0; // indice cargo
+            int j1 = 0; // indice good
             if (i1 >= 0 && i1 < playerCargos.size()) {
                 GoodsContainer cargo1 = playerCargos.get(i1);
-                if(j1 >= 0 && j1 < cargo1.getGoods().length) {
+                if (j1 >= 0 && j1 < cargo1.getGoods().length) {
                     removeGoods(cargo1, j1);
-                }else
+                } else
                     System.out.println("goods index is outbound");
             } else
                 System.out.println("cargo index is outbound");
         }
     }
 
-    public ArrayList<CargoHolds> getCargoHolds(){
+    public ArrayList<CargoHolds> getCargoHolds() {
         return cargoHolds;
     }
 
-    public ComponentTile[][] getComponents(){
+    public ComponentTile[][] getComponents() {
         return components;
     }
 
-    public ArrayList<Engine> getEngines(){
+    public ArrayList<Engine> getEngines() {
         return engines;
     }
 
-    public ArrayList<Cannon> getCannons(){
+    public ArrayList<Cannon> getCannons() {
         return cannons;
     }
 
@@ -463,18 +488,18 @@ public class SpaceshipPlance {
         return cabins;
     }
 
-    public int getStorage(){
+    public int getStorage() {
         int total = 0;
-        for(CargoHolds c : cargoHolds){
-            for(GoodsBlock block: c.getGoods()) {
-                if(block != null)
+        for (CargoHolds c : cargoHolds) {
+            for (GoodsBlock block : c.getGoods()) {
+                if (block != null)
                     total++;
             }
         }
         return total;
     }
 
-    public int countExposedConnectors(){
+    public int countExposedConnectors() {
 
         exposedConnectors = 0;
         for (int y = 0; y < 4; y++) {
@@ -483,16 +508,16 @@ public class SpaceshipPlance {
 
                 if (tile != null) {
 
-                    int[] dirx ={0, 1, 0, -1};
-                    int[] diry ={1, 0, -1, 0};
+                    int[] dirx = {0, 1, 0, -1};
+                    int[] diry = {1, 0, -1, 0};
 
                     ConnectorType[] connectors = tile.getConnectors();
-                    for(int i = 0; i < connectors.length; i++){
-                        if(connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE){
+                    for (int i = 0; i < connectors.length; i++) {
+                        if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
                             int x2 = x + dirx[i];
                             int y2 = y + diry[i];
                             ComponentTile tile2 = components[y2][x2];
-                            if(tile2 == null)
+                            if (tile2 == null)
                                 exposedConnectors++;
                         }
                     }
@@ -524,7 +549,7 @@ public class SpaceshipPlance {
         // aggiungere prima i check per la posizione
         int max_lenght = 7;
         // casella da cui partire
-        int x=0, y=0;
+        int x = 0, y = 0;
         switch (direction) {
             case NORTH:
                 x = position - 4;
@@ -548,7 +573,7 @@ public class SpaceshipPlance {
 
         ComponentTile hit = components[y][x];
 
-        for(int i = 0; i<max_lenght || hit == null; i++){
+        for (int i = 0; i < max_lenght || hit == null; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
@@ -566,16 +591,16 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if(hit != null){
+        if (hit != null) {
             reserveSpot.add(hit);
-            remove(x,y);
+            remove(x, y);
         }
     }
 
-    public boolean checkProtection (Direction direction, int position) {
+    public boolean checkProtection(Direction direction, int position) {
         int max_lenght = 7;
         // casella da cui partire
-        int x=0, y=0;
+        int x = 0, y = 0;
         switch (direction) {
             case NORTH:
                 x = position - 4;
@@ -599,7 +624,7 @@ public class SpaceshipPlance {
 
         ComponentTile hit = components[y][x];
 
-        for(int i = 0; i<max_lenght || hit == null; i++){
+        for (int i = 0; i < max_lenght || hit == null; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
@@ -617,7 +642,7 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if((hit != null) && (cannons.contains(hit))){
+        if ((hit != null) && (cannons.contains(hit))) {
             return true;
         }
 
@@ -639,7 +664,7 @@ public class SpaceshipPlance {
 
     public ArrayList<Cabin> getConnectedCabins() {
         ArrayList<Cabin> connectedCabins = new ArrayList<>();
-        for (int y = 0; y < 4; y++){
+        for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 6; x++) {
                 ComponentTile tile = components[y][x];
                 if (tile instanceof Cabin) {
@@ -648,14 +673,14 @@ public class SpaceshipPlance {
                     int[] diry = {1, 0, -1, 0};
 
                     ConnectorType[] connectors = tile.getConnectors();
-                    for(int i = 0; i < connectors.length; i++){
+                    for (int i = 0; i < connectors.length; i++) {
                         // Se da quel lato c'è un connettore singolo/doppio/universale vuol dire che è collegato a un'altra casella. Controllo che sia anch'essa una nave
-                        if(connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE){
+                        if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
                             int x2 = x + dirx[i];
                             int y2 = y + diry[i];
                             ComponentTile tile2 = components[y2][x2];
                             if (tile2 instanceof Cabin)
-                                connectedCabins.add((Cabin)tile2);
+                                connectedCabins.add((Cabin) tile2);
                         }
                     }
                 }
@@ -677,27 +702,27 @@ public class SpaceshipPlance {
         return nPurpleAliens;
     }
 
-    public boolean askPlaceTile(){
+    public boolean askPlaceTile() {
         return true;
     }
 
-    public void placeTileReserveSpot(ComponentTile tile){
-        if(reserveSpot.size() < 2)
+    public void placeTileReserveSpot(ComponentTile tile) {
+        if (reserveSpot.size() < 2)
             reserveSpot.add(tile);
         else
             System.out.println("Full reserve spot");
     }
 
     public void placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
-        if(x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y,x))
+        if (x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y, x))
             throw new SpaceShipPlanceException("Outbound index");
-        else if(components[y][x] != null){
+        else if (components[y][x] != null) {
             throw new SpaceShipPlanceException("Already busy spot");
         }
         components[y][x] = tile;
     }
 
-    public void placeReserveToComponents(ComponentTile tile, int x, int y){
+    public void placeReserveToComponents(ComponentTile tile, int x, int y) {
         placeTileComponents(tile, x, y);
         reserveSpot.remove(tile);
     }
@@ -706,7 +731,7 @@ public class SpaceshipPlance {
     public boolean checkExposedConnector(Direction direction, int position) {
         int max_lenght = 7;
         // casella da cui partire
-        int x=0, y=0;
+        int x = 0, y = 0;
         switch (direction) {
             case NORTH:
                 x = position - 4;
@@ -730,7 +755,7 @@ public class SpaceshipPlance {
 
         ComponentTile hit = components[y][x];
 
-        for(int i = 0; i<max_lenght || hit == null; i++){
+        for (int i = 0; i < max_lenght || hit == null; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
@@ -750,7 +775,7 @@ public class SpaceshipPlance {
 
         ArrayList<ConnectorType> disallowedConnectors = new ArrayList<>(Arrays.asList(ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL));
 
-        if((hit != null) && (disallowedConnectors.contains(hit.getConnectors()[direction.ordinal()]))){
+        if ((hit != null) && (disallowedConnectors.contains(hit.getConnectors()[direction.ordinal()]))) {
             return true;
         }
 
@@ -782,8 +807,9 @@ public class SpaceshipPlance {
             for (int line = 0; line < 3; line++) {
                 for (int tileCol = 0; tileCol < cols; tileCol++) {
                     char[][] tileChars = tileCrafter(this.components[tileRow][tileCol]);
-                    if (edgeCases(tileRow, tileCol)) {result.append("   ");}
-                    else {
+                    if (edgeCases(tileRow, tileCol)) {
+                        result.append("   ");
+                    } else {
                         for (int c = 0; c < 3; c++) {
                             result.append(tileChars[line][c]);
                         }
@@ -796,7 +822,8 @@ public class SpaceshipPlance {
         return result.toString();
     }
 
-    private char[][] tileCrafter(ComponentTile tile){
+
+    private char[][] tileCrafter(ComponentTile tile) {
         char[][] lines = {
                 {'┌', '-', '┐'},
                 {'|', ' ', '|'},
@@ -821,14 +848,79 @@ public class SpaceshipPlance {
             boolean[] protection = ((ShieldGenerator) tile).getProtection();
             if (protection[0] && protection[1]) {
                 lines[0][2] = 'S';
-            }
-            else if (protection[1] && protection[2]) {
+            } else if (protection[1] && protection[2]) {
                 lines[2][2] = 'S';
-            }
-            else if (protection[2] && protection[3]) {
+            } else if (protection[2] && protection[3]) {
                 lines[2][0] = 'S';
+            } else {
+                lines[0][0] = 'S';
             }
-            else {
+        }
+
+        return lines;
+    }
+
+    public String tileGridToStringAdjustments() {
+        int rows = this.components.length;
+        int cols = this.components[0].length;
+        StringBuilder result = new StringBuilder();
+
+        result.append('\n');
+
+        for (int tileRow = 0; tileRow < rows; tileRow++) {
+            for (int line = 0; line < 3; line++) {
+                for (int tileCol = 0; tileCol < cols; tileCol++) {
+                    char[][] tileChars = tileCrafterAdjustments(this.components[tileRow][tileCol]);
+                    if (edgeCases(tileRow, tileCol)) {
+                        result.append("   ");
+                    } else {
+                        for (int c = 0; c < 3; c++) {
+                            result.append(tileChars[line][c]);
+                        }
+                    }
+                }
+                result.append('\n'); // End of one horizontal line across tile row
+            }
+        }
+
+        return result.toString();
+    }
+
+    private char[][] tileCrafterAdjustments(ComponentTile tile) {
+        char[][] lines = {
+                {'┌', '-', '┐'},
+                {'|', ' ', '|'},
+                {'└', '-', '┘'}
+        };
+
+        if (tile == null) return lines;
+
+        // centro
+        char center;
+        if (tile.isWellConnected())
+            center = TileSymbols.ASCII_TILE_SYMBOLS.get(tiletoString(tile));
+        else
+            center = 'X';
+
+        lines[1][1] = center;
+
+        // connettori
+        ConnectorType[] connectors = tile.getConnectors();
+        lines[0][1] = connectorToChar(connectors[0]);
+        lines[1][2] = connectorToChar(connectors[1]);
+        lines[2][1] = connectorToChar(connectors[2]);
+        lines[1][0] = connectorToChar(connectors[3]);
+
+        // scudo
+        if (tile instanceof ShieldGenerator) {
+            boolean[] protection = ((ShieldGenerator) tile).getProtection();
+            if (protection[0] && protection[1]) {
+                lines[0][2] = 'S';
+            } else if (protection[1] && protection[2]) {
+                lines[2][2] = 'S';
+            } else if (protection[2] && protection[3]) {
+                lines[2][0] = 'S';
+            } else {
                 lines[0][0] = 'S';
             }
         }
@@ -837,7 +929,7 @@ public class SpaceshipPlance {
     }
 
     private char connectorToChar(ConnectorType ct) {
-        switch (ct){
+        switch (ct) {
             case UNIVERSAL -> {
                 return TileSymbols.CONNECTOR_SYMBOLS.get("universal");
             }
@@ -931,5 +1023,49 @@ public class SpaceshipPlance {
 
     public ArrayList<ComponentTile> getReserveSpot() {
         return reserveSpot;
+    }
+
+
+    public String tileGridToStringParts() {
+        int rows = this.shownComponents.length;
+        int cols = this.shownComponents[0].length;
+        StringBuilder result = new StringBuilder();
+
+        result.append('\n');
+
+        for (int tileRow = 0; tileRow < rows; tileRow++) {
+            for (int line = 0; line < 3; line++) {
+                for (int tileCol = 0; tileCol < cols; tileCol++) {
+                    char[][] tileChars = tileCrafterParts(this.shownComponents[tileRow][tileCol]);
+                    if (edgeCases(tileRow, tileCol)) {
+                        result.append("   ");
+                    } else {
+                        for (int c = 0; c < 3; c++) {
+                            result.append(tileChars[line][c]);
+                        }
+                    }
+                }
+                result.append('\n'); // End of one horizontal line across tile row
+            }
+        }
+
+        return result.toString();
+    }
+
+
+    private char[][] tileCrafterParts(int tile) {
+        char[][] lines = {
+                {'┌', '-', '┐'},
+                {'|', ' ', '|'},
+                {'└', '-', '┘'}
+        };
+
+        if (tile == -1) return lines;
+
+        // centro
+        char center = (char) (tile + '0');
+        lines[1][1] = center;
+
+        return lines;
     }
 }

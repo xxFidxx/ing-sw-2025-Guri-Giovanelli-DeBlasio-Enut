@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static it.polimi.ingsw.Server.GameState.SELECT_SHIP;
+
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final VirtualServerRmi server;
     private volatile GameState currentState;
@@ -151,10 +153,61 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                     case "1" -> server.addReserveSpot(this);
                     case "2" -> server.putTileBack(this);
-                    case "3" -> server.drawCard(this);
+                    case "3" -> server.drawCard();
                     case "5" -> server.rotateClockwise(this);
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
+            }
+
+            case ADJUST_SHIP -> {
+                switch (input) {
+                    case "0" -> {
+                        boolean inputValid = false;
+                        while (!inputValid) {
+                            System.out.print("Insert coordinates of the tile you want to remove: x y (es. 1 2): ");
+                            String inputLine = scan.nextLine();
+
+                            try {
+                                String[] parts = inputLine.split(" ");
+                                if (parts.length == 2) {
+                                    int xIndex = Integer.parseInt(parts[0]);
+                                    int yIndex = Integer.parseInt(parts[1]);
+
+                                    try {
+                                        server.removeAdjust(this, xIndex, yIndex);
+                                        inputValid = true;
+                                    } catch (SpaceShipPlanceException e) {
+                                        System.out.println(e.getMessage() + ",please try again with valid coordinates");
+                                    }
+                                } else
+                                    System.out.println("Wrong input. You need 2 numbers divided by a space \n");
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                            } catch (SpaceShipPlanceException e) {
+                                System.out.println("SpaceShipPlanceException error " + e.getMessage());
+                            } catch (RemoteException e) {
+                                System.out.println("RemoteException error " + e.getMessage());
+                            }
+                        }
+                    }
+                    case "1" -> server.drawCard();
+                    default -> System.out.print("Not accepted input, please try again:\n");
+                }
+            }case SELECT_SHIP -> {
+                    boolean inputValid = false;
+                    while(!inputValid){
+                        try {
+                            int part = Integer.parseInt(input);
+                            try {
+                                server.selectShipPart(this, part);
+                                inputValid = true;
+                            } catch (Exception e) {
+                                System.out.print("Error " + e.getMessage() + "\n");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.print("Error " + e.getMessage() + " please type a number \n");
+                        }
+                    }
             }
             case SHOW_SHIP -> {
                 System.out.print("Not accepted input, please try again:\n");
@@ -346,6 +399,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ASSEMBLY -> System.out.print("List of available tiles: ");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
+            case ADJUST_SHIP -> System.out.print("Type 0 to remove a tile, type 1 to force draw card phase\n");
+            case SELECT_SHIP -> System.out.print("Type the number corresponding to ship part you want to keep\n");
             case SHOW_SHIP -> System.out.print("Here is your spaceship\n");
             case TURN_START -> System.out.print("Here is the flight plance\n");
             case DRAW_CARD -> System.out.print("This is the drawn card:\n");
