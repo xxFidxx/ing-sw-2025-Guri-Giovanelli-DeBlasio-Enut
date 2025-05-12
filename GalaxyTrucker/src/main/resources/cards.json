@@ -34,6 +34,14 @@
     "reward": 5
   },
   {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
+    "level": 1,
+    "lostDays": 1,
+    "requiredCrew": 5,
+    "reward": [2, 1]
+  },
+  {
     "type": "SmugglersCard",
     "name": "Smugglers",
     "level": 1,
@@ -82,14 +90,6 @@
       { "type": 0, "direction": 2 },
       { "type": 1, "direction": 2 }
     ]
-  },
-  {
-    "type": "AbandonedStationCard",
-    "name": "Abandoned Station",
-    "level": 1,
-    "lostDays": 1,
-    "requiredCrew": 5,
-    "reward": [2, 1]
   },
   {
     "type": "EpidemicCard",

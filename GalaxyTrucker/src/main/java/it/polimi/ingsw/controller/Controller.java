@@ -194,7 +194,7 @@ public class Controller implements EventListenerInterface {
                 event = new Event(this, state, (EnemyStrenght) data);
             }
             case CHOOSE_CANNON -> {
-                event = new Event(this, state, (DoubleCannonNumber) data);
+                event = new Event(this, state, (DoubleCannonList) data);
             }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
@@ -373,13 +373,10 @@ public class Controller implements EventListenerInterface {
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
                 if (players.isEmpty()) {
-                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                    game.endTurn();
-                    ClientListener cl = listeners.getLast();
-                    drawCard();
+                    resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 if (game.choosePlayer(currentAdventureCard, currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersPlayer(l);
@@ -391,11 +388,10 @@ public class Controller implements EventListenerInterface {
 
             case AbandonedStationCard asc -> {
                 if (players.isEmpty()) {
-                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                    game.endTurn();
+                    resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 if (game.choosePlayer(currentAdventureCard, currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersPlayer(l);
@@ -407,15 +403,10 @@ public class Controller implements EventListenerInterface {
 
             case OpenSpaceCard osc ->{
                 if (players.isEmpty()) {
-                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                    game.endTurn();
-                    for(ClientListener cl : listeners){
-                        endCard(cl);
-                    }
-                    drawCard();
+                    resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 if(currentPlayer.hasResponded()){
                     fromChargeToManage();
                 }
@@ -436,26 +427,28 @@ public class Controller implements EventListenerInterface {
 
             case SlaversCard sl -> {
                 if (players.isEmpty() || ((SlaversCard) currentAdventureCard).getFightOutcome(currentPlayer)==1) {
-                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-                    ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    endCard(l);
+                    resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
             case PlanetsCard pc -> {
                 if (players.isEmpty()) {
-                    notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+                    resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
                 game.orderPlayers();
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
+                if(currentPlayer.hasResponded()){
+                    players.remove(currentPlayer);
+                    manageCard();
+                }
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard,currentPlanetsCard.getPlanets())) {
+                    currentPlayer.setResponded(true);
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     handleWaitersPlanets(l);
                 } else {
@@ -470,7 +463,14 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-
+    public void resetShowAndDraw() {
+        notifyAllListeners(eventCrafter(GameState.END_CARD, null));
+        game.endTurn();
+        for(ClientListener cl : listeners){
+            endCard(cl);
+        }
+        drawCard();
+    }
 
     public void activateAbandonedShipCard(ClientListener listener) throws LobbyExceptions {
         Player p = playerbyListener.get(listener);
