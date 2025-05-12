@@ -207,5 +207,61 @@ public class Game {
             p.setReward(null);
         }
     }
+
+    public String getEndStats(){
+        rewardPlaces();
+        rewardCargo();
+        penalizeLostTiles();
+        rewardSpaceship();
+
+        ArrayList<Player> sortedList = new ArrayList<>(players);
+        sortedList.sort(Comparator.comparing(Player::getCredits));
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < sortedList.size(); i++) {
+            Player p = sortedList.get(i);
+            result.append((i + 1)).append(". ").append(p.getNickname()).append(" - ").append(p.getCredits()).append("\n");
+        }
+
+        return result.toString();
+    }
+
+    private void rewardSpaceship() {
+        ArrayList<Player> sortedList = new ArrayList<>(players);
+        int minExposed = sortedList.stream().mapToInt(p -> p.getSpaceshipPlance().countExposedConnectors()).min().getAsInt();
+        List<Player> winners = sortedList.stream().filter(p -> p.getSpaceshipPlance().countExposedConnectors() == minExposed).toList();
+
+        for(Player p: winners){
+            p.setCredits(p.getCredits() + 2);
+        }
+
+    }
+
+    private void penalizeLostTiles() {
+        for (Player p: players) {
+            int penalty = p.getSpaceshipPlance().getReserveSpot().size();
+            p.setCredits(p.getCredits() - penalty);
+        }
+    }
+
+    private void rewardCargo() {
+        for (Player p: players) {
+            for (CargoHolds c: p.getSpaceshipPlance().getCargoHolds()) {
+                for (int i=0; i < c.getCapacity(); i++) {
+                    GoodsBlock goodsBlock = c.getGoods()[i];
+                    if (goodsBlock == null) continue;
+                    p.setCredits(p.getCredits() + goodsBlock.getValue());
+                }
+            }
+        }
+    }
+
+    private void rewardPlaces() {
+        int amount = 5 - players.size();
+        for (Player p: players) {
+            p.setCredits(players.getLast().getCredits() + amount);
+            amount++;
+        }
+    }
 }
 

@@ -203,6 +203,10 @@ public class Controller implements EventListenerInterface {
             case SELECT_SHIP -> {
                 event = new Event(this, state, (DataString) data);
             }
+
+            case END_GAME -> {
+                event = new Event(this, state, (DataString) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -371,8 +375,9 @@ public class Controller implements EventListenerInterface {
             notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
             manageCard();
         }
-        else
-            notifyAllListeners(eventCrafter(GameState.END_GAME, null));
+        else {
+            notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
+        }
         cards.remove(currentAdventureCard);
     }
 

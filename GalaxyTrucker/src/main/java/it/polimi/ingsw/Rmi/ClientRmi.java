@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.Planet;
+import it.polimi.ingsw.model.resources.TileSymbols;
 
 
 import java.rmi.RemoteException;
@@ -395,7 +396,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case IDLE -> System.out.print("Type 0 to create a lobby");
             case LOBBY_PHASE -> System.out.print("Lobby available\nEnter nickname: ");
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
-            case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
+            case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!\n" + TileSymbols.symbolExplanation);
             case ASSEMBLY -> System.out.print("List of available tiles: ");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
@@ -419,6 +420,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_BATTERY -> System.out.print("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or 1 to land on one of the planets");
             case CHOOSE_CANNON -> System.out.print("Type 0 to not use double cannons or 1 to use them");
+            case END_GAME -> System.out.print("Game has ended, below are the stats:");
         }
         System.out.print("\n> ");
     }
