@@ -361,24 +361,28 @@ public class Controller implements EventListenerInterface {
     }
 
     public void drawCard() {
+        String[] boardView = handleBoardView();
+        notifyAllListeners(eventCrafter(GameState.TURN_START,boardView));
         List<AdventureCard> cards = game.getFlightPlance().getDeck().getCards();
-        currentAdventureCard = cards.getFirst();
-        String cardName = currentAdventureCard.getName();
-        int cardLevel = currentAdventureCard.getLevel();
-        Card card = new Card(cardName, cardLevel);
-        players = new ArrayList<>(game.getPlayers());
-        // aggiorniamo liste della nave prima di attivare la carta
-        for(Player player: players){
-            player.getSpaceshipPlance().updateLists();
-        }
-        if (cardName != null) {
-            notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
-            manageCard();
+        if(!cards.isEmpty()) {
+            currentAdventureCard = cards.getFirst();
+            String cardName = currentAdventureCard.getName();
+            int cardLevel = currentAdventureCard.getLevel();
+            Card card = new Card(cardName, cardLevel);
+            players = new ArrayList<>(game.getPlayers());
+            // aggiorniamo liste della nave prima di attivare la carta
+            for (Player player : players) {
+                player.getSpaceshipPlance().updateLists();
+            }
+            if (cardName != null) {
+                notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
+                manageCard();
+            }
+            cards.remove(currentAdventureCard);
         }
         else {
-            notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
-        }
-        cards.remove(currentAdventureCard);
+                notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
+            }
     }
 
     public void manageCard(){
@@ -388,7 +392,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = players.getFirst();
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     players.remove(currentPlayer);
@@ -404,7 +408,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = players.getFirst();
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     players.remove(currentPlayer);
@@ -420,7 +424,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = players.getFirst();
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
                     if(e instanceof DoubleEngine) {
@@ -442,7 +446,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = players.getFirst();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
                 players.remove(currentPlayer);
                 handleWaitersEnemy(l);
@@ -454,7 +458,7 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 game.orderPlayers();
-                currentPlayer = players.getLast();
+                currentPlayer = players.getFirst();
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard,currentPlanetsCard.getPlanets())) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
@@ -497,6 +501,8 @@ public class Controller implements EventListenerInterface {
         listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
         // manageCard();
     }
+
+
 
 
     public void handleWaitersPlayer(ClientListener listener){
@@ -589,9 +595,19 @@ public class Controller implements EventListenerInterface {
             }
         }
 
+        int realpos;
+
+        switch(pos){
+            case 0 -> realpos = 0;
+            case 1 -> realpos = 1;
+            case 2 -> realpos = 3;
+            case 3 -> realpos = 6;
+            default -> realpos = 7;
+        }
+
         Flightplance flightPlance = game.getFlightPlance();
         Player p = playerbyListener.get(listener);
-        flightPlance.getPlaceholderByPlayer(p).setPosizione(pos);
+        flightPlance.getPlaceholderByPlayer(p).setPosizione(realpos);
         String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
         listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor));
         game.orderPlayers();
@@ -617,6 +633,21 @@ public class Controller implements EventListenerInterface {
                 printSpaceshipAdjustment(l);
             }
         }
+
+        boolean allOk = true;
+        for (Player p : players) {
+            if(!p.getSpaceshipPlance().checkCorrectness()){
+                allOk = false;
+                break;
+            }
+        }
+
+        if(allOk){
+            game.orderPlayers();
+            players = game.getPlayers();
+            drawCard();
+        }
+
     }
 
     private String[] handleBoardView() {
@@ -701,17 +732,17 @@ public class Controller implements EventListenerInterface {
     }
 
     public void printSpaceship(ClientListener listener) {
-            Player player = playerbyListener.get(listener);
-            String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToString();
-            DataString ds = new DataString(complete_ship);
-            listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
+        Player player = playerbyListener.get(listener);
+        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToString();
+        DataString ds = new DataString(complete_ship);
+        listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
     }
 
     public void printSpaceshipAdjustment(ClientListener listener) {
-            Player player = playerbyListener.get(listener);
-            String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringAdjustments();
-            DataString ds = new DataString(complete_ship);
-            listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds));
+        Player player = playerbyListener.get(listener);
+        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringAdjustments();
+        DataString ds = new DataString(complete_ship);
+        listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds));
     }
 
     public void endCard(ClientListener listener) {
@@ -783,7 +814,6 @@ public class Controller implements EventListenerInterface {
         }
         else if(!player.getSpaceshipPlance().checkStorage()) {
             try {
-                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
                 throw new CargoManagementException("You got 0 storage space, you can't manage any good");
             } finally {
                 manageCard();
@@ -852,9 +882,9 @@ public class Controller implements EventListenerInterface {
 
     private void printSpaceshipParts(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-            String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringParts();
-            DataString ds = new DataString(complete_ship);
-            listener.onEvent(eventCrafter(GameState.SELECT_SHIP, ds));
+        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringParts();
+        DataString ds = new DataString(complete_ship);
+        listener.onEvent(eventCrafter(GameState.SELECT_SHIP, ds));
     }
 
     public void selectShipPart(ClientListener listener, int part) {

@@ -340,6 +340,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();;
                         boolean inputValid = false;
                         while (!inputValid) {
+                            System.out.print("Insert the index of double cannons to charge: ");
                             String line = scan.nextLine();
                             String[] parts = line.trim().split("\\s+");
                             inputValid = true;
@@ -352,9 +353,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     inputValid = false;
                                     break;
                                 }
+
                             }
-                            if(inputValid)
-                                server.chargeCannons(this, chosenIndices);
+                            if(inputValid){
+                                try{
+                                    server.chargeCannons(this, chosenIndices);
+                                } catch (Exception e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            }
                         }
                     }
                 }

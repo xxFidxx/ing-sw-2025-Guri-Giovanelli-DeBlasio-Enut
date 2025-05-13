@@ -423,16 +423,13 @@ public class SpaceshipPlance {
     private boolean checkSpecialGoods(GoodsContainer cargo1, GoodsContainer cargo2, GoodsBlock good1, GoodsBlock good2) {
         if ((((good1 != null) && good1.getType() == RED && !cargo2.isSpecial())) || (((good2 != null) && good2.getType() == RED && !cargo1.isSpecial())))
             return false;
-
         return true;
 
     }
 
     private boolean checkSpecialGoods(GoodsContainer cargo, GoodsBlock good) {
-
         if ((good.getType() == RED && !cargo.isSpecial()))
             return false;
-
         return true;
     }
 

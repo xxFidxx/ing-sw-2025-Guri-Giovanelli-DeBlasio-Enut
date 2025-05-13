@@ -214,7 +214,7 @@ public class Game {
         rewardSpaceship();
 
         ArrayList<Player> sortedList = new ArrayList<>(players);
-        sortedList.sort(Comparator.comparing(Player::getCredits));
+        sortedList.sort(Comparator.comparing(Player::getCredits).reversed());
 
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < sortedList.size(); i++) {
@@ -258,7 +258,7 @@ public class Game {
     private void rewardPlaces() {
         int amount = 5 - players.size();
         for (Player p: players) {
-            p.setCredits(players.getLast().getCredits() + amount);
+            p.setCredits(players.getFirst().getCredits() + amount);
             amount++;
         }
     }
