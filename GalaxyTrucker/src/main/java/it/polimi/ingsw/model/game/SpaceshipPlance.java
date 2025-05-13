@@ -17,7 +17,7 @@ public class SpaceshipPlance {
     private final ArrayList<ComponentTile> reserveSpot;
     private final ArrayList<CargoHolds> cargoHolds;
     private final ArrayList<Engine> engines;
-    private final ArrayList<Cannon> cannons;
+    private ArrayList<Cannon> cannons;
     private final ArrayList<Cabin> cabins;
     private boolean[][] visited;
     private int[][] shownComponents;
@@ -47,7 +47,15 @@ public class SpaceshipPlance {
                 new Engine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL}, 4),
                 new Engine(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.DOUBLE, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 5)
         ));
-
+        this.cannons = new ArrayList<>(List.of(
+                new DoubleCannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 6),
+                new DoubleCannon(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 7),
+                new DoubleCannon(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 8),
+                new Cannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 9),
+                new Cannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL}, 10),
+                new Cannon(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 11),
+                new Cannon(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 12)
+        ));
         this.nAstronauts = 0;
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;
@@ -108,7 +116,7 @@ public class SpaceshipPlance {
     }
 
     public void updateLists() {
-        cannons.clear();
+        //cannons.clear();
         //engines.clear();
         cabins.clear();
         cargoHolds.clear();

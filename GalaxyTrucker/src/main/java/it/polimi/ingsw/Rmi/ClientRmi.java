@@ -342,7 +342,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         while (!inputValid) {
                             System.out.print("Insert the index of double cannons to charge: ");
                             String line = scan.nextLine();
-                            String[] parts = line.trim().split("\\s+");
+                            String[] parts = line.trim().split(" ");
                             inputValid = true;
                             for (String part : parts) {
                                 try {
@@ -353,7 +353,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     inputValid = false;
                                     break;
                                 }
-
                             }
                             if(inputValid){
                                 try{
@@ -528,9 +527,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private void printDoubleCannons(ArrayList<DoubleCannon> doubleCannons) {
         System.out.print("Here are the double cannons you can choose from:\n");
         for (int i = 0; i < doubleCannons.size(); i++) {
-            System.out.println("DoubleCannon: " + i + ", power: ");
             float power = doubleCannons.get(i).getPower();
-            System.out.println(power + "\n");
+            System.out.println("DoubleCannon: " + i + ", power: " + power);
+            System.out.print("\n");
         }
     }
 

@@ -1,7 +1,10 @@
 package it.polimi.ingsw.model.componentTiles;
 
 
-public class Cannon extends ComponentTile {
+import java.io.Serializable;
+
+public class Cannon extends ComponentTile implements Serializable {
+    private static final long serialVersionUID = 1L;
     protected float power;
 
     public Cannon(ConnectorType[] connectors,int id) {

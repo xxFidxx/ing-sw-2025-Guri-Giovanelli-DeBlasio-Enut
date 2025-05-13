@@ -442,7 +442,7 @@ public class Controller implements EventListenerInterface {
             }
 
             case SlaversCard sl -> {
-                if (players.isEmpty() || ((SlaversCard) currentAdventureCard).getFightOutcome(currentPlayer)==1) {
+                if (players.isEmpty()) {
                     resetShowAndDraw();
                     return;
                 }
@@ -542,6 +542,7 @@ public class Controller implements EventListenerInterface {
                     }
                 }
                 DoubleCannonList dcl = new DoubleCannonList(doubleCannons);
+                System.out.println("DoubleCannonList: " + dcl);
                 l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcl));
             } else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -571,7 +572,10 @@ public class Controller implements EventListenerInterface {
             case SlaversCard sc -> {
                 ((SlaversCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
-                manageCard();
+                if(((SlaversCard) currentCastedCard).getFightOutcome(currentPlayer) == 1)
+                    resetShowAndDraw();
+                else
+                    manageCard();
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);
         }

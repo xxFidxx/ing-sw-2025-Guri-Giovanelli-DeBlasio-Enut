@@ -2,9 +2,10 @@ package it.polimi.ingsw.model.componentTiles;
 
 import it.polimi.ingsw.model.resources.TileSymbols;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public abstract class ComponentTile{
+public abstract class ComponentTile implements Serializable {
     private int id;
     protected ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...// ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
     private boolean isWellConnected;
