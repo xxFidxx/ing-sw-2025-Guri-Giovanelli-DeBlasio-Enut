@@ -486,7 +486,7 @@ public class Controller implements EventListenerInterface {
         AbandonedShipCard currentAbandonedShipCard = (AbandonedShipCard) currentAdventureCard;
         currentAbandonedShipCard.setActivatedPlayer(p);
         currentAdventureCard.activate();
-        manageCard();
+        resetShowAndDraw();
     }
 
     private void activateAbandonedStationCard(ClientListener listener) {
