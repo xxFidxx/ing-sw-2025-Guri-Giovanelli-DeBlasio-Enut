@@ -377,8 +377,9 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = players.getLast();
-                if (game.choosePlayer(currentAdventureCard, currentPlayer)) {
+                if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    players.remove(currentPlayer);
                     handleWaitersPlayer(l);
                 } else {
                     players.remove(currentPlayer);
@@ -392,8 +393,9 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = players.getLast();
-                if (game.choosePlayer(currentAdventureCard, currentPlayer)) {
+                if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    players.remove(currentPlayer);
                     handleWaitersPlayer(l);
                 } else {
                     players.remove(currentPlayer);
@@ -407,9 +409,6 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = players.getLast();
-                if(currentPlayer.hasResponded()){
-                    fromChargeToManage();
-                }
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
                     if(e instanceof DoubleEngine) {
@@ -417,10 +416,11 @@ public class Controller implements EventListenerInterface {
                     }
                 }
                 if(numDE > 0) {
-                    currentPlayer.setResponded(true);
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    players.remove(currentPlayer);
                     handleWaitersBattery(l, numDE);
                 } else {
+                    players.remove(currentPlayer);
                     fromChargeToManage();
                 }
             }
@@ -432,6 +432,7 @@ public class Controller implements EventListenerInterface {
                 }
                 currentPlayer = players.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
+                players.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
@@ -442,14 +443,10 @@ public class Controller implements EventListenerInterface {
                 }
                 game.orderPlayers();
                 currentPlayer = players.getLast();
-                if(currentPlayer.hasResponded()){
-                    players.remove(currentPlayer);
-                    manageCard();
-                }
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard,currentPlanetsCard.getPlanets())) {
-                    currentPlayer.setResponded(true);
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    players.remove(currentPlayer);
                     handleWaitersPlanets(l);
                 } else {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
@@ -477,29 +474,23 @@ public class Controller implements EventListenerInterface {
         AbandonedShipCard currentAbandonedShipCard = (AbandonedShipCard) currentAdventureCard;
         currentAbandonedShipCard.setActivatedPlayer(p);
         currentAdventureCard.activate();
-        notifyAllListeners(eventCrafter(GameState.END_CARD, null));
-        endCard(listener);
-        drawCard();
+        manageCard();
     }
+
     private void activateAbandonedStationCard(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         AbandonedStationCard currentAbandonedStationCard = (AbandonedStationCard) currentAdventureCard;
         currentAbandonedStationCard.setActivatedPlayer(p);
         currentAdventureCard.activate();
         listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
-        //endCard(listener);
-        //drawCard(listener);
+        // manageCard();
     }
-
-
 
 
     public void handleWaitersPlayer(ClientListener listener){
         for(ClientListener l: listeners){
             if(l == listener) {
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null));
-                Player p = playerbyListener.get(l);
-                p.setResponded(true);
             }
             else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -557,13 +548,11 @@ public class Controller implements EventListenerInterface {
             case OpenSpaceCard osc -> {
                 ((OpenSpaceCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
-                players.remove(currentPlayer);
                 manageCard();
             }
             case SlaversCard sc -> {
                 ((SlaversCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
-                players.remove(currentPlayer);
                 manageCard();
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);
@@ -700,7 +689,6 @@ public class Controller implements EventListenerInterface {
     }
 
     public void endCard(ClientListener listener) {
-        game.endTurn();
         Player player = playerbyListener.get(listener);
         ArrayList<Player> players = game.getPlayers();
         for(Player p: players){
@@ -772,7 +760,6 @@ public class Controller implements EventListenerInterface {
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
                 throw new CargoManagementException("You got 0 storage space, you can't manage any good");
             } finally {
-                players.remove(player);
                 manageCard();
             }
         }
