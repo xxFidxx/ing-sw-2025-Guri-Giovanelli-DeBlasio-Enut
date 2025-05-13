@@ -23,5 +23,77 @@
       [3, 0, 0, 0],
       [3, 1]
     ]
+  },
+  {
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 1,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
+  },
+  {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
+    "level": 1,
+    "lostDays": 1,
+    "requiredCrew": 5,
+    "reward": [2, 1]
+  },
+  {
+    "type": "SmugglersCard",
+    "name": "Smugglers",
+    "level": 1,
+    "cannonStrength": 4,
+    "lostDays": 1,
+    "lossMalus": 2,
+    "reward": [2, 1, 0]
+  },
+  {
+    "type": "PiratesCard",
+    "name": "Pirates",
+    "level": 1,
+    "cannonStrength": 5,
+    "lostDays": 1,
+    "shots": [
+      { "type": 0, "direction": 0 },
+      { "type": 1, "direction": 0 },
+      { "type": 0, "direction": 0 }
+    ],
+    "reward": 4
+  },
+  {
+    "type": "StardustCard",
+    "name": "Stardust",
+    "level": 1,
+    "lostDays": 1
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 }
+    ]
+  },
+  {
+    "type": "CombatZoneCard",
+    "name": "Combat Zone",
+    "level": 1,
+    "combatZoneType": 0,
+    "lostDays": 3,
+    "lostOther": 2,
+    "cannons": [
+      { "type": 0, "direction": 2 },
+      { "type": 1, "direction": 2 }
+    ]
+  },
+  {
+    "type": "EpidemicCard",
+    "name": "Epidemic",
+    "level": 2
   }
 ]
