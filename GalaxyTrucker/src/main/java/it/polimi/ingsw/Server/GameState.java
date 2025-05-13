@@ -33,6 +33,8 @@ public enum GameState {
     CHOOSE_BATTERY,
     CHOOSE_CANNON,
     END_GAME,
+    ADJUST_SHIP,
+    SELECT_SHIP
     }
 
 

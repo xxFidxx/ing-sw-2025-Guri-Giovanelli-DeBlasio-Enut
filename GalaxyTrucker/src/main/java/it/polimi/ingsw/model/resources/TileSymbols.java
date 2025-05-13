@@ -7,19 +7,42 @@ public class TileSymbols {
     public static final Map<String, Character> ASCII_TILE_SYMBOLS = new HashMap<>();
     public static final Map<String, Character> CONNECTOR_SYMBOLS = new HashMap<>();
 
+    public static String symbolExplanation =
+            """
+                    Tile Symbols:
+                    'C' – Cannon / Cabin
+                    'K' – DoubleCannon
+                    'E' – Engine
+                    'Y' – DoubleEngine
+                    'X' – StructuralModule
+                    'L' – LifeSupportSystem
+                    'S' – ShieldGenerator
+                    'H' – CargoHolds
+                    'B' – BatteryHolds
+                    'P' – PowerCenter
+                    
+                    Connector Symbols:
+                    '┼' – universal
+                    '─' – single
+                    '═' – double
+                    ' ' – smooth
+                    'C' – cannon
+                    'E' – engine
+                    """;
+
     static {
         ASCII_TILE_SYMBOLS.put("Cannon", 'C');
-        ASCII_TILE_SYMBOLS.put("DoubleCannon", 'D');
+        ASCII_TILE_SYMBOLS.put("DoubleCannon", 'K');
         ASCII_TILE_SYMBOLS.put("Engine", 'E');
-        ASCII_TILE_SYMBOLS.put("DoubleEngine", 'F');
-        ASCII_TILE_SYMBOLS.put("Cabin", 'K');
-        ASCII_TILE_SYMBOLS.put("CentralCabin", 'B');
-        ASCII_TILE_SYMBOLS.put("StructuralModule", 'S');
+        ASCII_TILE_SYMBOLS.put("DoubleEngine", 'Y');
+        ASCII_TILE_SYMBOLS.put("Cabin", 'C');
+        //ASCII_TILE_SYMBOLS.put("CentralCabin", 'K');
+        ASCII_TILE_SYMBOLS.put("StructuralModule", 'X');
         ASCII_TILE_SYMBOLS.put("LifeSupportSystem", 'L');
-        ASCII_TILE_SYMBOLS.put("ShieldGenerator", 'G');
+        ASCII_TILE_SYMBOLS.put("ShieldGenerator", 'S');
         ASCII_TILE_SYMBOLS.put("CargoHolds", 'H');
-        ASCII_TILE_SYMBOLS.put("BatteryHolds", 'T');
-        ASCII_TILE_SYMBOLS.put("PowerCenter", 'T');
+        ASCII_TILE_SYMBOLS.put("BatteryHolds", 'B');
+        ASCII_TILE_SYMBOLS.put("PowerCenter", 'P');
 
         CONNECTOR_SYMBOLS.put("universal", '┼'); // All directions
         CONNECTOR_SYMBOLS.put("single", '─');    // Horizontal single line

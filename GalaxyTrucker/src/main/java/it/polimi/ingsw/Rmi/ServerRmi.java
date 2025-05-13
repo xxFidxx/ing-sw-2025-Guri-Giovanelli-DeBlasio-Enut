@@ -111,8 +111,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.pickTile(listener, id);
     }
 
-    public void drawCard(VirtualViewRmi client) throws RemoteException {
-        ClientListener listener = clientListeners.get(client);
+    @Override
+    public void drawCard() throws RemoteException {
         controller.drawCard();
     }
 
@@ -209,6 +209,18 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void rotateClockwise(VirtualViewRmi clientRmi) throws RemoteException {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.rotateClockwise(listener);
+    }
+
+    @Override
+    public void removeAdjust(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.removeAdjust(listener, xIndex, yIndex);
+    }
+
+    @Override
+    public void selectShipPart(VirtualViewRmi clientRmi, int part) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.selectShipPart(listener, part);
     }
 }
 
