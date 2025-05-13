@@ -408,7 +408,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     players.remove(currentPlayer);
@@ -424,7 +424,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
                     if(e instanceof DoubleEngine) {
@@ -446,7 +446,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
                 players.remove(currentPlayer);
                 handleWaitersEnemy(l);
@@ -458,7 +458,7 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 game.orderPlayers();
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard,currentPlanetsCard.getPlanets())) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
