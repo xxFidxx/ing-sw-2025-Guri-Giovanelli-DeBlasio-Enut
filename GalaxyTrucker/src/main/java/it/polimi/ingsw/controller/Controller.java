@@ -653,18 +653,18 @@ public class Controller implements EventListenerInterface {
     private String[] handleBoardView() {
 
         Flightplance flightPlance = game.getFlightPlance();
-        Placeholder[] placeHolders = flightPlance.getSpots();
-
+        ArrayList<Player> players = game.getPlayers();
         String[] boardView = new String[18];
         Arrays.fill(boardView, "[]");
 
 
         // 3) Li “sparo” nella board in base alla loro posizione
-        for (Placeholder p : placeHolders) {
-            int pos = (p.getPosizione() % 18);
+        for(Player player: players){
+            Placeholder p = player.getPlaceholder();
+            int pos = (p.getPosizione()) % 18;
+            System.out.println("Posizione prima di stampare board " + pos);
             if (pos < 0) {
-                throw new IllegalStateException(
-                        "Placeholder in posizione negativa: " + pos);
+                pos = pos + 18;
             }
             // prendo solo la prima lettera di ogni enum
             boardView[pos] = ("[" +p.getColor().name().charAt(0) + "]");
