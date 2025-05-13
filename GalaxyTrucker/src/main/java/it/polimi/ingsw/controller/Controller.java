@@ -451,6 +451,16 @@ public class Controller implements EventListenerInterface {
                 players.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
+            case SmugglersCard sg ->{
+                if (players.isEmpty()) {
+                    resetShowAndDraw();
+                    return;
+                }
+                currentPlayer = players.getLast();
+                ClientListener l = listenerbyPlayer.get(currentPlayer);
+                players.remove(currentPlayer);
+                handleWaitersEnemy(l);
+            }
 
             case PlanetsCard pc -> {
                 if (players.isEmpty()) {
@@ -531,9 +541,9 @@ public class Controller implements EventListenerInterface {
     public void handleWaitersEnemy(ClientListener listener){
         for(ClientListener l: listeners) {
             if (l == listener) {
-                SlaversCard currentSlaversCard = (SlaversCard) currentAdventureCard;
+                EnemyCard currentEnemyCard = (EnemyCard) currentAdventureCard;
                 float playerFire = currentPlayer.getFireStrenght();
-                EnemyStrenght es = new EnemyStrenght(currentSlaversCard.getCannonStrength(), playerFire);
+                EnemyStrenght es = new EnemyStrenght(currentEnemyCard.getCannonStrength(), playerFire);
                 l.onEvent(eventCrafter(GameState.SHOW_ENEMY, es));
                 ArrayList<DoubleCannon> doubleCannons = new ArrayList<>();
                 for (Cannon c : currentPlayer.getSpaceshipPlance().getCannons()) {
@@ -542,7 +552,6 @@ public class Controller implements EventListenerInterface {
                     }
                 }
                 DoubleCannonList dcl = new DoubleCannonList(doubleCannons);
-                System.out.println("DoubleCannonList: " + dcl);
                 l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcl));
             } else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -576,6 +585,14 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                 else
                     manageCard();
+            }
+            case SmugglersCard sc ->{
+                ((SmugglersCard) currentCastedCard).setActivatedPlayer(currentPlayer);
+                currentAdventureCard.activate();
+                if (((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer) == 1){
+                    ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    l.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
+                }
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);
         }
