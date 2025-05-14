@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 
 public class Player {
@@ -212,9 +213,38 @@ public class Player {
         }
     }
 
+    private void removeGoodByValue(int value) {
+        ArrayList<CargoHolds> playerCargo = getSpaceshipPlance().getCargoHolds();
+
+        for(int i = 0; i< playerCargo.size(); i++) {
+            GoodsBlock[] goods = playerCargo.get(i).getGoods();
+            for(int j = 0; j < goods.length; j++) {
+                if((goods[j].getValue() == value)) {
+                    goods[j] = null;
+                    return;
+                }
+
+            }
+
+        }
+    }
+
     public void removeMostValuableCargo() {
-        // toglie le due merci piu importanti
-        // altrimenti toglie due batterie
+
+       ArrayList<CargoHolds> playerCargo = getSpaceshipPlance().getCargoHolds();
+       ArrayList<GoodsBlock> playergoods= new ArrayList<>();
+       for(int i = 0; i< playerCargo.size() ; i++) {
+           GoodsBlock[] goods = playerCargo.get(i).getGoods();
+           for(int j = 0; j < goods.length; j++) {
+                playergoods.add(goods[j]);
+           }
+       }
+        playergoods.sort(Comparator.comparingDouble(GoodsBlock::getValue).reversed());
+       GoodsBlock gb1 = playergoods.get(0);
+       GoodsBlock gb2 = playergoods.get(1);
+       removeGoodByValue(gb1.getValue());
+        removeGoodByValue(gb2.getValue());
+
     }
 
 
