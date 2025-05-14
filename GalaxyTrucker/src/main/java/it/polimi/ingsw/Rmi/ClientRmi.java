@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static it.polimi.ingsw.Server.GameState.SELECT_SHIP;
-
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final VirtualServerRmi server;
     private volatile GameState currentState;

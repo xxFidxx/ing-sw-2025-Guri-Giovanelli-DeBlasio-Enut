@@ -212,7 +212,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void removeAdjust(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException {
+    public void removeAdjust(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.removeAdjust(listener, xIndex, yIndex);
     }

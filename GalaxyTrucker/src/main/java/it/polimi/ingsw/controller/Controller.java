@@ -370,6 +370,8 @@ public class Controller implements EventListenerInterface {
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
             players = new ArrayList<>(game.getPlayers());
+
+
             // aggiorniamo liste della nave prima di attivare la carta
             for (Player player : players) {
                 player.getSpaceshipPlance().updateLists();
@@ -609,6 +611,8 @@ public class Controller implements EventListenerInterface {
             default -> realpos = 7;
         }
 
+        System.out.println("pos " + pos + "realpos " + realpos);
+
         Flightplance flightPlance = game.getFlightPlance();
         Player p = playerbyListener.get(listener);
         flightPlance.getPlaceholderByPlayer(p).setPosizione(realpos);
@@ -624,39 +628,54 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-    public void handleCraftingEnded() {
+    private void handleCraftingEnded() {
 
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
         String[] boardView = handleBoardView();
         players = game.getPlayers();
-        for (Player p : players) {
-            ClientListener l = listenerbyPlayer.get(p);
-            if (p.getSpaceshipPlance().checkCorrectness())
-                l.onEvent(eventCrafter(GameState.TURN_START, boardView));
-            else{
-                printSpaceshipAdjustment(l);
+
+        synchronized (isDonecrafting) {
+            for (ClientListener l : listeners) {
+                isDonecrafting.put(l, false);
             }
         }
 
+
         boolean allOk = true;
         for (Player p : players) {
+            ClientListener l = listenerbyPlayer.get(p);
             if(!p.getSpaceshipPlance().checkCorrectness()){
+                printSpaceshipAdjustment(l);
                 allOk = false;
-                break;
+            }else{
+                isDonecrafting.put(l, true);
+                printSpaceship(l);
             }
         }
 
         if(allOk){
             game.orderPlayers();
             players = game.getPlayers();
-            drawCard();
+                drawCard();
+            }else{ // for each already done client I send state to wait forthe ones who aren't done yet
+            isDonecrafting.entrySet().stream()
+                    .filter(Map.Entry::getValue)
+                    .forEach(entry -> {
+                        ClientListener l = entry.getKey();
+                        l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                    });
         }
 
     }
 
+    private boolean handleAdjustmentEnded(){
+        synchronized (isDonecrafting) {
+            return !isDonecrafting.containsValue(false);
+        }
+    }
+
     private String[] handleBoardView() {
 
-        Flightplance flightPlance = game.getFlightPlance();
         ArrayList<Player> players = game.getPlayers();
         String[] boardView = new String[18];
         Arrays.fill(boardView, "[]");
@@ -737,7 +756,7 @@ public class Controller implements EventListenerInterface {
 
     public void printSpaceship(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToString();
+        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringAdjustments();
         DataString ds = new DataString(complete_ship);
         listener.onEvent(eventCrafter(GameState.SHOW_SHIP, ds));
     }
@@ -874,14 +893,25 @@ public class Controller implements EventListenerInterface {
         listener.onEvent(eventCrafter(GameState.PICKED_TILE, new PickedTile(tile.toString())));
     }
 
-    public void removeAdjust(ClientListener listener, int xIndex, int yIndex) {
+    public void removeAdjust(ClientListener listener, int xIndex, int yIndex) throws SpaceShipPlanceException {
         Player player = playerbyListener.get(listener);
         int stumps = player.getSpaceshipPlance().remove(xIndex, yIndex);
 
-        if(stumps > 1)
-            printSpaceship(listener);
-        else
+        // se non c'è più di un troncone, faccio un check di correttezza: se è ok, allora sono apposto altrimenti ritorno nello stato di ShipAdjustment
+        if(stumps <= 1){
+            if(player.getSpaceshipPlance().checkCorrectness()) {
+                isDonecrafting.put(listener, true);
+                printSpaceship(listener);
+                if (handleAdjustmentEnded())
+                    drawCard();
+                else
+                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }else
+                printSpaceshipAdjustment(listener);
+        }
+        else{
             printSpaceshipParts(listener);
+        }
     }
 
     private void printSpaceshipParts(ClientListener listener) {
@@ -892,9 +922,18 @@ public class Controller implements EventListenerInterface {
     }
 
     public void selectShipPart(ClientListener listener, int part) {
-        Player player = playerbyListener.get(listener);
-        player.getSpaceshipPlance().selectPart(part);
-        printSpaceship(listener);
+        Player p = playerbyListener.get(listener);
+        p.getSpaceshipPlance().selectPart(part);
+        if(!p.getSpaceshipPlance().checkCorrectness()){
+            printSpaceshipAdjustment(listener);
+        }else{
+            isDonecrafting.put(listener,true);
+            printSpaceship(listener);
+            if(handleAdjustmentEnded())
+                drawCard();
+            else
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        }
     }
 }
 

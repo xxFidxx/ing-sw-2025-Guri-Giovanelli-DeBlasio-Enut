@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -27,6 +28,10 @@ public class SpaceshipPlance {
     private int nPurpleAliens;
     private int exposedConnectors;
     private ArrayList<GoodsContainer> goodsContainers;
+    private static final int ROWS = 5;
+    private static final int COLS = 7;
+    private static final int[] DIR_X = {0, 1, 0, -1};
+    private static final int[] DIR_Y = {-1, 0, 1, 0};
 
 
     public SpaceshipPlance() {
@@ -68,6 +73,8 @@ public class SpaceshipPlance {
                 ConnectorType.UNIVERSAL    // Lato sinistro
         };
         components[2][3] = new Cabin(cannonConnectors, true, -1);
+        ComponentTile tile = components[2][3];
+        tile.setWellConnected(true);
     }
 
     public void setGoodsContainers(ArrayList<GoodsContainer> goodsContainers) {
@@ -95,8 +102,8 @@ public class SpaceshipPlance {
 
     private void initVisited() {
         // Imposta visited a false
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
                 visited[i][j] = false;
             }
         }
@@ -104,8 +111,8 @@ public class SpaceshipPlance {
 
     private void initShownComponents() {
         // Imposta shownComponents a -1
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
                 shownComponents[i][j] = -1;
             }
         }
@@ -121,8 +128,8 @@ public class SpaceshipPlance {
         cabins.clear();
         cargoHolds.clear();
         shieldGenerators.clear();
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
                 ComponentTile tile = components[i][j];
 
                 if (tile != null) {
@@ -155,156 +162,346 @@ public class SpaceshipPlance {
         }
     }
 
-    private void removeIslands() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (!visited[i][j]) {
-                    components[i][j] = null;
-                }
+    private boolean inBounds(int x, int y) {
+        // Prima controlla i bound standard
+        boolean standardBounds = (x >= 0 && x < COLS && y >= 0 && y < ROWS);
+
+        // Poi verifica gli edge case specifici della forma
+        return standardBounds && !edgeCases(y, x);
+    }
+
+    private void clearVisited() {
+        for (int y = 0; y < ROWS; y++) {
+            for (int x = 0; x < COLS; x++) {
+                visited[y][x] = false;
             }
         }
     }
 
-    public void selectPart(int iteration) {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (shownComponents[i][j] != iteration) {
-                    components[i][j] = null;
-                }
+    private void removeUnvisited() {
+        for (int y = 0; y < ROWS; y++) {
+            for (int x = 0; x < COLS; x++) {
+                if (!visited[y][x]) components[y][x] = null;
             }
         }
     }
 
     public boolean checkCorrectness() {
         initVisited();
-        dfsCorrectness(3, 2); // per ora parto dal centro
-        removeIslands();
-        boolean correct = true;
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                ComponentTile tile = components[i][j];
-                if (tile != null) {
-                    if (!tile.isWellConnected()) {
-                        correct = false;
+        // prima guardo se la tile in 3 2 è null, se è null alllora faccio un doppio for dove cerco la prima tile libera, perchè vuol dire che sono nel caso in cui è stato rimosso
+        // il centro, per cui non incappo in isole, perchè nella fase iniziale si possono creare e li sicuramente il centro esiste
+        ComponentTile tile = components[2][3];
+        if(tile == null) {
+            int xStart = 0;
+            int yStart = 0;
+            for (int y = 0; y < ROWS; y++) {
+                for (int x = 0; x < COLS; x++) {
+                    if (components[y][x] != null) {
+                        xStart = x;
+                        yStart = y;
                         break;
                     }
                 }
             }
+            dfsExploration(xStart, yStart);
+        }else {
+            // 1. Fase di esplorazione: trova tutte le tile connesse alla cabina centrale
+            dfsExploration(3, 2); // Parte dalla posizione centrale
         }
-        return correct;
+
+
+        // 2. Rimozione immediata delle tile non connesse
+        removeUnvisitedTiles();
+
+        // 3. Fase di validazione: controlla le connessioni delle tile rimanenti
+        return validateRemainingTiles();
     }
 
-    private void dfsCorrectness(int x, int y) {
-
-        // visita tutti le tile in profondità e dice se sono connesse bene
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 ||
+    private void dfsExploration(int x, int y) {
+        if (!inBounds(x, y) || edgeCases(y, x) ||
                 components[y][x] == null || visited[y][x]) {
-            System.out.println("x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y, x) ||\n" +
-                    "                components[y][x] == null || visited[y][x])");
             return;
         }
 
-        ComponentTile tile = components[y][x];
         visited[y][x] = true;
 
-        //sopra destra sotto sinistra
-        int[] dirx = {0, 1, 0, -1};
-        int[] diry = {-1, 0, 1, 0};
+        int[] dirx = DIR_X;
+        int[] diry = DIR_Y;
+        ComponentTile tile = components[y][x];
 
-        // caso default, nel costruttore abbiamo WellConnected a true di default
-        ConnectorType[] connectors = tile.getConnectors();
+        for (int dir = 0; dir < 4; dir++) {
+            // Non seguire i connettori smooth
+            if (tile.getConnectors()[dir] == ConnectorType.SMOOTH) continue;
 
-        for (int i = 0; i < 4; i++) {
-            int x2 = x + dirx[i];
-            int y2 = y + diry[i];
-
-            if (connectors[i] != ConnectorType.SMOOTH) {
-                ComponentTile tile2 = components[y2][x2];
-
-                //controllo se il connettore è un engine puntato verso una direzione diversa da sud
-                if (i != 2 && connectors[i] == ConnectorType.ENGINE)
-                    tile.setWellConnected(false);
-
-                if (tile2 != null) {
-                    ConnectorType[] connectors2 = tile2.getConnectors();
-
-                    if (i == 2 && connectors[i] == ConnectorType.ENGINE) {
-                        tile.setWellConnected(false);
-                        tile2.setWellConnected(false);
-                    }
-
-
-                    if (connectors[i] == ConnectorType.CANNON)
-                        tile2.setWellConnected(false);
-                    // per ogni connettore confronto quello della cella adiacente opposto, se è gia a false perchè è engine non entro
-                    if (tile.isWellConnected() && (checkConnection(connectors[i], connectors2[(i + 2) % 4]))) {
-                        tile.setWellConnected(false);
-                    }
-                    dfsCorrectness(x2, y2);
-                }
-                else
-                    System.out.println("else (tile2 != null) {");
-            }else
-                System.out.println("else (connectors[i] != ConnectorType.SMOOTH) {");
+            int nx = x + dirx[dir];
+            int ny = y + diry[dir];
+            dfsExploration(nx, ny);
         }
     }
+
+    private void removeUnvisitedTiles() {
+        for (int y = 0; y < ROWS; y++) {
+            for (int x = 0; x < COLS; x++) {
+                if (!visited[y][x] || edgeCases(y, x)) {
+                    components[y][x] = null;
+                }
+            }
+        }
+    }
+
+    private boolean validateRemainingTiles() {
+        boolean allValid = true;
+
+        for (int y = 0; y < ROWS; y++) {
+            for (int x = 0; x < COLS; x++) {
+                ComponentTile tile = components[y][x];
+                if (tile != null) {
+                    boolean valid = isTileValid(x, y);
+                    tile.setWellConnected(valid);
+                    if (!valid) allValid = false;
+                }
+            }
+        }
+
+        return allValid;
+    }
+
+    private boolean isTileValid(int x, int y) {
+        ComponentTile tile = components[y][x];
+
+        // Controllo componenti speciali
+        if (tile instanceof Engine && !isEngineValid(y, x)) return false;
+        if (tile instanceof Cannon && !isCannonValid(y, x)) return false;
+
+
+        int[] dirx = DIR_X;
+        int[] diry = DIR_Y;  // dy: NORD, EST, SUD, OVEST
+
+        for (int dir = 0; dir < 4; dir++) {
+            int nx = x + dirx[dir];
+            int ny = y + diry[dir];
+
+            if (!inBounds(nx, ny) || components[ny][nx] == null) continue;
+
+            ConnectorType a = tile.getConnectors()[dir];
+            ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
+
+            if (!isConnectionValid(a, b)) return false;
+        }
+
+        return true;
+    }
+
+    private boolean isConnectionValid(ComponentTile tile, int direction, int nx, int ny) {
+        ConnectorType a = tile.getConnectors()[direction];
+
+        // Caso bordo o tile nulla
+        if (!inBounds(nx, ny)){
+            return a == ConnectorType.SMOOTH ||
+                    a == ConnectorType.ENGINE ||
+                    a == ConnectorType.CANNON;
+        }
+
+        ComponentTile adjTile = components[ny][nx];
+        if (adjTile == null) return false;
+
+        ConnectorType b = adjTile.getConnectors()[(direction + 2) % 4];
+
+        // Logica di connessione
+        if (a == ConnectorType.SMOOTH) return b == ConnectorType.SMOOTH;
+        if (b == ConnectorType.SMOOTH) return false;
+
+        // Casi speciali
+        if (a == ConnectorType.ENGINE || a == ConnectorType.CANNON) return false;
+        if (b == ConnectorType.ENGINE || b == ConnectorType.CANNON) return false;
+
+        // Match esatto o universale
+        return a == b ||
+                a == ConnectorType.UNIVERSAL ||
+                b == ConnectorType.UNIVERSAL;
+    }
+
+    private boolean isTileWellConnected(int x, int y) {
+        ComponentTile tile = components[y][x];
+        if (tile == null) return true;
+
+        // 1. Controllo orientamento componenti speciali
+        if (tile instanceof Engine && !isEngineValid(y, x)) return false;
+        if (tile instanceof Cannon && !isCannonValid(y, x)) return false;
+
+        // 2. Controllo connessioni con tile adiacenti
+        int[] dx = DIR_X;
+        int[] dy = DIR_Y;
+
+        for (int dir = 0; dir < 4; dir++) {
+            int nx = x + dx[dir];
+            int ny = y + dy[dir];
+
+            if (!inBounds(nx, ny) || components[ny][nx] == null) {
+                continue; // Ignora connettori esposti (non invalidano)
+            }
+
+            ConnectorType a = tile.getConnectors()[dir];
+            ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
+
+            if (!isConnectionValid(a, b)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isConnectionValid(ConnectorType a, ConnectorType b) {
+        System.out.println(a.toString() + " " + b.toString());
+        boolean prova = true;
+        // Regole base di connessione (ignora i casi esposti)
+        if (a == ConnectorType.SMOOTH || b == ConnectorType.SMOOTH) {
+            prova = (a == b); // Entrambi smooth
+            System.out.println(prova);
+            return prova;
+        }
+
+        if (a == ConnectorType.ENGINE || b == ConnectorType.ENGINE) {
+            System.out.println(false);
+            return false; // Motori non si connettono
+        }
+
+        if (a == ConnectorType.CANNON || b == ConnectorType.CANNON) {
+            System.out.println(false);
+            return false; // Cannoni non si connettono
+        }
+
+        // Regole per connettori normali
+        prova =(a == ConnectorType.UNIVERSAL ||
+                b == ConnectorType.UNIVERSAL ||
+                a == b);
+        System.out.println(prova);
+        return prova;
+    }
+
+    private boolean isEngineValid(int y, int x) {
+        // Controlla solo orientamento e spazio dietro
+        return components[y][x].getConnectors()[2] == ConnectorType.ENGINE &&
+                (y + 1 >= 4 || components[y + 1][x] == null);
+    }
+
+    private boolean isCannonValid(int y, int x) {
+        // Controlla solo orientamento e spazio davanti
+        return components[y][x].getConnectors()[0] == ConnectorType.CANNON &&
+                (y - 1 < 0 || components[y - 1][x] == null);
+    }
+
+
+    public boolean checkNewTile(int x, int y) {
+        if (edgeCases(y, x) || !inBounds(x, y) || components[y][x] == null) {
+            return false;
+        }
+
+        ComponentTile tile = components[y][x];
+        boolean isValid = true;
+
+        // Controlla tutti e 4 i connettori
+        for (int dir = 0; dir < 4; dir++) {
+            int adjX = x + DIR_X[dir];
+            int adjY = y + DIR_Y[dir];
+
+            // Caso 1: Controllo speciale per ENGINE/CANNON
+            if (tile instanceof Engine && dir == 2) { // SOUTH
+                if (y + 1 < ROWS && components[y + 1][x] != null) {
+                    isValid = false;
+                }
+                continue;
+            }
+
+            if (tile instanceof Cannon && dir == 0) { // NORTH
+                if (y - 1 >= 0 && components[y - 1][x] != null) {
+                    isValid = false;
+                }
+                continue;
+            }
+
+            // Caso 2: Connessione con tile adiacente
+            if (inBounds(adjX, adjY) && !edgeCases(adjY, adjX)) {
+                ComponentTile adjTile = components[adjY][adjX];
+
+                if (adjTile != null) {
+                    ConnectorType current = tile.getConnectors()[dir];
+                    ConnectorType adjacent = adjTile.getConnectors()[(dir + 2) % 4];
+
+                    if (!isConnectionValid(current, adjacent)) {
+                        isValid = false;
+                    }
+                }
+            }
+        }
+
+        return isValid;
+    }
+
+
 
 
     public int remove(int x, int y) {
         initShownComponents();
         initVisited();
-        components[y][x] = null;
-        int realIterations = 0;
-        int[] dirx = {0, 1, 0, -1};
-        int[] diry = {1, 0, -1, 0};
+        if(components[y][x] == null)
+            throw new SpaceShipPlanceException("No tile in the index you provided, please retry");
 
-        // fai partire il dfs dalle 4 caselle adiacenti al pezzo rimosso
-        for (int i = 0; i < 4; i++) {
-            realIterations += dfsRemove(x + dirx[i], y + diry[i], i);
+        components[y][x] = null;
+
+        int[] dirx = DIR_X;
+        int[] diry = DIR_Y;
+        int partsFound = 0;
+
+        // Parte da tutte e 4 le direzioni con iterazioni diverse
+        for (int iteration = 0; iteration < 4; iteration++) {
+            int nx = x + dirx[iteration];
+            int ny = y + diry[iteration];
+
+            if (inBounds(nx, ny) && !edgeCases(ny, nx) && components[ny][nx] != null) {
+                partsFound += dfsRemove(nx, ny, iteration);
+            }
         }
 
-        return realIterations;
+        return partsFound;
     }
 
-
     private int dfsRemove(int x, int y, int iteration) {
-
-        if (x < 0 || x > 6 || y < 0 || y > 4 ||
-                components[y][x] == null || visited[y][x]) {
+        if (!inBounds(x, y) || edgeCases(y, x) || visited[y][x] || components[y][x] == null) {
             return 0;
         }
 
-        ComponentTile tile = components[y][x];
-        // per ogni casella mi segno se è stata visitata e quale iterazione (quindi troncone) appartiene
+        if(iteration == 0)
+            System.out.println(components[y][x]);
+
         visited[y][x] = true;
         shownComponents[y][x] = iteration;
+        int count = 1;
 
-        //sopra destra sotto sinistra
-        int[] dirx = {0, 1, 0, -1};
-        int[] diry = {1, 0, -1, 0};
+        int[] dirx = DIR_X;
+        int[] diry = DIR_Y;
+        ComponentTile tile = components[y][x];
 
-        // caso default, nel costruttore abbiamo WellConnected a true di default
-        ConnectorType[] connectors = tile.getConnectors();
+        for (int dir = 0; dir < 4; dir++) {
+            // Non seguire i connettori smooth
+            if (tile.getConnectors()[dir] == ConnectorType.SMOOTH) continue;
 
-        for (int i = 0; i < 4; i++) {
-            int x2 = x + dirx[i];
-            int y2 = y + diry[i];
+            int nx = x + dirx[dir];
+            int ny = y + diry[dir];
+            dfsRemove(nx, ny,iteration);
+        }
 
-            if (connectors[i] != ConnectorType.SMOOTH) {
-                ComponentTile tile2 = components[y2][x2];
+        return count;
+    }
 
-
-                if (tile2 != null) {
-                    ConnectorType[] connectors2 = tile2.getConnectors();
-                    if ((checkConnection(connectors[i], connectors2[(i + 2) % 4]))) {
-                        dfsRemove(x2, y2, iteration);
-                    }
-
+    public void selectPart(int iteration) {
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                if (shownComponents[i][j] != iteration) {
+                    components[i][j] = null;
                 }
             }
         }
-        return 1;
     }
 
 
@@ -513,8 +710,8 @@ public class SpaceshipPlance {
 
                 if (tile != null) {
 
-                    int[] dirx = {0, 1, 0, -1};
-                    int[] diry = {1, 0, -1, 0};
+                    int[] dirx = DIR_X;
+                    int[] diry = DIR_Y;
 
                     ConnectorType[] connectors = tile.getConnectors();
                     for (int i = 0; i < connectors.length; i++) {
@@ -674,8 +871,8 @@ public class SpaceshipPlance {
                 ComponentTile tile = components[y][x];
                 if (tile instanceof Cabin) {
 
-                    int[] dirx = {0, 1, 0, -1};
-                    int[] diry = {1, 0, -1, 0};
+                    int[] dirx = DIR_X;
+                    int[] diry = DIR_Y;
 
                     ConnectorType[] connectors = tile.getConnectors();
                     for (int i = 0; i < connectors.length; i++) {
@@ -719,12 +916,13 @@ public class SpaceshipPlance {
     }
 
     public void placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
-        if (x < 0 || x >= 6 || y < 0 || y >= 4 || edgeCases(y, x))
+        if (x < 0 || x > 6 || y < 0 || y > 4 || edgeCases(y, x))
             throw new SpaceShipPlanceException("Outbound index");
         else if (components[y][x] != null) {
             throw new SpaceShipPlanceException("Already busy spot");
         }
         components[y][x] = tile;
+        tile.setWellConnected(checkNewTile(x,y));
     }
 
     public void placeReserveToComponents(ComponentTile tile, int x, int y) {

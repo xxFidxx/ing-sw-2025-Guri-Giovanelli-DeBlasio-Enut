@@ -56,7 +56,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void rotateClockwise(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void removeAdjust(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException;
+    void removeAdjust(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException;
 
     void selectShipPart(VirtualViewRmi clientRmi, int part) throws RemoteException;
 }
