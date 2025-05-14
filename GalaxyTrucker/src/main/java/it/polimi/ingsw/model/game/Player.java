@@ -247,6 +247,10 @@ public class Player {
 
     }
 
+    public void handleRemoveCrew(){
+        ArrayList<CargoHolds> playerCabin = getSpaceshipPlance().getCargoHolds();
+    }
+
 
 }
 

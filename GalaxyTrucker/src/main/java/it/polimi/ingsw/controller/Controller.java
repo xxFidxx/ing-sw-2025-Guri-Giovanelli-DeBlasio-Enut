@@ -190,6 +190,11 @@ public class Controller implements EventListenerInterface {
             case CHOOSE_PLANETS -> {
                 event = new Event(this, state,new PlanetsBlock((ArrayList<Planet>) data));
             }
+
+            case CHOOSE_ALIEN -> {
+                event = new Event(this, state, (ListCabinAliens) data);
+            }
+
             case SHOW_ENEMY -> {
                 event = new Event(this, state, (EnemyStrenght) data);
             }
@@ -205,6 +210,10 @@ public class Controller implements EventListenerInterface {
             }
 
             case END_GAME -> {
+                event = new Event(this, state, (DataString) data);
+            }
+
+            case BYTILE_SHIP -> {
                 event = new Event(this, state, (DataString) data);
             }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
@@ -665,6 +674,7 @@ public class Controller implements EventListenerInterface {
                 printSpaceshipAdjustment(l);
                 allOk = false;
             }else{
+                p.getSpaceshipPlance().updateLists();
                 isDonecrafting.put(l, true);
                 printSpaceship(l);
             }
@@ -721,20 +731,28 @@ public class Controller implements EventListenerInterface {
             // Creazione della lista di GoodsContainer
             ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
 
-            goodsContainers.add(new GoodsContainer(playerReward, true));
+            goodsContainers.add(new GoodsContainer(playerReward, true,-1));
 
             for (CargoHolds cargo : playerCargos) {
                 GoodsBlock[] goods = cargo.getGoods();
-                goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial()));
+                goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
             }
 
             player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
+            printSpaceshipbyTile(listener,playerCargos.getFirst());
             listener.onEvent(new Event(this,GameState.CARGO_VIEW,new Cargos(goodsContainers)));
         }else {
             // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             throw new CargoManagementException("You got 0 storage space, you can't manage any good");
         }
+    }
+
+    private void  printSpaceshipbyTile(ClientListener listener, ComponentTile tile){
+        Player player = playerbyListener.get(listener);
+        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringTile(tile);
+        DataString ds = new DataString(complete_ship);
+        listener.onEvent(eventCrafter(GameState.BYTILE_SHIP, ds));
     }
 
     public void addGood(ClientListener listener,int cargoIndex, int goodIndex, int rewardIndex) {
@@ -917,6 +935,7 @@ public class Controller implements EventListenerInterface {
         // se non c'è più di un troncone, faccio un check di correttezza: se è ok, allora sono apposto altrimenti ritorno nello stato di ShipAdjustment
         if(stumps <= 1){
             if(player.getSpaceshipPlance().checkCorrectness()) {
+                player.getSpaceshipPlance().updateLists();
                 isDonecrafting.put(listener, true);
                 printSpaceship(listener);
                 if (handleAdjustmentEnded())
@@ -944,12 +963,46 @@ public class Controller implements EventListenerInterface {
         if(!p.getSpaceshipPlance().checkCorrectness()){
             printSpaceshipAdjustment(listener);
         }else{
+            p.getSpaceshipPlance().updateLists();
             isDonecrafting.put(listener,true);
             printSpaceship(listener);
             if(handleAdjustmentEnded())
                 drawCard();
             else
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        }
+    }
+
+    private void chooseAliens(){
+        for(ClientListener l: listeners){
+            Player p = playerbyListener.get(l);
+            ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
+            boolean brown = false;
+            boolean purple = false;
+            ArrayList <CabinAliens> cabinAliens = new ArrayList <>();
+            boolean atLeastOneSupport = false;
+            for(Cabin c: cabins){
+                AlienColor[]  lifeSupportSystemColors = c.getLifeSupportSystemColor();
+                if(Arrays.stream(lifeSupportSystemColors)
+                        .anyMatch(s -> s == AlienColor.BROWN)){
+                    brown = true;
+                    atLeastOneSupport = true;
+                }
+
+                if(Arrays.stream(lifeSupportSystemColors)
+                        .anyMatch(s -> s == AlienColor.PURPLE)){
+                    purple = true;
+                    atLeastOneSupport = true;
+                }
+                cabinAliens.add(new CabinAliens(c,brown,purple));
+            }
+
+
+            if(!cabinAliens.isEmpty()){
+                l.onEvent(eventCrafter(GameState.CHOOSE_ALIEN, new ListCabinAliens(cabinAliens)));
+            }else{
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }
         }
     }
 }

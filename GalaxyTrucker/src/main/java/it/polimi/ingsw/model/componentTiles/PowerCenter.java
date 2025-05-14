@@ -5,18 +5,16 @@ import it.polimi.ingsw.model.bank.BatteryToken;
 import java.util.Arrays;
 
 public class PowerCenter extends ComponentTile {
-    private BatteryToken[] batteries;
+    private boolean[] batteries;
 
     public PowerCenter(ConnectorType[] connectors, int capacity, int id) {
         super(connectors,id);
+        batteries = new boolean[capacity];
+        Arrays.fill(batteries, true);
     }
 
-    public BatteryToken[] getBatteries() {
+    public boolean[] getBatteries() {
         return batteries;
-    }
-
-    public void setBatteries(BatteryToken[] batteries){
-        this.batteries = batteries;
     }
 
     @Override

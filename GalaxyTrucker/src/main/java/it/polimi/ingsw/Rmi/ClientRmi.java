@@ -407,6 +407,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ADJUST_SHIP -> System.out.print("Type 0 to remove a tile, type 1 to force draw card phase\n");
             case SELECT_SHIP -> System.out.print("Type the number corresponding to ship part you want to keep\n");
             case SHOW_SHIP -> System.out.print("Here is your spaceship\n");
+            case BYTILE_SHIP -> System.out.print("Here is your spaceship with ids of interested tiles\n");
+            case CHOOSE_ALIEN -> System.out.print("Here are your cabins list with their relatives ids, choose in the elegible ones if you want to get an alien\n");
             case TURN_START -> System.out.print("Here is the flight plance\n");
             case DRAW_CARD -> System.out.print("This is the drawn card:\n");
             case CARGO_MANAGEMENT -> {
@@ -506,8 +508,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         container.isSpecial() ? "Special " : "", i);
                 System.out.print(header);
             }else {
-                String header = String.format("%sCargo %d:",
-                        container.isSpecial() ? "Special " : "", i);
+                String header = String.format("%sCargo %d id %d:",
+                        container.isSpecial() ? "Special " : "", i, container.getId());
                 System.out.print(header);
             }
             for (GoodsBlock block : blocks) {

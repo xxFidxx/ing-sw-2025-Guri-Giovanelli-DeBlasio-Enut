@@ -8,13 +8,19 @@ public class GoodsContainer implements Serializable {
     private static final long serialVersionUID = 1L;
     private GoodsBlock[] goods;
     private boolean isSpecial;
-    public GoodsContainer(GoodsBlock[] goods, boolean isSpecial) {
+    int id;
+    public GoodsContainer(GoodsBlock[] goods, boolean isSpecial, int id) {
         this.goods = goods;
         this.isSpecial = isSpecial;
+        this.id = id;
     }
 
     public GoodsBlock[] getGoods() {
         return goods;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public boolean isSpecial() {

@@ -173,6 +173,8 @@ public class Game {
         player.getSpaceshipPlance().handleRemove(cargoIndex,goodIndex);
     }
 
+
+
     public void endTurn(){
         resetResponded();
         resetRewards();

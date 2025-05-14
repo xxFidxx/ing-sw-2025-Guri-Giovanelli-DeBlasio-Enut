@@ -34,7 +34,7 @@ public enum GameState {
     CHOOSE_CANNON,
     END_GAME,
     ADJUST_SHIP,
-    SELECT_SHIP
+    BYTILE_SHIP, CHOOSE_ALIEN, SELECT_SHIP
     }
 
 

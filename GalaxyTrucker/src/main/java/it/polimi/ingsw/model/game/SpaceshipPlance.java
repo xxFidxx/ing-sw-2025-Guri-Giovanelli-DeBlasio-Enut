@@ -144,7 +144,22 @@ public class SpaceshipPlance {
                         }
                         case Cabin cab -> {
                             cabins.add(cab);
-
+                            if(cab.isCentral()){
+                                for (int dir = 0; dir < 4; dir++) {
+                                    int[] dirx = DIR_X;
+                                    int[] diry = DIR_Y;
+                                    int nx = i + dirx[dir];
+                                    int ny = j + diry[dir];
+                                    if (inBounds(nx, ny) && !edgeCases(ny, nx) && components[ny][nx] != null) {
+                                        ComponentTile tile2 = components[nx][ny];
+                                        if(tile2 instanceof LifeSupportSystem){
+                                            // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente
+                                            AlienColor[] colors = cab.getLifeSupportSystemColor();
+                                            colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
+                                        }
+                                    }
+                                }
+                            }
                         }
                         case CargoHolds ch -> {
                             cargoHolds.add(ch);
@@ -1268,6 +1283,78 @@ public class SpaceshipPlance {
         // centro
         char center = (char) (tile + '0');
         lines[1][1] = center;
+
+        return lines;
+    }
+
+    public String tileGridToStringTile(ComponentTile tileToShow) {
+        int rows = this.components.length;
+        int cols = this.components[0].length;
+        StringBuilder result = new StringBuilder();
+
+        result.append('\n');
+
+        for (int tileRow = 0; tileRow < rows; tileRow++) {
+            for (int line = 0; line < 3; line++) {
+                for (int tileCol = 0; tileCol < cols; tileCol++) {
+                    char[][] tileChars = tileCrafterbyTile(this.components[tileRow][tileCol],tileToShow );
+                    if (edgeCases(tileRow, tileCol)) {
+                        result.append("   ");
+                    } else {
+                        for (int c = 0; c < 3; c++) {
+                            result.append(tileChars[line][c]);
+                        }
+                    }
+                }
+                result.append('\n'); // End of one horizontal line across tile row
+            }
+        }
+
+        return result.toString();
+    }
+
+    private char[][] tileCrafterbyTile(ComponentTile tile, ComponentTile tileToShow) {
+        char[][] lines = {
+                {'┌', '-', '┐'},
+                {'|', ' ', '|'},
+                {'└', '-', '┘'}
+        };
+
+        if(tile != null)
+            System.out.println(tile.getClass().equals(tileToShow.getClass()));
+
+        if (tile == null ) return lines;
+
+        // centro
+        if(tile.getClass().equals(tileToShow.getClass())){
+            System.out.println("centro = " + String.valueOf(tile.getId()).charAt(0));
+            char center = String.valueOf(tile.getId()).charAt(0);
+            lines[1][1] = center;
+        }else{
+            char center = TileSymbols.ASCII_TILE_SYMBOLS.get(tiletoString(tile));
+            lines[1][1] = center;
+        }
+
+        // connettori
+        ConnectorType[] connectors = tile.getConnectors();
+        lines[0][1] = connectorToChar(connectors[0]);
+        lines[1][2] = connectorToChar(connectors[1]);
+        lines[2][1] = connectorToChar(connectors[2]);
+        lines[1][0] = connectorToChar(connectors[3]);
+
+        // scudo
+        if (tile instanceof ShieldGenerator) {
+            boolean[] protection = ((ShieldGenerator) tile).getProtection();
+            if (protection[0] && protection[1]) {
+                lines[0][2] = 'S';
+            } else if (protection[1] && protection[2]) {
+                lines[2][2] = 'S';
+            } else if (protection[2] && protection[3]) {
+                lines[2][0] = 'S';
+            } else {
+                lines[0][0] = 'S';
+            }
+        }
 
         return lines;
     }

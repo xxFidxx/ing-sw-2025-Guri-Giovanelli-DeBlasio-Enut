@@ -1,5 +1,5 @@
 package it.polimi.ingsw.model.componentTiles;
 
-public enum AlienColor {
+public enum AlienColor{
     BROWN,PURPLE
 }
