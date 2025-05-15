@@ -36,6 +36,7 @@ public class Controller implements EventListenerInterface {
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
     private ArrayList<Player> players;
+    private boolean cargoended;
 
     public Controller() {
         this.game = null;
@@ -44,6 +45,7 @@ public class Controller implements EventListenerInterface {
         this.currentAdventureCard = null;
         this.currentPlayer = null;
         this.players = null;
+        this.cargoended=false;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -403,7 +405,7 @@ public class Controller implements EventListenerInterface {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getFirst();
+                currentPlayer = players.getLast();
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     players.remove(currentPlayer);
@@ -415,7 +417,9 @@ public class Controller implements EventListenerInterface {
             }
 
             case AbandonedStationCard asc -> {
-                if (players.isEmpty()) {
+                if (players.isEmpty()||cargoended) {
+                    System.out.println("entrato");
+                    cargoended=false;
                     resetShowAndDraw();
                     return;
                 }
@@ -425,6 +429,7 @@ public class Controller implements EventListenerInterface {
                     players.remove(currentPlayer);
                     handleWaitersPlayer(l);
                 } else {
+                    System.out.println("else");
                     players.remove(currentPlayer);
                     manageCard();
                 }
@@ -463,13 +468,13 @@ public class Controller implements EventListenerInterface {
                 handleWaitersEnemy(l);
             }
             case SmugglersCard sg ->{
-                if (players.isEmpty()) {
+                if (players.isEmpty()||cargoended) {
+                    cargoended=false;
                     resetShowAndDraw();
                     return;
                 }
                 currentPlayer = players.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
-                players.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
@@ -519,8 +524,9 @@ public class Controller implements EventListenerInterface {
         AbandonedStationCard currentAbandonedStationCard = (AbandonedStationCard) currentAdventureCard;
         currentAbandonedStationCard.setActivatedPlayer(p);
         currentAdventureCard.activate();
+        cargoended=true;
         listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
-        // manageCard();
+
     }
 
 
@@ -602,8 +608,14 @@ public class Controller implements EventListenerInterface {
                 currentAdventureCard.activate();
                 if (((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer) == 1){
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    cargoended=true;
                     l.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
                 }
+                else {
+                    players.remove(currentPlayer);
+                    manageCard();
+                }
+
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);
         }
@@ -743,8 +755,15 @@ public class Controller implements EventListenerInterface {
             listener.onEvent(new Event(this,GameState.CARGO_VIEW,new Cargos(goodsContainers)));
         }else {
             // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
-            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
-            throw new CargoManagementException("You got 0 storage space, you can't manage any good");
+           // separiamo i casi per ogni tipo di carta per vedere se termina subito o passa agli altri player
+            try {
+                throw new CargoManagementException("You got 0 storage space, you can't manage any good");
+            }
+            finally {
+                endCargoManagement(listener);
+            }
+
+
         }
     }
 
