@@ -39,6 +39,7 @@ public class Controller implements EventListenerInterface {
     private int currentDiceThrow;
     private ArrayList<Player> tmpPlayers;
     private List<AdventureCard> cards;
+    private ArrayList<Player> defeatedPlayers;
 
     public Controller() {
         this.game = null;
@@ -49,6 +50,7 @@ public class Controller implements EventListenerInterface {
         this.players = null;
         this.cargoended=false;
         this.currentProjectile = null;
+        this.defeatedPlayers = null;
         cards = null;
     }
 
@@ -488,6 +490,7 @@ public class Controller implements EventListenerInterface {
             }
 
             case PiratesCard pc -> {
+                ArrayList<Projectile> shots = (ArrayList<Projectile>) List.of(((PiratesCard) currentAdventureCard).getShots());
                 if (tmpPlayers.isEmpty()) {
                     resetShowAndDraw();
                     return;
@@ -725,10 +728,47 @@ public class Controller implements EventListenerInterface {
                 }
             }
             case PiratesCard pc -> {
-
+                ((PiratesCard) currentCastedCard).setActivatedPlayer(currentPlayer);
+                currentAdventureCard.activate();
+                if(((PiratesCard) currentCastedCard).getFightOutcome(currentPlayer) == -1){
+                    defeatedPlayers.add(currentPlayer);
+                    //defeatedByPirates(currentPlayer);
+                }
+                else if(((PiratesCard) currentCastedCard).getFightOutcome(currentPlayer) == 0) {
+                    manageCard();
+                }
+                else{
+                    resetShowAndDraw();
+                }
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);
         }
+    }
+
+    public void defeatedByPirates(Player player){
+        ArrayList<Projectile> shots = (ArrayList<Projectile>) List.of(((PiratesCard) currentAdventureCard).getShots());
+        if(shots.isEmpty()){
+            ClientListener l = listenerbyPlayer.get(player);
+            l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            manageCard();
+        }
+        currentProjectile = shots.getFirst();
+        currentDiceThrow = game.throwDices();
+        int size = defeatedPlayers.size();
+        Player first = defeatedPlayers.get(0);
+        activateMeteor(first);
+        Player second = defeatedPlayers.get(1);
+        activateMeteor(second);
+        if(size >= 3) {
+            Player third = defeatedPlayers.get(2);
+            activateMeteor(third);
+            if (size == 4) {
+                Player fourth = defeatedPlayers.get(3);
+                activateMeteor(fourth);
+            }
+        }
+        shots.remove(currentProjectile);
+        defeatedByPirates(player);
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {

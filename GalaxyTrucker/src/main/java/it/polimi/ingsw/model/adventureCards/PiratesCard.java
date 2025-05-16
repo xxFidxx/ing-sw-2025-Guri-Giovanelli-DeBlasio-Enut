@@ -31,17 +31,11 @@ public class PiratesCard extends EnemyCard {
 
     @Override
     public void penalize(Player player) {
-        Game game = deck.getFlightPlance().getGame();
-        int position = game.throwDices();
-        Projectile first = shots[0];
-        if(first == null){
-            Projectile second = shots[1];
-            if(second == null){
-                Projectile third = shots[2];
-            }
-        } else {
-            shots[0] = null;
-        }
+
+    }
+
+    public Projectile[] getShots() {
+        return shots;
     }
 
     @Override
