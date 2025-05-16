@@ -35,6 +35,7 @@ public class Controller implements EventListenerInterface {
     private Player currentPlayer;
     private ArrayList<Player> players;
     private boolean cargoended;
+    private boolean piratesended;
     private Projectile currentProjectile;
     private int currentDiceThrow;
     private ArrayList<Player> tmpPlayers;
@@ -49,6 +50,7 @@ public class Controller implements EventListenerInterface {
         this.currentPlayer = null;
         this.players = null;
         this.cargoended=false;
+        this.piratesended=false;
         this.currentProjectile = null;
         this.defeatedPlayers = null;
         cards = null;
@@ -491,8 +493,9 @@ public class Controller implements EventListenerInterface {
 
             case PiratesCard pc -> {
                 ArrayList<Projectile> shots = (ArrayList<Projectile>) List.of(((PiratesCard) currentAdventureCard).getShots());
-                if (tmpPlayers.isEmpty()) {
-                    resetShowAndDraw();
+                if (tmpPlayers.isEmpty()||piratesended) {
+                    piratesended=false;
+                    defeatedByPirates();//resetandshowl lo metto in questo metodo
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
@@ -605,6 +608,11 @@ public class Controller implements EventListenerInterface {
                     }
                 }
                 player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+            }
+            case BigCannonShot bcs ->{
+                Direction direction = currentProjectile.getDirection();
+                player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentProjectile);
         }
@@ -738,19 +746,21 @@ public class Controller implements EventListenerInterface {
                     manageCard();
                 }
                 else{
-                    resetShowAndDraw();
+                    piratesended = true;
+                    manageCard();
+
                 }
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);
         }
     }
 
-    public void defeatedByPirates(Player player){
+    public void defeatedByPirates(){
         ArrayList<Projectile> shots = (ArrayList<Projectile>) List.of(((PiratesCard) currentAdventureCard).getShots());
-        if(shots.isEmpty()){
-            ClientListener l = listenerbyPlayer.get(player);
-            l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
-            manageCard();
+        if(shots.isEmpty()||defeatedPlayers.isEmpty()){
+            defeatedPlayers.clear();
+            resetShowAndDraw();
+            return;
         }
         currentProjectile = shots.getFirst();
         currentDiceThrow = game.throwDices();
@@ -768,8 +778,9 @@ public class Controller implements EventListenerInterface {
             }
         }
         shots.remove(currentProjectile);
-        defeatedByPirates(player);
+        defeatedByPirates();
     }
+
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
         if (isDone.get(listener))
