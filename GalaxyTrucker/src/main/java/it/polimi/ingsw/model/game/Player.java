@@ -10,7 +10,7 @@ import java.util.Comparator;
 
 public class Player {
         private String nickname;
-        private Placeholder placeholder;
+        final private Placeholder placeholder;
         private SpaceshipPlance spaceshipPlance;
         private int credits;
         private int numAstronauts;

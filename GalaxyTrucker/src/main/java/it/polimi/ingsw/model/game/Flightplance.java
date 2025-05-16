@@ -7,10 +7,10 @@ import java.net.URL;
 import java.util.*;
 
 public class  Flightplance {
-    private Placeholder[] spots;
+    final private Placeholder[] spots;
     private Deck deck;
-    private Game game;
-    private Map<Player, Placeholder> placeholderByPlayer; // Mappa giocatore -> placeholder
+    final private Game game;
+    final private Map<Player, Placeholder> placeholderByPlayer; // Mappa giocatore -> placeholder
 
     public Flightplance(int spots, Game game, ArrayList<Player> players) {
         this.spots = new Placeholder[spots];
@@ -19,9 +19,8 @@ public class  Flightplance {
         // Crea un placeholder per ogni giocatore e associalo al colore
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
-            Placeholder placeholder = new Placeholder(i);
-            placeholderByPlayer.put(player, placeholder);
-            this.spots[i] = placeholder;
+            placeholderByPlayer.put(player, player.getPlaceholder());
+            this.spots[i] = player.getPlaceholder();
         }
 //        try {
 //            List<AdventureCard> cards = AdventureCardFactory.loadCards(
