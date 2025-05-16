@@ -495,7 +495,7 @@ public class Controller implements EventListenerInterface {
                 ArrayList<Projectile> shots = (ArrayList<Projectile>) List.of(((PiratesCard) currentAdventureCard).getShots());
                 if (tmpPlayers.isEmpty()||piratesended) {
                     piratesended=false;
-                    defeatedByPirates();//resetandshowl lo metto in questo metodo
+                    defeatedByPirates();//reset and show lo metto in questo metodo
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
@@ -525,7 +525,8 @@ public class Controller implements EventListenerInterface {
             }
 
             case MeteorSwarmCard msc -> {
-                ArrayList<Projectile> meteors = (ArrayList<Projectile>) List.of(((MeteorSwarmCard) currentAdventureCard).getMeteors());
+                Projectile[] meteorArray = ((MeteorSwarmCard) currentAdventureCard).getMeteors();
+                ArrayList<Projectile> meteors = new ArrayList<>(Arrays.asList(meteorArray));
                 if(meteors.isEmpty()){
                     resetShowAndDraw();
                     return;
@@ -717,8 +718,10 @@ public class Controller implements EventListenerInterface {
             case SlaversCard sc -> {
                 ((SlaversCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
-                if(((SlaversCard) currentCastedCard).getFightOutcome(currentPlayer) == 1)
+
+                if(((SlaversCard) currentCastedCard).getFightOutcome(currentPlayer) == 1){
                     resetShowAndDraw();
+                }
                 else
                     manageCard();
             }
@@ -756,7 +759,8 @@ public class Controller implements EventListenerInterface {
     }
 
     public void defeatedByPirates(){
-        ArrayList<Projectile> shots = (ArrayList<Projectile>) List.of(((PiratesCard) currentAdventureCard).getShots());
+        Projectile[] projectileArray = ((PiratesCard) currentAdventureCard).getShots();
+        ArrayList<Projectile> shots = new ArrayList<>(Arrays.asList(projectileArray));
         if(shots.isEmpty()||defeatedPlayers.isEmpty()){
             defeatedPlayers.clear();
             resetShowAndDraw();
@@ -850,7 +854,7 @@ public class Controller implements EventListenerInterface {
         }
 
         if(allOk){
-                drawCard();
+            chooseAliens();
             }else{ // for each already done client I send state to wait for the ones who aren't done yet
             isDone.entrySet().stream()
                     .filter(Map.Entry::getValue)
@@ -861,6 +865,8 @@ public class Controller implements EventListenerInterface {
         }
 
     }
+
+
 
     private boolean handleAdjustmentEnded(){
         synchronized (isDone) {
@@ -1150,6 +1156,15 @@ public class Controller implements EventListenerInterface {
     }
 
     private void chooseAliens(){
+
+        System.out.println("Entrato in chooseAliens");
+
+        synchronized (isDone) {
+            for (ClientListener l : listeners) {
+                isDone.put(l, false);
+            }
+        }
+
         for(ClientListener l: listeners){
             Player p = playerbyListener.get(l);
             ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
@@ -1170,16 +1185,27 @@ public class Controller implements EventListenerInterface {
                     purple = true;
                     atLeastOneSupport = true;
                 }
-                cabinAliens.add(new CabinAliens(c,brown,purple));
+
+                // if there is at least one support connected to this cabin I push it
+                if(atLeastOneSupport)
+                    cabinAliens.add(new CabinAliens(c,brown,purple));
             }
 
 
             if(!cabinAliens.isEmpty()){
                 l.onEvent(eventCrafter(GameState.CHOOSE_ALIEN, new ListCabinAliens(cabinAliens)));
             }else{
+                isDone.put(l, true);
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
+
+        // if everyone went to waitPlayer, so isDone is all true
+        if(!isDone.containsValue(false)){
+            drawCard();
+            System.out.println("Entrato in if(!isDone.containsValue(false)){");
+        }
+
     }
 
     public void playerHit(ClientListener listener) {
@@ -1193,6 +1219,44 @@ public class Controller implements EventListenerInterface {
         Player p = playerbyListener.get(listener);
         // togliere una batteria dato che ha attivato lo scudo
         manageCard();
+    }
+
+    public boolean addAlienCabin(ClientListener listener, int cabinId, String alienColor) {
+        Player p = playerbyListener.get(listener);
+        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
+        for(Cabin c: cabins){
+            if(c.getId() == cabinId){
+                AlienColor[] colors = c.getLifeSupportSystemColor();
+                if(Objects.equals(alienColor, "b")){
+                    if(colors[AlienColor.BROWN.ordinal()] != null){
+                        Figure[] figures = c.getFigures();
+                        figures[0] = new Alien(1, AlienColor.BROWN);
+                        figures[1] = null;
+                        return true;
+                    }
+                }
+
+                if(Objects.equals(alienColor, "p")){
+                    if(colors[AlienColor.PURPLE.ordinal()] != null){
+                        Figure[] figures = c.getFigures();
+                        figures[0] = new Alien(1, AlienColor.BROWN);
+                        figures[1] = null;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void handleEndChooseAliens(ClientListener listener) {
+        isDone.put(listener, true);
+
+        // player who didn't have cabins to put aliens in or finished they alien chosen have isDone = true
+        if(!isDone.containsValue(false))
+            drawCard();
+        else
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
     }
 }
 

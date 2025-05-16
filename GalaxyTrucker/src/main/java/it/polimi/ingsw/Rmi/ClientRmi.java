@@ -19,6 +19,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -153,6 +154,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "1" -> server.addReserveSpot(this);
                     case "2" -> server.putTileBack(this);
                     case "3" -> server.drawCard();
+                    case "4" -> server.endCrafting(this);
                     case "5" -> server.rotateClockwise(this);
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
@@ -214,6 +216,45 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
             case DRAW_CARD ->
                     System.out.print("If you are the leader you will have to choose what to do, else just wait the players ahead are done!\n");
+
+            case CHOOSE_ALIEN -> {
+                switch (input) {
+                    case "0" -> server.handleEndChooseAliens(this);
+                    case "1"-> {
+                        boolean exit = false;
+                        while (!exit) {
+                                System.out.print("Insert the id of the cabin you want to choose and then the color( b for brown and p for purple) of the alien you want to place in (ex. 1 b ): ");
+                                String line = scan.nextLine();
+                                try {
+                                    String[] parts = line.split(" ");
+                                    if(Integer.parseInt(parts[0]) == -1){
+                                        server.handleEndChooseAliens(this);
+                                        exit = true;
+                                    }
+                                    if (parts.length == 2) {
+                                        int cabinId = Integer.parseInt(parts[0]);
+                                        String alienColor = parts[1];
+                                        if(!Objects.equals(alienColor, "b") && !Objects.equals(alienColor, "p"))
+                                            System.out.println("You type a different letter from b or p, please try again");
+                                        try {
+                                            if(server.addAlienCabin(this, cabinId, alienColor))
+                                                System.out.println("Successfully exchanged in cabin " + cabinId +  " 2 astronauts for a " + alienColor + " alien");
+                                            else
+                                                System.out.println("Your provided cabin id '" + cabinId +  "' or your provided alien color '" + alienColor + "' were incorrect, please try again");
+                                        } catch (RemoteException e) {
+                                            System.out.println(e.getMessage());
+                                        }
+                                    } else
+                                        System.out.println("Wrong input. You need a number and the letter b or v divided by a space \n");
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars \n");
+                                } catch (RemoteException e) {
+                                    System.out.println("RemoteException error " + e.getMessage());
+                                }
+                            }
+                        }
+                    }
+                }
 
             case CARGO_MANAGEMENT -> {
                 System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
@@ -421,7 +462,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case SELECT_SHIP -> System.out.print("Type the number corresponding to ship part you want to keep\n");
             case SHOW_SHIP -> System.out.print("Here is your spaceship\n");
             case BYTILE_SHIP -> System.out.print("Here is your spaceship with ids of interested tiles\n");
-            case CHOOSE_ALIEN -> System.out.print("Here are your cabins list with their relatives ids, choose in the elegible ones if you want to get an alien\n");
+            case CHOOSE_ALIEN -> System.out.print("Here are your cabins list with their relatives ids, choose in the eligible ones if you want to get an alien\n");
             case TURN_START -> System.out.print("Here is the flight plance\n");
             case DRAW_CARD -> System.out.print("This is the drawn card:\n");
             case FAILED_CARD -> System.out.print("You haven't met the requirements to activate this card:\n");

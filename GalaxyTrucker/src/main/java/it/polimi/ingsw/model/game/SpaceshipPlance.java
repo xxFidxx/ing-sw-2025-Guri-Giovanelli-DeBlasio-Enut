@@ -153,9 +153,16 @@ public class SpaceshipPlance {
                                     if (inBounds(nx, ny) && !edgeCases(ny, nx) && components[ny][nx] != null) {
                                         ComponentTile tile2 = components[nx][ny];
                                         if(tile2 instanceof LifeSupportSystem){
-                                            // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente
-                                            AlienColor[] colors = cab.getLifeSupportSystemColor();
-                                            colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
+                                            ConnectorType a = tile.getConnectors()[dir];
+                                            ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
+
+                                            if (isConnectionValid(a, b)){
+                                                // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente.
+                                                // la cabina ha un array di AlienColors a 2 posti, metto a true la casella corrispondente al colore dell'alieno, faccio
+                                                // cosi perchè nel caso ci siano 2 colori, sono sicuro che non vado a sovrascrivere la casella contenente già un colore
+                                                AlienColor[] colors = cab.getLifeSupportSystemColor();
+                                                colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
+                                            }
                                         }
                                     }
                                 }
@@ -885,13 +892,14 @@ public class SpaceshipPlance {
             if(cannonConnectors[i] == ConnectorType.CANNON)
                 return i;
         }
+        throw new IllegalStateException("Not a cannon connector in a cannon tile");
     }
 
     public boolean getCannonActivation(Direction direction, int position) {
-        if (checkProtection(direction, position) == true) {
-            boolean active = askActivateCannon();
-            if (active) return true;
-        }
+//        if (checkProtection(direction, position) == true) {
+//            boolean active = askActivateCannon();
+//            if (active) return true;
+//        }
 
         return false;
     }

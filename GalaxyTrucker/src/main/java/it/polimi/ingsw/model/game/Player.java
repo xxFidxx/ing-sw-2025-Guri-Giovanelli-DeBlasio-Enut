@@ -212,7 +212,7 @@ public class Player {
             if (i1 >= 0 && i1 < playerCrew.size()) {
                 Cabin cabin1 = playerCrew.get(i1);
                 if (j1 >= 0 && j1 < cabin1.getFigures().length) {
-                    removeCrew(cabin1, j1);
+                    //removeCrew(cabin1, j1);
                 } else System.out.println("crew index is outbound");
             }else  System.out.println("cabin index is outbound");
         }

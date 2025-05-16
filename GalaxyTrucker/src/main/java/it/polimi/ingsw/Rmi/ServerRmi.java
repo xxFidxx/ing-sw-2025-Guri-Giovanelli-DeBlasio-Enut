@@ -234,5 +234,17 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.playerProtected(listener);
     }
+
+    @Override
+    public boolean addAlienCabin(VirtualViewRmi clientRmi, int cabinId, String alienColor) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        return controller.addAlienCabin(listener,cabinId,alienColor);
+    }
+
+    @Override
+    public void handleEndChooseAliens(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.handleEndChooseAliens(listener);
+    }
 }
 

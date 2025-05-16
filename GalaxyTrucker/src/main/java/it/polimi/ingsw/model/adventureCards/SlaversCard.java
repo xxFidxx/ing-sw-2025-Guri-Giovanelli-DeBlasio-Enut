@@ -28,4 +28,8 @@ public class SlaversCard extends EnemyCard  {
     public void penalize(Player player) {
         player.loseCrew(lostCrew);
     }
+
+    public int getLostCrew(){
+        return lostCrew;
+    }
 }

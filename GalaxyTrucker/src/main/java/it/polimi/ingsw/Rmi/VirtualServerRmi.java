@@ -63,4 +63,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void playerHit(VirtualViewRmi clientRmi) throws RemoteException;
 
     void playerProtected(VirtualViewRmi clientRmi) throws RemoteException;
+
+    boolean addAlienCabin(VirtualViewRmi clientRmi, int cabinId, String alienColor) throws RemoteException;
+
+    void handleEndChooseAliens(VirtualViewRmi clientRmi) throws RemoteException;
 }
