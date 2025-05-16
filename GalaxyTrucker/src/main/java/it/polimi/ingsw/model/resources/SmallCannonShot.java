@@ -11,10 +11,11 @@ public class SmallCannonShot extends Projectile {
     }
 
     @Override
-    public void activate(Player player, int position) {
-        if (player.getSpaceshipPlance().getShieldActivation(direction) == true) {
-            return;
-        }
-        player.getSpaceshipPlance().takeHit(direction, position);
+    public boolean activate(Player player, int position) {
+//        if (player.getSpaceshipPlance().getShieldActivation(direction) == true) {
+//            return true;
+//        }
+//        player.getSpaceshipPlance().takeHit(direction, position);
+        return false;
     }
 }

@@ -37,11 +37,9 @@ public enum GameState {
     BYTILE_SHIP,
     CHOOSE_ALIEN,
     SELECT_SHIP,
-    ASK_SHIELD
-    BYTILE_SHIP,
-    CHOOSE_ALIEN,
+    ASK_SHIELD,
     FAILED_CARD,
-    SELECT_SHIP
+    ASK_CANNON
     }
 
 

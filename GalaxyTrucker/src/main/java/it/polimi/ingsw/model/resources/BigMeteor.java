@@ -13,10 +13,11 @@ public class BigMeteor extends Projectile {
     @Override
     public boolean activate(Player player, int position) {
 
-        if (player.getSpaceshipPlance().checkProtection(direction, position) == true) {
-            return true;
-        }
-        return false;
+//        if (player.getSpaceshipPlance().checkProtection(direction, position) == true) {
+//            return true;
+//        }
+//        return false;
         //player.getSpaceshipPlance().takeHit(direction, position);
+        return false;
     }
 }

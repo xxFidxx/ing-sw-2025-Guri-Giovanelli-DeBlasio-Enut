@@ -476,7 +476,7 @@ public class Controller implements EventListenerInterface {
                 handleWaitersEnemy(l);
             }
 
-            case SmugglersCard sg ->{
+            case SmugglersCard sg -> {
                 if (tmpPlayers.isEmpty()||cargoended) {
                     cargoended=false;
                     resetShowAndDraw();
@@ -484,6 +484,17 @@ public class Controller implements EventListenerInterface {
                 }
                 currentPlayer = tmpPlayers.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
+                handleWaitersEnemy(l);
+            }
+
+            case PiratesCard pc -> {
+                if (tmpPlayers.isEmpty()) {
+                    resetShowAndDraw();
+                    return;
+                }
+                currentPlayer = tmpPlayers.getLast();
+                ClientListener l = listenerbyPlayer.get(currentPlayer);
+                tmpPlayers.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
@@ -517,28 +528,18 @@ public class Controller implements EventListenerInterface {
                 currentDiceThrow = game.throwDices();
                 int size = players.size();
                 Player first = players.get(0);
-
+                activateMeteor(first);
                 Player second = players.get(1);
+                activateMeteor(second);
                 if(size >= 3) {
                     Player third = players.get(2);
+                    activateMeteor(third);
                     if(size == 4) {
                         Player fourth = players.get(3);
+                        activateMeteor(fourth);
                     }
                 }
                 meteors.remove(currentProjectile);
-
-                /*for(Player p: players){
-                    for(Projectile m: meteors){
-                        if(m instanceof SmallMeteor){
-                            if(!m.activate(p, position)) {
-                                ClientListener l = listenerbyPlayer.get(p);
-                                l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
-                            }
-                        } else {
-
-                        }
-                    }
-                }*/
             }
 
             case EpidemicCard ec -> {
@@ -561,42 +562,50 @@ public class Controller implements EventListenerInterface {
             case SmallMeteor sm -> {
                 boolean check = currentProjectile.activate(player, currentDiceThrow);
                 if(!check) {
+                    Direction direction = currentProjectile.getDirection();
                     ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                     for (ShieldGenerator shield : shields) {
-                        Direction direction = currentProjectile.getDirection();
                         if(shield.checkProtection(direction)) {
                             ClientListener l = listenerbyPlayer.get(currentPlayer);
                             l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
                             return;
                         }
                     }
+                    player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
                 }
             }
             case BigMeteor bm -> {
-                boolean check = currentProjectile.activate(player, currentDiceThrow);
-                if(check){
-                    ArrayList<Cannon> cannons = player.getSpaceshipPlance().getCannons();
-                    for (Cannon cannon : cannons) {
-                        Direction direction = currentProjectile.getDirection();
-                        int dirMeteor = direction.ordinal();
-                        int dirCannon = getCannonDirection(cannon);
-                        if(dirMeteor == dirCannon) {
-
-                        }
+                Direction direction = currentProjectile.getDirection();
+                int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
+                if(result == -1) {
+                    manageCard();
+                }
+                else if(result == 0) {
+                    player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+                }
+                else if(result == 1) {
+                    manageCard();
+                }
+                else{
+                    ClientListener l = listenerbyPlayer.get(player);
+                    l.onEvent(eventCrafter(GameState.ASK_CANNON, null));
+                }
+            }
+            case SmallCannonShot scs -> {
+                Direction direction = currentProjectile.getDirection();
+                ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
+                for (ShieldGenerator shield : shields) {
+                    if(shield.checkProtection(direction)) {
+                        ClientListener l = listenerbyPlayer.get(currentPlayer);
+                        l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
+                        return;
                     }
                 }
+                player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentProjectile);
         }
 
-    }
-
-    public int getCannonDirection(Cannon cannon){
-        ConnectorType[] cannonConnectors = cannon.getConnectors();
-        for(int i=0; i<cannonConnectors.length; i++) {
-            if(cannonConnectors[i] == ConnectorType.CANNON)
-                return i;
-        }
     }
 
     public void resetShowAndDraw() {
@@ -702,7 +711,7 @@ public class Controller implements EventListenerInterface {
                 else
                     manageCard();
             }
-            case SmugglersCard sc ->{
+            case SmugglersCard sc -> {
                 ((SmugglersCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
                 if (((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer) == 1){
@@ -714,6 +723,8 @@ public class Controller implements EventListenerInterface {
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
+            }
+            case PiratesCard pc -> {
 
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentCastedCard);

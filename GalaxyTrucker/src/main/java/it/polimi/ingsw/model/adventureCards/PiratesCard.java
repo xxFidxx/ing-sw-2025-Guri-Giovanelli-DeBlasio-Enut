@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.resources.Projectile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PiratesCard extends EnemyCard {
@@ -32,8 +33,14 @@ public class PiratesCard extends EnemyCard {
     public void penalize(Player player) {
         Game game = deck.getFlightPlance().getGame();
         int position = game.throwDices();
-        for (Projectile shot : shots) {
-            shot.activate(player, position);
+        Projectile first = shots[0];
+        if(first == null){
+            Projectile second = shots[1];
+            if(second == null){
+                Projectile third = shots[2];
+            }
+        } else {
+            shots[0] = null;
         }
     }
 

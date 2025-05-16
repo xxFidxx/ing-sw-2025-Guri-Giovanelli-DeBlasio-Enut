@@ -818,7 +818,7 @@ public class SpaceshipPlance {
         }
     }
 
-    public boolean checkProtection(Direction direction, int position) {
+    public int checkProtection(Direction direction, int position) {
         int max_lenght = 7;
         // casella da cui partire
         int x = 0, y = 0;
@@ -863,11 +863,28 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if ((hit != null) && (cannons.contains(hit))) {
-            return true;
+        if(hit == null) {
+            return -1; // se non veniamo colpiti
         }
+        if (cannons.contains(hit)) {
+            int dirP = direction.ordinal();
+            int dirDD = getCannonDirection((Cannon) hit);
+            if(dirP == dirDD) {
+                if (hit instanceof DoubleCannon) {
+                        return 2; // se abbiamo un doppio cannone
+                }
+                return 1; // se abbiamo un cannone singolo
+            }
+        }
+        return 0; // se non abbiamo un cannone
+    }
 
-        return false;
+    public int getCannonDirection(Cannon cannon){
+        ConnectorType[] cannonConnectors = cannon.getConnectors();
+        for(int i=0; i<cannonConnectors.length; i++) {
+            if(cannonConnectors[i] == ConnectorType.CANNON)
+                return i;
+        }
     }
 
     public boolean getCannonActivation(Direction direction, int position) {
@@ -948,6 +965,7 @@ public class SpaceshipPlance {
         placeTileComponents(tile, x, y);
         reserveSpot.remove(tile);
     }
+
 
 
     public boolean checkExposedConnector(Direction direction, int position) {
