@@ -1,20 +1,11 @@
 [
   {
-    "type": "SlaversCard",
-    "name": "Slavers",
-    "level": 1,
-    "cannonStrength": 6,
-    "lostDays": 1,
-    "lostCrew": 3,
-    "reward": 5
-  },
-  {
-    "type": "AbandonedShipCard",
-    "name": "Abandoned Ship",
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
     "level": 1,
     "lostDays": 1,
-    "lostCrew": 0,
-    "credits": 2
+    "requiredCrew": 5,
+    "reward": [2, 1]
   },
   {
     "type": "OpenSpaceCard",
@@ -34,12 +25,21 @@
     ]
   },
   {
-    "type": "AbandonedStationCard",
-    "name": "Abandoned Station",
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 1,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
+  },
+  {
+    "type": "AbandonedShipCard",
+    "name": "Abandoned Ship",
     "level": 1,
     "lostDays": 1,
-    "requiredCrew": 5,
-    "reward": [2, 1]
+    "lostCrew": 0,
+    "credits": 2
   },
   {
     "type": "SmugglersCard",

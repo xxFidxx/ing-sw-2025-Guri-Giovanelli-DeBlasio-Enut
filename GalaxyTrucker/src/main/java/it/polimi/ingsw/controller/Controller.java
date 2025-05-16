@@ -30,13 +30,15 @@ public class Controller implements EventListenerInterface {
     private final Object GameLock = new Object();
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
-    final Map <ClientListener, Boolean> isDonecrafting  = new HashMap<>();
+    final Map <ClientListener, Boolean> isDone = new HashMap<>();
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
     private ArrayList<Player> players;
     private boolean cargoended;
     private Projectile currentProjectile;
     private int currentDiceThrow;
+    private ArrayList<Player> tmpPlayers;
+    private List<AdventureCard> cards;
 
     public Controller() {
         this.game = null;
@@ -47,6 +49,7 @@ public class Controller implements EventListenerInterface {
         this.players = null;
         this.cargoended=false;
         this.currentProjectile = null;
+        cards = null;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -233,7 +236,8 @@ public class Controller implements EventListenerInterface {
 
         ArrayList<String> nicks = lobby.getPlayersNicknames();
         game = new Game(nicks);
-        ArrayList<Player> players= game.getPlayers();
+        players= game.getPlayers();
+        cards = game.getFlightplance().getDeck().getCards();
 
 
         synchronized(playerbyListener) {
@@ -248,9 +252,9 @@ public class Controller implements EventListenerInterface {
             }
         }
 
-        synchronized (isDonecrafting) {
+        synchronized (isDone) {
             for (ClientListener l : listeners) {
-                isDonecrafting.put(l, false);
+                isDone.put(l, false);
             }
         }
 
@@ -375,14 +379,14 @@ public class Controller implements EventListenerInterface {
     public void drawCard() {
         String[] boardView = handleBoardView();
         notifyAllListeners(eventCrafter(GameState.TURN_START,boardView));
-        List<AdventureCard> cards = game.getFlightPlance().getDeck().getCards();
+
+
         if(!cards.isEmpty()) {
             currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
-            System.out.println("Nome carta: " + cardName);
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
-            players = new ArrayList<>(game.getPlayers());
+
 
             // aggiorniamo liste della nave prima di attivare la carta
             for (Player player : players) {
@@ -390,9 +394,12 @@ public class Controller implements EventListenerInterface {
             }
             if (cardName != null) {
                 notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
+                game.orderPlayers();
+                players = game.getPlayers();
+                tmpPlayers = new ArrayList<>(players);
                 manageCard();
             }
-            cards.remove(currentAdventureCard);
+
         }
         else {
                 notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
@@ -402,46 +409,46 @@ public class Controller implements EventListenerInterface {
     public void manageCard(){
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
-                if (players.isEmpty()) {
+                if (tmpPlayers.isEmpty()) {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = tmpPlayers.getLast();
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
+                    l.onEvent(eventCrafter(GameState.FAILED_CARD, null));
                     handleWaitersPlayer(l);
                 } else {
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
             }
 
             case AbandonedStationCard asc -> {
-                if (players.isEmpty()||cargoended) {
-                    System.out.println("entrato");
+                if (tmpPlayers.isEmpty()||cargoended) {
                     cargoended=false;
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = tmpPlayers.getLast();
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
+                    l.onEvent(eventCrafter(GameState.FAILED_CARD, null));
                     handleWaitersPlayer(l);
                 } else {
-                    System.out.println("else");
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
             }
 
             case OpenSpaceCard osc ->{
-                if (players.isEmpty()) {
+                if (tmpPlayers.isEmpty()) {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = tmpPlayers.getLast();
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
                     if(e instanceof DoubleEngine) {
@@ -450,52 +457,52 @@ public class Controller implements EventListenerInterface {
                 }
                 if(numDE > 0) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     handleWaitersBattery(l, numDE);
                 } else {
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     fromChargeToManage();
                 }
             }
 
             case SlaversCard sl -> {
-                if (players.isEmpty()) {
+                if (tmpPlayers.isEmpty()) {
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = tmpPlayers.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
-                players.remove(currentPlayer);
+                tmpPlayers.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
             case SmugglersCard sg ->{
-                if (players.isEmpty()||cargoended) {
+                if (tmpPlayers.isEmpty()||cargoended) {
                     cargoended=false;
                     resetShowAndDraw();
                     return;
                 }
-                currentPlayer = players.getLast();
+                currentPlayer = tmpPlayers.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
             case PlanetsCard pc -> {
-                if (players.isEmpty()) {
+                if (tmpPlayers.isEmpty()) {
                     resetShowAndDraw();
                     return;
                 }
                 game.orderPlayers();
-                currentPlayer = players.getLast();
+                currentPlayer = tmpPlayers.getLast();
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard,currentPlanetsCard.getPlanets())) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     handleWaitersPlanets(l);
                 } else {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
             }
@@ -596,8 +603,10 @@ public class Controller implements EventListenerInterface {
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
         game.endTurn();
         for(ClientListener cl : listeners){
+            isDone.put(cl, false);
             endCard(cl);
         }
+        cards.remove(currentAdventureCard);
         drawCard();
     }
 
@@ -702,7 +711,7 @@ public class Controller implements EventListenerInterface {
                     l.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
                 }
                 else {
-                    players.remove(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
 
@@ -712,16 +721,16 @@ public class Controller implements EventListenerInterface {
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
-        if (isDonecrafting.get(listener))
+        if (isDone.get(listener))
             throw new Exception("The player was already done crafting!\n");
 
         int pos;
-        synchronized (isDonecrafting) {
-            isDonecrafting.replace(listener, true);
+        synchronized (isDone) {
+            isDone.replace(listener, true);
             synchronized (GameLock) {
-                pos = isDonecrafting.keySet().size();
+                pos = isDone.keySet().size();
 
-                for (Boolean done : isDonecrafting.values()) {
+                for (Boolean done : isDone.values()) {
                     if (done) {
                         pos--;
                     }
@@ -739,17 +748,15 @@ public class Controller implements EventListenerInterface {
             default -> realpos = 7;
         }
 
-        System.out.println("pos " + pos + "realpos " + realpos);
 
-        Flightplance flightPlance = game.getFlightPlance();
+        Flightplance flightPlance = game.getFlightplance();
         Player p = playerbyListener.get(listener);
         flightPlance.getPlaceholderByPlayer(p).setPosizione(realpos);
         String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
         listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor));
-        game.orderPlayers();
-        players = game.getPlayers();
-        synchronized (isDonecrafting) {
-            if (!isDonecrafting.containsValue(false))
+
+        synchronized (isDone) {
+            if (!isDone.containsValue(false))
                 handleCraftingEnded();
             else
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -759,12 +766,10 @@ public class Controller implements EventListenerInterface {
     private void handleCraftingEnded() {
 
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null));
-        String[] boardView = handleBoardView();
-        players = game.getPlayers();
 
-        synchronized (isDonecrafting) {
+        synchronized (isDone) {
             for (ClientListener l : listeners) {
-                isDonecrafting.put(l, false);
+                isDone.put(l, false);
             }
         }
 
@@ -777,17 +782,15 @@ public class Controller implements EventListenerInterface {
                 allOk = false;
             }else{
                 p.getSpaceshipPlance().updateLists();
-                isDonecrafting.put(l, true);
+                isDone.put(l, true);
                 printSpaceship(l);
             }
         }
 
         if(allOk){
-            game.orderPlayers();
-            players = game.getPlayers();
                 drawCard();
-            }else{ // for each already done client I send state to wait forthe ones who aren't done yet
-            isDonecrafting.entrySet().stream()
+            }else{ // for each already done client I send state to wait for the ones who aren't done yet
+            isDone.entrySet().stream()
                     .filter(Map.Entry::getValue)
                     .forEach(entry -> {
                         ClientListener l = entry.getKey();
@@ -798,14 +801,13 @@ public class Controller implements EventListenerInterface {
     }
 
     private boolean handleAdjustmentEnded(){
-        synchronized (isDonecrafting) {
-            return !isDonecrafting.containsValue(false);
+        synchronized (isDone) {
+            return !isDone.containsValue(false);
         }
     }
 
     private String[] handleBoardView() {
 
-        ArrayList<Player> players = game.getPlayers();
         String[] boardView = new String[18];
         Arrays.fill(boardView, "[]");
 
@@ -813,8 +815,8 @@ public class Controller implements EventListenerInterface {
         // 3) Li “sparo” nella board in base alla loro posizione
         for(Player player: players){
             Placeholder p = player.getPlaceholder();
+
             int pos = (p.getPosizione()) % 18;
-            System.out.println("Posizione prima di stampare board " + pos);
             if (pos < 0) {
                 pos = pos + 18;
             }
@@ -852,8 +854,6 @@ public class Controller implements EventListenerInterface {
             finally {
                 endCargoManagement(listener);
             }
-
-
         }
     }
 
@@ -914,7 +914,6 @@ public class Controller implements EventListenerInterface {
 
     public void endCard(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        ArrayList<Player> players = game.getPlayers();
         for(Player p: players){
             if(p == player){
                 String nick = p.getNickname();
@@ -1024,10 +1023,16 @@ public class Controller implements EventListenerInterface {
 
     public void endCargoManagement(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        players.remove(player);
+        tmpPlayers.remove(player);
         player.setReward(null);
+        cargoended = true;
         manageCard();
     }
+
+//    private void handleEndManagement(ClientListener listener) {
+//        Player player = playerbyListener.get(listener);
+//
+//    }
 
     public void rotateClockwise(ClientListener listener) {
         Player player = playerbyListener.get(listener);
@@ -1045,7 +1050,7 @@ public class Controller implements EventListenerInterface {
         if(stumps <= 1){
             if(player.getSpaceshipPlance().checkCorrectness()) {
                 player.getSpaceshipPlance().updateLists();
-                isDonecrafting.put(listener, true);
+                isDone.put(listener, true);
                 printSpaceship(listener);
                 if (handleAdjustmentEnded())
                     drawCard();
@@ -1073,7 +1078,7 @@ public class Controller implements EventListenerInterface {
             printSpaceshipAdjustment(listener);
         }else{
             p.getSpaceshipPlance().updateLists();
-            isDonecrafting.put(listener,true);
+            isDone.put(listener,true);
             printSpaceship(listener);
             if(handleAdjustmentEnded())
                 drawCard();

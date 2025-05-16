@@ -408,6 +408,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!\n" + TileSymbols.symbolExplanation);
             case ASSEMBLY -> System.out.print("List of available tiles: ");
+            case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
             case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
             case ADJUST_SHIP -> System.out.print("Type 0 to remove a tile, type 1 to force draw card phase\n");
@@ -417,6 +418,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_ALIEN -> System.out.print("Here are your cabins list with their relatives ids, choose in the elegible ones if you want to get an alien\n");
             case TURN_START -> System.out.print("Here is the flight plance\n");
             case DRAW_CARD -> System.out.print("This is the drawn card:\n");
+            case FAILED_CARD -> System.out.print("You haven't met the requirements to activate this card:\n");
             case CARGO_MANAGEMENT -> {
                 try{
                     server.checkStorage(this);

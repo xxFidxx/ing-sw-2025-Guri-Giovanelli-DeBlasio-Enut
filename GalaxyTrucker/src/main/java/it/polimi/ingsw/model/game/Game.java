@@ -7,13 +7,12 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Game {
     private ArrayList<Player> players;
-    private Timer timer;
-    private Dice[] dices;
-    private Flightplance plance;
+    final private Timer timer;
+    final private Dice[] dices;
+    final private Flightplance plance;
     private ComponentTile[] assemblingTiles;
 
     public Game(ArrayList<String> playersName) {
@@ -85,7 +84,7 @@ public class Game {
         return timer;
     }
 
-    public Flightplance getFlightPlance() {
+    public Flightplance getFlightplance() {
         return plance;
     }
 
