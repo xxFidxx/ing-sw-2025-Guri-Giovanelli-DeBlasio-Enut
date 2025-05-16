@@ -188,9 +188,14 @@ public class Player {
     }
 
 
-    public void removeCrew(Cabin cabin1, int j1) {//METODO CHE TOGLIE UN MEMBRO DELL EQUIPAGGIO
-        cabin1.getFigures()[j1] = null;
-
+    public void removeCrew(Cabin cabin1) {//METODO CHE TOGLIE UN MEMBRO DELL EQUIPAGGIO
+        Figure[] figures = cabin1.getFigures();
+        for(int i=0; i < figures.length; i++){
+            if(figures[i] != null){
+                figures[i] = null;
+                return;
+            }
+        }
     }
 
     public void loseCrew(int lostOther) {

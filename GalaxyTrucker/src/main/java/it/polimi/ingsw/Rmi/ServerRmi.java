@@ -222,5 +222,17 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.selectShipPart(listener, part);
     }
+
+    @Override
+    public void playerHit(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.playerHit(listener);
+    }
+
+    @Override
+    public void playerProtected(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.playerProtected(listener);
+    }
 }
 

@@ -24,7 +24,7 @@ public class EpidemicCard extends AdventureCard  {
         for (Player player : game.getPlayers()) {
             ArrayList<Cabin> cabins = player.getSpaceshipPlance().getConnectedCabins();
             for (Cabin cabin : cabins) {
-                player.askRemoveCrew(cabin);
+                player.removeCrew(cabin);
             }
         }
     }

@@ -11,10 +11,8 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
-import it.polimi.ingsw.model.resources.Planet;
-import it.polimi.ingsw.model.resources.TileSymbols;
+import it.polimi.ingsw.model.resources.*;
 import it.polimi.ingsw.model.game.*;
-import it.polimi.ingsw.model.resources.GoodsContainer;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -37,6 +35,8 @@ public class Controller implements EventListenerInterface {
     private Player currentPlayer;
     private ArrayList<Player> players;
     private boolean cargoended;
+    private Projectile currentProjectile;
+    private int currentDiceThrow;
 
     public Controller() {
         this.game = null;
@@ -46,6 +46,7 @@ public class Controller implements EventListenerInterface {
         this.currentPlayer = null;
         this.players = null;
         this.cargoended=false;
+        this.currentProjectile = null;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -378,10 +379,10 @@ public class Controller implements EventListenerInterface {
         if(!cards.isEmpty()) {
             currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
+            System.out.println("Nome carta: " + cardName);
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
             players = new ArrayList<>(game.getPlayers());
-
 
             // aggiorniamo liste della nave prima di attivare la carta
             for (Player player : players) {
@@ -467,6 +468,7 @@ public class Controller implements EventListenerInterface {
                 players.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
+
             case SmugglersCard sg ->{
                 if (players.isEmpty()||cargoended) {
                     cargoended=false;
@@ -498,7 +500,95 @@ public class Controller implements EventListenerInterface {
                 }
             }
 
+            case MeteorSwarmCard msc -> {
+                ArrayList<Projectile> meteors = (ArrayList<Projectile>) List.of(((MeteorSwarmCard) currentAdventureCard).getMeteors());
+                if(meteors.isEmpty()){
+                    resetShowAndDraw();
+                    return;
+                }
+                currentProjectile = meteors.getFirst();
+                currentDiceThrow = game.throwDices();
+                int size = players.size();
+                Player first = players.get(0);
+
+                Player second = players.get(1);
+                if(size >= 3) {
+                    Player third = players.get(2);
+                    if(size == 4) {
+                        Player fourth = players.get(3);
+                    }
+                }
+                meteors.remove(currentProjectile);
+
+                /*for(Player p: players){
+                    for(Projectile m: meteors){
+                        if(m instanceof SmallMeteor){
+                            if(!m.activate(p, position)) {
+                                ClientListener l = listenerbyPlayer.get(p);
+                                l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
+                            }
+                        } else {
+
+                        }
+                    }
+                }*/
+            }
+
+            case EpidemicCard ec -> {
+                currentAdventureCard.activate();
+                resetShowAndDraw();
+            }
+
+            case StardustCard sc -> {
+                currentAdventureCard.activate();
+                resetShowAndDraw();
+            }
+
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+        }
+    }
+
+
+    public void activateMeteor(Player player) {
+        switch(currentProjectile){
+            case SmallMeteor sm -> {
+                boolean check = currentProjectile.activate(player, currentDiceThrow);
+                if(!check) {
+                    ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
+                    for (ShieldGenerator shield : shields) {
+                        Direction direction = currentProjectile.getDirection();
+                        if(shield.checkProtection(direction)) {
+                            ClientListener l = listenerbyPlayer.get(currentPlayer);
+                            l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
+                            return;
+                        }
+                    }
+                }
+            }
+            case BigMeteor bm -> {
+                boolean check = currentProjectile.activate(player, currentDiceThrow);
+                if(check){
+                    ArrayList<Cannon> cannons = player.getSpaceshipPlance().getCannons();
+                    for (Cannon cannon : cannons) {
+                        Direction direction = currentProjectile.getDirection();
+                        int dirMeteor = direction.ordinal();
+                        int dirCannon = getCannonDirection(cannon);
+                        if(dirMeteor == dirCannon) {
+
+                        }
+                    }
+                }
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + currentProjectile);
+        }
+
+    }
+
+    public int getCannonDirection(Cannon cannon){
+        ConnectorType[] cannonConnectors = cannon.getConnectors();
+        for(int i=0; i<cannonConnectors.length; i++) {
+            if(cannonConnectors[i] == ConnectorType.CANNON)
+                return i;
         }
     }
 
@@ -1023,6 +1113,19 @@ public class Controller implements EventListenerInterface {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
+    }
+
+    public void playerHit(ClientListener listener) {
+        Player p = playerbyListener.get(listener);
+        Direction direction = currentProjectile.getDirection();
+        p.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+        manageCard();
+    }
+
+    public void playerProtected(ClientListener listener) {
+        Player p = playerbyListener.get(listener);
+        // togliere una batteria dato che ha attivato lo scudo
+        manageCard();
     }
 }
 

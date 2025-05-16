@@ -302,6 +302,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
+            case ASK_SHIELD -> {
+                switch (input) {
+                    case "0" -> server.playerHit(this);
+                    case "1" -> server.playerProtected(this);
+                }
+            }
             case CHOOSE_PLAYER -> {
                 switch (input) {
                     case "0" -> server.acceptCard(this);
@@ -426,6 +432,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_BATTERY -> System.out.print("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or 1 to land on one of the planets");
             case CHOOSE_CANNON -> System.out.print("Type 0 to not use double cannons or 1 to use them");
+            case ASK_SHIELD -> System.out.print("Type 0 to not use your shield or 1 to use it");
             case END_GAME -> System.out.print("Game has ended, below are the stats:");
         }
         System.out.print("\n> ");

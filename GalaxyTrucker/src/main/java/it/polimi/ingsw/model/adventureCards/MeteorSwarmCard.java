@@ -32,6 +32,10 @@ public class MeteorSwarmCard extends AdventureCard {
         }
     }
 
+    public Projectile[] getMeteors() {
+        return meteors;
+    }
+
     @Override
     public String toString() {
         return "MeteorSwarmCard{" +

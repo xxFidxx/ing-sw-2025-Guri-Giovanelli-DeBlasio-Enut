@@ -12,7 +12,7 @@ public abstract class Projectile {
         this.direction = direction;
     }
 
-    public abstract void activate(Player player, int position);
+    public abstract boolean activate(Player player, int position);
 
     public Direction getDirection() {
         return direction;

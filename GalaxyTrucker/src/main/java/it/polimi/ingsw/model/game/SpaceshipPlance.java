@@ -705,6 +705,10 @@ public class SpaceshipPlance {
         return cabins;
     }
 
+    public ArrayList<ShieldGenerator> getShields() {
+        return shieldGenerators;
+    }
+
     public int getStorage() {
         int total = 0;
         for (CargoHolds c : cargoHolds) {
