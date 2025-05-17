@@ -211,5 +211,20 @@
     "type": "LifeSupportSystem",
     "connectors": [0, 0, 1, 1],
     "color": 0
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 0, 1, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [2, 0, 1, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 3, 1, 1],
+    "isCentral": false
   }
 ]

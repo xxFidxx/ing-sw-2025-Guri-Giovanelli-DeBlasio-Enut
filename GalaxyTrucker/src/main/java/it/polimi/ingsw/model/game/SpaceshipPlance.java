@@ -128,9 +128,9 @@ public class SpaceshipPlance {
         cabins.clear();
         cargoHolds.clear();
         shieldGenerators.clear();
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
-                ComponentTile tile = components[i][j];
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col < COLS; col++) {
+                ComponentTile tile = components[row][col];
 
                 if (tile != null) {
                     switch (tile) {
@@ -144,19 +144,25 @@ public class SpaceshipPlance {
                         }
                         case Cabin cab -> {
                             cabins.add(cab);
-                            if(cab.isCentral()){
+                            if (!cab.isCentral()) {
                                 for (int dir = 0; dir < 4; dir++) {
                                     int[] dirx = DIR_X;
                                     int[] diry = DIR_Y;
-                                    int nx = i + dirx[dir];
-                                    int ny = j + diry[dir];
-                                    if (inBounds(nx, ny) && !edgeCases(ny, nx) && components[ny][nx] != null) {
+                                    int nx = row + dirx[dir];
+                                    int ny = col + diry[dir];
+                                    System.out.println("row: " + row + " col: " + col + " nx: " + nx + " ny: " + ny);
+                                    if (inBounds(nx, ny) && components[nx][ny] != null) {
                                         ComponentTile tile2 = components[nx][ny];
-                                        if(tile2 instanceof LifeSupportSystem){
+                                        System.out.println("if (inBounds(nx, ny) && components[ny][nx] != null) {");
+                                        System.out.println(tile);
+                                        System.out.println(tile2);
+                                        if (tile2 instanceof LifeSupportSystem) {
+                                            System.out.println("if(tile2 instanceof LifeSupportSystem){");
                                             ConnectorType a = tile.getConnectors()[dir];
-                                            ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
+                                            ConnectorType b = components[nx][ny].getConnectors()[(dir + 2) % 4];
 
-                                            if (isConnectionValid(a, b)){
+                                            if (isConnectionValid(a, b)) {
+                                                System.out.println("Connection valid");
                                                 // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente.
                                                 // la cabina ha un array di AlienColors a 2 posti, metto a true la casella corrispondente al colore dell'alieno, faccio
                                                 // cosi perchè nel caso ci siano 2 colori, sono sicuro che non vado a sovrascrivere la casella contenente già un colore
@@ -213,7 +219,7 @@ public class SpaceshipPlance {
         // prima guardo se la tile in 3 2 è null, se è null alllora faccio un doppio for dove cerco la prima tile libera, perchè vuol dire che sono nel caso in cui è stato rimosso
         // il centro, per cui non incappo in isole, perchè nella fase iniziale si possono creare e li sicuramente il centro esiste
         ComponentTile tile = components[2][3];
-        if(tile == null) {
+        if (tile == null) {
             int xStart = 0;
             int yStart = 0;
             for (int y = 0; y < ROWS; y++) {
@@ -226,7 +232,7 @@ public class SpaceshipPlance {
                 }
             }
             dfsExploration(xStart, yStart);
-        }else {
+        } else {
             // 1. Fase di esplorazione: trova tutte le tile connesse alla cabina centrale
             dfsExploration(3, 2); // Parte dalla posizione centrale
         }
@@ -318,7 +324,7 @@ public class SpaceshipPlance {
         ConnectorType a = tile.getConnectors()[direction];
 
         // Caso bordo o tile nulla
-        if (!inBounds(nx, ny)){
+        if (!inBounds(nx, ny)) {
             return a == ConnectorType.SMOOTH ||
                     a == ConnectorType.ENGINE ||
                     a == ConnectorType.CANNON;
@@ -374,30 +380,30 @@ public class SpaceshipPlance {
     }
 
     private boolean isConnectionValid(ConnectorType a, ConnectorType b) {
-        System.out.println(a.toString() + " " + b.toString());
+        //System.out.println(a.toString() + " " + b.toString());
         boolean prova = true;
         // Regole base di connessione (ignora i casi esposti)
         if (a == ConnectorType.SMOOTH || b == ConnectorType.SMOOTH) {
             prova = (a == b); // Entrambi smooth
-            System.out.println(prova);
+            //System.out.println(prova);
             return prova;
         }
 
         if (a == ConnectorType.ENGINE || b == ConnectorType.ENGINE) {
-            System.out.println(false);
+            //System.out.println(false);
             return false; // Motori non si connettono
         }
 
         if (a == ConnectorType.CANNON || b == ConnectorType.CANNON) {
-            System.out.println(false);
+            //System.out.println(false);
             return false; // Cannoni non si connettono
         }
 
         // Regole per connettori normali
-        prova =(a == ConnectorType.UNIVERSAL ||
+        prova = (a == ConnectorType.UNIVERSAL ||
                 b == ConnectorType.UNIVERSAL ||
                 a == b);
-        System.out.println(prova);
+        //System.out.println(prova);
         return prova;
     }
 
@@ -461,12 +467,10 @@ public class SpaceshipPlance {
     }
 
 
-
-
     public int remove(int x, int y) {
         initShownComponents();
         initVisited();
-        if(components[y][x] == null)
+        if (components[y][x] == null)
             throw new SpaceShipPlanceException("No tile in the index you provided, please retry");
 
         components[y][x] = null;
@@ -493,7 +497,7 @@ public class SpaceshipPlance {
             return 0;
         }
 
-        if(iteration == 0)
+        if (iteration == 0)
             System.out.println(components[y][x]);
 
         visited[y][x] = true;
@@ -510,7 +514,7 @@ public class SpaceshipPlance {
 
             int nx = x + dirx[dir];
             int ny = y + diry[dir];
-            dfsRemove(nx, ny,iteration);
+            dfsRemove(nx, ny, iteration);
         }
 
         return count;
@@ -537,17 +541,17 @@ public class SpaceshipPlance {
             return false;
 
         // se c'è un universale ora è sicuramente true perchè abbiamo già controllato cannoni ed engine
-        if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH){
+        if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH) {
             System.out.println("if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH)");
             return true;
         }
 
-        if (connector == ConnectorType.SINGLE && connector2 == ConnectorType.SINGLE){
+        if (connector == ConnectorType.SINGLE && connector2 == ConnectorType.SINGLE) {
             System.out.println("if (connector == ConnectorType.SINGLE && connector2 != ConnectorType.SINGLE)");
             return true;
         }
 
-        if (connector == ConnectorType.DOUBLE && connector2 == ConnectorType.DOUBLE){
+        if (connector == ConnectorType.DOUBLE && connector2 == ConnectorType.DOUBLE) {
             System.out.println("if (connector == ConnectorType.DOUBLE && connector2 != ConnectorType.DOUBLE)");
             return true;
         }
@@ -870,15 +874,15 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if(hit == null) {
+        if (hit == null) {
             return -1; // se non veniamo colpiti
         }
         if (cannons.contains(hit)) {
             int dirP = direction.ordinal();
             int dirDD = getCannonDirection((Cannon) hit);
-            if(dirP == dirDD) {
+            if (dirP == dirDD) {
                 if (hit instanceof DoubleCannon) {
-                        return 2; // se abbiamo un doppio cannone
+                    return 2; // se abbiamo un doppio cannone
                 }
                 return 1; // se abbiamo un cannone singolo
             }
@@ -886,10 +890,10 @@ public class SpaceshipPlance {
         return 0; // se non abbiamo un cannone
     }
 
-    public int getCannonDirection(Cannon cannon){
+    public int getCannonDirection(Cannon cannon) {
         ConnectorType[] cannonConnectors = cannon.getConnectors();
-        for(int i=0; i<cannonConnectors.length; i++) {
-            if(cannonConnectors[i] == ConnectorType.CANNON)
+        for (int i = 0; i < cannonConnectors.length; i++) {
+            if (cannonConnectors[i] == ConnectorType.CANNON)
                 return i;
         }
         throw new IllegalStateException("Not a cannon connector in a cannon tile");
@@ -966,14 +970,13 @@ public class SpaceshipPlance {
             throw new SpaceShipPlanceException("Already busy spot");
         }
         components[y][x] = tile;
-        tile.setWellConnected(checkNewTile(x,y));
+        tile.setWellConnected(checkNewTile(x, y));
     }
 
     public void placeReserveToComponents(ComponentTile tile, int x, int y) {
         placeTileComponents(tile, x, y);
         reserveSpot.remove(tile);
     }
-
 
 
     public boolean checkExposedConnector(Direction direction, int position) {
@@ -1325,18 +1328,18 @@ public class SpaceshipPlance {
         result.append('\n');
 
         for (int tileRow = 0; tileRow < rows; tileRow++) {
-            for (int line = 0; line < 3; line++) {
+            for (int line = 0; line < 5; line++) {  // Ora 5 linee per tile
                 for (int tileCol = 0; tileCol < cols; tileCol++) {
-                    char[][] tileChars = tileCrafterbyTile(this.components[tileRow][tileCol],tileToShow );
+                    char[][] tileChars = tileCrafterbyTile(this.components[tileRow][tileCol], tileToShow);
                     if (edgeCases(tileRow, tileCol)) {
-                        result.append("   ");
+                        result.append("     ");  // 5 spazi per mantenere l'allineamento
                     } else {
-                        for (int c = 0; c < 3; c++) {
+                        for (int c = 0; c < 5; c++) {
                             result.append(tileChars[line][c]);
                         }
                     }
                 }
-                result.append('\n'); // End of one horizontal line across tile row
+                result.append('\n');
             }
         }
 
@@ -1345,45 +1348,45 @@ public class SpaceshipPlance {
 
     private char[][] tileCrafterbyTile(ComponentTile tile, ComponentTile tileToShow) {
         char[][] lines = {
-                {'┌', '-', '┐'},
-                {'|', ' ', '|'},
-                {'└', '-', '┘'}
+                {'┌', '-', '-', '-', '┐'},  // Riga superiore
+                {'|', ' ', ' ', ' ', '|'},   // Riga centrale superiore
+                {'|', ' ', ' ', ' ', '|'},   // Riga centrale (ID qui)
+                {'|', ' ', ' ', ' ', '|'},   // Riga centrale inferiore
+                {'└', '-', '-', '-', '┘'}    // Riga inferiore
         };
 
-        if(tile != null)
-            System.out.println(tile.getClass().equals(tileToShow.getClass()));
+        if (tile == null) return lines;
 
-        if (tile == null ) return lines;
+        // Centro (ID a 2-3 cifre)
+        String idStr = String.valueOf(tile.getId());
+        int centerRow = 2;  // Riga centrale per l'ID
 
-        // centro
-        if(tile.getClass().equals(tileToShow.getClass())){
-            System.out.println("centro = " + String.valueOf(tile.getId()).charAt(0));
-            char center = String.valueOf(tile.getId()).charAt(0);
-            lines[1][1] = center;
-        }else{
+        if (tile.getClass().equals(tileToShow.getClass())) {
+            // Allinea l'ID al centro (2-3 cifre)
+            int startPos = (5 - idStr.length()) / 2;  // Calcola la posizione di inizio
+            for (int i = 0; i < idStr.length(); i++) {
+                lines[centerRow][startPos + i] = idStr.charAt(i);
+            }
+        } else {
+            // Altri casi (simbolo singolo)
             char center = TileSymbols.ASCII_TILE_SYMBOLS.get(tiletoString(tile));
-            lines[1][1] = center;
+            lines[centerRow][2] = center;  // Posizione centrale per simboli
         }
 
-        // connettori
+        // Connettori (aggiornati per la griglia 5x5)
         ConnectorType[] connectors = tile.getConnectors();
-        lines[0][1] = connectorToChar(connectors[0]);
-        lines[1][2] = connectorToChar(connectors[1]);
-        lines[2][1] = connectorToChar(connectors[2]);
-        lines[1][0] = connectorToChar(connectors[3]);
+        lines[0][2] = connectorToChar(connectors[0]);  // Alto
+        lines[2][4] = connectorToChar(connectors[1]);  // Destra
+        lines[4][2] = connectorToChar(connectors[2]);  // Basso
+        lines[2][0] = connectorToChar(connectors[3]);  // Sinistra
 
-        // scudo
+        // Scudo (esempio, adatta alla nuova griglia)
         if (tile instanceof ShieldGenerator) {
             boolean[] protection = ((ShieldGenerator) tile).getProtection();
-            if (protection[0] && protection[1]) {
-                lines[0][2] = 'S';
-            } else if (protection[1] && protection[2]) {
-                lines[2][2] = 'S';
-            } else if (protection[2] && protection[3]) {
-                lines[2][0] = 'S';
-            } else {
-                lines[0][0] = 'S';
-            }
+            if (protection[0] && protection[1]) lines[0][4] = 'S';
+            else if (protection[1] && protection[2]) lines[4][4] = 'S';
+            else if (protection[2] && protection[3]) lines[4][0] = 'S';
+            else lines[0][0] = 'S';
         }
 
         return lines;

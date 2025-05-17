@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
+import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
@@ -123,7 +124,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert coordinates: x y (es. 1 2): ");
+                            System.out.println("Insert coordinates: x y (es. 1 2): ");
+                            System.out.print("> ");
                             String inputLine = scan.nextLine();
 
                             try {
@@ -165,7 +167,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert coordinates of the tile you want to remove: x y (es. 1 2): ");
+                            System.out.println("Insert coordinates of the tile you want to remove: x y (es. 1 2): ");
+                            System.out.print("> ");
                             String inputLine = scan.nextLine();
 
                             try {
@@ -223,7 +226,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "1"-> {
                         boolean exit = false;
                         while (!exit) {
-                                System.out.print("Insert the id of the cabin you want to choose and then the color( b for brown and p for purple) of the alien you want to place in (ex. 1 b ): ");
+                                System.out.println("Type -1 to exit or insert the id of the cabin you want to choose and then the color( b for brown and p for purple) of the alien you want to place in (ex. 1 b ): ");
+                                System.out.print("> ");
                                 String line = scan.nextLine();
                                 try {
                                     String[] parts = line.split(" ");
@@ -253,6 +257,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }
                             }
                         }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                     }
                 }
 
@@ -265,7 +270,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
+                            System.out.println("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
+                            System.out.print("> ");
                             String inputLine = scan.nextLine();
                             try {
                                 String[] parts = inputLine.split(" ");
@@ -290,7 +296,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
                         while(!inputValid){
                             try {
-                                System.out.print("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
+                                System.out.println("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
+                                System.out.print("> ");
                                 String inputLine = scan.nextLine();
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length == 4) {
@@ -315,7 +322,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         boolean inputValid = false;
 
                         while(!inputValid){
-                            System.out.print("Insert: cargoIndex goodIndex (es. 0 1): ");
+                            System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
+                            System.out.print("> ");
                             String inputLine = scan.nextLine();
                             try {
                                 String[] parts = inputLine.split(" ");
@@ -391,7 +399,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();;
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert the index of double cannons to charge: ");
+                            System.out.println("Insert the index of double cannons to charge: ");
+                            System.out.print("> ");
                             String line = scan.nextLine();
                             String[] parts = line.trim().split(" ");
                             inputValid = true;
@@ -450,42 +459,42 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private void handleState() throws RemoteException {
         System.out.print("\n");
         switch(currentState){
-            case IDLE -> System.out.print("Type 0 to create a lobby");
-            case LOBBY_PHASE -> System.out.print("Lobby available\nEnter nickname: ");
-            case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
-            case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!\n" + TileSymbols.symbolExplanation);
-            case ASSEMBLY -> System.out.print("List of available tiles: ");
+            case IDLE -> System.out.println("Type 0 to create a lobby");
+            case LOBBY_PHASE -> System.out.println("Lobby available\nEnter nickname: ");
+            case WAIT_LOBBY -> System.out.println("Waiting for other players to join...");
+            case GAME_INIT -> System.out.println("--- GAME STARTED ---\n You will now craft your spaceship!\n" + TileSymbols.symbolExplanation);
+            case ASSEMBLY -> System.out.println("List of available tiles: ");
             case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
-            case PICKED_TILE -> System.out.print("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
-            case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
-            case ADJUST_SHIP -> System.out.print("Type 0 to remove a tile, type 1 to force draw card phase\n");
-            case SELECT_SHIP -> System.out.print("Type the number corresponding to ship part you want to keep\n");
-            case SHOW_SHIP -> System.out.print("Here is your spaceship\n");
-            case BYTILE_SHIP -> System.out.print("Here is your spaceship with ids of interested tiles\n");
-            case CHOOSE_ALIEN -> System.out.print("Here are your cabins list with their relatives ids, choose in the eligible ones if you want to get an alien\n");
-            case TURN_START -> System.out.print("Here is the flight plance\n");
-            case DRAW_CARD -> System.out.print("This is the drawn card:\n");
-            case FAILED_CARD -> System.out.print("You haven't met the requirements to activate this card:\n");
+            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
+            case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
+            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile, type 1 to force draw card phase");
+            case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
+            case SHOW_SHIP -> System.out.println("Here is your spaceship");
+            case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");
+            case CHOOSE_ALIEN -> System.out.println("Press 0 to exit exchange mode, press 1 to enter");
+            case TURN_START -> System.out.println("Here is the flight plance");
+            case DRAW_CARD -> System.out.println("This is the drawn card:");
+            case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
             case CARGO_MANAGEMENT -> {
                 try{
                     server.checkStorage(this);
                 } catch (Exception e){
-                    System.out.print("Error " + e.getMessage());
+                    System.out.println("Error " + e.getMessage());
                 }
             }
-            case CARGO_VIEW -> System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
-            case CHOOSE_PLAYER -> System.out.print("Type 0 to activate the card, 1 to reject the card\n");
-            case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player\n");
-            case END_CARD -> System.out.print("End card\n");
-            case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
-            case CHOOSE_BATTERY -> System.out.print("Type 0 to skip your turn or 1 to charge your double engines ");
-            case CHOOSE_PLANETS -> System.out.print("Type 0 to skip your turn or 1 to land on one of the planets");
-            case CHOOSE_CANNON -> System.out.print("Type 0 to not use double cannons or 1 to use them");
-            case ASK_SHIELD -> System.out.print("Type 0 to not use your shield or 1 to use it");
-            case ASK_CANNON -> System.out.print("Type 0 to not use your DoubleCannon or 1 to use it");
-            case END_GAME -> System.out.print("Game has ended, below are the stats:");
+            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+            case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
+            case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
+            case END_CARD -> System.out.println("End card");
+            case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
+            case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
+            case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
+            case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
+            case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
+            case ASK_CANNON -> System.out.println("Type 0 to not use your DoubleCannon or 1 to use it");
+            case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
-        System.out.print("\n> ");
+        System.out.print("> ");
     }
 
     @Override
@@ -532,8 +541,19 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PlanetsBlock pb -> printPlanets(pb.getPlanets());
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strenght, " + "You have " + es.getPlayerStrenght() + " fire strenght without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
+            case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
             default -> {}
         }
+        System.out.print("> ");
+    }
+
+    private void printCabinAliens(ArrayList<CabinAliens> cabinAliens) {
+        for(CabinAliens cabinAlien : cabinAliens) {
+            Cabin c = cabinAlien.getCabin();
+            System.out.println(c);
+            System.out.println("brown: " + cabinAlien.isBrown() + " purple: " + cabinAlien.isPurple());
+        }
+        System.out.print("> ");
     }
 
     private void printPlanets(ArrayList<Planet> planets) {
@@ -599,7 +619,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("[" + "Tile" + tile + "]");
         }
 
-        System.out.print("Enter the index of the tile you want to pick or type -1 to end crafting:\n");
+        System.out.println("Enter the index of the tile you want to pick or type -1 to end crafting:");
     }
 
     public void printLobbyNicks(ArrayList<String> nicks){

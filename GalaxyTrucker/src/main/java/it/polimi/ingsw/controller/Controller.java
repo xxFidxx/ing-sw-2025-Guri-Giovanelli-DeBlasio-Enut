@@ -848,6 +848,7 @@ public class Controller implements EventListenerInterface {
                 allOk = false;
             }else{
                 p.getSpaceshipPlance().updateLists();
+                System.out.println("uscito da update!");
                 isDone.put(l, true);
                 printSpaceship(l);
             }
@@ -855,7 +856,7 @@ public class Controller implements EventListenerInterface {
 
         if(allOk){
             chooseAliens();
-            }else{ // for each already done client I send state to wait for the ones who aren't done yet
+            }else{ // for each already done client I send state to wait for the ones who aren't done cause they have to adjust
             isDone.entrySet().stream()
                     .filter(Map.Entry::getValue)
                     .forEach(entry -> {
@@ -1173,7 +1174,9 @@ public class Controller implements EventListenerInterface {
             ArrayList <CabinAliens> cabinAliens = new ArrayList <>();
             boolean atLeastOneSupport = false;
             for(Cabin c: cabins){
+                System.out.println(c);
                 AlienColor[]  lifeSupportSystemColors = c.getLifeSupportSystemColor();
+                System.out.println(Arrays.toString(lifeSupportSystemColors));
                 if(Arrays.stream(lifeSupportSystemColors)
                         .anyMatch(s -> s == AlienColor.BROWN)){
                     brown = true;
@@ -1193,6 +1196,7 @@ public class Controller implements EventListenerInterface {
 
 
             if(!cabinAliens.isEmpty()){
+                printSpaceshipbyTile(l,  cabinAliens.getFirst().getCabin());
                 l.onEvent(eventCrafter(GameState.CHOOSE_ALIEN, new ListCabinAliens(cabinAliens)));
             }else{
                 isDone.put(l, true);
