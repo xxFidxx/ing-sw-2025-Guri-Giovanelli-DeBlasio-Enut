@@ -39,7 +39,8 @@ public enum GameState {
     SELECT_SHIP,
     ASK_SHIELD,
     FAILED_CARD,
-    ASK_CANNON
+    ASK_CANNON,
+    MOVE_PLAYER
     }
 
 

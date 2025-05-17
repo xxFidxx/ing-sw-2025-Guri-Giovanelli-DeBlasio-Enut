@@ -476,6 +476,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CARGO_VIEW -> System.out.print("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.print("Type 0 to activate the card, 1 to reject the card\n");
             case WAIT_PLAYER -> System.out.print("Wait for the choice of the current player\n");
+            case MOVE_PLAYER -> System.out.print("you have the least crew\n");
             case END_CARD -> System.out.print("End card\n");
             case SHOW_PLAYER -> System.out.print("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.print("Type 0 to skip your turn or 1 to charge your double engines ");
@@ -532,6 +533,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PlanetsBlock pb -> printPlanets(pb.getPlanets());
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strenght, " + "You have " + es.getPlayerStrenght() + " fire strenght without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
+            case LostDays ld -> System.out.println("you lose " + ld.getLd() + " days \n");
             default -> {}
         }
     }

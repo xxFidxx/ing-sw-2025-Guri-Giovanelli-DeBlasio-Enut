@@ -226,6 +226,9 @@ public class Controller implements EventListenerInterface {
             case BYTILE_SHIP -> {
                 event = new Event(this, state, (DataString) data);
             }
+            case MOVE_PLAYER ->{
+                event = new Event(this, state, (LostDays) data);
+            }
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -558,6 +561,24 @@ public class Controller implements EventListenerInterface {
                 currentAdventureCard.activate();
                 resetShowAndDraw();
             }
+            case CombatZoneCard czc ->{
+                if(((CombatZoneCard)currentAdventureCard).getType() == CombatZoneType.LOSTCREW){
+                    Player minEquipPlayer = tmpPlayers.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
+                    int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
+                    LostDays obj= new LostDays(ld);
+                    ClientListener l = listenerbyPlayer.get(minEquipPlayer);
+                    l.onEvent(eventCrafter(GameState.MOVE_PLAYER, obj));
+                    game.getFlightplance().move(ld,minEquipPlayer);
+                    for(ClientListener listener : listeners) {
+                        Player player = playerbyListener.get(listener);
+                        int es = player.getEngineStrenght();
+
+
+                    }
+
+                }
+
+            }
 
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
@@ -771,14 +792,16 @@ public class Controller implements EventListenerInterface {
         int size = defeatedPlayers.size();
         Player first = defeatedPlayers.get(0);
         activateMeteor(first);
-        Player second = defeatedPlayers.get(1);
-        activateMeteor(second);
-        if(size >= 3) {
-            Player third = defeatedPlayers.get(2);
-            activateMeteor(third);
-            if (size == 4) {
-                Player fourth = defeatedPlayers.get(3);
-                activateMeteor(fourth);
+        if(size >= 2) {
+            Player second = defeatedPlayers.get(1);
+            activateMeteor(second);
+            if (size >= 3) {
+                Player third = defeatedPlayers.get(2);
+                activateMeteor(third);
+                if (size == 4) {
+                    Player fourth = defeatedPlayers.get(3);
+                    activateMeteor(fourth);
+                }
             }
         }
         shots.remove(currentProjectile);

@@ -66,4 +66,6 @@ public class CombatZoneCard extends AdventureCard  {
     public int getLostOther() {
         return lostOther;
     }
+
+    public CombatZoneType getType() { return type; }
 }
