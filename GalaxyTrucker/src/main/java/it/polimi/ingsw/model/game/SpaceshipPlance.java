@@ -72,7 +72,7 @@ public class SpaceshipPlance {
                 ConnectorType.UNIVERSAL,   // Lato inferiore
                 ConnectorType.UNIVERSAL    // Lato sinistro
         };
-        components[2][3] = new Cabin(cannonConnectors, true, -1);
+        components[2][3] = new Cabin(cannonConnectors, true, 100);
         ComponentTile tile = components[2][3];
         tile.setWellConnected(true);
     }
@@ -128,9 +128,9 @@ public class SpaceshipPlance {
         cabins.clear();
         cargoHolds.clear();
         shieldGenerators.clear();
-        for (int row = 0; row < ROWS; row++) {
-            for (int col = 0; col < COLS; col++) {
-                ComponentTile tile = components[row][col];
+        for (int y = 0; y < ROWS; y++) {
+            for (int x = 0; x < COLS; x++) {
+                ComponentTile tile = components[y][x];
 
                 if (tile != null) {
                     switch (tile) {
@@ -144,22 +144,23 @@ public class SpaceshipPlance {
                         }
                         case Cabin cab -> {
                             cabins.add(cab);
-                            if (!cab.isCentral()) {
                                 for (int dir = 0; dir < 4; dir++) {
                                     int[] dirx = DIR_X;
                                     int[] diry = DIR_Y;
-                                    int nx = row + dirx[dir];
-                                    int ny = col + diry[dir];
-                                    System.out.println("row: " + row + " col: " + col + " nx: " + nx + " ny: " + ny);
-                                    if (inBounds(nx, ny) && components[nx][ny] != null) {
-                                        ComponentTile tile2 = components[nx][ny];
+                                    int nx = x + dirx[dir];
+                                    int ny = y + diry[dir];
+                                    System.out.println("row: " + y + " col: " + x + " nx: " + nx + " ny: " + ny + " dir: " + dir);
+                                    if (inBounds(nx, ny) && components[ny][nx] != null) {
+                                        ComponentTile tile2 = components[ny][nx];
                                         System.out.println("if (inBounds(nx, ny) && components[ny][nx] != null) {");
                                         System.out.println(tile);
                                         System.out.println(tile2);
                                         if (tile2 instanceof LifeSupportSystem) {
                                             System.out.println("if(tile2 instanceof LifeSupportSystem){");
                                             ConnectorType a = tile.getConnectors()[dir];
-                                            ConnectorType b = components[nx][ny].getConnectors()[(dir + 2) % 4];
+                                            ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
+
+                                            System.out.println("Connettore tile: " + a + "Connettore tile2: " + b);
 
                                             if (isConnectionValid(a, b)) {
                                                 System.out.println("Connection valid");
@@ -172,7 +173,6 @@ public class SpaceshipPlance {
                                         }
                                     }
                                 }
-                            }
                         }
                         case CargoHolds ch -> {
                             cargoHolds.add(ch);
@@ -188,6 +188,8 @@ public class SpaceshipPlance {
                 }
             }
         }
+
+        countFigures();
     }
 
     private boolean inBounds(int x, int y) {
@@ -562,20 +564,26 @@ public class SpaceshipPlance {
 
 
     public void countFigures() {
+        nAstronauts = 0;
+        nBrownAliens = 0;
+        nPurpleAliens = 0;
         for (Cabin cabin : cabins) {
             Figure[] figures = cabin.getFigures();
-            for (Figure figure : figures) {
-                if (figure instanceof Astronaut)
-                    nAstronauts++;
-                else {
-                    Alien alien = (Alien) figure;
-                    if (alien.getColor() == BROWN)
-                        nBrownAliens++;
-                    else if (alien.getColor() == PURPLE)
-                        nPurpleAliens++;
+            for (Figure figure : figures){
+                if(figure != null){
+                    if (figure instanceof Astronaut)
+                        nAstronauts++;
+                    else {
+                        Alien alien = (Alien) figure;
+                        if (alien.getColor() == BROWN)
+                            nBrownAliens++;
+                        else if (alien.getColor() == PURPLE)
+                            nPurpleAliens++;
+                    }
                 }
             }
         }
+        System.out.println("Astronauts: " + nAstronauts + "Brown aliens: " + nBrownAliens + "Purple aliens: " + nPurpleAliens);
     }
 
     public boolean checkStorage() {

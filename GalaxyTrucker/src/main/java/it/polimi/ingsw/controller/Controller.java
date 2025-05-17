@@ -1169,11 +1169,11 @@ public class Controller implements EventListenerInterface {
         for(ClientListener l: listeners){
             Player p = playerbyListener.get(l);
             ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
-            boolean brown = false;
-            boolean purple = false;
             ArrayList <CabinAliens> cabinAliens = new ArrayList <>();
             boolean atLeastOneSupport = false;
             for(Cabin c: cabins){
+                boolean brown = false;
+                boolean purple = false;
                 System.out.println(c);
                 AlienColor[]  lifeSupportSystemColors = c.getLifeSupportSystemColor();
                 System.out.println(Arrays.toString(lifeSupportSystemColors));
@@ -1262,5 +1262,32 @@ public class Controller implements EventListenerInterface {
         else
             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
     }
+
+//    public void handleFiguresManagement(ClientListener listener) {
+//        Player p = playerbyListener.get(listener);
+//        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
+//        for(Cabin c: cabins){
+//            if(c.getId() == cabinId){
+//                AlienColor[] colors = c.getLifeSupportSystemColor();
+//                if(Objects.equals(alienColor, "b")){
+//                    if(colors[AlienColor.BROWN.ordinal()] != null){
+//                        Figure[] figures = c.getFigures();
+//                        figures[0] = new Alien(1, AlienColor.BROWN);
+//                        figures[1] = null;
+//                        return true;
+//                    }
+//                }
+//
+//                if(Objects.equals(alienColor, "p")){
+//                    if(colors[AlienColor.PURPLE.ordinal()] != null){
+//                        Figure[] figures = c.getFigures();
+//                        figures[0] = new Alien(1, AlienColor.BROWN);
+//                        figures[1] = null;
+//                        return true;
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 

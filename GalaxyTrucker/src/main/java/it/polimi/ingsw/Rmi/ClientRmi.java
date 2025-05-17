@@ -124,12 +124,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert coordinates: x y (es. 1 2): ");
+                            System.out.println("Type -1 to exit crafting or Insert coordinates: x y (es. 1 2): ");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();
 
                             try {
                                 String[] parts = inputLine.split(" ");
+                                if(Integer.parseInt(parts[0]) == -1){
+                                    inputValid = true;
+                                    server.endCrafting(this);
+                                }
                                 if (parts.length == 2) {
                                     int xIndex = Integer.parseInt(parts[0]);
                                     int yIndex = Integer.parseInt(parts[1]);
@@ -167,12 +171,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert coordinates of the tile you want to remove: x y (es. 1 2): ");
+                            System.out.println("Type -1 to exit or insert coordinates of the tile you want to remove: x y (es. 1 2): ");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();
 
                             try {
                                 String[] parts = inputLine.split(" ");
+                                if(Integer.parseInt(parts[0]) == -1){
+                                    inputValid = true;
+                                    server.endCrafting(this);
+                                }
                                 if (parts.length == 2) {
                                     int xIndex = Integer.parseInt(parts[0]);
                                     int yIndex = Integer.parseInt(parts[1]);
