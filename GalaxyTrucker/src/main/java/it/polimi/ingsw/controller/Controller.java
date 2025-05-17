@@ -1243,7 +1243,7 @@ public class Controller implements EventListenerInterface {
                 if(Objects.equals(alienColor, "p")){
                     if(colors[AlienColor.PURPLE.ordinal()] != null){
                         Figure[] figures = c.getFigures();
-                        figures[0] = new Alien(1, AlienColor.BROWN);
+                        figures[0] = new Alien(1, AlienColor.PURPLE);
                         figures[1] = null;
                         return true;
                     }
@@ -1261,6 +1261,39 @@ public class Controller implements EventListenerInterface {
             drawCard();
         else
             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+    }
+
+    public boolean removeFigure(ClientListener listener,int cabinId, String figure){
+        Player p = playerbyListener.get(listener);
+        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
+        for(Cabin c: cabins){
+            if(c.getId() == cabinId){
+                Figure[] figures = c.getFigures();
+                switch (figure) {
+                    case "as" -> {
+                        if (figures[1] != null && figures[1] instanceof Astronaut) {
+                            figures[1] = null;
+                            return true;
+                        } else if (figures[0] != null && figures[0] instanceof Astronaut) {
+                            figures[0] = null;
+                            return true;
+                        } else
+                            return false;
+                    }
+                    case "al" -> {
+                        if (figures[0] != null && figures[0] instanceof Alien) {
+                            figures[0] = null;
+                            return true;
+                        } else
+                            return false;
+                    }
+                    case null, default -> {
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 //    public void handleFiguresManagement(ClientListener listener) {

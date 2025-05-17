@@ -67,4 +67,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean addAlienCabin(VirtualViewRmi clientRmi, int cabinId, String alienColor) throws RemoteException;
 
     void handleEndChooseAliens(VirtualViewRmi clientRmi) throws RemoteException;
+
+    boolean removeFigure(VirtualViewRmi clientRmi, int cabinId, String part) throws RemoteException;
 }

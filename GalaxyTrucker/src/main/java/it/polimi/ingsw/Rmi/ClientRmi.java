@@ -1,5 +1,6 @@
 package it.polimi.ingsw.Rmi;
 
+import com.sun.glass.ui.Screen;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
@@ -30,11 +31,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final LinkedBlockingQueue<Event> eventQueue;
     private final Scanner scan = new Scanner(System.in);
     private final Object StateLock = new Object();
+    private Event currentEvent;
 
 
     public ClientRmi(VirtualServerRmi server) throws RemoteException{
         super();
         this.server = server;
+        this.currentEvent = null;
         eventQueue = new LinkedBlockingQueue<>();
         currentState = GameState.IDLE;
     }
@@ -269,6 +272,65 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                 }
 
+            case CREW_MANAGEMENT ->{
+                if (input.equals("0")) {
+                    DataContainer data = currentEvent.getData();
+                    int lostCrew = ((CrewManagement) data).getLostCrew();
+                    int lostAliens = ((CrewManagement) data).getLostAliens();
+                    while ((lostCrew != 0 || lostAliens != 0)) {
+                        System.out.println("Ex input:\ncabinId as -> this removes an astronaut\n cabinId al -> this removes an alien");
+                        System.out.println("You have to remove " + "Generic crew: " + lostCrew + " Aliens: " + lostAliens);
+                        System.out.print("> ");
+                        String line = scan.nextLine();
+                        boolean removed = false;
+                        try {
+                            String[] parts = line.split(" ");
+                            if (parts.length == 2) {
+                                int cabinId = Integer.parseInt(parts[0]);
+                                if (lostCrew != 0) {
+                                    if (parts[1] != null && (parts[1].equals("as"))) {
+                                        if (server.removeFigure(this, cabinId, parts[1])) {
+                                            lostCrew--;
+                                            removed = true;
+                                        } else {
+                                            System.out.println("You have to put a cabinId containing an astronaut");
+                                        }
+                                    } else {
+                                        System.out.println("You have to type as as second parameter, please retry");
+                                    }
+                                } else {
+                                    if (lostAliens != 0) {
+                                        if (parts[1] != null && (parts[1].equals("al"))) {
+                                            if (server.removeFigure(this, cabinId, parts[1])) {
+                                                lostAliens--;
+                                                removed = true;
+                                            } else {
+                                                System.out.println("You have to put a cabinId containing an alien of that color");
+                                            }
+                                        } else {
+                                            System.out.println("You have to type alB or alP as second parameter, please retry");
+                                        }
+                                    }
+                                }
+                            } else {
+                                System.out.println("Wrong input. You need to put a number and a string divided by a space\n");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars");
+                        } catch (RemoteException e) {
+                            System.out.println("Error " + e.getMessage());
+                        }
+                        if (removed)
+                            System.out.println("Successfully removed");
+                    }
+                } else {
+                    System.out.print("Not accepted input, please try again:\n");
+                }
+
+
+
+            }
+
             case CARGO_MANAGEMENT -> {
                 System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
             }
@@ -490,6 +552,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     System.out.println("Error " + e.getMessage());
                 }
             }
+            case CREW_MANAGEMENT ->{
+                System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
+                System.out.println("Press 0 to continue");
+            }
             case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
@@ -513,13 +579,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private void handleEvents(){
         while (true) {
             try {
-                Event event = eventQueue.take();
+                currentEvent = eventQueue.take();
                     synchronized (StateLock) {
-                        currentState = event.getState();
+                        currentState = currentEvent.getState();
                         System.out.println("\n--- Game State Updated ---");
                         handleState();
                     }
-                showData(event.getData());
+                showData(currentEvent.getData());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("\n> Event thread interrupted");

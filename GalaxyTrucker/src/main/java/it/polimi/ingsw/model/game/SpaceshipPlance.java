@@ -144,6 +144,10 @@ public class SpaceshipPlance {
                         }
                         case Cabin cab -> {
                             cabins.add(cab);
+                            // I reset aliens of previuos check, maybe the lifesupport system has been destroyed so I need to do that to ensure the alien doesnt remain on the cabin
+                            AlienColor[] colors = cab.getLifeSupportSystemColor();
+                            colors[0] = null;
+                            colors[1] = null;
                                 for (int dir = 0; dir < 4; dir++) {
                                     int[] dirx = DIR_X;
                                     int[] diry = DIR_Y;
@@ -167,12 +171,15 @@ public class SpaceshipPlance {
                                                 // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente.
                                                 // la cabina ha un array di AlienColors a 2 posti, metto a true la casella corrispondente al colore dell'alieno, faccio
                                                 // cosi perchè nel caso ci siano 2 colori, sono sicuro che non vado a sovrascrivere la casella contenente già un colore
-                                                AlienColor[] colors = cab.getLifeSupportSystemColor();
                                                 colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
                                             }
                                         }
                                     }
                                 }
+                                Figure[] figures = cab.getFigures();
+                                // if a lifesupport has been removed, it means there is an alien on the cabin but there isnt anymore the corresponding color in the colors array
+                                if(figures[0] != null && figures[0] instanceof Alien && colors[((Alien) figures[0]).getColor().ordinal()] == null)
+                                    figures[0] = null;
                         }
                         case CargoHolds ch -> {
                             cargoHolds.add(ch);
