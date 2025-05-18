@@ -1,6 +1,5 @@
 package it.polimi.ingsw.Rmi;
 
-import com.sun.glass.ui.Screen;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
@@ -15,6 +14,7 @@ import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
 
+import javax.sound.midi.SysexMessage;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -519,6 +519,20 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             }
                         }
                     }
+                    default ->{
+                        System.out.println("Not accepted input, please try again");
+                        System.out.print("> ");
+                    }
+                }
+            }case ASK_SURRENDERER ->{
+                switch (input) {
+                    case "-1" ->{
+                        server.surrend(this);
+                        System.out.println("You surrended, you will now be in spectator mode");
+                    }
+                    case "0"->{
+                        server.handleSurrenderEnded(this);
+                    }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
@@ -566,6 +580,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your DoubleCannon or 1 to use it");
+            case ASK_SURRENDERER -> System.out.println("Type -1 to surrendered or 0 to continue the game");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");

@@ -253,13 +253,19 @@ public class Game {
                     p.setCredits(p.getCredits() + goodsBlock.getValue());
                 }
             }
+            // surrended players get half of the cargo reward
+            if(p.isSurrended())
+                p.setCredits(p.getCredits() / 2);
         }
     }
 
     private void rewardPlaces() {
         int amount = 5 - players.size();
         for (Player p: players) {
-            p.setCredits(players.getFirst().getCredits() + amount);
+            // surrended players dont get position reward
+            if(!p.isSurrended())
+                p.setCredits(players.getFirst().getCredits() + amount);
+
             amount++;
         }
     }

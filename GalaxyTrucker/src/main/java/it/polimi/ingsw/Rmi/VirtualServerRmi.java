@@ -69,4 +69,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void handleEndChooseAliens(VirtualViewRmi clientRmi) throws RemoteException;
 
     boolean removeFigure(VirtualViewRmi clientRmi, int cabinId, String part) throws RemoteException;
+
+    void surrend(VirtualViewRmi clientRmi) throws RemoteException;
+
+    void handleSurrenderEnded(VirtualViewRmi clientRmi) throws RemoteException;
 }

@@ -453,19 +453,25 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
+                int numE = 0;
                 int numDE = 0;
                 for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
+                    numE ++;
                     if(e instanceof DoubleEngine) {
                         numDE++;
                     }
                 }
-                if(numDE > 0) {
-                    ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    tmpPlayers.remove(currentPlayer);
-                    handleWaitersBattery(l, numDE);
-                } else {
-                    tmpPlayers.remove(currentPlayer);
-                    fromChargeToManage();
+                if(numE == 0){
+                    handleEarlyEnd(currentPlayer);
+                }else{
+                    if(numDE > 0) {
+                        ClientListener l = listenerbyPlayer.get(currentPlayer);
+                        tmpPlayers.remove(currentPlayer);
+                        handleWaitersBattery(l, numDE);
+                    } else {
+                        tmpPlayers.remove(currentPlayer);
+                        fromChargeToManage();
+                    }
                 }
             }
 
@@ -563,6 +569,12 @@ public class Controller implements EventListenerInterface {
         }
     }
 
+    private void handleEarlyEnd(Player player) {
+        ClientListener listener = listenerbyPlayer.get(player);
+        isDone.remove(listener);
+        players.remove(player);
+    }
+
 
     public void activateMeteor(Player player) {
         switch(currentProjectile){
@@ -623,12 +635,12 @@ public class Controller implements EventListenerInterface {
     public void resetShowAndDraw() {
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
         game.endTurn();
+        isDone.replaceAll((c, v) -> false);
         for(ClientListener cl : listeners){
-            isDone.put(cl, false);
             endCard(cl);
         }
         cards.remove(currentAdventureCard);
-        drawCard();
+        endTurn();
     }
 
     public void activateAbandonedShipCard(ClientListener listener) throws LobbyExceptions {
@@ -867,14 +879,6 @@ public class Controller implements EventListenerInterface {
 
     }
 
-
-
-    private boolean handleAdjustmentEnded(){
-        synchronized (isDone) {
-            return !isDone.containsValue(false);
-        }
-    }
-
     private String[] handleBoardView() {
 
         String[] boardView = new String[18];
@@ -1098,10 +1102,6 @@ public class Controller implements EventListenerInterface {
         manageCard();
     }
 
-//    private void handleEndManagement(ClientListener listener) {
-//        Player player = playerbyListener.get(listener);
-//
-//    }
 
     public void rotateClockwise(ClientListener listener) {
         Player player = playerbyListener.get(listener);
@@ -1122,7 +1122,7 @@ public class Controller implements EventListenerInterface {
                 isDone.put(listener, true);
                 printSpaceship(listener);
                 if (handleAdjustmentEnded())
-                    drawCard();
+                    chooseAliens();
                 else
                     listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }else
@@ -1150,7 +1150,7 @@ public class Controller implements EventListenerInterface {
             isDone.put(listener,true);
             printSpaceship(listener);
             if(handleAdjustmentEnded())
-                drawCard();
+                chooseAliens();
             else
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
         }
@@ -1296,6 +1296,58 @@ public class Controller implements EventListenerInterface {
         return false;
     }
 
+    private void checkEarlyEndConditions(){
+        for(Player player: players){
+            if(player.getSpaceshipPlance().getnAstronauts()==0)
+                handleEarlyEnd(player);
+            if(players.getLast().getPlaceholder().getPosizione() > player.getPlaceholder().getPosizione() + 18)
+                handleEarlyEnd(player);
+        }
+    }
+
+    private void endTurn(){
+        for(Player player: players){
+            ClientListener listener = listenerbyPlayer.get(player);
+            listener.onEvent(eventCrafter(GameState.ASK_SURRENDERER, null));
+        }
+    }
+
+    private boolean handleAdjustmentEnded(){
+        synchronized (isDone) {
+            return !isDone.containsValue(false);
+        }
+    }
+
+    public void handleSurrenderEnded(ClientListener listener){
+
+                System.out.println("Client: " + listener);
+
+        synchronized (isDone){
+            isDone.put(listener, true);
+        }
+
+        synchronized (isDone) {
+            if(!isDone.containsValue(false))
+                drawCard();
+            else{
+                isDone.forEach((client, value) ->
+                        System.out.println("Client: " + client + " -> Value: " + value)
+                );
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }
+                }
+        }
+
+    public void surrend(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        isDone.remove(listener);
+        players.remove(player);
+        player.setSurrended(true);
+    }
+}
+
+
+
 //    public void handleFiguresManagement(ClientListener listener) {
 //        Player p = playerbyListener.get(listener);
 //        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
@@ -1322,5 +1374,5 @@ public class Controller implements EventListenerInterface {
 //            }
 //        }
 //    }
-}
+
 
