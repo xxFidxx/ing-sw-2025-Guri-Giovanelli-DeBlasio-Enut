@@ -59,7 +59,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>${javafx.maven.plugin.version}</version>
         <configuration>
-          <mainClass>it.polimi.ingsw.MainApp</mainClass>
+          <mainClass>it.polimi.ingsw.gui.MainApp</mainClass>
         </configuration>
       </plugin>
     </plugins>
