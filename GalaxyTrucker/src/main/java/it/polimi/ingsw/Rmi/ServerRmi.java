@@ -246,5 +246,23 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.handleEndChooseAliens(listener);
     }
+
+    @Override
+    public boolean removeFigure(VirtualViewRmi clientRmi, int cabinId, String figure) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        return controller.removeFigure(listener,cabinId,figure);
+    }
+
+    @Override
+    public void surrend(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.surrend(listener);
+    }
+
+    @Override
+    public void handleSurrenderEnded(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.handleSurrenderEnded(listener);
+    }
 }
 

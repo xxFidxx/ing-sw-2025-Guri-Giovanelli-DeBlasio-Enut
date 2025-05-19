@@ -19,6 +19,7 @@ public class Player {
         private ComponentTile handTile;
         private boolean responded;
         private GoodsBlock[] reward;
+        private boolean surrended;
 
     public Player(String nickname, Game game, int playerNumber) {
         this.nickname = nickname;
@@ -31,10 +32,19 @@ public class Player {
         this.handTile = null;
         this.responded = false;
         this.reward = null;
+        this.surrended = false;
     }
 
     public void setSpaceshipPlance(SpaceshipPlance spaceshipPlance) {
         this.spaceshipPlance = spaceshipPlance;
+    }
+
+    public void setSurrended(boolean surrended) {
+        this.surrended = surrended;
+    }
+
+    public boolean isSurrended() {
+        return surrended;
     }
 
     public GoodsBlock[] getReward(){

@@ -144,35 +144,34 @@ public class SpaceshipPlance {
                         }
                         case Cabin cab -> {
                             cabins.add(cab);
+                            // I reset aliens of previuos check, maybe the lifesupport system has been destroyed so I need to do that to ensure the alien doesnt remain on the cabin
+                            AlienColor[] colors = cab.getLifeSupportSystemColor();
+                            colors[0] = null;
+                            colors[1] = null;
                                 for (int dir = 0; dir < 4; dir++) {
                                     int[] dirx = DIR_X;
                                     int[] diry = DIR_Y;
                                     int nx = x + dirx[dir];
                                     int ny = y + diry[dir];
-                                    System.out.println("row: " + y + " col: " + x + " nx: " + nx + " ny: " + ny + " dir: " + dir);
                                     if (inBounds(nx, ny) && components[ny][nx] != null) {
                                         ComponentTile tile2 = components[ny][nx];
-                                        System.out.println("if (inBounds(nx, ny) && components[ny][nx] != null) {");
-                                        System.out.println(tile);
-                                        System.out.println(tile2);
                                         if (tile2 instanceof LifeSupportSystem) {
-                                            System.out.println("if(tile2 instanceof LifeSupportSystem){");
                                             ConnectorType a = tile.getConnectors()[dir];
                                             ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
 
-                                            System.out.println("Connettore tile: " + a + "Connettore tile2: " + b);
-
                                             if (isConnectionValid(a, b)) {
-                                                System.out.println("Connection valid");
                                                 // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente.
                                                 // la cabina ha un array di AlienColors a 2 posti, metto a true la casella corrispondente al colore dell'alieno, faccio
                                                 // cosi perchè nel caso ci siano 2 colori, sono sicuro che non vado a sovrascrivere la casella contenente già un colore
-                                                AlienColor[] colors = cab.getLifeSupportSystemColor();
                                                 colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
                                             }
                                         }
                                     }
                                 }
+                                Figure[] figures = cab.getFigures();
+                                // if a lifesupport has been removed, it means there is an alien on the cabin but there isnt anymore the corresponding color in the colors array
+                                if(figures[0] != null && figures[0] instanceof Alien && colors[((Alien) figures[0]).getColor().ordinal()] == null)
+                                    figures[0] = null;
                         }
                         case CargoHolds ch -> {
                             cargoHolds.add(ch);
@@ -218,8 +217,8 @@ public class SpaceshipPlance {
 
     public boolean checkCorrectness() {
         initVisited();
-        // prima guardo se la tile in 3 2 è null, se è null alllora faccio un doppio for dove cerco la prima tile libera, perchè vuol dire che sono nel caso in cui è stato rimosso
-        // il centro, per cui non incappo in isole, perchè nella fase iniziale si possono creare e li sicuramente il centro esiste
+        // prima guardo se la tile in 3 2 è null, se è null allora faccio un doppio for dove cerco la prima tile libera, perch vuol dire che sono nel caso in cui è stato rimosso
+        // il centro, per cui non incappo in isole, perch nella fase iniziale si possono creare e li sicuramente il centro esiste
         ComponentTile tile = components[2][3];
         if (tile == null) {
             int xStart = 0;
@@ -273,6 +272,7 @@ public class SpaceshipPlance {
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
                 if (!visited[y][x] || edgeCases(y, x)) {
+                    addReserveSpot(components[y][x]);
                     components[y][x] = null;
                 }
             }
@@ -475,6 +475,7 @@ public class SpaceshipPlance {
         if (components[y][x] == null)
             throw new SpaceShipPlanceException("No tile in the index you provided, please retry");
 
+        addReserveSpot(components[y][x]);
         components[y][x] = null;
 
         int[] dirx = DIR_X;
@@ -498,9 +499,6 @@ public class SpaceshipPlance {
         if (!inBounds(x, y) || edgeCases(y, x) || visited[y][x] || components[y][x] == null) {
             return 0;
         }
-
-        if (iteration == 0)
-            System.out.println(components[y][x]);
 
         visited[y][x] = true;
         shownComponents[y][x] = iteration;
@@ -530,36 +528,6 @@ public class SpaceshipPlance {
                 }
             }
         }
-    }
-
-
-    private boolean checkConnection(ConnectorType connector, ConnectorType connector2) {
-
-
-        if (connector == ConnectorType.CANNON || connector2 == ConnectorType.CANNON)
-            return false;
-
-        if (connector == ConnectorType.ENGINE || connector2 == ConnectorType.ENGINE)
-            return false;
-
-        // se c'è un universale ora è sicuramente true perchè abbiamo già controllato cannoni ed engine
-        if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH) {
-            System.out.println("if (connector == ConnectorType.UNIVERSAL && connector2 != ConnectorType.SMOOTH)");
-            return true;
-        }
-
-        if (connector == ConnectorType.SINGLE && connector2 == ConnectorType.SINGLE) {
-            System.out.println("if (connector == ConnectorType.SINGLE && connector2 != ConnectorType.SINGLE)");
-            return true;
-        }
-
-        if (connector == ConnectorType.DOUBLE && connector2 == ConnectorType.DOUBLE) {
-            System.out.println("if (connector == ConnectorType.DOUBLE && connector2 != ConnectorType.DOUBLE)");
-            return true;
-        }
-
-
-        return false;
     }
 
 

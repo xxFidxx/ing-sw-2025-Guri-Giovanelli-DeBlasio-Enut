@@ -41,6 +41,8 @@ public enum GameState {
     FAILED_CARD,
     ASK_CANNON,
     MOVE_PLAYER
+    ASK_SURRENDERER,
+    ASK_CANNON
     }
 
 
