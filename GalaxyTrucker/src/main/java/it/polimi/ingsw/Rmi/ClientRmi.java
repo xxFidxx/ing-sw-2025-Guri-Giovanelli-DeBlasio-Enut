@@ -465,12 +465,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 switch (input) {
                     case "0" -> server.playerHit(this);
                     case "1" -> server.playerProtected(this);
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case ASK_CANNON -> {
                 switch (input) {
                     case "0" -> server.playerHit(this);
                     case "1" -> server.playerProtected(this);
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case CHOOSE_PLAYER -> {
@@ -500,6 +502,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             }
                         }
                     }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case CHOOSE_CANNON -> {
@@ -533,6 +536,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             }
                         }
                     }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case CHOOSE_PLANETS -> {

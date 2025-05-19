@@ -439,12 +439,12 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
+                ClientListener l = listenerbyPlayer.get(currentPlayer);
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
-                    ClientListener l = listenerbyPlayer.get(currentPlayer);
                     tmpPlayers.remove(currentPlayer);
-                    l.onEvent(eventCrafter(GameState.FAILED_CARD, null));
                     handleWaitersPlayer(l);
                 } else {
+                    l.onEvent(eventCrafter(GameState.FAILED_CARD, null));
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
@@ -457,12 +457,12 @@ public class Controller implements EventListenerInterface {
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
+                ClientListener l = listenerbyPlayer.get(currentPlayer);
                 if (currentAdventureCard.checkCondition(currentPlayer)) {
-                    ClientListener l = listenerbyPlayer.get(currentPlayer);
                     tmpPlayers.remove(currentPlayer);
-                    l.onEvent(eventCrafter(GameState.FAILED_CARD, null));
                     handleWaitersPlayer(l);
                 } else {
+                    l.onEvent(eventCrafter(GameState.FAILED_CARD, null));
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
@@ -833,7 +833,7 @@ public class Controller implements EventListenerInterface {
                         ClientListener l = listenerbyPlayer.get(minEnginePlayer);
                         handleMinEngine(l, lostCrew);
                         minEnginePlayer.loseCrew(lostOther);
-                        combactZoneCannons();
+                        combatZoneCannons();
                     } else {
                         listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
                     }
@@ -859,7 +859,7 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-    public void combactZoneCannons(){
+    public void combatZoneCannons(){
         for(ClientListener listener : listeners) {
             Player player = playerbyListener.get(listener);
             float fs = player.getFireStrenght();
