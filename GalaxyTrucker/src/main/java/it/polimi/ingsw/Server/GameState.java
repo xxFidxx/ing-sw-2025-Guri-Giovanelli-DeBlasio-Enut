@@ -40,9 +40,13 @@ public enum GameState {
     ASK_SHIELD,
     FAILED_CARD,
     ASK_CANNON,
-    MOVE_PLAYER
+    MOVE_PLAYER,
     ASK_SURRENDERER,
-    ASK_CANNON
+    LOST_CREW,
+    NOT_MIN_EQUIP,
+    NOT_MIN_ENGINE,
+    NOT_MIN_FIRE,
+    CANNON_FIRE
     }
 
 

@@ -573,7 +573,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
-            case MOVE_PLAYER -> System.out.print("you have the least crew\n");
+            case MOVE_PLAYER -> System.out.print("You have the least crew\n");
+            case LOST_CREW -> System.out.println("You have the least engine strenght");
+            case CANNON_FIRE -> System.out.println("You have the least fire strenght");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
@@ -582,6 +584,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your DoubleCannon or 1 to use it");
             case ASK_SURRENDERER -> System.out.println("Type -1 to surrendered or 0 to continue the game");
+            case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
+            case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strenght");
+            case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strenght");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");
@@ -626,13 +631,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             //case DataString ds -> System.out.println(ds);
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
-            case DoubleEngineNumber den -> System.out.println("You have " + den.getNum() + " double engines \n");
+            case DoubleEngineNumber den -> System.out.println("You have " + den.getPower() + " engine strenght and " + den.getNum() + " double engines \n");
             case DoubleCannonNumber den -> System.out.println("You have " + den.getNum() + " double cannons \n");
             case PlanetsBlock pb -> printPlanets(pb.getPlanets());
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strenght, " + "You have " + es.getPlayerStrenght() + " fire strenght without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
-            case LostDays ld -> System.out.println("you lose " + ld.getLd() + " days \n");
+            case LostDays ld -> System.out.println("You lose " + ld.getLd() + " days \n");
+            case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members \n");
             default -> {}
         }
         System.out.print("> ");

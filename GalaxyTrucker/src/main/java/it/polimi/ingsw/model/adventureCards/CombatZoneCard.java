@@ -67,5 +67,9 @@ public class CombatZoneCard extends AdventureCard  {
         return lostOther;
     }
 
+    public Projectile[] getCannons() {
+        return cannons;
+    }
+
     public CombatZoneType getType() { return type; }
 }
