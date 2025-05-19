@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.bank.BatteryToken;
 import java.util.Arrays;
 
 public class PowerCenter extends ComponentTile {
-    private boolean[] batteries;
+    private final boolean[] batteries;
 
     public PowerCenter(ConnectorType[] connectors, int capacity, int id) {
         super(connectors,id);
@@ -19,6 +19,6 @@ public class PowerCenter extends ComponentTile {
 
     @Override
     public String toString() {
-        return super.toString() + "batteries=" + Arrays.toString(batteries);
+        return super.toString() + "id: " + getId() + "batteries= " + Arrays.toString(batteries);
     }
 }

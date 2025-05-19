@@ -7,6 +7,7 @@ import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
+import it.polimi.ingsw.model.componentTiles.PowerCenter;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -299,17 +300,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                         System.out.println("You have to type as as second parameter, please retry");
                                     }
                                 } else {
-                                    if (lostAliens != 0) {
-                                        if (parts[1] != null && (parts[1].equals("al"))) {
-                                            if (server.removeFigure(this, cabinId, parts[1])) {
-                                                lostAliens--;
-                                                removed = true;
-                                            } else {
-                                                System.out.println("You have to put a cabinId containing an alien of that color");
-                                            }
+                                    if (parts[1] != null && (parts[1].equals("al"))) {
+                                        if (server.removeFigure(this, cabinId, parts[1])) {
+                                            lostAliens--;
+                                            removed = true;
                                         } else {
-                                            System.out.println("You have to type alB or alP as second parameter, please retry");
+                                            System.out.println("You have to put a cabinId containing an alien of that color");
                                         }
+                                    } else {
+                                        System.out.println("You have to type alB or alP as second parameter, please retry");
                                     }
                                 }
                             } else {
@@ -323,12 +322,53 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
+                    server.endManagement(this);
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
+            }
 
+            case BATTERIES_MANAGEMENT ->{
+                if (input.equals("0")) {
+                    DataContainer data = currentEvent.getData();
+                    int nBatteries = ((BatteriesManagement) data).getNBatteries();
+                    while ((nBatteries != 0)) {
+                        System.out.println("Ex input: 14 2 -> remove 2 batteries from powerCenter number 14");
+                        System.out.println("You have to remove " + "Batteries: " + nBatteries);
+                        System.out.print("> ");
+                        String line = scan.nextLine();
+                        boolean removed = false;
+                        try {
+                            String[] parts = line.split(" ");
+                            if (parts.length == 2) {
+                                int powerCenterId = Integer.parseInt(parts[0]);
+                                int batteries = Integer.parseInt(parts[1]);
+                                    if (batteries <= 2 && batteries > 0) {
+                                        if (server.removeBatteries(this, powerCenterId, batteries)) {
+                                            nBatteries--;
+                                            removed = true;
+                                        } else {
+                                            System.out.println("You have to put a PowerCenter containing a battery");
+                                        }
+                                    } else {
+                                        System.out.println("You have to choose 1 or 2 batteries to remove, please retry");
+                                    }
 
-
+                            } else {
+                                System.out.println("Wrong input. You need to put a PowerCenterId and a nBatteries divided by a space\n");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars");
+                        } catch (RemoteException e) {
+                            System.out.println("Error " + e.getMessage());
+                        }
+                        if (removed)
+                            System.out.println("Successfully removed");
+                    }
+                    server.endManagement(this);
+                } else {
+                    System.out.print("Not accepted input, please try again:\n");
+                }
             }
 
             case CARGO_MANAGEMENT -> {
@@ -570,6 +610,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
                 System.out.println("Press 0 to continue");
             }
+            case BATTERIES_MANAGEMENT -> {
+                System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
+                System.out.println("Press 0 to continue");
+            }
             case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
@@ -631,17 +675,24 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             //case DataString ds -> System.out.println(ds);
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
-            case DoubleEngineNumber den -> System.out.println("You have " + den.getPower() + " engine strenght and " + den.getNum() + " double engines \n");
-            case DoubleCannonNumber den -> System.out.println("You have " + den.getNum() + " double cannons \n");
+            case DoubleEngineNumber den -> System.out.println("You have " + den.getPower() + " engine strength and " + den.getNum() + " double engines");
+            case DoubleCannonNumber den -> System.out.println("You have " + den.getNum() + " double cannons");
             case PlanetsBlock pb -> printPlanets(pb.getPlanets());
-            case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strenght, " + "You have " + es.getPlayerStrenght() + " fire strenght without double cannons \n" );
+            case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strength, " + "You have " + es.getPlayerStrenght() + " fire strength without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
-            case LostDays ld -> System.out.println("You lose " + ld.getLd() + " days \n");
-            case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members \n");
+            case LostDays ld -> System.out.println("You lose " + ld.getLd() + " days");
+            case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
+            case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
             default -> {}
         }
         System.out.print("> ");
+    }
+
+    private void printPowerCenters(ArrayList<PowerCenter> powerCenters) {
+        for(PowerCenter pc : powerCenters){
+            System.out.println(pc);
+        }
     }
 
     private void printCabinAliens(ArrayList<CabinAliens> cabinAliens) {

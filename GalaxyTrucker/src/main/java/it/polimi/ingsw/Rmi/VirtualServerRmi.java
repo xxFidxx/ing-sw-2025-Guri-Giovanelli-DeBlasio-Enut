@@ -73,4 +73,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void surrend(VirtualViewRmi clientRmi) throws RemoteException;
 
     void handleSurrenderEnded(VirtualViewRmi clientRmi) throws RemoteException;
+
+    boolean removeBatteries(VirtualViewRmi clientRmi, int powerCenterId, int batteries)throws RemoteException;
+
+    void endManagement(VirtualViewRmi clientRmi)throws RemoteException;
 }

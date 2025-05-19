@@ -264,5 +264,17 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.handleSurrenderEnded(listener);
     }
+
+    @Override
+    public boolean removeBatteries(VirtualViewRmi clientRmi, int powerCenterId, int batteries) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        return controller.removeBatteries(listener,powerCenterId,batteries);
+    }
+
+    @Override
+    public void endManagement(VirtualViewRmi clientRmi) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        controller.endManagement(listener);
+    }
 }
 

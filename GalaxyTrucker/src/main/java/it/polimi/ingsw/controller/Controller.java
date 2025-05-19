@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.*;
+import it.polimi.ingsw.model.bank.BatteryToken;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.CargoManagementException;
@@ -228,12 +229,22 @@ public class Controller implements EventListenerInterface {
             case BYTILE_SHIP -> {
                 event = new Event(this, state, (DataString) data);
             }
+
             case MOVE_PLAYER ->{
                 event = new Event(this, state, (LostDays) data);
             }
             case LOST_CREW -> {
                 event = new Event(this, state, (LostCrew) data);
             }
+
+            case CREW_MANAGEMENT -> {
+                event = new Event(this, state, (CrewManagement) data);
+            }
+
+            case BATTERIES_MANAGEMENT -> {
+                event = new Event(this, state, (BatteriesManagement) data);
+            }
+
             default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
@@ -419,6 +430,8 @@ public class Controller implements EventListenerInterface {
     }
 
     public void manageCard(){
+        // nelle carte dove si chiede di rimuovere alieni/batterie, voi fate finta che, chw l'abbiano già fatto e a fine turno chi deve rimuovere
+        // invece glieli facciamo fisicamente rimuovere, dopo che tutti li avranno rimossi, allora vai in resetShowandDrawn
         switch(currentAdventureCard){
             case AbandonedShipCard asc -> {
                 if (tmpPlayers.isEmpty()) {
@@ -672,7 +685,6 @@ public class Controller implements EventListenerInterface {
         currentAdventureCard.activate();
         cargoended=true;
         listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
-
     }
 
     public void handleWaitersPlayer(ClientListener listener){
@@ -1278,13 +1290,8 @@ public class Controller implements EventListenerInterface {
 
     private void chooseAliens(){
 
-        System.out.println("Entrato in chooseAliens");
+        isDone.replaceAll((c, v) -> false);
 
-        synchronized (isDone) {
-            for (ClientListener l : listeners) {
-                isDone.put(l, false);
-            }
-        }
 
         for(ClientListener l: listeners){
             Player p = playerbyListener.get(l);
@@ -1327,7 +1334,6 @@ public class Controller implements EventListenerInterface {
         // if everyone went to waitPlayer, so isDone is all true
         if(!isDone.containsValue(false)){
             drawCard();
-            System.out.println("Entrato in if(!isDone.containsValue(false)){");
         }
 
     }
@@ -1426,6 +1432,7 @@ public class Controller implements EventListenerInterface {
     }
 
     private void endTurn(){
+        checkEarlyEndConditions();
         for(Player player: players){
             ClientListener listener = listenerbyPlayer.get(player);
             listener.onEvent(eventCrafter(GameState.ASK_SURRENDERER, null));
@@ -1463,6 +1470,45 @@ public class Controller implements EventListenerInterface {
         isDone.remove(listener);
         players.remove(player);
         player.setSurrended(true);
+    }
+
+    public boolean removeBatteries(ClientListener listener, int powerCenterId, int batteries) {
+        Player p = playerbyListener.get(listener);
+        ArrayList<PowerCenter> powerCenters = p.getSpaceshipPlance().getPowerCenters();
+        boolean error = false;
+        for(PowerCenter pc: powerCenters){
+            if(pc.getId() == powerCenterId) {
+                boolean[] pcBatteries= pc.getBatteries();
+                while (batteries > 0 && !error){
+                    if(batteries == 1){
+                        if(pcBatteries[1]){
+                            pcBatteries[1] = false;
+                            batteries--;
+                        }else if(pcBatteries[0]){
+                            pcBatteries[0] = false;
+                            batteries--;
+                        }else
+                            error = true;
+                        } else if (batteries == 2){
+                            if(pcBatteries[1]){
+                                pcBatteries[1] = false;
+                                batteries--;
+                            }else
+                                error = true;
+                    }else
+                        error = true;
+                }
+            }
+        }
+        return !error;
+    }
+
+    public void endManagement(ClientListener listener) {
+        isDone.put(listener, true);
+        if(isDone.containsValue(false))
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        else
+            resetShowAndDraw();
     }
 }
 

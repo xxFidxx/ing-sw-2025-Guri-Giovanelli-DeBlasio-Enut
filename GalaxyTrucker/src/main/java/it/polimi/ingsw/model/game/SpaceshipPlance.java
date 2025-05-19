@@ -20,12 +20,14 @@ public class SpaceshipPlance {
     private final ArrayList<Engine> engines;
     private ArrayList<Cannon> cannons;
     private final ArrayList<Cabin> cabins;
-    private boolean[][] visited;
-    private int[][] shownComponents;
+    private final ArrayList<PowerCenter> powerCenters;
+    private final boolean[][] visited;
+    private final int[][] shownComponents;
     private final ArrayList<ShieldGenerator> shieldGenerators;
     private int nAstronauts;
     private int nBrownAliens;
     private int nPurpleAliens;
+    private int nBatteries;
     private int exposedConnectors;
     private ArrayList<GoodsContainer> goodsContainers;
     private static final int ROWS = 5;
@@ -44,6 +46,7 @@ public class SpaceshipPlance {
         this.cannons = new ArrayList<>();
         this.cabins = new ArrayList<>();
         this.cargoHolds = new ArrayList<>();
+        this.powerCenters = new ArrayList<>();
         // ci creiamo un arraylist di engines per simulare open space card
         this.engines = new ArrayList<>(List.of(
                 new DoubleEngine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 1),
@@ -128,6 +131,7 @@ public class SpaceshipPlance {
         cabins.clear();
         cargoHolds.clear();
         shieldGenerators.clear();
+        powerCenters.clear();
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
                 ComponentTile tile = components[y][x];
@@ -181,6 +185,10 @@ public class SpaceshipPlance {
                             shieldGenerators.add(sg);
                         }
 
+                        case PowerCenter pc -> {
+                            powerCenters.add(pc);
+                        }
+
                         default -> {
                         }
                     }
@@ -189,6 +197,7 @@ public class SpaceshipPlance {
         }
 
         countFigures();
+        countBatteries();
     }
 
     private boolean inBounds(int x, int y) {
@@ -464,7 +473,6 @@ public class SpaceshipPlance {
                 }
             }
         }
-
         return isValid;
     }
 
@@ -676,6 +684,10 @@ public class SpaceshipPlance {
         return cargoHolds;
     }
 
+    public ArrayList<PowerCenter> getPowerCenters() {
+        return powerCenters;
+    }
+
     public ComponentTile[][] getComponents() {
         return components;
     }
@@ -696,6 +708,15 @@ public class SpaceshipPlance {
         return shieldGenerators;
     }
 
+    private void countBatteries(){
+        nBatteries=0;
+        for(PowerCenter powerCenter : powerCenters){
+            for(boolean b: powerCenter.getBatteries())
+                if(b)
+                    nBatteries++;
+        }
+    }
+
     public int getStorage() {
         int total = 0;
         for (CargoHolds c : cargoHolds) {
@@ -712,38 +733,27 @@ public class SpaceshipPlance {
         exposedConnectors = 0;
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 6; x++) {
-                ComponentTile tile = components[y][x];
+                if (inBounds(x, y) && components[y][x] != null) {
+                    ComponentTile tile = components[y][x];
 
-                if (tile != null) {
+                        int[] dirx = DIR_X;
+                        int[] diry = DIR_Y;
 
-                    int[] dirx = DIR_X;
-                    int[] diry = DIR_Y;
-
-                    ConnectorType[] connectors = tile.getConnectors();
-                    for (int i = 0; i < connectors.length; i++) {
-                        if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
-                            int x2 = x + dirx[i];
-                            int y2 = y + diry[i];
-                            ComponentTile tile2 = components[y2][x2];
-                            if (tile2 == null)
-                                exposedConnectors++;
+                        ConnectorType[] connectors = tile.getConnectors();
+                        for (int i = 0; i < connectors.length; i++) {
+                            if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
+                                int x2 = x + dirx[i];
+                                int y2 = y + diry[i];
+                                ComponentTile tile2 = components[y2][x2];
+                                if (tile2 == null)
+                                    exposedConnectors++;
+                            }
                         }
-                    }
                 }
             }
         }
 
         return exposedConnectors;
-    }
-
-    public boolean getShieldActivation(Direction direction) {
-        for (ShieldGenerator shieldGenerator : shieldGenerators) {
-            if (shieldGenerator.checkProtection(direction) == true) {
-                boolean active = askActivateShield(shieldGenerator);
-                if (active) return true;
-            }
-        }
-        return false;
     }
 
 
@@ -799,7 +809,7 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if (hit != null) {
+        if (components[y][x] != null) {
             reserveSpot.add(hit);
             remove(x, y);
         }
@@ -850,10 +860,10 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if (hit == null) {
+        if (components[y][x] == null) {
             return -1; // se non veniamo colpiti
         }
-        if (cannons.contains(hit)) {
+        if (cannons.contains((Cannon) hit)) {
             int dirP = direction.ordinal();
             int dirDD = getCannonDirection((Cannon) hit);
             if (dirP == dirDD) {
@@ -900,14 +910,22 @@ public class SpaceshipPlance {
 
                     ConnectorType[] connectors = tile.getConnectors();
                     for (int i = 0; i < connectors.length; i++) {
-                        // Se da quel lato c'è un connettore singolo/doppio/universale vuol dire che è collegato a un'altra casella. Controllo che sia anch'essa una nave
+                        // questo approccio funziona perché do per scontato che la nave sia ben connessa a sto punto
+                        // Se da quel lato c'è un connettore singolo/doppio/universale vuol dire che è collegato a un'altra casella. Controllo che sia anch'essa una cabina
                         if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
                             int x2 = x + dirx[i];
                             int y2 = y + diry[i];
                             ComponentTile tile2 = components[y2][x2];
-                            if (tile2 instanceof Cabin)
-                                connectedCabins.add((Cabin) tile2);
+                            if (tile2 instanceof Cabin){
+                                if (!connectedCabins.contains(tile2)) {
+                                    connectedCabins.add((Cabin) tile2);
+                                }
+                            }
+
                         }
+                    }
+                    if (!connectedCabins.contains(tile)) {
+                        connectedCabins.add((Cabin) tile);
                     }
                 }
             }

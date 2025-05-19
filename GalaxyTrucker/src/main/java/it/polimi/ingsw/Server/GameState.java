@@ -41,6 +41,8 @@ public enum GameState {
     FAILED_CARD,
     ASK_CANNON,
     MOVE_PLAYER,
+    BATTERIES_MANAGEMENT,
+    MOVE_PLAYER,
     ASK_SURRENDERER,
     LOST_CREW,
     NOT_MIN_EQUIP,
