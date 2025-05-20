@@ -78,7 +78,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     public void createLobby(VirtualViewRmi client,int number) throws RemoteException, LobbyExceptions {
         synchronized(controller){
-            controller.createLobby(number);
+            ClientListener listener = clientListeners.get(client);
+            controller.createLobby(listener, number);
         }
         System.out.println("Lobby created\n");
     }
@@ -87,7 +88,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void removeClient(VirtualViewRmi client){
         synchronized(clients){
             clients.remove(client);
-            //synchronized(controller){}
         }
         synchronized (clientbyNickname){
             clientbyNickname.values().removeIf(v -> v.equals(client));
@@ -275,6 +275,12 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void endManagement(VirtualViewRmi clientRmi) throws RemoteException {
         ClientListener listener = clientListeners.get(clientRmi);
         controller.endManagement(listener);
+    }
+
+    @Override
+    public boolean removeMVGood(ClientRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException {
+        ClientListener listener = clientListeners.get(clientRmi);
+        return controller.removeMVGood(listener,cargoIndex,goodIndex);
     }
 }
 
