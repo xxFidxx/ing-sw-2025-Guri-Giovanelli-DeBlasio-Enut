@@ -49,7 +49,9 @@ public class AbandonedStationCard extends AdventureCard {
             if(p.getNumEquip() >= requiredCrew){
                 return true;
             }
-            return false;
+            else {
+                return false;
+            }
         }
 
     @Override

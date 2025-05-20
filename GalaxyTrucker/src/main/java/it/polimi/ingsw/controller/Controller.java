@@ -6,7 +6,6 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.*;
-import it.polimi.ingsw.model.bank.BatteryToken;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.CargoManagementException;
@@ -553,9 +552,36 @@ public class Controller implements EventListenerInterface {
             }
 
             case MeteorSwarmCard msc -> {
-                int i=0;
-                meteorSwarm(i);
+                Projectile[] meteorArray = ((MeteorSwarmCard) currentAdventureCard).getMeteors();
+                int length = meteorArray.length;
+                int i = 0;
+                while(i < length && meteorArray[i] == null ) {
+                    i++;
+                }
+                if(i==length){
+                    resetShowAndDraw();
+                    return;
+                }
+                currentProjectile = meteorArray[i];
+                meteorArray[i] = null;
+                currentDiceThrow = game.throwDices();
+                int size = players.size();
+                Player first = players.get(0);
+                activateMeteor(first);
+                Player second = players.get(1);
+                activateMeteor(second);
+                if(size >= 3) {
+                    Player third = players.get(2);
+                    activateMeteor(third);
+                    if(size == 4) {
+                        Player fourth = players.get(3);
+                        activateMeteor(fourth);
+                    }
+                }
+
             }
+
+
 
             case EpidemicCard ec -> {
                 currentAdventureCard.activate();
@@ -586,7 +612,7 @@ public class Controller implements EventListenerInterface {
                             }
                         }
                         DoubleEngineNumber den = new DoubleEngineNumber(es, numDE);
-                        l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
+                        listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
                     }
                 } else {
                     for(ClientListener listener : listeners) {
@@ -625,12 +651,13 @@ public class Controller implements EventListenerInterface {
                     ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                     for (ShieldGenerator shield : shields) {
                         if(shield.checkProtection(direction)) {
-                            ClientListener l = listenerbyPlayer.get(currentPlayer);
+                            ClientListener l = listenerbyPlayer.get(player);
                             l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
                             return;
                         }
                     }
-                    player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+                    ClientListener l = listenerbyPlayer.get(player);
+                    playerHit(l);
                 }
             }
             case BigMeteor bm -> {
@@ -640,7 +667,8 @@ public class Controller implements EventListenerInterface {
                     manageCard();
                 }
                 else if(result == 0) {
-                    player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+                    ClientListener l = listenerbyPlayer.get(player);
+                    playerHit(l);
                 }
                 else if(result == 1) {
                     manageCard();
@@ -660,11 +688,12 @@ public class Controller implements EventListenerInterface {
                         return;
                     }
                 }
-                player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+                ClientListener l = listenerbyPlayer.get(player);
+                playerHit(l);
             }
             case BigCannonShot bcs ->{
-                Direction direction = currentProjectile.getDirection();
-                player.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+                ClientListener l = listenerbyPlayer.get(player);
+                playerHit(l);
 
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentProjectile);
@@ -859,12 +888,9 @@ public class Controller implements EventListenerInterface {
                             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
                             ClientListener l = listenerbyPlayer.get(minFirePlayer);
                             handleMinFire(l);
-                            Projectile[] cannons = ((CombatZoneCard) currentAdventureCard).getCannons();
-                            currentProjectile = cannons[0];
-                            activateMeteor(minFirePlayer);
-                            currentProjectile = cannons[1];
-                            activateMeteor(minFirePlayer);
-                            resetShowAndDraw();
+                            int i = 0;
+                            combatZoneShots(minFirePlayer);
+
                         } else {
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
                         }
@@ -881,11 +907,28 @@ public class Controller implements EventListenerInterface {
                             handleMinFire(l);
                             l.onEvent(eventCrafter(GameState.MOVE_PLAYER, obj));
                             game.getFlightplance().move(-ld,minFirePlayer);
+                            combatZoneEngine();
 
                         } else {
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
                         }
                     } else {
+                        combatZoneFlag = false;
+                        isDone.put(listener, true);
+                        if (!isDone.containsKey(false)) {
+                            Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
+                            ClientListener l = listenerbyPlayer.get(minEnginePlayer);
+                            handleMinEngine(l);
+                            //cargo
+                            Player minEquipPlayer = tmpPlayers.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
+                            ClientListener l2 = listenerbyPlayer.get(minEquipPlayer);
+                            handleMinEquip(l2);
+                            int i = 0;
+                            combatZoneShots(minEquipPlayer);
+                        }else{
+                            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                        }
+
 
                     }
                 }
@@ -907,6 +950,38 @@ public class Controller implements EventListenerInterface {
             DoubleCannonList dcl = new DoubleCannonList(doubleCannons);
             listener.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcl));
         }
+    }
+
+    public void combatZoneEngine(){
+        for(ClientListener listener : listeners) {
+            Player player = playerbyListener.get(listener);
+            int es = player.getEngineStrenght();
+            int numDE = 0;
+            for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
+                if(e instanceof DoubleEngine) {
+                    numDE++;
+                }
+            }
+            DoubleEngineNumber den = new DoubleEngineNumber(es, numDE);
+            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
+        }
+
+    }
+    public void combatZoneShots(Player minEquipPlayer){
+        Projectile[] shots = ((CombatZoneCard)currentAdventureCard).getCannons();
+        int length = shots.length;
+        int i = 0;
+        while (i < length && shots[i] == null  ) {
+            i++;
+        }
+        if(i== length){
+            resetShowAndDraw();
+            return;
+        }
+        currentProjectile = shots[i];
+        shots[i] = null;
+        activateMeteor(minEquipPlayer);
+
     }
 
     public void defeatedByPirates(int i){
@@ -938,31 +1013,9 @@ public class Controller implements EventListenerInterface {
         defeatedByPirates(i+1);
     }
 
-    public void meteorSwarm(int i){
-        Projectile[] meteorArray = ((MeteorSwarmCard) currentAdventureCard).getMeteors();
-        int length = meteorArray.length;
-        if(i>length){
-            resetShowAndDraw();
-            return;
-        }
-        currentProjectile = meteorArray[i];
-        currentDiceThrow = game.throwDices();
-        int size = players.size();
-        Player first = players.get(0);
-        activateMeteor(first);
-        Player second = players.get(1);
-        activateMeteor(second);
-        if(size >= 3) {
-            Player third = players.get(2);
-            activateMeteor(third);
-            if(size == 4) {
-                Player fourth = players.get(3);
-                activateMeteor(fourth);
-            }
-        }
-        meteorArray[i] = null;
-        meteorSwarm(i+1);
-    }
+
+
+
 
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
@@ -1377,13 +1430,22 @@ public class Controller implements EventListenerInterface {
         Player p = playerbyListener.get(listener);
         Direction direction = currentProjectile.getDirection();
         p.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
-        manageCard();
+        if(currentAdventureCard instanceof CombatZoneCard){
+            combatZoneShots(p);
+        }else {
+            manageCard();
+        }
+
     }
 
     public void playerProtected(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         // togliere una batteria dato che ha attivato lo scudo
-        manageCard();
+        if(currentAdventureCard instanceof CombatZoneCard){
+            combatZoneShots(p);
+        }else {
+            manageCard();
+        }
     }
 
     public boolean addAlienCabin(ClientListener listener, int cabinId, String alienColor) {

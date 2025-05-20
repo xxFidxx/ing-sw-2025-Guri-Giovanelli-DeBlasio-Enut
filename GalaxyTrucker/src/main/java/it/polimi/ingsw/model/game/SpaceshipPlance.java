@@ -126,8 +126,8 @@ public class SpaceshipPlance {
     }
 
     public void updateLists() {
-        //cannons.clear();
-        //engines.clear();
+        cannons.clear();
+        engines.clear();
         cabins.clear();
         cargoHolds.clear();
         shieldGenerators.clear();
