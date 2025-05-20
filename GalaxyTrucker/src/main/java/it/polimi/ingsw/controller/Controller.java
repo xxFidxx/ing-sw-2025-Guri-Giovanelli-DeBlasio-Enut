@@ -574,7 +574,8 @@ public class Controller implements EventListenerInterface {
                     LostDays obj= new LostDays(ld);
                     ClientListener l = listenerbyPlayer.get(minEquipPlayer);
                     handleMinEquip(l);
-                    game.getFlightplance().move(ld,minEquipPlayer);
+                    l.onEvent(eventCrafter(GameState.MOVE_PLAYER, obj));
+                    game.getFlightplance().move(-ld,minEquipPlayer);
                     for(ClientListener listener : listeners) {
                         Player player = playerbyListener.get(listener);
                         int es = player.getEngineStrenght();
@@ -587,7 +588,19 @@ public class Controller implements EventListenerInterface {
                         DoubleEngineNumber den = new DoubleEngineNumber(es, numDE);
                         l.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
                     }
-
+                } else {
+                    for(ClientListener listener : listeners) {
+                        Player player = playerbyListener.get(listener);
+                        float fs = player.getFireStrenght();
+                        ArrayList<DoubleCannon> doubleCannons = new ArrayList<>();
+                        for (Cannon c : currentPlayer.getSpaceshipPlance().getCannons()) {
+                            if (c instanceof DoubleCannon) {
+                                doubleCannons.add((DoubleCannon) c);
+                            }
+                        }
+                        DoubleCannonList dcl = new DoubleCannonList(doubleCannons);
+                        listener.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcl));
+                    }
                 }
 
             }
@@ -701,7 +714,7 @@ public class Controller implements EventListenerInterface {
     public void handleMinEquip(ClientListener listener){
         for(ClientListener l: listeners){
             if(l == listener) {
-                l.onEvent(eventCrafter(GameState.MOVE_PLAYER, null));
+                l.onEvent(eventCrafter(GameState.LEAST_CREW, null));
             }
             else {
                 l.onEvent(eventCrafter(GameState.NOT_MIN_EQUIP, null));
@@ -709,10 +722,10 @@ public class Controller implements EventListenerInterface {
         }
     }
 
-    public void handleMinEngine(ClientListener listener, LostCrew lostCrew){
+    public void handleMinEngine(ClientListener listener){
         for(ClientListener l: listeners){
             if(l == listener) {
-                l.onEvent(eventCrafter(GameState.LOST_CREW, lostCrew));
+                l.onEvent(eventCrafter(GameState.LEAST_ENGINE, null));
             }
             else {
                 l.onEvent(eventCrafter(GameState.NOT_MIN_ENGINE, null));
@@ -823,35 +836,57 @@ public class Controller implements EventListenerInterface {
                 }
             }
             case CombatZoneCard czc -> {
-                if(!combatZoneFlag){
-                    combatZoneFlag = true;
-                    isDone.put(listener,true);
-                    if(!isDone.containsKey(false)){
-                        Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
-                        int lostOther = ((CombatZoneCard) currentAdventureCard).getLostOther();
-                        LostCrew lostCrew = new LostCrew(lostOther);
-                        ClientListener l = listenerbyPlayer.get(minEnginePlayer);
-                        handleMinEngine(l, lostCrew);
-                        minEnginePlayer.loseCrew(lostOther);
-                        combatZoneCannons();
+                if(((CombatZoneCard) currentAdventureCard).getType() == CombatZoneType.LOSTCREW){
+                    if(!combatZoneFlag){
+                        combatZoneFlag = true;
+                        isDone.put(listener,true);
+                        if(!isDone.containsKey(false)){
+                            Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
+                            int lostOther = ((CombatZoneCard) currentAdventureCard).getLostOther();
+                            LostCrew lostCrew = new LostCrew(lostOther);
+                            ClientListener l = listenerbyPlayer.get(minEnginePlayer);
+                            handleMinEngine(l);
+                            l.onEvent(eventCrafter(GameState.LOST_CREW, lostCrew));
+                            minEnginePlayer.loseCrew(lostOther);
+                            combatZoneCannons();
+                        } else {
+                            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                        }
                     } else {
-                        listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                        combatZoneFlag = false;
+                        isDone.put(listener,true);
+                        if(!isDone.containsKey(false)){
+                            Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
+                            ClientListener l = listenerbyPlayer.get(minFirePlayer);
+                            handleMinFire(l);
+                            Projectile[] cannons = ((CombatZoneCard) currentAdventureCard).getCannons();
+                            currentProjectile = cannons[0];
+                            activateMeteor(minFirePlayer);
+                            currentProjectile = cannons[1];
+                            activateMeteor(minFirePlayer);
+                            resetShowAndDraw();
+                        } else {
+                            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                        }
                     }
                 } else {
-                    combatZoneFlag = false;
-                    isDone.put(listener,true);
-                    if(!isDone.containsKey(false)){
-                        Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
-                        ClientListener l = listenerbyPlayer.get(minFirePlayer);
-                        handleMinFire(l);
-                        Projectile[] cannons = ((CombatZoneCard) currentAdventureCard).getCannons();
-                        currentProjectile = cannons[0];
-                        activateMeteor(minFirePlayer);
-                        currentProjectile = cannons[1];
-                        activateMeteor(minFirePlayer);
-                        resetShowAndDraw();
+                    if(!combatZoneFlag) {
+                        combatZoneFlag = true;
+                        isDone.put(listener, true);
+                        if (!isDone.containsKey(false)) {
+                            Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
+                            int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
+                            LostDays obj= new LostDays(ld);
+                            ClientListener l = listenerbyPlayer.get(minFirePlayer);
+                            handleMinFire(l);
+                            l.onEvent(eventCrafter(GameState.MOVE_PLAYER, obj));
+                            game.getFlightplance().move(-ld,minFirePlayer);
+
+                        } else {
+                            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                        }
                     } else {
-                        listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+
                     }
                 }
             }

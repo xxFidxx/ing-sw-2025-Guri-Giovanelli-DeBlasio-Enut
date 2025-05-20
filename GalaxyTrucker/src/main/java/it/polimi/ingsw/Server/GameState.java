@@ -47,7 +47,9 @@ public enum GameState {
     NOT_MIN_EQUIP,
     NOT_MIN_ENGINE,
     NOT_MIN_FIRE,
-    CANNON_FIRE
+    CANNON_FIRE,
+    LEAST_CREW,
+    LEAST_ENGINE
     }
 
 

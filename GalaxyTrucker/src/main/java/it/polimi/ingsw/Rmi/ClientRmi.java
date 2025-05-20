@@ -621,8 +621,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
-            case MOVE_PLAYER -> System.out.print("You have the least crew\n");
-            case LOST_CREW -> System.out.println("You have the least engine strenght");
+            case LEAST_CREW -> System.out.print("You have the least crew\n");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
             case CANNON_FIRE -> System.out.println("You have the least fire strenght");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
@@ -685,7 +685,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strength, " + "You have " + es.getPlayerStrenght() + " fire strength without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
-            case LostDays ld -> System.out.println("You lose " + ld.getLd() + " days");
+            case LostDays ld -> System.out.println("You lose " + ld.getLd() + " flight days");
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
             default -> {}
