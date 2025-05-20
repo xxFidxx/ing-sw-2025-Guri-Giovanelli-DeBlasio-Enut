@@ -48,6 +48,9 @@ public enum GameState {
     NOT_MIN_ENGINE,
     NOT_MIN_FIRE,
     REMOVE_MV_GOODS, CANNON_FIRE
+    CANNON_FIRE,
+    LEAST_CREW,
+    LEAST_ENGINE
     }
 
 
