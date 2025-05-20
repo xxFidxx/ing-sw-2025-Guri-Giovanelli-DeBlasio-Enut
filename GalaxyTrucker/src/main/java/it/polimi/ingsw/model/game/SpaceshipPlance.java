@@ -281,8 +281,10 @@ public class SpaceshipPlance {
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
                 if (!visited[y][x] || edgeCases(y, x)) {
-                    addReserveSpot(components[y][x]);
-                    components[y][x] = null;
+                    if(components[y][x] != null) {
+                        addReserveSpot(components[y][x]);
+                        components[y][x] = null;
+                    }
                 }
             }
         }
