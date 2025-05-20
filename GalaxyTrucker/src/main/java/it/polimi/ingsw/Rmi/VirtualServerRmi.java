@@ -77,4 +77,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean removeBatteries(VirtualViewRmi clientRmi, int powerCenterId, int batteries)throws RemoteException;
 
     void endManagement(VirtualViewRmi clientRmi)throws RemoteException;
+
+    boolean removeMVGood(ClientRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
 }

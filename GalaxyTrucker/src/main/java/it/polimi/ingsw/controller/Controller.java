@@ -6,7 +6,6 @@ import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.*;
-import it.polimi.ingsw.model.bank.BatteryToken;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.CargoManagementException;
@@ -95,9 +94,10 @@ public class Controller implements EventListenerInterface {
         queue.add(event);
     }
 
-    public void createLobby(int numPlayers) {
-        if(lobby !=null)
-            throw new LobbyExceptions("Lobby is already set");
+    public void createLobby(ClientListener listener,  int numPlayers) {
+        if(lobby !=null){
+                throw new LobbyExceptions("Lobby is already set");
+        }
 
         if (numPlayers < 2 || numPlayers > 4)
             throw new LobbyExceptions("Number of players must be between 2 and 4");
@@ -796,10 +796,19 @@ public class Controller implements EventListenerInterface {
             case SmugglersCard sc -> {
                 ((SmugglersCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
-                if (((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer) == 1){
-                    ClientListener l = listenerbyPlayer.get(currentPlayer);
+                int outcome = ((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer);
+                if (outcome == 1){
                     cargoended=true;
-                    l.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
+                    listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
+                }else if(outcome == -1){
+                    ArrayList <GoodsContainer> goodsContainers = new ArrayList<>();
+                    ArrayList<CargoHolds> playerCargos = currentPlayer.getSpaceshipPlance().getCargoHolds();
+                    for (CargoHolds cargo : playerCargos) {
+                        GoodsBlock[] goods = cargo.getGoods();
+                        goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
+                    }
+                    RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentCastedCard).getLossMalus(),goodsContainers);
+                    listener.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
                 }
                 else {
                     tmpPlayers.remove(currentPlayer);
@@ -1435,7 +1444,7 @@ public class Controller implements EventListenerInterface {
         checkEarlyEndConditions();
         for(Player player: players){
             ClientListener listener = listenerbyPlayer.get(player);
-            listener.onEvent(eventCrafter(GameState.ASK_SURRENDERER, null));
+            listener.onEvent(eventCrafter(GameState.ASK_SURRENDER, null));
         }
     }
 
@@ -1510,35 +1519,11 @@ public class Controller implements EventListenerInterface {
         else
             resetShowAndDraw();
     }
+
+    public boolean removeMVGood(ClientListener listener, int cargoIndex, int goodIndex) {
+        Player player = playerbyListener.get(listener);
+        return player.getSpaceshipPlance().removeMVGood(cargoIndex,goodIndex);
+    }
 }
-
-
-
-//    public void handleFiguresManagement(ClientListener listener) {
-//        Player p = playerbyListener.get(listener);
-//        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
-//        for(Cabin c: cabins){
-//            if(c.getId() == cabinId){
-//                AlienColor[] colors = c.getLifeSupportSystemColor();
-//                if(Objects.equals(alienColor, "b")){
-//                    if(colors[AlienColor.BROWN.ordinal()] != null){
-//                        Figure[] figures = c.getFigures();
-//                        figures[0] = new Alien(1, AlienColor.BROWN);
-//                        figures[1] = null;
-//                        return true;
-//                    }
-//                }
-//
-//                if(Objects.equals(alienColor, "p")){
-//                    if(colors[AlienColor.PURPLE.ordinal()] != null){
-//                        Figure[] figures = c.getFigures();
-//                        figures[0] = new Alien(1, AlienColor.BROWN);
-//                        figures[1] = null;
-//                        return true;
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 

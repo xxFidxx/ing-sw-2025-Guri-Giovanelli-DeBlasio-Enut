@@ -15,7 +15,6 @@ import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
 
-import javax.sound.midi.SysexMessage;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -87,6 +86,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 server.createLobby(this, size);
                                 inputValid = true;
                             } catch (Exception e) {
+                                inputValid = true;
                                 System.out.print("Error " + e.getMessage() + "\n");
                             }
 
@@ -371,9 +371,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
 
-            case CARGO_MANAGEMENT -> {
-                System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
-            }
+            case CARGO_MANAGEMENT -> System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
 
             case CARGO_VIEW -> {
                 switch (input) {
@@ -439,13 +437,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length != 2) {
                                     System.out.println("Wrong input. You need 2 numbers divided by a space \n");
+                                }else{
+                                    int cargoIndex = Integer.parseInt(parts[0]);
+                                    int goodIndex = Integer.parseInt(parts[1]);
+                                    server.removeGood(this, cargoIndex, goodIndex);
+                                    inputValid = true;
                                 }
-
-                                int cargoIndex = Integer.parseInt(parts[0]);
-                                int goodIndex = Integer.parseInt(parts[1]);
-
-                                server.removeGood(this, cargoIndex, goodIndex);
-                                inputValid = true;
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
                             } catch (Exception e) {
@@ -559,25 +556,61 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 inputValid = true;
                             }catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
-                                e.printStackTrace();
                             }
                         }
+                        server.manageCard();
                     }
                     default ->{
                         System.out.println("Not accepted input, please try again");
                         System.out.print("> ");
                     }
                 }
-            }case ASK_SURRENDERER ->{
+            }case ASK_SURRENDER ->{
                 switch (input) {
                     case "-1" ->{
                         server.surrend(this);
-                        System.out.println("You surrended, you will now be in spectator mode");
+                        System.out.println("You surrendered, you will now be in spectator mode");
                     }
                     case "0"->{
                         server.handleSurrenderEnded(this);
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
+                }
+            }
+
+            case REMOVE_MV_GOODS ->{
+                if (input.equals("0")) {
+                    DataContainer data = currentEvent.getData();
+                    int nGoods = ((RemoveMostValuable) data).getNGoods();
+                    while ((nGoods != 0)) {
+                            System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
+                            System.out.print("> ");
+                            String inputLine = scan.nextLine();
+                            boolean removed = false;
+                            try {
+                                String[] parts = inputLine.split(" ");
+                                if (parts.length != 2) {
+                                    System.out.println("Wrong input. You need 2 numbers divided by a space");
+                                }else{
+                                    int cargoIndex = Integer.parseInt(parts[0]);
+                                    int goodIndex = Integer.parseInt(parts[1]);
+                                    if(server.removeMVGood(this, cargoIndex, goodIndex)){
+                                        nGoods--;
+                                        removed = true;
+                                    }else
+                                        System.out.println("This was not one of the most valuable goods you have, please select one among them!");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
+                            } catch (Exception e) {
+                                System.out.println("Error " + e.getMessage());
+                            }
+                        if (removed)
+                            System.out.println("Successfully removed");
+                    }
+                    server.endManagement(this);
+                } else {
+                    System.out.print("Not accepted input, please try again:\n");
                 }
             }
         }
@@ -622,8 +655,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
             case MOVE_PLAYER -> System.out.print("You have the least crew\n");
-            case LOST_CREW -> System.out.println("You have the least engine strenght");
-            case CANNON_FIRE -> System.out.println("You have the least fire strenght");
+            case LOST_CREW -> System.out.println("You have the least engine strength");
+            case CANNON_FIRE -> System.out.println("You have the least fire strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
@@ -631,10 +664,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your DoubleCannon or 1 to use it");
-            case ASK_SURRENDERER -> System.out.println("Type -1 to surrendered or 0 to continue the game");
+            case ASK_SURRENDER -> System.out.println("Type -1 to surrender or 0 to continue the game");
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
-            case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strenght");
-            case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strenght");
+            case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
+            case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");
@@ -676,7 +709,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case Cargos c -> printCargos(c.getCargos());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
-            //case DataString ds -> System.out.println(ds);
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
             case DataString ds -> System.out.println(ds.getText());
             case DoubleEngineNumber den -> System.out.println("You have " + den.getPower() + " engine strength and " + den.getNum() + " double engines");
@@ -688,9 +720,32 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LostDays ld -> System.out.println("You lose " + ld.getLd() + " days");
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
+            case RemoveMostValuable removeMostValuable -> printCargosRemove(removeMostValuable.getCargos());
             default -> {}
         }
         System.out.print("> ");
+    }
+
+    private void printCargosRemove(ArrayList<GoodsContainer> cargos) {
+        System.out.println("--------------------------------------------------");
+
+        for (int i = 0; i < cargos.size(); i++) {
+            GoodsContainer container = cargos.get(i);
+            GoodsBlock[] blocks = container.getGoods();
+
+                String header = String.format("%sCargo %d id %d:",
+                        container.isSpecial() ? "Special " : "", i, container.getId());
+                System.out.print(header);
+
+            for (GoodsBlock block : blocks) {
+                String blockValue = (block != null) ?
+                        String.valueOf(block.getValue()) : " ";
+                System.out.printf(" [%2s]", blockValue);
+            }
+            System.out.println();
+        }
+        System.out.println("--------------------------------------------------");
+        System.out.println();
     }
 
     private void printPowerCenters(ArrayList<PowerCenter> powerCenters) {
@@ -716,8 +771,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }else{
                 System.out.println("Planet : " + i  );
                 GoodsBlock[] blocks = planets.get(i).getReward();
-                for(int j = 0; j < blocks.length; j++){
-                System.out.printf(" ["+ blocks[j].getValue() + "] ");
+                for (GoodsBlock block : blocks) {
+                    System.out.printf(" [" + block.getValue() + "] ");
                 }
                 System.out.print("\n");}
         }

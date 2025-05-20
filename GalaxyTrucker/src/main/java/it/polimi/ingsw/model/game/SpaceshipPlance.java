@@ -6,9 +6,7 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
@@ -90,6 +88,10 @@ public class SpaceshipPlance {
 
     public int getPurpleAliens() {
         return this.nPurpleAliens;
+    }
+
+    public int getnBatteries(){
+        return nBatteries;
     }
 
     private boolean edgeCases(int y, int x) {
@@ -280,9 +282,11 @@ public class SpaceshipPlance {
     private void removeUnvisitedTiles() {
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
-                if (!visited[y][x] || edgeCases(y, x)) {
-                    addReserveSpot(components[y][x]);
-                    components[y][x] = null;
+                if (!visited[y][x]) {
+                    if(components[y][x] != null) {
+                        addReserveSpot(components[y][x]);
+                        components[y][x] = null;
+                    }
                 }
             }
         }
@@ -1384,5 +1388,28 @@ public class SpaceshipPlance {
         }
 
         return lines;
+    }
+
+    public boolean removeMVGood(int cargoIndex, int goodIndex) {
+        ArrayList<CargoHolds> playerCargo = getCargoHolds();
+        ArrayList<GoodsBlock> playerGoods = new ArrayList<>();
+        for (CargoHolds cargo : playerCargo) {
+            GoodsBlock[] goods = cargo.getGoods();
+            Collections.addAll(playerGoods, goods);
+        }
+        playerGoods.sort(Comparator.comparingDouble(GoodsBlock::getValue).reversed());
+
+        if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
+            GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
+            if (goodIndex >= 0 && goodIndex < cargo1.getGoods().length) {
+                if(cargo1.getGoods()[goodIndex].getValue() >= playerGoods.getFirst().getValue() ){
+                    removeGoods(cargo1, goodIndex);
+                    return true;
+                }else
+                    return false;
+            } else
+                throw new CargoManagementException("goods index is outbound");
+        } else
+            throw new CargoManagementException("cargo index is outbound");
     }
 }
