@@ -27,7 +27,7 @@ import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
-    private final VirtualServerRmi server;
+    public final VirtualServerRmi server;
     private volatile GameState currentState;
     private final LinkedBlockingQueue<Event> eventQueue;
     private final Scanner scan = new Scanner(System.in);
@@ -51,16 +51,22 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
-        new ClientRmi(server).run();
+        new ClientRmi(server).run(0);
     }
 
 
-    private void run() throws Exception {
+    public void run(int mode) throws Exception {
         server.connect(this);
-        Thread eventThread = new Thread(this::handleEvents);
+
+        Thread eventThread;
+        eventThread = new Thread(this::handleEvents);
         eventThread.start();
-        runCli();
+
+        if (mode == 0) {
+            runCli();
+        }
     }
+
 
     private void runCli() throws Exception {
         while (true) {
@@ -562,6 +568,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 e.printStackTrace();
                             }
                         }
+                        server.manageCard();
                     }
                     default ->{
                         System.out.println("Not accepted input, please try again");
