@@ -28,7 +28,10 @@ public class SmugglersCard extends EnemyCard {
 
     @Override
     public void penalize(Player player) {
-        player.removeMostValuableCargo();
+    }
+
+    public int getLossMalus() {
+        return lossMalus;
     }
 
     @Override
