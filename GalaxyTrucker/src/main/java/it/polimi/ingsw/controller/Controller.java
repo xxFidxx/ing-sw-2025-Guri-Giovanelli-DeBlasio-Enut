@@ -484,6 +484,7 @@ public class Controller implements EventListenerInterface {
                 }
                 if(numE == 0){
                     handleEarlyEnd(currentPlayer);
+                    manageCard();
                 }else{
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
                     if(numDE > 0) {
@@ -640,6 +641,7 @@ public class Controller implements EventListenerInterface {
         ClientListener listener = listenerbyPlayer.get(player);
         isDone.remove(listener);
         tmpPlayers.remove(player);
+
     }
 
 
@@ -799,8 +801,13 @@ public class Controller implements EventListenerInterface {
                         doubleCannons.add((DoubleCannon) c);
                     }
                 }
-                DoubleCannonList dcl = new DoubleCannonList(doubleCannons);
-                l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcl));
+                if(!doubleCannons.isEmpty()) {
+                    DoubleCannonList dcl = new DoubleCannonList(doubleCannons);
+                    l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, dcl));
+                }else{
+                    fromChargeToManage(l);
+
+                }
             } else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
@@ -1243,9 +1250,11 @@ public class Controller implements EventListenerInterface {
             throw new ControllerExceptions("You selected a wrong double engines number");
         }
         else {
-            for(int j=0; j<i; j++){
-                doubleEngines.get(j).setCharged(true);
+           for(int j=0; j<i; j++){
+              doubleEngines.get(j).setCharged(true);
             }
+
+
             fromChargeToManage(listener);
         }
     }
