@@ -1229,8 +1229,8 @@ public class Controller implements EventListenerInterface {
                 String nick = p.getNickname();
                 int pos = p.getPlaceholder().getPosizione();
                 int cred = p.getCredits();
-                int astr = p.getNumAstronauts();
-                int al = p.getNumAliens();
+                int astr = p.getSpaceshipPlance().getnAstronauts();
+                int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
                 PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
                 listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
             }
@@ -1246,16 +1246,20 @@ public class Controller implements EventListenerInterface {
                 doubleEngines.add((DoubleEngine) e);
             }
         }
+        int batteries = player.getSpaceshipPlance().getnBatteries();
         if(i < 0 || i > doubleEngines.size()) {
             throw new ControllerExceptions("You selected a wrong double engines number");
+        }
+        else if (i > batteries) {
+            throw new ControllerExceptions("You don't have enough batteries");
         }
         else {
            for(int j=0; j<i; j++){
               doubleEngines.get(j).setCharged(true);
-            }
-
-
-            fromChargeToManage(listener);
+           }
+           ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
+           BatteriesManagement bm = new BatteriesManagement(i, pc);
+           listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
         }
     }
 
@@ -1268,6 +1272,9 @@ public class Controller implements EventListenerInterface {
                 doubleCannons.add((DoubleCannon) c);
             }
         }
+        int batteries = player.getSpaceshipPlance().getnBatteries();
+        if(chosenIndices.size() > batteries)
+            throw new ControllerExceptions("You don't have enough batteries");
         for(Integer i: chosenIndices){
             if(i < 0 || i > doubleCannons.size()) {
                 throw new ControllerExceptions("You selected a wrong chosen cannons number");
@@ -1276,7 +1283,9 @@ public class Controller implements EventListenerInterface {
                 doubleCannons.get(i).setCharged(true);
             }
         }
-        fromChargeToManage(listener);
+        ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
+        BatteriesManagement bm = new BatteriesManagement(chosenIndices.size(), pc);
+        listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
     }
 
     public void choosePlanets(ClientListener listener, int i) throws CargoManagementException {
@@ -1460,11 +1469,14 @@ public class Controller implements EventListenerInterface {
     public void playerProtected(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         // togliere una batteria dato che ha attivato lo scudo
-        if(currentAdventureCard instanceof CombatZoneCard){
+        ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
+        BatteriesManagement bm = new BatteriesManagement(1, pc);
+        listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
+        /*if(currentAdventureCard instanceof CombatZoneCard){
             combatZoneShots(p);
         }else {
             manageCard();
-        }
+        }*/
     }
 
     public boolean addAlienCabin(ClientListener listener, int cabinId, String alienColor) {
@@ -1620,11 +1632,20 @@ public class Controller implements EventListenerInterface {
     }
 
     public void endManagement(ClientListener listener) {
-        isDone.put(listener, true);
-        if(isDone.containsValue(false))
-            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
-        else
-            resetShowAndDraw();
+        Player p = playerbyListener.get(listener);
+        switch(currentAdventureCard){
+            case CombatZoneCard czc -> combatZoneShots(p);
+            case MeteorSwarmCard msc -> manageCard();
+            case OpenSpaceCard osc -> fromChargeToManage(listener);
+            case PiratesCard pc -> fromChargeToManage(listener);
+            default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+        }
+        /*if(currentAdventureCard instanceof CombatZoneCard){
+            combatZoneShots(p);
+        }else {
+            manageCard();
+        }
+        fromChargeToManage(listener);*/
     }
 
     public boolean removeMVGood(ClientListener listener, int cargoIndex, int goodIndex) {
