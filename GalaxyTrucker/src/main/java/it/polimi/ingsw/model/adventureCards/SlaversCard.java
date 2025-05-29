@@ -26,7 +26,6 @@ public class SlaversCard extends EnemyCard  {
 
     @Override
     public void penalize(Player player) {
-        player.loseCrew(lostCrew);
     }
 
     public int getLostCrew(){

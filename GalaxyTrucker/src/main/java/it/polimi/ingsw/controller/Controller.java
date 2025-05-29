@@ -42,6 +42,8 @@ public class Controller implements EventListenerInterface {
     private List<AdventureCard> cards;
     private ArrayList<Player> defeatedPlayers;
     private boolean combatZoneFlag;
+    private boolean piratesFlag;
+    private boolean enemyDefeated;
 
     public Controller() {
         this.game = null;
@@ -56,6 +58,8 @@ public class Controller implements EventListenerInterface {
         this.defeatedPlayers = null;
         this.cards = null;
         this.combatZoneFlag = false;
+        this.piratesFlag = false;
+        this.enemyDefeated = false;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -499,8 +503,9 @@ public class Controller implements EventListenerInterface {
             }
 
             case SlaversCard sl -> {
-                if (tmpPlayers.isEmpty()) {
-                    resetShowAndDraw();
+                if (tmpPlayers.isEmpty()||enemyDefeated) {
+                    defeatedBySlavers();
+                    //resetShowAndDraw();
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
@@ -517,14 +522,15 @@ public class Controller implements EventListenerInterface {
                 }
                 currentPlayer = tmpPlayers.getLast();
                 ClientListener l = listenerbyPlayer.get(currentPlayer);
+                tmpPlayers.remove(currentPlayer);
                 handleWaitersEnemy(l);
             }
 
             case PiratesCard pc -> {
                 if (tmpPlayers.isEmpty()||piratesended) {
                     piratesended=false;
-                    int i=0;
-                    defeatedByPirates(i);//reset and show lo metto in questo metodo
+                    piratesFlag=true;
+                    defeatedByPirates();//reset and show lo metto in questo metodo
                     return;
                 }
                 currentPlayer = tmpPlayers.getLast();
@@ -836,9 +842,12 @@ public class Controller implements EventListenerInterface {
             case SlaversCard sc -> {
                 ((SlaversCard) currentCastedCard).setActivatedPlayer(currentPlayer);
                 currentAdventureCard.activate();
-
-                if(((SlaversCard) currentCastedCard).getFightOutcome(currentPlayer) == 1){
-                    resetShowAndDraw();
+                int outcome = ((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer);
+                if(outcome == 1){
+                    enemyDefeated = true;
+                    manageCard();
+                } else if(outcome == -1){
+                    defeatedPlayers.add(currentPlayer);
                 }
                 else
                     manageCard();
@@ -851,17 +860,19 @@ public class Controller implements EventListenerInterface {
                     cargoended=true;
                     listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
                 }else if(outcome == -1){
-                    ArrayList <GoodsContainer> goodsContainers = new ArrayList<>();
+                    defeatedPlayers.add(currentPlayer);
+                    /*ArrayList <GoodsContainer> goodsContainers = new ArrayList<>();
                     ArrayList<CargoHolds> playerCargos = currentPlayer.getSpaceshipPlance().getCargoHolds();
                     for (CargoHolds cargo : playerCargos) {
                         GoodsBlock[] goods = cargo.getGoods();
                         goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
                     }
                     RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentCastedCard).getLossMalus(),goodsContainers);
-                    listener.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
+                    listener.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));*/
+                    // se non abbiamo abbstanza merci, rimuovere batterie
                 }
                 else {
-                    tmpPlayers.remove(currentPlayer);
+                    // tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
             }
@@ -1001,15 +1012,20 @@ public class Controller implements EventListenerInterface {
 
     }
 
-    public void defeatedByPirates(int i){
+    public void defeatedByPirates(){
         Projectile[] projectileArray = ((PiratesCard) currentAdventureCard).getShots();
         int length = projectileArray.length;
-        if(i>length || defeatedPlayers.isEmpty()){
+        int i = 0;
+        while(i < length && projectileArray[i] == null ) {
+            i++;
+        }
+        if(i==length || defeatedPlayers.isEmpty()){
             defeatedPlayers.clear();
             resetShowAndDraw();
             return;
         }
         currentProjectile = projectileArray[i];
+        projectileArray[i] = null;
         currentDiceThrow = game.throwDices();
         int size = defeatedPlayers.size();
         Player first = defeatedPlayers.get(0);
@@ -1026,11 +1042,18 @@ public class Controller implements EventListenerInterface {
                 }
             }
         }
-        projectileArray[i] = null;
-        defeatedByPirates(i+1);
     }
 
+public void defeatedBySlavers(){
+        for(Player p : defeatedPlayers){
+            int astr = p.getSpaceshipPlance().getnAstronauts();
+            int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
+            ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
+            if((astr + al) >= ((SlaversCard)currentAdventureCard).getLostCrew()) {
 
+            }
+        }
+}
 
 
 
@@ -1344,7 +1367,7 @@ public class Controller implements EventListenerInterface {
 
     public void endCargoManagement(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        tmpPlayers.remove(player);
+        //tmpPlayers.remove(player);
         player.setReward(null);
         cargoended = true;
         manageCard();
@@ -1362,22 +1385,30 @@ public class Controller implements EventListenerInterface {
     public void removeAdjust(ClientListener listener, int xIndex, int yIndex) throws SpaceShipPlanceException {
         Player player = playerbyListener.get(listener);
         int stumps = player.getSpaceshipPlance().remove(xIndex, yIndex);
-
-        // se non c'è più di un troncone, faccio un check di correttezza: se è ok, allora sono apposto altrimenti ritorno nello stato di ShipAdjustment
-        if(stumps <= 1){
-            if(player.getSpaceshipPlance().checkCorrectness()) {
-                player.getSpaceshipPlance().updateLists();
-                isDone.put(listener, true);
-                printSpaceship(listener);
-                if (handleAdjustmentEnded())
-                    chooseAliens();
-                else
-                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
-            }else
-                printSpaceshipAdjustment(listener);
-        }
-        else{
-            printSpaceshipParts(listener);
+        // means the method is invoked at the beginning of the game
+        if(currentAdventureCard == null) {
+            if(stumps <= 1){
+                if(player.getSpaceshipPlance().checkCorrectness()) {
+                    player.getSpaceshipPlance().updateLists();
+                    isDone.put(listener, true);
+                    printSpaceship(listener);
+                    if (handleAdjustmentEnded())
+                        chooseAliens();
+                    else
+                        listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+                }else
+                    printSpaceshipAdjustment(listener);
+            }
+            // se non c'è più di un troncone, faccio un check di correttezza: se è ok, allora sono apposto altrimenti ritorno nello stato di ShipAdjustment
+            else{
+                printSpaceshipParts(listener);
+            }
+        }else{
+            if(stumps <= 1){
+                waitForNextShot(listener);
+            }else{
+                printSpaceshipParts(listener);
+            }
         }
     }
 
@@ -1391,16 +1422,24 @@ public class Controller implements EventListenerInterface {
     public void selectShipPart(ClientListener listener, int part) {
         Player p = playerbyListener.get(listener);
         p.getSpaceshipPlance().selectPart(part);
-        if(!p.getSpaceshipPlance().checkCorrectness()){
-            printSpaceshipAdjustment(listener);
+        if(currentAdventureCard==null){
+            if(!p.getSpaceshipPlance().checkCorrectness()){
+                printSpaceshipAdjustment(listener);
+            }else{
+                p.getSpaceshipPlance().updateLists();
+                isDone.put(listener,true);
+                printSpaceship(listener);
+                if(handleAdjustmentEnded())
+                    chooseAliens();
+                else
+                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            }
         }else{
-            p.getSpaceshipPlance().updateLists();
-            isDone.put(listener,true);
-            printSpaceship(listener);
-            if(handleAdjustmentEnded())
-                chooseAliens();
-            else
-                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+            if(!p.getSpaceshipPlance().checkCorrectness()){
+                printSpaceshipAdjustment(listener);
+            }else{
+                waitForNextShot(listener);
+            }
         }
     }
 
@@ -1457,26 +1496,41 @@ public class Controller implements EventListenerInterface {
     public void playerHit(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         Direction direction = currentProjectile.getDirection();
-        p.getSpaceshipPlance().takeHit(direction, currentDiceThrow);
+        takeHit(listener, direction, currentDiceThrow);
         if(currentAdventureCard instanceof CombatZoneCard){
             combatZoneShots(p);
-        }else {
-            manageCard();
-        }
-
+        } else
+            waitForNextShot(listener);
     }
 
-    public void playerProtected(ClientListener listener) {
+    public void playerProtected(ClientListener listener) throws ControllerExceptions{
         Player p = playerbyListener.get(listener);
         // togliere una batteria dato che ha attivato lo scudo
-        ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
-        BatteriesManagement bm = new BatteriesManagement(1, pc);
-        listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
-        /*if(currentAdventureCard instanceof CombatZoneCard){
-            combatZoneShots(p);
-        }else {
-            manageCard();
-        }*/
+        Player player = playerbyListener.get(listener);
+        int batteries = player.getSpaceshipPlance().getnBatteries();
+        if(batteries > 0){
+            ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
+            BatteriesManagement bm = new BatteriesManagement(1, pc);
+            listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
+        } else {
+            try {
+                throw new ControllerExceptions("Batteries not enough to protect");
+            } finally {
+                playerHit(listener);
+            }
+        }
+    }
+
+    public void waitForNextShot(ClientListener listener) {
+        isDone.put(listener,true);
+        if(!isDone.containsKey(false)) {
+            if(currentAdventureCard instanceof MeteorSwarmCard)
+                manageCard();
+            else
+                defeatedByPirates();
+        } else {
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        }
     }
 
     public boolean addAlienCabin(ClientListener listener, int cabinId, String alienColor) {
@@ -1635,9 +1689,16 @@ public class Controller implements EventListenerInterface {
         Player p = playerbyListener.get(listener);
         switch(currentAdventureCard){
             case CombatZoneCard czc -> combatZoneShots(p);
-            case MeteorSwarmCard msc -> manageCard();
+            case MeteorSwarmCard msc -> waitForNextShot(listener);
             case OpenSpaceCard osc -> fromChargeToManage(listener);
-            case PiratesCard pc -> fromChargeToManage(listener);
+            case PiratesCard pc -> {
+                if(piratesFlag)
+                    waitForNextShot(listener);
+                else
+                    fromChargeToManage(listener);
+            }
+            case SlaversCard sc -> fromChargeToManage(listener);
+            case SmugglersCard sc -> fromChargeToManage(listener);
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
         /*if(currentAdventureCard instanceof CombatZoneCard){
@@ -1651,6 +1712,61 @@ public class Controller implements EventListenerInterface {
     public boolean removeMVGood(ClientListener listener, int cargoIndex, int goodIndex) {
         Player player = playerbyListener.get(listener);
         return player.getSpaceshipPlance().removeMVGood(cargoIndex,goodIndex);
+    }
+
+    public void takeHit(ClientListener l, Direction direction, int position) {
+        // cammini partendo dalla casella indicata verso il centro
+        // appena trovi un componente lo rimuovi
+        // aggiungere prima i check per la posizione
+        Player p = playerbyListener.get(l);
+        ComponentTile [][] components = p.getSpaceshipPlance().getComponents();
+        int max_lenght = 7;
+        // casella da cui partire
+        int x = 0, y = 0;
+        switch (direction) {
+            case NORTH:
+                x = position - 4;
+                y = 0;
+                max_lenght = 5;
+                break;
+            case EAST:
+                x = 6;
+                y = position - 5;
+                break;
+            case SOUTH:
+                x = position - 4;
+                y = 4;
+                max_lenght = 5;
+                break;
+            case WEST:
+                x = 0;
+                y = position - 5;
+                break;
+        }
+
+        ComponentTile hit = components[y][x];
+
+        for (int i = 0; i < max_lenght || hit == null; i++) {
+            switch (direction) {
+                case NORTH:
+                    y += 1;
+                    break;
+                case EAST:
+                    x -= 1;
+                    break;
+                case SOUTH:
+                    y -= 1;
+                    break;
+                case WEST:
+                    x += 1;
+                    break;
+            }
+            hit = components[y][x];
+        }
+
+        if (components[y][x] != null) {
+            removeAdjust(l, x, y);
+        }
     }
 }
 

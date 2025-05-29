@@ -9,7 +9,7 @@ public class CrewManagement extends DataContainer implements java.io.Serializabl
     private int lostAliens;
     private int lostCrew;
 
-    public CrewManagement(ArrayList<Cabin> cabins, int lostAstronauts, int lostAliens, int lostCrew) {
+    public CrewManagement(ArrayList<Cabin> cabins, int lostAliens, int lostCrew) {
         this.cabins = cabins;
         this.lostAliens = lostAliens;
         this.lostCrew = lostCrew;

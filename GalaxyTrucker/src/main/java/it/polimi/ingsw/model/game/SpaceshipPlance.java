@@ -814,7 +814,6 @@ public class SpaceshipPlance {
         }
 
         if (components[y][x] != null) {
-            reserveSpot.add(hit);
             remove(x, y);
         }
     }
