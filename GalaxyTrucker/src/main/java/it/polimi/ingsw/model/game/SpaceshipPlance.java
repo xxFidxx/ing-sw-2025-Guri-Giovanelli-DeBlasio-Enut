@@ -45,8 +45,10 @@ public class SpaceshipPlance {
         this.cabins = new ArrayList<>();
         this.cargoHolds = new ArrayList<>();
         this.powerCenters = new ArrayList<>();
+        this.engines = new ArrayList<>();
+        this.cannons = new ArrayList<>();
         // ci creiamo un arraylist di engines per simulare open space card
-        this.engines = new ArrayList<>(List.of(
+        /*this.engines = new ArrayList<>(List.of(
                 new DoubleEngine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 1),
                 new DoubleEngine(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 2),
                 new Engine(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 3),
@@ -61,7 +63,7 @@ public class SpaceshipPlance {
                 new Cannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL}, 10),
                 new Cannon(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 11),
                 new Cannon(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 12)
-        ));
+        ));*/
         this.nAstronauts = 0;
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;

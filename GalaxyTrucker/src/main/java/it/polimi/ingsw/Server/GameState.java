@@ -50,7 +50,11 @@ public enum GameState {
     REMOVE_MV_GOODS,
     CANNON_FIRE,
     LEAST_CREW,
-    LEAST_ENGINE
+    LEAST_ENGINE,
+    ENEMY_LOST,
+    ENEMY_WIN,
+    ENEMY_DRAW,
+    NO_DOUBLE_CANNON,
     }
 
 

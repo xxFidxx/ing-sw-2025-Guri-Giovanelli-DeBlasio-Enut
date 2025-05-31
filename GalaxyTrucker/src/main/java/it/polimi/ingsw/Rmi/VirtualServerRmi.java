@@ -48,6 +48,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void manageCard() throws RemoteException;
 
+    void fromChargeToManage(VirtualViewRmi clientRmi) throws RemoteException ;
+
     void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException ;
 
     void endCargoManagement(VirtualViewRmi clientRmi) throws RemoteException ;
@@ -77,6 +79,10 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean removeBatteries(VirtualViewRmi clientRmi, int powerCenterId, int batteries)throws RemoteException;
 
     void endManagement(VirtualViewRmi clientRmi)throws RemoteException;
+
+    void endCrewManagement(VirtualViewRmi clientRmi)throws RemoteException;
+
+    void endMVGoodsManagement(VirtualViewRmi clientRmi)throws RemoteException;
 
     boolean removeMVGood(ClientRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
 }

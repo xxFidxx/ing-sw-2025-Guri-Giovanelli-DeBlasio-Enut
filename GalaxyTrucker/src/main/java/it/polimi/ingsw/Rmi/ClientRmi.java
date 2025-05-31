@@ -329,7 +329,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endManagement(this);
+                    server.endCrewManagement(this);
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
@@ -511,7 +511,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CHOOSE_CANNON -> {
                 switch (input) {
-                    case "0" -> server.manageCard();
+                    case "0" -> server.fromChargeToManage(this);
                     case "1"-> {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();;
                         boolean inputValid = false;
@@ -615,7 +615,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endManagement(this);
+                    server.endMVGoodsManagement(this);
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
@@ -677,6 +677,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
             case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
             case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
+            case ENEMY_LOST -> System.out.println("You have been defeated by the enemies");
+            case ENEMY_WIN -> System.out.println("You defeated the enemies");
+            case ENEMY_DRAW -> System.out.println("You have the same power of enemies");
+            case NO_DOUBLE_CANNON -> System.out.println("You don't have any double cannon");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");
