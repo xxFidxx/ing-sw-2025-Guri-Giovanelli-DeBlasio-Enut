@@ -1,67 +1,66 @@
-package it.polimi.ingsw.Rmi;
-
+package it.polimi.ingsw.Socket.Client;
 import it.polimi.ingsw.Server.GameState;
-import it.polimi.ingsw.controller.ControllerExceptions;
+import it.polimi.ingsw.Socket.SocketWrapper;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
 import it.polimi.ingsw.model.componentTiles.PowerCenter;
-import it.polimi.ingsw.model.game.CargoManagementException;
-import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
-    public final VirtualServerRmi server;
+
+public class ClientSocket implements VirtualViewSocket {
     private volatile GameState currentState;
-    private final LinkedBlockingQueue<Event> eventQueue;
+    private static final LinkedBlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
+    private static final LinkedBlockingQueue<Event> responseQueue = new LinkedBlockingQueue<>();
     private final Scanner scan = new Scanner(System.in);
     private final Object StateLock = new Object();
     private Event currentEvent;
+    private final ObjectOutputStream outputStream;
 
 
-    public ClientRmi(VirtualServerRmi server) throws RemoteException{
+    public ClientSocket(Socket socket) throws IOException {
         super();
-        this.server = server;
         this.currentEvent = null;
-        eventQueue = new LinkedBlockingQueue<>();
         currentState = GameState.IDLE;
+        this.outputStream = new ObjectOutputStream(socket.getOutputStream());
     }
 
     public static void main(String[] args) throws Exception {
-        final String serverName = "ServerRmi";
+        try {
+            Socket socket = new Socket("127.0.0.1", 1234);
+            EventReceiver receiver = new EventReceiver(socket, eventQueue,responseQueue );
+            new Thread(receiver).start();
 
-        // qua c'è da metterci come primo argomento identificativo registro, visto che voglio testare sulla mia macchina
-        // ora l'ip è quello della macchina locale: 127.0.0.1 indirizzo local host
-        Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
-        VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
-
-        new ClientRmi(server).run(0);
+            new ClientSocket(socket).run(0);
+        }catch(IOException e){
+            System.out.println(e.getMessage());
+        }
     }
 
 
     public void run(int mode) throws Exception {
-        server.connect(this);
 
         Thread eventThread;
         eventThread = new Thread(this::handleEvents);
         eventThread.start();
 
-        if (mode == 0) {
+        if (mode == 0){
             runCli();
         }
     }
@@ -70,7 +69,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private void runCli() throws Exception {
         while (true) {
             if (scan.hasNextLine()) {
-                String input = scan.nextLine().trim(); // trim to remove white spaces around the string
+                String input = scan.nextLine().trim();
                 synchronized (StateLock) {
                     handleInput(input);
                 }
@@ -78,7 +77,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
     }
 
-    // sono da capire dove gestire gli errori di parsing in input
+    private void EventSender(String command, Object[] params) throws IOException {
+        SocketWrapper wrapper = new SocketWrapper(command, params);
+        outputStream.writeObject(wrapper);
+        outputStream.flush();
+    }
+
+
     private void handleInput(String input) throws Exception {
         switch (currentState) {
             case IDLE -> {
@@ -88,15 +93,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         try {
                             System.out.print("Enter lobby size [2-4]: ");
                             int size = Integer.parseInt(scan.nextLine());
-                            try {
-                                server.createLobby(size);
-                            } catch (Exception e) {
-                                System.out.print("Error " + e.getMessage() + "\n");
-                            }
-                            inputValid = true;
+                            EventSender("createLobby", new Object[]{size});
 
+                            inputValid = handleServerResponse();
                         } catch (NumberFormatException e) {
                             System.out.print("Error " + e.getMessage() + " please type a number \n");
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
                         }
                     }
                 } else {
@@ -104,27 +107,42 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
             case LOBBY_PHASE -> {
+                EventSender("addNickname" , new Object[]{input});
+                boolean inputValid;
                 try {
-                    server.addNickname(this, input);
-                } catch (Exception e) {
-                    System.out.print("Error " + e.getMessage() + "\n");
+                    inputValid = handleServerResponse();
+                    if (!inputValid) {
+                        System.out.print("Nickname not accepted, please try another one:\n");
+                    }
+                } catch (InterruptedException e) {
+                    System.out.println("Interrupted: " + e.getMessage());
                 }
             }
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
-
             case ASSEMBLY -> {
                 if(input.equals("-1")){
+                    EventSender("endCrafting" , new Object[0]);
                     try {
-                        server.endCrafting(this);
-                    } catch (Exception e) {
-                        System.out.print("Error " + e.getMessage() + "\n");
+                        handleServerResponse();
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
                     }
                 }else{
                     try {
-                        server.pickTile(this, Integer.parseInt(input));
-                    } catch (Exception e) {
-                        System.out.print("Error " + e.getMessage() + "\n");
+                        int tileIndex = Integer.parseInt(input);
+                        EventSender("pickTile", new Object[]{tileIndex});
+                        boolean inputValid;
+                        try {
+                            inputValid = handleServerResponse();
+                            if (!inputValid) {
+                                System.out.print("Invalid tile selection, please try again:\n");
+                            }
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input, please enter a valid number for the tile index");
                     }
                 }
             }
@@ -140,48 +158,77 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             try {
                                 String[] parts = inputLine.split(" ");
                                 if(Integer.parseInt(parts[0]) == -1){
-                                    inputValid = true;
-                                    server.endCrafting(this);
+                                    EventSender("endCrafting" , new Object[0]);
+                                    try {
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
+                                    }
                                 }
                                 if (parts.length == 2) {
                                     int xIndex = Integer.parseInt(parts[0]);
                                     int yIndex = Integer.parseInt(parts[1]);
-
+                                    EventSender("addTile", new Object[]{xIndex,yIndex});
                                     try {
-                                        server.addTile(this, xIndex, yIndex);
-                                        inputValid = true;
-                                    }catch(SpaceShipPlanceException e) {
-                                        System.out.println(e.getMessage() + ",please try again with valid coordinates");
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
                                     }
                                 }else
                                     System.out.println("Wrong input. You need 2 numbers divided by a space \n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (SpaceShipPlanceException e) {
-                                System.out.println("SpaceShipPlanceException error " + e.getMessage());
-                            } catch (RemoteException e) {
-                            System.out.println("RemoteException error " + e.getMessage());
                             }
-
-
                         }
                     }
-                    case "1" -> server.addReserveSpot(this);
-                    case "2" -> server.putTileBack(this);
-                    case "3" -> server.drawCard();
-                    case "4" -> server.endCrafting(this);
-                    case "5" -> server.rotateClockwise(this);
+                    case "1" -> {
+                        EventSender("addReserveSpot" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    case "2" -> {
+                        EventSender("putTileBack" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    case "3" -> {
+                        EventSender("drawCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    case "4" -> {
+                        EventSender("endCrafting" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    case "5" -> {
+                        EventSender("rotateClockwise" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
-
             case ADJUST_SHIP -> {
                 switch (input) {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-
-                            // da rimuovere l'escape con -1 quando sappiamo che funziona tutto
                             System.out.println("Type -1 to exit or insert coordinates of the tile you want to remove: x y (es. 1 2): ");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();
@@ -189,97 +236,107 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             try {
                                 String[] parts = inputLine.split(" ");
                                 if(Integer.parseInt(parts[0]) == -1){
-                                    inputValid = true;
-                                    server.endCrafting(this);
+                                    EventSender("endCrafting" , new Object[0]);
+                                    try {
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
+                                    }
                                 }
                                 if (parts.length == 2) {
                                     int xIndex = Integer.parseInt(parts[0]);
                                     int yIndex = Integer.parseInt(parts[1]);
-
+                                    EventSender("removeAdjust", new Object[]{xIndex,yIndex});
                                     try {
-                                        server.removeAdjust(this, xIndex, yIndex);
-                                        inputValid = true;
-                                    } catch (SpaceShipPlanceException e) {
-                                        System.out.println(e.getMessage() + ",please try again with valid coordinates");
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
                                     }
                                 } else
                                     System.out.println("Wrong input. You need 2 numbers divided by a space \n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (SpaceShipPlanceException e) {
-                                System.out.println("SpaceShipPlanceException error " + e.getMessage());
-                            } catch (RemoteException e) {
-                                System.out.println("RemoteException error " + e.getMessage());
                             }
+                        }
+                    }
+                    case "1" -> {
+                        EventSender("drawCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
                         }
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
-            }case SELECT_SHIP -> {
-                    boolean inputValid = false;
-                    while(!inputValid){
+            }
+            case SELECT_SHIP -> {
+                boolean inputValid = false;
+                while(!inputValid){
+                    try {
+                        int part = Integer.parseInt(input);
+                        EventSender("selectShipPart" , new Object[]{part});
                         try {
-                            int part = Integer.parseInt(input);
-                            try {
-                                server.selectShipPart(this, part);
-                                inputValid = true;
-                            } catch (Exception e) {
-                                System.out.print("Error " + e.getMessage() + "\n");
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.print("Error " + e.getMessage() + " please type a number \n");
+                            inputValid = handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
                         }
+                    } catch (NumberFormatException e) {
+                        System.out.print("Error " + e.getMessage() + " please type a number \n");
                     }
+                }
             }
-            case SHOW_SHIP -> {
-                System.out.print("Not accepted input, please try again:\n");
-            }
+            case SHOW_SHIP -> System.out.print("Not accepted input, please try again:\n");
             case ROBBED_TILE -> System.out.print("Someone faster picked your card! Please try again\n");
-            case DRAW_CARD ->
-                    System.out.print("If you are the leader you will have to choose what to do, else just wait the players ahead are done!\n");
-
+            case DRAW_CARD -> System.out.print("If you are the leader you will have to choose what to do, else just wait the players ahead are done!\n");
             case CHOOSE_ALIEN -> {
                 switch (input) {
-                    case "0" -> server.handleEndChooseAliens(this);
+                    case "0" -> {
+                        EventSender("handleEndChooseAliens" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     case "1"-> {
                         boolean exit = false;
                         while (!exit) {
-                                System.out.println("Type -1 to exit or insert the id of the cabin you want to choose and then the color( b for brown and p for purple) of the alien you want to place in (ex. 1 b ): ");
-                                System.out.print("> ");
-                                String line = scan.nextLine();
-                                try {
-                                    String[] parts = line.split(" ");
-                                    if(Integer.parseInt(parts[0]) == -1){
-                                        server.handleEndChooseAliens(this);
-                                        exit = true;
+                            System.out.println("Type -1 to exit or insert the id of the cabin you want to choose and then the color( b for brown and p for purple) of the alien you want to place in (ex. 1 b ): ");
+                            System.out.print("> ");
+                            String line = scan.nextLine();
+                            try {
+                                String[] parts = line.split(" ");
+                                if(Integer.parseInt(parts[0]) == -1){
+                                    EventSender("handleEndChooseAliens" , new Object[0]);
+                                    try {
+                                        exit = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
                                     }
-                                    if (parts.length == 2) {
-                                        int cabinId = Integer.parseInt(parts[0]);
-                                        String alienColor = parts[1];
-                                        if(!Objects.equals(alienColor, "b") && !Objects.equals(alienColor, "p"))
-                                            System.out.println("You type a different letter from b or p, please try again");
-                                        try {
-                                            if(server.addAlienCabin(this, cabinId, alienColor))
-                                                System.out.println("Successfully exchanged in cabin " + cabinId +  " 2 astronauts for a " + alienColor + " alien");
-                                            else
-                                                System.out.println("Your provided cabin id '" + cabinId +  "' or your provided alien color '" + alienColor + "' were incorrect, please try again");
-                                        } catch (RemoteException e) {
-                                            System.out.println(e.getMessage());
-                                        }
-                                    } else
-                                        System.out.println("Wrong input. You need a number and the letter b or v divided by a space \n");
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars \n");
-                                } catch (RemoteException e) {
-                                    System.out.println("RemoteException error " + e.getMessage());
                                 }
+                                if (parts.length == 2) {
+                                    int cabinId = Integer.parseInt(parts[0]);
+                                    String alienColor = parts[1];
+                                    if(!Objects.equals(alienColor, "b") && !Objects.equals(alienColor, "p"))
+                                        System.out.println("You type a different letter from b or p, please try again");
+                                    EventSender("addAlienCabin", new Object[]{cabinId, alienColor});
+                                    try {
+                                        exit = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
+                                    }
+                                } else
+                                    System.out.println("Wrong input. You need a number and the letter b or v divided by a space \n");
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars \n");
                             }
                         }
-                    default -> System.out.print("Not accepted input, please try again:\n");
                     }
+                    default -> System.out.print("Not accepted input, please try again:\n");
                 }
-
-            case CREW_MANAGEMENT ->{
+            }
+            case CREW_MANAGEMENT -> {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int lostCrew = ((CrewManagement) data).getLostCrew();
@@ -296,25 +353,31 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 int cabinId = Integer.parseInt(parts[0]);
                                 if (lostCrew != 0) {
                                     if (parts[1] != null && (parts[1].equals("as"))) {
-                                        if (server.removeFigure(this, cabinId, parts[1])) {
-                                            lostCrew--;
-                                            removed = true;
-                                        } else {
-                                            System.out.println("You have to put a cabinId containing an astronaut");
+                                        EventSender("removeFigure", new Object[]{cabinId,"as"});
+                                        try {
+                                            if (handleServerResponse()) {
+                                                lostCrew--;
+                                                removed = true;
+                                            }
+                                        } catch (InterruptedException e) {
+                                            System.out.println("Interrupted: " + e.getMessage());
                                         }
                                     } else {
                                         System.out.println("You have to type as as second parameter, please retry");
                                     }
                                 } else {
                                     if (parts[1] != null && (parts[1].equals("al"))) {
-                                        if (server.removeFigure(this, cabinId, parts[1])) {
-                                            lostAliens--;
-                                            removed = true;
-                                        } else {
-                                            System.out.println("You have to put a cabinId containing an alien of that color");
+                                        EventSender("removeFigure", new Object[]{cabinId,"al"});
+                                        try {
+                                            if (handleServerResponse()) {
+                                                lostAliens--;
+                                                removed = true;
+                                            }
+                                        } catch (InterruptedException e) {
+                                            System.out.println("Interrupted: " + e.getMessage());
                                         }
                                     } else {
-                                        System.out.println("You have to type alB or alP as second parameter, please retry");
+                                        System.out.println("You have to type al as second parameter, please retry");
                                     }
                                 }
                             } else {
@@ -322,19 +385,21 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             }
                         } catch (NumberFormatException e) {
                             System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars");
-                        } catch (RemoteException e) {
-                            System.out.println("Error " + e.getMessage());
                         }
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endCrewManagement(this);
+                    EventSender("endManagement" , new Object[0]);
+                    try {
+                        handleServerResponse();
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
+                    }
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
             }
-
-            case BATTERIES_MANAGEMENT ->{
+            case BATTERIES_MANAGEMENT -> {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nBatteries = ((BatteriesManagement) data).getNBatteries();
@@ -349,36 +414,39 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             if (parts.length == 2) {
                                 int powerCenterId = Integer.parseInt(parts[0]);
                                 int batteries = Integer.parseInt(parts[1]);
-                                    if (batteries <= 2 && batteries > 0) {
-                                        if (server.removeBatteries(this, powerCenterId, batteries)) {
+                                if (batteries <= 2 && batteries > 0) {
+                                    EventSender("removeBatteries", new Object[]{powerCenterId, batteries});
+                                    try {
+                                        if (handleServerResponse()) {
                                             nBatteries--;
                                             removed = true;
-                                        } else {
-                                            System.out.println("You have to put a PowerCenter containing a battery");
                                         }
-                                    } else {
-                                        System.out.println("You have to choose 1 or 2 batteries to remove, please retry");
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
                                     }
-
+                                } else {
+                                    System.out.println("You have to choose 1 or 2 batteries to remove, please retry");
+                                }
                             } else {
                                 System.out.println("Wrong input. You need to put a PowerCenterId and a nBatteries divided by a space\n");
                             }
                         } catch (NumberFormatException e) {
                             System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars");
-                        } catch (RemoteException e) {
-                            System.out.println("Error " + e.getMessage());
                         }
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endManagement(this);
+                    EventSender("endManagement" , new Object[0]);
+                    try {
+                        handleServerResponse();
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
+                    }
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
             }
-
             case CARGO_MANAGEMENT -> System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
-
             case CARGO_VIEW -> {
                 switch (input) {
                     case "0" -> {
@@ -393,21 +461,21 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     int cargoIndex = Integer.parseInt(parts[0]);
                                     int goodIndex = Integer.parseInt(parts[1]);
                                     int rewardIndex = Integer.parseInt(parts[2]);
-
-                                    server.addGood(this, cargoIndex, goodIndex, rewardIndex);
-                                    inputValid = true;
+                                    EventSender("addGood", new Object[]{cargoIndex,goodIndex,rewardIndex});
+                                    try {
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
+                                    }
                                 }else
                                     System.out.println("Wrong input. You need 3 numbers divided by a space \n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
                             }
                         }
                     }
                     case "1" -> {
                         boolean inputValid = false;
-
                         while(!inputValid){
                             try {
                                 System.out.println("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
@@ -415,26 +483,25 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 String inputLine = scan.nextLine();
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length == 4) {
-
                                     int cargoIndex1 = Integer.parseInt(parts[0]);
                                     int cargoIndex2 = Integer.parseInt(parts[1]);
                                     int goodIndex1 = Integer.parseInt(parts[2]);
                                     int goodIndex2 = Integer.parseInt(parts[3]);
-
-                                    server.swapGoods(this, cargoIndex1, cargoIndex2, goodIndex1, goodIndex2);
-                                    inputValid = true;
+                                    EventSender("swapGoods" , new Object[]{cargoIndex1,cargoIndex2,goodIndex1,goodIndex2});
+                                    try {
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
+                                    }
                                 }else
                                     System.out.println("Wrong input. You need 4 numbers divided by a space\n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
                             }
                         }
                     }
                     case "2" -> {
                         boolean inputValid = false;
-
                         while(!inputValid){
                             System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
                             System.out.print("> ");
@@ -446,62 +513,96 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }else{
                                     int cargoIndex = Integer.parseInt(parts[0]);
                                     int goodIndex = Integer.parseInt(parts[1]);
-                                    server.removeGood(this, cargoIndex, goodIndex);
-                                    inputValid = true;
+                                    EventSender("removeGood", new Object[]{cargoIndex,goodIndex});
+                                    try {
+                                        inputValid = handleServerResponse();
+                                    } catch (InterruptedException e) {
+                                        System.out.println("Interrupted: " + e.getMessage());
+                                    }
                                 }
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
                             }
                         }
                     }
-
                     case "3" -> {
-                        server.endCargoManagement(this);
+                        EventSender("endCargoManagement" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
                         System.out.print("Cargo management ended:\n");
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
-            case ASK_SHIELD -> {
+            case ASK_SHIELD, ASK_CANNON -> {
                 switch (input) {
-                    case "0" -> server.playerHit(this);
-                    case "1" -> server.playerProtected(this);
-                    default -> System.out.print("Not accepted input, please try again:\n");
-                }
-            }
-            case ASK_CANNON -> {
-                switch (input) {
-                    case "0" -> server.playerHit(this);
-                    case "1" -> server.playerProtected(this);
+                    case "0" -> {
+                        EventSender("playerHit" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    case "1" -> {
+                        EventSender("playerProtected" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case CHOOSE_PLAYER -> {
                 switch (input) {
-                    case "0" -> server.acceptCard(this);
-                    case "1" -> server.manageCard();
+                    case "0" -> {
+                        EventSender("acceptCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    case "1" -> {
+                        EventSender("manageCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
             case CHOOSE_BATTERY -> {
                 switch (input) {
-                    case "0" -> server.manageCard();
+                    case "0" -> {
+                        EventSender("manageCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
                             System.out.print("Insert the number of double engines to charge: ");
                             try {
                                 int numDE = Integer.parseInt(scan.nextLine());
-                                server.charge(this, numDE);
-                                inputValid = true;
-                            } catch (ControllerExceptions e) {
-                                System.out.println(e.getMessage());
+                                EventSender("charge" , new Object[]{numDE});
+                                try {
+                                    inputValid = handleServerResponse();
+                                } catch (InterruptedException e) {
+                                    System.out.println("Interrupted: " + e.getMessage());
+                                }
                             } catch (NumberFormatException e) {
                                 System.out.print("Error " + e.getMessage() + " please type a number \n");
-                            } catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
                             }
                         }
                     }
@@ -510,9 +611,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CHOOSE_CANNON -> {
                 switch (input) {
-                    case "0" -> server.fromChargeToManage(this);
+                    case "0" -> {
+                        EventSender("manageCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     case "1"-> {
-                        ArrayList<Integer> chosenIndices = new ArrayList<>();;
+                        ArrayList<Integer> chosenIndices = new ArrayList<>();
                         boolean inputValid = false;
                         while (!inputValid) {
                             System.out.println("Insert the index of double cannons to charge: ");
@@ -531,10 +639,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }
                             }
                             if(inputValid){
-                                try{
-                                    server.chargeCannons(this, chosenIndices);
-                                } catch (Exception e) {
-                                    System.out.println(e.getMessage());
+                                EventSender("chargeCannons", new Object[]{chosenIndices});
+                                try {
+                                    inputValid = handleServerResponse();
+                                } catch (InterruptedException e) {
+                                    System.out.println("Interrupted: " + e.getMessage());
                                 }
                             }
                         }
@@ -544,77 +653,110 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CHOOSE_PLANETS -> {
                 switch (input) {
-                    case "0" -> server.manageCard();
+                    case "0" -> {
+                        EventSender("manageCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
                     case "1"->{
                         boolean inputValid = false;
+                        EventSender("checkStorageOk", new Object[]{});
+                        try {
+                            inputValid = !handleServerResponse();
+                        }catch(InterruptedException e){
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+
                         while (!inputValid) {
                             try {
                                 System.out.print("Insert planet index (from 0 to 3): ");
                                 int numP = Integer.parseInt(scan.nextLine());
-                                server.choosePlanets(this, numP);
-                                inputValid = true;
-                            } catch (ControllerExceptions e) {
-                                System.out.println(e.getMessage());
+                                EventSender("choosePlanets", new Object[]{numP});
+                                try {
+                                    inputValid = handleServerResponse();
+                                } catch (InterruptedException e) {
+                                    System.out.println("Interrupted: " + e.getMessage());
+                                }
                             } catch (NumberFormatException e) {
-                            System.out.print("Error " + e.getMessage() + " please type a number \n");
-                            } catch (CargoManagementException e) {
-                                System.out.println(e.getMessage());
-                                inputValid = true;
-                            }catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
+                                System.out.print("Error " + e.getMessage() + " please type a number \n");
                             }
                         }
-                        server.manageCard();
+                        EventSender("manageCard" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
                     }
                     default ->{
                         System.out.println("Not accepted input, please try again");
                         System.out.print("> ");
                     }
                 }
-            }case ASK_SURRENDER ->{
+            }
+            case ASK_SURRENDER ->{
                 switch (input) {
                     case "-1" ->{
-                        server.surrender(this);
+                        EventSender("surrender" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
                         System.out.println("You surrendered, you will now be in spectator mode");
                     }
                     case "0"->{
-                        server.handleSurrenderEnded(this);
+                        EventSender("handleSurrenderEnded" , new Object[0]);
+                        try {
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
                     }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
-
             case REMOVE_MV_GOODS ->{
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nGoods = ((RemoveMostValuable) data).getNGoods();
                     while ((nGoods != 0)) {
-                            System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
-                            System.out.print("> ");
-                            String inputLine = scan.nextLine();
-                            boolean removed = false;
-                            try {
-                                String[] parts = inputLine.split(" ");
-                                if (parts.length != 2) {
-                                    System.out.println("Wrong input. You need 2 numbers divided by a space");
-                                }else{
-                                    int cargoIndex = Integer.parseInt(parts[0]);
-                                    int goodIndex = Integer.parseInt(parts[1]);
-                                    if(server.removeMVGood(this, cargoIndex, goodIndex)){
+                        System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
+                        System.out.print("> ");
+                        String inputLine = scan.nextLine();
+                        boolean removed = false;
+                        try {
+                            String[] parts = inputLine.split(" ");
+                            if (parts.length != 2) {
+                                System.out.println("Wrong input. You need 2 numbers divided by a space");
+                            }else{
+                                int cargoIndex = Integer.parseInt(parts[0]);
+                                int goodIndex = Integer.parseInt(parts[1]);
+                                EventSender("removeMVGood", new Object[]{cargoIndex,goodIndex});
+                                try {
+                                    if (handleServerResponse()) {
                                         nGoods--;
                                         removed = true;
-                                    }else
-                                        System.out.println("This was not one of the most valuable goods you have, please select one among them!");
+                                    }
+                                } catch (InterruptedException e) {
+                                    System.out.println("Interrupted: " + e.getMessage());
                                 }
-                            } catch (NumberFormatException e) {
-                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
-                            } catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
                             }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
+                        }
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endMVGoodsManagement(this);
+                    EventSender("endManagement" , new Object[0]);
+                    try {
+                        handleServerResponse();
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
+                    }
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
@@ -623,7 +765,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         System.out.print("\n> ");
     }
 
-    private void handleState() throws RemoteException {
+    private void handleState() throws IOException {
         System.out.print("\n");
         switch(currentState){
             case IDLE -> System.out.println("Type 0 to create a lobby");
@@ -643,12 +785,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case DRAW_CARD -> System.out.println("This is the drawn card:");
             case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
             case CARGO_MANAGEMENT -> {
+                EventSender("endManagement" , new Object[0]);
                 try{
-                    server.checkStorage(this);
-                } catch (CargoManagementException e){
-                    System.out.println(e.getMessage());
-                } catch (Exception e){
-                    System.out.println("Error " + e.getMessage());
+                    handleServerResponse();
+                } catch (InterruptedException e) {
+                    System.out.println("Interrupted: " + e.getMessage());
                 }
             }
             case CREW_MANAGEMENT ->{
@@ -677,10 +818,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
             case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
             case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
-            case ENEMY_LOST -> System.out.println("You have been defeated by the enemies");
-            case ENEMY_WIN -> System.out.println("You defeated the enemies");
-            case ENEMY_DRAW -> System.out.println("You have the same power of enemies");
-            case NO_DOUBLE_CANNON -> System.out.println("You don't have any double cannon");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");
@@ -695,17 +832,17 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         while (true) {
             try {
                 currentEvent = eventQueue.take();
-                    synchronized (StateLock) {
-                        currentState = currentEvent.getState();
-                        System.out.println("\n--- Game State Updated ---");
-                        handleState();
-                    }
+                synchronized (StateLock) {
+                    currentState = currentEvent.getState();
+                    System.out.println("\n--- Game State Updated ---");
+                    handleState();
+                }
                 showData(currentEvent.getData());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("\n> Event thread interrupted");
                 return;
-            } catch (RemoteException e) {
+            } catch (IOException e) {
                 System.out.println("\n> You have been disconnected");
             }
         }
@@ -746,9 +883,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             GoodsContainer container = cargos.get(i);
             GoodsBlock[] blocks = container.getGoods();
 
-                String header = String.format("%sCargo %d id %d:",
-                        container.isSpecial() ? "Special " : "", i, container.getId());
-                System.out.print(header);
+            String header = String.format("%sCargo %d id %d:",
+                    container.isSpecial() ? "Special " : "", i, container.getId());
+            System.out.print(header);
 
             for (GoodsBlock block : blocks) {
                 String blockValue = (block != null) ?
@@ -849,4 +986,24 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
         System.out.println("\n");
     }
+
+    private boolean handleServerResponse() throws InterruptedException {
+        long timeout = 30000;
+        Event event = responseQueue.poll(timeout, TimeUnit.MILLISECONDS);
+
+        if (event == null) {
+            System.out.println("Server response timeout after " + timeout + "ms");
+            return false;
+        }
+
+        ServerResponse response = (ServerResponse)event.getData();
+
+        if (response.isError()) {
+            System.out.println("Error: " + response.getError());
+            return false;
+        }
+        return true;
+    }
+
 }
+

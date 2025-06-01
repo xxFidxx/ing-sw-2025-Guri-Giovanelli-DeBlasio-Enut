@@ -3,27 +3,19 @@ package it.polimi.ingsw.controller.network;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.data.DataContainer;
 
-import java.util.EventObject;
+import java.io.Serializable;
 
 
-public class Event extends EventObject implements EventInterface {
+public class Event implements Serializable {
 
     private final GameState gameState;
-    private final DataContainer data;    // e.g., BoardData, MoveValidationData
+    private final DataContainer data;
 
-    public Event(Object source, GameState gameState, DataContainer data) {
-        super(source);
+    public Event(GameState gameState, DataContainer data) {
         this.gameState = gameState;
         this.data = data;
     }
 
-
-    @Override
-    public boolean isValid() {
-        return false;
-    }
-
-    @Override
     public GameState getState() {
         return gameState;
     }

@@ -24,7 +24,7 @@ public class HomeController extends Controller {
     private void handleHost() throws RemoteException {
         sceneManager.switchTo("lobby");
         int lobbySize = Integer.parseInt(lobbySizeBox.getValue());
-        clientRmi.server.createLobby(clientRmi, lobbySize);
+        clientRmi.server.createLobby(lobbySize);
     }
 
     @FXML

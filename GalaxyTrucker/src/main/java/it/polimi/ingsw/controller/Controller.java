@@ -2,7 +2,6 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
-import it.polimi.ingsw.controller.network.EventListenerInterface;
 import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.adventureCards.*;
@@ -15,21 +14,17 @@ import it.polimi.ingsw.model.resources.*;
 import it.polimi.ingsw.model.game.*;
 
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
-public class Controller implements EventListenerInterface {
+public class Controller{
     private Game game;
     private Lobby lobby;
     private GameState currentGameState = GameState.IDLE;
-    // queue of messageEvents, because you don't want the client to wait the computational time
-    private final BlockingQueue<Event> queue;
     private final List<ClientListener> listeners = new ArrayList<>();
     private final Object LobbyLock = new Object();
     private final Object GameLock = new Object();
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
-    final Map<Player,ClientListener> listenerbyPlayer = new HashMap<>();
+    final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <ClientListener, Boolean> isDone = new HashMap<>();
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
@@ -41,14 +36,13 @@ public class Controller implements EventListenerInterface {
     private int currentDiceThrow;
     private ArrayList<Player> tmpPlayers;
     private List<AdventureCard> cards;
-    private ArrayList<Player> defeatedPlayers;
+    private final ArrayList<Player> defeatedPlayers;
     private boolean combatZoneFlag;
     private boolean piratesFlag;
     private boolean enemyDefeated;
 
     public Controller() {
         this.game = null;
-        this.queue = new LinkedBlockingQueue<>();
         this.lobby = null;
         this.currentAdventureCard = null;
         this.currentPlayer = null;
@@ -96,11 +90,8 @@ public class Controller implements EventListenerInterface {
         return game;
     }
 
-    public void onEvent(Event event) {
-        queue.add(event);
-    }
 
-    public void createLobby(ClientListener listener,  int numPlayers) {
+    public void createLobby(int numPlayers) {
         if(lobby !=null){
                 throw new LobbyExceptions("Lobby is already set");
         }
@@ -174,84 +165,84 @@ public class Controller implements EventListenerInterface {
                 synchronized(LobbyLock){
                     nicks = lobby.getPlayersNicknames();
                 }
-                event = new Event(this, state,  new LobbyNicks(nicks));
+                event = new Event(state,  new LobbyNicks(nicks));
             }
             case ASSEMBLY ->{
                 Integer[] assemblingTiles;
                 synchronized(GameLock){
                     assemblingTiles = game.getAssemblingTilesId();
                 }
-                event = new Event(this, state, new PickableTiles(assemblingTiles));
+                event = new Event(state, new PickableTiles(assemblingTiles));
             }
 
             case SHOW_SHIP -> {
-                event = new Event(this, state, (DataString) data);
+                event = new Event(state, (DataString) data);
             }
 
             case PICKED_TILE -> {
-                event = new Event(this, state, (PickedTile)data);
+                event = new Event(state, (PickedTile)data);
             }
             case DRAW_CARD -> {
-                event = new Event(this, state, (Card) data);
+                event = new Event(state, (Card) data);
             }
 
-            case PLAYER_COLOR -> event = new Event(this, state, new PlayerColor((String)data));
+            case PLAYER_COLOR -> event = new Event( state, new PlayerColor((String)data));
 
             case TURN_START -> {
-                event = new Event(this, state, new BoardView((String[])data));
+                event = new Event( state, new BoardView((String[])data));
             }
             case SHOW_PLAYER -> {
-                event = new Event(this, state, (PlayerInfo) data);
+                event = new Event(state, (PlayerInfo) data);
             }
             case CHOOSE_BATTERY -> {
-                event = new Event(this, state, (DoubleEngineNumber) data);
+                event = new Event( state, (DoubleEngineNumber) data);
             }
             case CHOOSE_PLANETS -> {
-                event = new Event(this, state,new PlanetsBlock((ArrayList<Planet>) data));
+                event = new Event( state,new PlanetsBlock((ArrayList<Planet>) data));
             }
 
             case CHOOSE_ALIEN -> {
-                event = new Event(this, state, (ListCabinAliens) data);
+                event = new Event( state, (ListCabinAliens) data);
             }
 
             case SHOW_ENEMY -> {
-                event = new Event(this, state, (EnemyStrenght) data);
+                event = new Event( state, (EnemyStrenght) data);
             }
             case CHOOSE_CANNON -> {
-                event = new Event(this, state, (DoubleCannonList) data);
+                event = new Event(state, (DoubleCannonList) data);
             }
             case ADJUST_SHIP -> {
-                event = new Event(this, state, (DataString) data);
+                event = new Event(state, (DataString) data);
             }
 
             case SELECT_SHIP -> {
-                event = new Event(this, state, (DataString) data);
+                event = new Event(state, (DataString) data);
             }
 
             case END_GAME -> {
-                event = new Event(this, state, (DataString) data);
+                event = new Event(state, (DataString) data);
             }
 
             case BYTILE_SHIP -> {
-                event = new Event(this, state, (DataString) data);
+                event = new Event(state, (DataString) data);
             }
 
             case MOVE_PLAYER ->{
-                event = new Event(this, state, (LostDays) data);
+                event = new Event(state, (LostDays) data);
             }
             case LOST_CREW -> {
-                event = new Event(this, state, (LostCrew) data);
+                event = new Event(state, (LostCrew) data);
             }
 
             case CREW_MANAGEMENT -> {
-                event = new Event(this, state, (CrewManagement) data);
+                event = new Event(state, (CrewManagement) data);
             }
 
             case BATTERIES_MANAGEMENT -> {
-                event = new Event(this, state, (BatteriesManagement) data);
+                event = new Event(state, (BatteriesManagement) data);
             }
 
-            default ->event = new Event(this, state, null); // in cases where you don't have to send data, you just send the current state
+            default ->event = new Event(state, null); // in cases where you don't have to send data, you just send the current state
         }
         return event;
     }
@@ -1208,7 +1199,6 @@ public class Controller implements EventListenerInterface {
                 allOk = false;
             }else{
                 p.getSpaceshipPlance().updateLists();
-                System.out.println("uscito da update!");
                 isDone.put(l, true);
                 printSpaceship(l);
             }
@@ -1265,7 +1255,7 @@ public class Controller implements EventListenerInterface {
 
             player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
             printSpaceshipbyTile(listener,playerCargos.getFirst());
-            listener.onEvent(new Event(this,GameState.CARGO_VIEW,new Cargos(goodsContainers)));
+            listener.onEvent(new Event(GameState.CARGO_VIEW,new Cargos(goodsContainers)));
         }else {
             // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
            // separiamo i casi per ogni tipo di carta per vedere se termina subito o passa agli altri player
@@ -1278,6 +1268,13 @@ public class Controller implements EventListenerInterface {
         }
     }
 
+    public void checkStorageOk(ClientListener listener) throws CargoManagementException {
+        Player player = playerbyListener.get(listener);
+        if(!player.getSpaceshipPlance().checkStorage()){
+                throw new CargoManagementException("You got 0 storage space, you can't manage any good");
+            }
+        }
+
     private void  printSpaceshipbyTile(ClientListener listener, ComponentTile tile){
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringTile(tile);
@@ -1285,13 +1282,13 @@ public class Controller implements EventListenerInterface {
         listener.onEvent(eventCrafter(GameState.BYTILE_SHIP, ds));
     }
 
-    public void addGood(ClientListener listener,int cargoIndex, int goodIndex, int rewardIndex) {
+    public void addGood(ClientListener listener, int cargoIndex, int goodIndex, int rewardIndex) {
         Player player = playerbyListener.get(listener);
         game.addGood(player,cargoIndex,goodIndex,rewardIndex);
         checkStorage(listener);
     }
 
-    public void swapGoods(ClientListener listener,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+    public void swapGoods(ClientListener listener, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
         Player player = playerbyListener.get(listener);
         game.swapGoods(player,cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
         checkStorage(listener);
@@ -1328,7 +1325,7 @@ public class Controller implements EventListenerInterface {
 
     public void printSpaceshipAdjustment(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringAdjustments();
+        String complete_ship = player.getSpaceshipPlance().tileGridToStringAdjustments();
         DataString ds = new DataString(complete_ship);
         listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds));
     }
@@ -1471,6 +1468,7 @@ public class Controller implements EventListenerInterface {
     }
 
     public void removeAdjust(ClientListener listener, int xIndex, int yIndex) throws SpaceShipPlanceException {
+
         Player player = playerbyListener.get(listener);
         int stumps = player.getSpaceshipPlance().remove(xIndex, yIndex);
         // means the method is invoked at the beginning of the game
@@ -1502,7 +1500,7 @@ public class Controller implements EventListenerInterface {
 
     private void printSpaceshipParts(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        String complete_ship = player.getSpaceshipPlance().reserveSpotToString() + "\n" + player.getSpaceshipPlance().tileGridToStringParts();
+        String complete_ship = player.getSpaceshipPlance().tileGridToStringParts();
         DataString ds = new DataString(complete_ship);
         listener.onEvent(eventCrafter(GameState.SELECT_SHIP, ds));
     }
@@ -1660,7 +1658,7 @@ public class Controller implements EventListenerInterface {
             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
     }
 
-    public boolean removeFigure(ClientListener listener,int cabinId, String figure){
+    public boolean removeFigure(ClientListener listener, int cabinId, String figure){
         Player p = playerbyListener.get(listener);
         ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
         for(Cabin c: cabins){
@@ -1718,8 +1716,6 @@ public class Controller implements EventListenerInterface {
 
     public void handleSurrenderEnded(ClientListener listener){
 
-                System.out.println("Client: " + listener);
-
         synchronized (isDone){
             isDone.put(listener, true);
         }
@@ -1736,7 +1732,7 @@ public class Controller implements EventListenerInterface {
                 }
         }
 
-    public void surrend(ClientListener listener) {
+    public void surrender(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         isDone.remove(listener);
         players.remove(player);

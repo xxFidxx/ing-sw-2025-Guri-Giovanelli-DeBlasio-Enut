@@ -2,7 +2,9 @@ package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.VirtualServer;
 import it.polimi.ingsw.controller.LobbyExceptions;
+import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
+import it.polimi.ingsw.view.VirtualView;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -10,21 +12,21 @@ import java.util.ArrayList;
 
 public interface VirtualServerRmi extends Remote, VirtualServer {
 
-    void connect(VirtualViewRmi client) throws RemoteException;
+    void connect(VirtualView client) throws RemoteException;
 
     // metodi controller:
 
 
-    void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions;
+    void addNickname(VirtualView client, String nickname) throws RemoteException, LobbyExceptions;
 
-    @Override
-    void createLobby(VirtualViewRmi client,int number) throws RemoteException, LobbyExceptions;
+
+    void createLobby(int number) throws RemoteException, LobbyExceptions;
 
     void pickTile(VirtualViewRmi clientRmi, int input) throws RemoteException;
 
     void drawCard() throws RemoteException;
 
-    void checkStorage(VirtualViewRmi clientRmi) throws Exception;
+    void checkStorage(VirtualViewRmi clientRmi) throws RemoteException, CargoManagementException;
 
     void endCrafting(VirtualViewRmi clientRmi) throws Exception;
 
@@ -72,7 +74,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     boolean removeFigure(VirtualViewRmi clientRmi, int cabinId, String part) throws RemoteException;
 
-    void surrend(VirtualViewRmi clientRmi) throws RemoteException;
+    void surrender(VirtualViewRmi clientRmi) throws RemoteException;
 
     void handleSurrenderEnded(VirtualViewRmi clientRmi) throws RemoteException;
 
