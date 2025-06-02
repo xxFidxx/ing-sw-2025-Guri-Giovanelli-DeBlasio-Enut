@@ -680,7 +680,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ENEMY_LOST -> System.out.println("You have been defeated by the enemies");
             case ENEMY_WIN -> System.out.println("You defeated the enemies");
             case ENEMY_DRAW -> System.out.println("You have the same power of enemies");
-            case NO_DOUBLE_CANNON -> System.out.println("You don't have any double cannon");
+            case NO_DOUBLE_CANNON -> {
+                System.out.println("You don't have any double cannon");
+                server.fromChargeToManage(this);
+            }
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");

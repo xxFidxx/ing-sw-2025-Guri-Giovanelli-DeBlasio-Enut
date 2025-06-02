@@ -189,7 +189,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     @Override
     public void fromChargeToManage(VirtualViewRmi clientRmi) throws RemoteException {
-        ClientListener listener = clientListeners.get(clientRmi);
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
         controller.fromChargeToManage(listener);
     }
 
@@ -285,13 +285,13 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     @Override
     public void endCrewManagement(VirtualViewRmi clientRmi) throws RemoteException {
-        ClientListener listener = clientListeners.get(clientRmi);
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
         controller.endCrewManagement(listener);
     }
 
     @Override
     public void endMVGoodsManagement(VirtualViewRmi clientRmi) throws RemoteException {
-        ClientListener listener = clientListeners.get(clientRmi);
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
         controller.endMVGoodsManagement(listener);
     }
 

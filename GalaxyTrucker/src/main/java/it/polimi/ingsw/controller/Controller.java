@@ -417,6 +417,7 @@ public class Controller{
                 game.orderPlayers();
                 players = game.getPlayers();
                 tmpPlayers = new ArrayList<>(players);
+                isDone.replaceAll((c, v) -> false);
                 manageCard();
             }
 
@@ -640,8 +641,7 @@ public class Controller{
     private void handleEarlyEnd(Player player) {
         ClientListener listener = listenerbyPlayer.get(player);
         isDone.remove(listener);
-        tmpPlayers.remove(player);
-
+        players.remove(player);
     }
 
 
@@ -708,8 +708,9 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
         game.endTurn();
         isDone.replaceAll((c, v) -> false);
-        for(ClientListener cl : listeners){
-            endCard(cl);
+        endCard();
+        for (Player player : players) {
+            player.getSpaceshipPlance().updateLists();
         }
         cards.remove(currentAdventureCard);
         endTurn();
@@ -727,9 +728,11 @@ public class Controller{
         int lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
         if((astr + al) >= lostCrew) {
             CrewManagement cm = new CrewManagement(cabins, 0, lostCrew);
+            printSpaceshipbyTile(listener, cabins.getFirst());
             listener.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
         } else {
             CrewManagement cm = new CrewManagement(cabins, 0, astr+al);
+            printSpaceshipbyTile(listener, cabins.getFirst());
             listener.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
         }
     }
@@ -820,7 +823,6 @@ public class Controller{
                 }else{
                     System.out.println("handleWaitersEnemy: mando in NO_DOUBLE_CANNON");
                     listener.onEvent(eventCrafter(GameState.NO_DOUBLE_CANNON, null));
-                    fromChargeToManage(l);
                 }
             } else {
                 System.out.println("handleWaitersEnemy: mando in WAIT_PLAYER");
@@ -912,7 +914,7 @@ public class Controller{
                     if(!combatZoneFlag){
                         combatZoneFlag = true;
                         isDone.put(listener,true);
-                        if(!isDone.containsKey(false)){
+                        if(!isDone.containsValue(false)){
                             Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
                             int lostOther = ((CombatZoneCard) currentAdventureCard).getLostOther();
                             LostCrew lostCrew = new LostCrew(lostOther);
@@ -927,7 +929,7 @@ public class Controller{
                     } else {
                         combatZoneFlag = false;
                         isDone.put(listener,true);
-                        if(!isDone.containsKey(false)){
+                        if(!isDone.containsValue(false)){
                             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
                             ClientListener l = listenerbyPlayer.get(minFirePlayer);
                             handleMinFire(l);
@@ -942,7 +944,7 @@ public class Controller{
                     if(!combatZoneFlag) {
                         combatZoneFlag = true;
                         isDone.put(listener, true);
-                        if (!isDone.containsKey(false)) {
+                        if (!isDone.containsValue(false)) {
                             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
                             int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
                             LostDays obj= new LostDays(ld);
@@ -958,7 +960,7 @@ public class Controller{
                     } else {
                         combatZoneFlag = false;
                         isDone.put(listener, true);
-                        if (!isDone.containsKey(false)) {
+                        if (!isDone.containsValue(false)) {
                             Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
                             ClientListener l = listenerbyPlayer.get(minEnginePlayer);
                             handleMinEngine(l);
@@ -1077,9 +1079,11 @@ public class Controller{
                 System.out.println("defeatedBySlavers: mando in CREW_MANAGEMENT");
                 if((astr + al) >= lostCrew) {
                     CrewManagement cm = new CrewManagement(cabins, 0, lostCrew);
+                    printSpaceshipbyTile(l, cabins.getFirst());
                     l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
                 } else {
                     CrewManagement cm = new CrewManagement(cabins, 0, astr+al);
+                    printSpaceshipbyTile(l, cabins.getFirst());
                     l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
                 }
             } else {
@@ -1092,7 +1096,7 @@ public class Controller{
     public void waitForSlavers(ClientListener l){
         isDone.put(l, true);
         // forse containsValue
-        if(!isDone.containsKey(false)) {
+        if(!isDone.containsValue(false)) {
             System.out.println("waitForSlavers: mando in defeatedBySlavers");
             defeatedBySlavers();
         } else {
@@ -1330,18 +1334,17 @@ public class Controller{
         listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds));
     }
 
-    public void endCard(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
+    public void endCard() {
         for(Player p: players){
-            if(p == player){
-                String nick = p.getNickname();
-                int pos = p.getPlaceholder().getPosizione();
-                int cred = p.getCredits();
-                int astr = p.getSpaceshipPlance().getnAstronauts();
-                int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
-                PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
-                listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
-            }
+            p.getSpaceshipPlance().updateLists();
+            String nick = p.getNickname();
+            int pos = p.getPlaceholder().getPosizione();
+            int cred = p.getCredits();
+            int astr = p.getSpaceshipPlance().getnAstronauts();
+            int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
+            PlayerInfo pi = new PlayerInfo(nick, pos, cred, astr, al);
+            ClientListener listener = listenerbyPlayer.get(p);
+            listener.onEvent(eventCrafter(GameState.SHOW_PLAYER, pi));
         }
     }
 
@@ -1610,7 +1613,7 @@ public class Controller{
     public void waitForNextShot(ClientListener listener) {
         isDone.put(listener,true);
         // forse containsValue
-        if(!isDone.containsKey(false)) {
+        if(!isDone.containsValue(false)) {
             if(currentAdventureCard instanceof MeteorSwarmCard)
                 manageCard();
             else
