@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Socket.Server;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.Socket.Client.ClientHandler;
+import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
@@ -11,7 +12,6 @@ import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 
 import java.io.*;
 import java.net.*;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +105,7 @@ public class SocketServer implements VirtualServerSocket {
 
 
 
-    public void addNickname(ObjectOutputStream client, String nickname) throws RemoteException, LobbyExceptions {
+    public void addNickname(ObjectOutputStream client, String nickname) throws  LobbyExceptions {
         ClientListenerSocket listener = clientListeners.get(client);
         synchronized(controller){
             controller.addNickname(listener,nickname);
@@ -116,19 +116,19 @@ public class SocketServer implements VirtualServerSocket {
     }
 
 
-    public void createLobby(int number) throws RemoteException, LobbyExceptions {
+    public void createLobby(int number) throws   LobbyExceptions {
         synchronized(controller){
             controller.createLobby(number);
         }
         System.out.println("Lobby created\n");
     }
 
-    public void pickTile(ObjectOutputStream client, int id) throws RemoteException {
+    public void pickTile(ObjectOutputStream client, int id)   {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.pickTile(listener, id);
     }
 
-    public void drawCard() throws RemoteException {
+    public void drawCard()   {
         controller.drawCard();
     }
 
@@ -139,12 +139,12 @@ public class SocketServer implements VirtualServerSocket {
     }
 
 
-    public void checkStorage(ObjectOutputStream client) throws RemoteException, CargoManagementException {
+    public void checkStorage(ObjectOutputStream client) throws   CargoManagementException {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.checkStorage(listener);
     }
 
-    public void checkStorageOk(ObjectOutputStream client) throws RemoteException, CargoManagementException {
+    public void checkStorageOk(ObjectOutputStream client) throws   CargoManagementException {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.checkStorageOk(listener);
     }
@@ -170,133 +170,138 @@ public class SocketServer implements VirtualServerSocket {
     }
 
 
-    public void acceptCard(ObjectOutputStream client) throws RemoteException {
+    public void acceptCard(ObjectOutputStream client)    {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.acceptCard(listener);
     }
 
 
-    public void addTile(ObjectOutputStream client, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException {
+    public void addTile(ObjectOutputStream client, int xIndex, int yIndex) throws   SpaceShipPlanceException {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.addTile(listener,xIndex,yIndex);
     }
 
 
-    public void charge(ObjectOutputStream client, int i) throws RemoteException {
+    public void charge(ObjectOutputStream client, int i)    {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.charge(listener, i);
     }
 
 
-    public void putTileBack(ObjectOutputStream client) throws RemoteException {
+    public void putTileBack(ObjectOutputStream client)    {
         ClientListenerSocket listener = clientListeners.get(client);
         controller.putTileBack(listener);
     }
 
 
-    public void choosePlanets(ObjectOutputStream clientRmi, int i)throws RemoteException{
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void choosePlanets(ObjectOutputStream client, int i)  {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.choosePlanets(listener,i);
     }
 
 
-    public void manageCard() throws RemoteException {
+    public void manageCard()    {
         controller.manageCard();
     }
 
 
-    public void addReserveSpot(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void addReserveSpot(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.addReserveSpot(listener);
     }
 
 
-    public void endCargoManagement(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void endCargoManagement(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.endCargoManagement(listener);
     }
 
 
 
-    public void chargeCannons(ObjectOutputStream clientRmi, ArrayList<Integer> chosenIndices) throws RemoteException{
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void chargeCannons(ObjectOutputStream client, ArrayList<Integer> chosenIndices)   {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.chargeCannons(listener, chosenIndices);
     }
 
-    public void rotateClockwise(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void rotateClockwise(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.rotateClockwise(listener);
     }
 
 
-    public void removeAdjust(ObjectOutputStream clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void removeAdjust(ObjectOutputStream client, int xIndex, int yIndex) throws   SpaceShipPlanceException {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.removeAdjust(listener, xIndex, yIndex);
     }
 
 
-    public void selectShipPart(ObjectOutputStream clientRmi, int part) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void selectShipPart(ObjectOutputStream client, int part)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.selectShipPart(listener, part);
     }
 
 
-    public void playerHit(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void playerHit(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.playerHit(listener);
     }
 
 
-    public void playerProtected(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void playerProtected(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.playerProtected(listener);
     }
 
 
-    public boolean addAlienCabin(ObjectOutputStream clientRmi, int cabinId, String alienColor) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public boolean addAlienCabin(ObjectOutputStream client, int cabinId, String alienColor)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         return controller.addAlienCabin(listener,cabinId,alienColor);
     }
 
 
-    public void handleEndChooseAliens(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void handleEndChooseAliens(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.handleEndChooseAliens(listener);
     }
 
 
-    public boolean removeFigure(ObjectOutputStream clientRmi, int cabinId, String figure) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public boolean removeFigure(ObjectOutputStream client, int cabinId, String figure)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         return controller.removeFigure(listener,cabinId,figure);
     }
 
 
-    public void surrender(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void surrender(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.surrender(listener);
     }
 
 
-    public void handleSurrenderEnded(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void handleSurrenderEnded(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.handleSurrenderEnded(listener);
     }
 
-    public boolean removeBatteries(ObjectOutputStream clientRmi, int powerCenterId, int batteries) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public boolean removeBatteries(ObjectOutputStream client, int powerCenterId, int batteries)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         return controller.removeBatteries(listener,powerCenterId,batteries);
     }
 
 
-    public void endManagement(ObjectOutputStream clientRmi) throws RemoteException {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public void endManagement(ObjectOutputStream client)    {
+        ClientListenerSocket listener = clientListeners.get(client);
         controller.endManagement(listener);
     }
 
 
-    public boolean removeMVGood(ObjectOutputStream clientRmi, int cargoIndex, int goodIndex) {
-        ClientListenerSocket listener = clientListeners.get(clientRmi);
+    public boolean removeMVGood(ObjectOutputStream client, int cargoIndex, int goodIndex) {
+        ClientListenerSocket listener = clientListeners.get(client);
         return controller.removeMVGood(listener,cargoIndex,goodIndex);
+    }
+
+    public void endMVGoodsManagement(ObjectOutputStream client)    {
+        ClientListener listener = clientListeners.get(client);
+        controller.endMVGoodsManagement(listener);
     }
 
 
@@ -405,6 +410,8 @@ public class SocketServer implements VirtualServerSocket {
                 case "addNickname":
                     addNickname(out, (String)parameters[0]);
                     break;
+                case "endMVGoodsManagement":
+                    endMVGoodsManagement(out);
 
                 default:
                     System.out.println("Comando non riconosciuto: '" + command + "' (lunghezza: " + command.length() + ")"); // Debug
@@ -416,8 +423,6 @@ public class SocketServer implements VirtualServerSocket {
             notifyClient(out, new Event(GameState.SERVER_RESPONSE,
                     new ServerResponse(result, false, null)));
 
-        } catch (RemoteException e) {
-            handleException(out, command, "Errore di comunicazione", e);
         } catch (LobbyExceptions e) {
             handleException(out, command, "Errore lobby", e);
         } catch (CargoManagementException e) {

@@ -93,7 +93,7 @@ public class Controller{
 
     public void createLobby(int numPlayers) {
         if(lobby !=null){
-                throw new LobbyExceptions("Lobby is already set");
+            throw new LobbyExceptions("Lobby is already set");
         }
 
         if (numPlayers < 2 || numPlayers > 4)
@@ -256,7 +256,7 @@ public class Controller{
 
         ArrayList<String> nicks = lobby.getPlayersNicknames();
         game = new Game(nicks);
-        players= game.getPlayers();
+        players = new ArrayList<>(game.getPlayers());
         cards = game.getFlightplance().getDeck().getCards();
 
 
@@ -401,7 +401,7 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.TURN_START,boardView));
 
 
-        if(!cards.isEmpty()) {
+        if(!cards.isEmpty() || players.isEmpty()) {
             currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
@@ -414,8 +414,7 @@ public class Controller{
             }
             if (cardName != null) {
                 notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card));
-                game.orderPlayers();
-                players = game.getPlayers();
+                orderPlayers();
                 tmpPlayers = new ArrayList<>(players);
                 isDone.replaceAll((c, v) -> false);
                 manageCard();
@@ -423,8 +422,8 @@ public class Controller{
 
         }
         else {
-                notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
-            }
+            notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
+        }
     }
 
     public void manageCard(){
@@ -641,7 +640,9 @@ public class Controller{
     private void handleEarlyEnd(Player player) {
         ClientListener listener = listenerbyPlayer.get(player);
         isDone.remove(listener);
+        System.out.println("handleEarlyEnd " + player);
         players.remove(player);
+        listener.onEvent(eventCrafter(GameState.DIED, null));
     }
 
 
@@ -1210,7 +1211,7 @@ public class Controller{
 
         if(allOk){
             chooseAliens();
-            }else{ // for each already done client I send state to wait for the ones who aren't done cause they have to adjust
+        }else{ // for each already done client I send state to wait for the ones who aren't done cause they have to adjust
             isDone.entrySet().stream()
                     .filter(Map.Entry::getValue)
                     .forEach(entry -> {
@@ -1262,7 +1263,7 @@ public class Controller{
             listener.onEvent(new Event(GameState.CARGO_VIEW,new Cargos(goodsContainers)));
         }else {
             // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
-           // separiamo i casi per ogni tipo di carta per vedere se termina subito o passa agli altri player
+            // separiamo i casi per ogni tipo di carta per vedere se termina subito o passa agli altri player
             try {
                 throw new CargoManagementException("You got 0 storage space, you can't manage any good");
             }
@@ -1275,9 +1276,9 @@ public class Controller{
     public void checkStorageOk(ClientListener listener) throws CargoManagementException {
         Player player = playerbyListener.get(listener);
         if(!player.getSpaceshipPlance().checkStorage()){
-                throw new CargoManagementException("You got 0 storage space, you can't manage any good");
-            }
+            throw new CargoManagementException("You got 0 storage space, you can't manage any good");
         }
+    }
 
     private void  printSpaceshipbyTile(ClientListener listener, ComponentTile tile){
         Player player = playerbyListener.get(listener);
@@ -1365,12 +1366,12 @@ public class Controller{
             throw new ControllerExceptions("You don't have enough batteries");
         }
         else {
-           for(int j=0; j<i; j++){
-              doubleEngines.get(j).setCharged(true);
-           }
-           ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
-           BatteriesManagement bm = new BatteriesManagement(i, pc);
-           listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
+            for(int j=0; j<i; j++){
+                doubleEngines.get(j).setCharged(true);
+            }
+            ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
+            BatteriesManagement bm = new BatteriesManagement(i, pc);
+            listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
         }
     }
 
@@ -1695,20 +1696,32 @@ public class Controller{
     }
 
     private void checkEarlyEndConditions(){
+        List<Player> playersToRemove = new ArrayList<>();
+
         for(Player player: players){
-            if(player.getSpaceshipPlance().getnAstronauts()==0)
-                handleEarlyEnd(player);
-            if(players.getLast().getPlaceholder().getPosizione() > player.getPlaceholder().getPosizione() + 18)
-                handleEarlyEnd(player);
+            System.out.println("Player early condition checked " + player);
+            if(player.getSpaceshipPlance().getnAstronauts()==0 ||
+                    players.getLast().getPlaceholder().getPosizione() > player.getPlaceholder().getPosizione() + 18) {
+                playersToRemove.add(player);
+            }
+        }
+
+        for(Player player : playersToRemove) {
+            handleEarlyEnd(player);
         }
     }
 
     private void endTurn(){
         checkEarlyEndConditions();
-        for(Player player: players){
-            ClientListener listener = listenerbyPlayer.get(player);
-            listener.onEvent(eventCrafter(GameState.ASK_SURRENDER, null));
+        if(players.isEmpty()){
+            notifyAllListeners(eventCrafter(GameState.END_GAME, new DataString(game.getEndStats())));
+        }else{
+            for(Player player: players){
+                ClientListener listener = listenerbyPlayer.get(player);
+                listener.onEvent(eventCrafter(GameState.ASK_SURRENDER, null));
+            }
         }
+
     }
 
     private boolean handleAdjustmentEnded(){
@@ -1732,14 +1745,15 @@ public class Controller{
                 );
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
-                }
         }
+    }
 
     public void surrender(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         isDone.remove(listener);
         players.remove(player);
         player.setSurrended(true);
+        listener.onEvent(eventCrafter(GameState.DIED, null));
     }
 
     public boolean removeBatteries(ClientListener listener, int powerCenterId, int batteries) {
@@ -1759,12 +1773,12 @@ public class Controller{
                             batteries--;
                         }else
                             error = true;
-                        } else if (batteries == 2){
-                            if(pcBatteries[1]){
-                                pcBatteries[1] = false;
-                                batteries--;
-                            }else
-                                error = true;
+                    } else if (batteries == 2){
+                        if(pcBatteries[1]){
+                            pcBatteries[1] = false;
+                            batteries--;
+                        }else
+                            error = true;
                     }else
                         error = true;
                 }
@@ -1869,6 +1883,8 @@ public class Controller{
             removeAdjust(l, x, y);
         }
     }
+
+    public void orderPlayers(){
+        players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+    }
 }
-
-

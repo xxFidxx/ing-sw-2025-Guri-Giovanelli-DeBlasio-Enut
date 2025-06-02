@@ -86,5 +86,5 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void endMVGoodsManagement(VirtualViewRmi clientRmi)throws RemoteException;
 
-    boolean removeMVGood(ClientRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
+    boolean removeMVGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
 }

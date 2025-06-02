@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Rmi;
 
 
+import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.ClientListenerRmi;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
@@ -296,7 +297,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public boolean removeMVGood(ClientRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException {
+    public boolean removeMVGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException {
         ClientListenerRmi listener = clientListeners.get(clientRmi);
         return controller.removeMVGood(listener,cargoIndex,goodIndex);
     }

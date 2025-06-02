@@ -152,7 +152,7 @@ public class SpaceshipPlance {
                         }
                         case Cabin cab -> {
                             cabins.add(cab);
-                            // I reset aliens of previuos check, maybe the lifesupport system has been destroyed so I need to do that to ensure the alien doesnt remain on the cabin
+                            // I reset aliens of previous check, maybe the lifesupport system has been destroyed so I need to do that to ensure the alien doesnt remain on the cabin
                             AlienColor[] colors = cab.getLifeSupportSystemColor();
                             colors[0] = null;
                             colors[1] = null;

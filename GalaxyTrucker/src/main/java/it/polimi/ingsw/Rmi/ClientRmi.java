@@ -619,6 +619,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
+            case DIED -> System.out.println("You are on spectator mode because you died");
         }
         System.out.print("\n> ");
     }
@@ -659,12 +661,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
                 System.out.println("Press 0 to continue");
             }
-            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
-            case LEAST_CREW -> System.out.print("You have the least crew\n");
+            case LEAST_CREW -> System.out.print("You have the least crew");
             case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
-            case MOVE_PLAYER -> System.out.print("You have the least crew\n");
+            case MOVE_PLAYER -> System.out.println("You have the least crew");
             case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
@@ -684,7 +686,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double cannon");
                 server.fromChargeToManage(this);
             }
+            case DIED -> System.out.println("You are on spectator mode because you died");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
+
         }
         System.out.print("> ");
     }

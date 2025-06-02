@@ -751,7 +751,7 @@ public class ClientSocket implements VirtualViewSocket {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    EventSender("endManagement" , new Object[0]);
+                    EventSender("endMVGoodsManagement" , new Object[0]);
                     try {
                         handleServerResponse();
                     } catch (InterruptedException e) {
