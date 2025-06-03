@@ -1120,7 +1120,6 @@ public class Controller{
 
     public void defeatedBySmugglers(){
         if(defeatedPlayers.isEmpty()){
-            defeatedPlayers.clear();
             resetShowAndDraw();
             return;
         }
@@ -1134,20 +1133,32 @@ public class Controller{
                     GoodsBlock[] goods = cargo.getGoods();
                     goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
                 }
-                int diff = p.getSpaceshipPlance().countGoods() - ((SmugglersCard)currentAdventureCard).getLossMalus();
+
+                int playerGoods = p.getSpaceshipPlance().countGoods();
+                int cardMalus = ((SmugglersCard)currentAdventureCard).getLossMalus();
+                int diff = playerGoods - cardMalus ;
                 if(diff >= 0) {
-                    RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
+                    RemoveMostValuable mostValuableData = new RemoveMostValuable(cardMalus,goodsContainers);
                     System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
                     l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
                 } else {
-                    if(p.getSpaceshipPlance().countGoods() > 0){
-                        RemoveMostValuable mostValuableData = new RemoveMostValuable(p.getSpaceshipPlance().countGoods(),goodsContainers);
+                    if(playerGoods > 0){
+                        RemoveMostValuable mostValuableData = new RemoveMostValuable(playerGoods,goodsContainers);
                         System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
                         l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
                     }
-                    if(p.getSpaceshipPlance().getnBatteries() > 0){
+
+                    int playerBatteries = p.getSpaceshipPlance().getnBatteries();
+                    if(playerBatteries > 0){
+                        int diffBatteries = playerBatteries + diff;
                         ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
-                        BatteriesManagement bm = new BatteriesManagement(-diff, pc);
+                        printSpaceshipbyTile(l,pc.getFirst());
+                        BatteriesManagement bm;
+                        if(diffBatteries >= 0) {
+                            bm = new BatteriesManagement(-diff, pc);
+                        }else{
+                            bm = new BatteriesManagement(-diffBatteries, pc);
+                        }
                         l.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
                     }
                 }
@@ -1418,6 +1429,7 @@ public class Controller{
                 doubleEngines.get(j).setCharged(true);
             }
             ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
+            printSpaceshipbyTile(listener,pc.getFirst());
             BatteriesManagement bm = new BatteriesManagement(i, pc);
             listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
         }
@@ -1443,7 +1455,9 @@ public class Controller{
                 doubleCannons.get(i).setCharged(true);
             }
         }
+
         ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
+        printSpaceshipbyTile(listener,pc.getFirst());
         BatteriesManagement bm = new BatteriesManagement(chosenIndices.size(), pc);
         listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
     }
@@ -1649,6 +1663,7 @@ public class Controller{
         int batteries = player.getSpaceshipPlance().getnBatteries();
         if(batteries > 0){
             ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
+            printSpaceshipbyTile(listener, pc.getFirst());
             BatteriesManagement bm = new BatteriesManagement(1, pc);
             listener.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
         } else {
