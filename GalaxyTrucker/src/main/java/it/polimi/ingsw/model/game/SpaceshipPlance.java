@@ -1413,4 +1413,17 @@ public class SpaceshipPlance {
         } else
             throw new CargoManagementException("cargo index is outbound");
     }
+
+    public int countGoods(){
+        int i = 0;
+        ArrayList<CargoHolds> playerCargo = getCargoHolds();
+        for (CargoHolds cargo : playerCargo) {
+            GoodsBlock[] goods = cargo.getGoods();
+            for(GoodsBlock good : goods){
+                if(good != null)
+                    i++;
+            }
+        }
+        return i;
+    }
 }
