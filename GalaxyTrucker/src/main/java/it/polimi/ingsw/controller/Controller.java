@@ -703,9 +703,11 @@ public class Controller{
                 playerHit(l);
             }
             case BigCannonShot bcs ->{
+                Direction direction = currentProjectile.getDirection();
                 ClientListener l = listenerbyPlayer.get(player);
+                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                 playerHit(l);
-
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentProjectile);
         }
@@ -1052,8 +1054,8 @@ public class Controller{
             i++;
         }
         if(i==length || defeatedPlayers.isEmpty()){
-            defeatedPlayers.clear();
             piratesFlag = false;
+            defeatedPlayers.clear();
             resetShowAndDraw();
             return;
         }
@@ -1062,6 +1064,9 @@ public class Controller{
         currentDiceThrow = game.throwDices();
         int size = defeatedPlayers.size();
         System.out.println("defeatedPlayers size: " + size);
+        /*for(Player p : defeatedPlayers){
+            activateMeteor(p);
+        }*/
         Player first = defeatedPlayers.get(0);
         System.out.println("defeatedByPirates: mando il primo player in activateMeteor");
         activateMeteor(first);
@@ -1127,9 +1132,19 @@ public class Controller{
                     GoodsBlock[] goods = cargo.getGoods();
                     goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
                 }
-                RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
-                System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
-                l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
+                if(!goodsContainers.isEmpty()){
+                    if(goodsContainers.size() >= ((SmugglersCard)currentAdventureCard).getLossMalus()){
+                        RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
+                        System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
+                        l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
+                    } else {
+                        RemoveMostValuable mostValuableData = new RemoveMostValuable(goodsContainers.size(),goodsContainers);
+                        System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
+                        l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
+                    }
+                } else {
+
+                }
             } else {
                 System.out.println("defeatedBySmugglers: mando in WAIT_PLAYER");
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
@@ -1645,8 +1660,10 @@ public class Controller{
         if(!isDone.containsValue(false)) {
             if(currentAdventureCard instanceof MeteorSwarmCard)
                 manageCard();
-            else
+            else{
+                isDone.replaceAll((c, v) -> false);
                 defeatedByPirates();
+            }
         } else {
             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
         }
@@ -1887,6 +1904,9 @@ public class Controller{
                 break;
         }
 
+        if (x < 0 || y < 0 || y >= components.length || x >= components[0].length) {
+            return; // Fuori dai limiti → nessun colpo
+        }
         ComponentTile hit = components[y][x];
 
         for (int i = 0; i < max_lenght && hit == null; i++) {
@@ -1904,10 +1924,13 @@ public class Controller{
                     x += 1;
                     break;
             }
+            if (x < 0 || y < 0 || y >= components.length || x >= components[0].length) {
+                return; // Fuori dai limiti → nessun colpo
+            }
             hit = components[y][x];
         }
 
-        if (components[y][x] != null) {
+        if (hit != null) {
             removeAdjust(l, x, y);
         }
     }
