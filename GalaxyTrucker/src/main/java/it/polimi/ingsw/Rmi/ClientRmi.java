@@ -741,6 +741,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
             case RemoveMostValuable removeMostValuable -> printCargosRemove(removeMostValuable.getCargos());
+            case ProjectileDirPos pdr -> System.out.println("You are about to be hit by a projectile from " + pdr.getDirection() + " direction in " + pdr.getPosition() + " position");
             default -> {}
         }
         System.out.print("> ");

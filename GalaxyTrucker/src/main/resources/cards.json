@@ -1,23 +1,5 @@
 [
   {
-    "type": "SlaversCard",
-    "name": "Slavers",
-    "level": 1,
-    "cannonStrength": 6,
-    "lostDays": 1,
-    "lostCrew": 3,
-    "reward": 5
-  },
-  {
-    "type": "SmugglersCard",
-    "name": "Smugglers",
-    "level": 1,
-    "cannonStrength": 4,
-    "lostDays": 1,
-    "lossMalus": 2,
-    "reward": [2, 1, 0]
-  },
-  {
     "type": "PiratesCard",
     "name": "Pirates",
     "level": 1,
@@ -29,6 +11,24 @@
       { "type": 0, "direction": 0 }
     ],
     "reward": 4
+  },
+  {
+    "type": "SmugglersCard",
+    "name": "Smugglers",
+    "level": 1,
+    "cannonStrength": 4,
+    "lostDays": 1,
+    "lossMalus": 2,
+    "reward": [2, 1, 0]
+  },
+  {
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 1,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
   },
   {
     "type": "MeteorSwarmCard",

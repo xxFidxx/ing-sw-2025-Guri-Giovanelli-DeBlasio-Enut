@@ -56,6 +56,7 @@ public enum GameState {
     ENEMY_WIN,
     ENEMY_DRAW,
     NO_DOUBLE_CANNON,
+    SCS_DIR_POS,
     DIED
     }
 

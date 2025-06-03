@@ -241,6 +241,9 @@ public class Controller{
             case BATTERIES_MANAGEMENT -> {
                 event = new Event(state, (BatteriesManagement) data);
             }
+            case SCS_DIR_POS -> {
+                event = new Event(state, (ProjectileDirPos) data);
+            }
 
             default ->event = new Event(state, null); // in cases where you don't have to send data, you just send the current state
         }
@@ -510,7 +513,9 @@ public class Controller{
 
             case SmugglersCard sg -> {
                 if (tmpPlayers.isEmpty()||cargoended) {
+                    System.out.println("manageCard: cargoended " + cargoended);
                     cargoended=false;
+                    System.out.println("manageCard: vado in defeatedBySmugglers");
                     defeatedBySmugglers();
                     return;
                 }
@@ -524,6 +529,7 @@ public class Controller{
                 if (tmpPlayers.isEmpty()||piratesended) {
                     piratesended=false;
                     piratesFlag=true;
+                    System.out.println("manageCard: vado in defeatedByPirates");
                     defeatedByPirates();//reset and show lo metto in questo metodo
                     return;
                 }
@@ -684,15 +690,16 @@ public class Controller{
             }
             case SmallCannonShot scs -> {
                 Direction direction = currentProjectile.getDirection();
+                ClientListener l = listenerbyPlayer.get(player);
+                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                 ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                 for (ShieldGenerator shield : shields) {
                     if(shield.checkProtection(direction)) {
-                        ClientListener l = listenerbyPlayer.get(currentPlayer);
                         l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
                         return;
                     }
                 }
-                ClientListener l = listenerbyPlayer.get(player);
                 playerHit(l);
             }
             case BigCannonShot bcs ->{
@@ -874,9 +881,11 @@ public class Controller{
                 currentAdventureCard.activate();
                 int outcome = ((SmugglersCard)currentCastedCard).getFightOutcome(currentPlayer);
                 if (outcome == 1){
+                    listener.onEvent(eventCrafter(GameState.ENEMY_WIN, null));
                     cargoended=true;
                     listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null));
                 } else if(outcome == -1){
+                    listener.onEvent(eventCrafter(GameState.ENEMY_LOST, null));
                     defeatedPlayers.add(currentPlayer);
                     manageCard();
                     /*ArrayList <GoodsContainer> goodsContainers = new ArrayList<>();
@@ -891,6 +900,7 @@ public class Controller{
                 }
                 else {
                     // tmpPlayers.remove(currentPlayer);
+                    listener.onEvent(eventCrafter(GameState.ENEMY_DRAW, null));
                     manageCard();
                 }
             }
@@ -899,14 +909,18 @@ public class Controller{
                 currentAdventureCard.activate();
                 int outcome = ((PiratesCard) currentCastedCard).getFightOutcome(currentPlayer);
                 if (outcome == 1){
+                    listener.onEvent(eventCrafter(GameState.ENEMY_WIN, null));
                     piratesended = true;
                     manageCard();
                 } else if(((PiratesCard) currentCastedCard).getFightOutcome(currentPlayer) == -1){
+                    System.out.println("fromChargeToManage: vado in ENEMY_LOST");
+                    listener.onEvent(eventCrafter(GameState.ENEMY_LOST, null));
                     defeatedPlayers.add(currentPlayer);
                     manageCard();
                     //defeatedByPirates(currentPlayer);
                 }
                 else {
+                    listener.onEvent(eventCrafter(GameState.ENEMY_DRAW, null));
                     manageCard();
                 }
             }
@@ -1047,10 +1061,13 @@ public class Controller{
         projectileArray[i] = null;
         currentDiceThrow = game.throwDices();
         int size = defeatedPlayers.size();
+        System.out.println("defeatedPlayers size: " + size);
         Player first = defeatedPlayers.get(0);
+        System.out.println("defeatedByPirates: mando il primo player in activateMeteor");
         activateMeteor(first);
         if(size >= 2) {
             Player second = defeatedPlayers.get(1);
+            System.out.println("defeatedByPirates: mando il secondo player in activateMeteor");
             activateMeteor(second);
             if (size >= 3) {
                 Player third = defeatedPlayers.get(2);
@@ -1094,18 +1111,6 @@ public class Controller{
         }
     }
 
-    public void waitForSlavers(ClientListener l){
-        isDone.put(l, true);
-        // forse containsValue
-        if(!isDone.containsValue(false)) {
-            System.out.println("waitForSlavers: mando in defeatedBySlavers");
-            defeatedBySlavers();
-        } else {
-            System.out.println("waitForSlavers: mando in WAIT_PLAYER");
-            l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
-        }
-    }
-
     public void defeatedBySmugglers(){
         if(defeatedPlayers.isEmpty()){
             defeatedPlayers.clear();
@@ -1123,8 +1128,10 @@ public class Controller{
                     goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
                 }
                 RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
+                System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
                 l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
             } else {
+                System.out.println("defeatedBySmugglers: mando in WAIT_PLAYER");
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
@@ -1140,6 +1147,26 @@ public class Controller{
             RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
             l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
         }*/
+    }
+
+    public void waitForEnemies(ClientListener l){
+        isDone.put(l, true);
+        if(!isDone.containsValue(false)) {
+            switch(currentAdventureCard){
+                case SlaversCard sc -> {
+                    System.out.println("waitForEnemies: mando in defeatedBySlavers");
+                    defeatedBySlavers();
+                }
+                case SmugglersCard sc -> {
+                    System.out.println("waitForEnemies: mando in defeatedBySmugglers");
+                    defeatedBySmugglers();
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+            }
+        } else {
+            System.out.println("waitForEnemies: mando in WAIT_PLAYER");
+            l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
+        }
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
@@ -1586,6 +1613,7 @@ public class Controller{
     public void playerHit(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         Direction direction = currentProjectile.getDirection();
+        System.out.println("playerHit: mando in takeHit");
         takeHit(listener, direction, currentDiceThrow);
         if(currentAdventureCard instanceof CombatZoneCard){
             combatZoneShots(p);
@@ -1807,7 +1835,7 @@ public class Controller{
 
     public void endCrewManagement(ClientListener listener){
         switch(currentAdventureCard){
-            case SlaversCard sc -> waitForSlavers(listener);
+            case SlaversCard sc -> waitForEnemies(listener);
             // controllare a cosa far tornare per asc e czc
             case AbandonedShipCard asc -> manageCard();
             case CombatZoneCard czc -> fromChargeToManage(listener);
@@ -1817,7 +1845,7 @@ public class Controller{
 
     public void endMVGoodsManagement(ClientListener listener){
         if(currentAdventureCard instanceof SmugglersCard){
-            defeatedBySmugglers();
+            waitForEnemies(listener);
         } // controllare case czc
         else if(currentAdventureCard instanceof CombatZoneCard){
             manageCard();
@@ -1861,7 +1889,7 @@ public class Controller{
 
         ComponentTile hit = components[y][x];
 
-        for (int i = 0; i < max_lenght || hit == null; i++) {
+        for (int i = 0; i < max_lenght && hit == null; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
