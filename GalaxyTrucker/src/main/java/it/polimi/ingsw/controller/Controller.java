@@ -963,12 +963,14 @@ public class Controller{
                         isDone.put(listener, true);
                         if (!isDone.containsValue(false)) {
                             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
-                            int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
-                            LostDays obj= new LostDays(ld);
-                            ClientListener l = listenerbyPlayer.get(minFirePlayer);
-                            handleMinFire(l);
-                            l.onEvent(eventCrafter(GameState.MOVE_PLAYER, obj));
-                            game.getFlightplance().move(-ld,minFirePlayer);
+                            if(minFirePlayer != null) {
+                                int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
+                                LostDays obj= new LostDays(ld);
+                                ClientListener l = listenerbyPlayer.get(minFirePlayer);
+                                handleMinFire(l);
+                                l.onEvent(eventCrafter(GameState.MOVE_PLAYER, obj));
+                                game.getFlightplance().move(-ld,minFirePlayer);
+                            }
                             combatZoneEngine();
 
                         } else {
@@ -1132,18 +1134,22 @@ public class Controller{
                     GoodsBlock[] goods = cargo.getGoods();
                     goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
                 }
-                if(!goodsContainers.isEmpty()){
-                    if(goodsContainers.size() >= ((SmugglersCard)currentAdventureCard).getLossMalus()){
-                        RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
-                        System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
-                        l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
-                    } else {
-                        RemoveMostValuable mostValuableData = new RemoveMostValuable(goodsContainers.size(),goodsContainers);
+                int diff = p.getSpaceshipPlance().countGoods() - ((SmugglersCard)currentAdventureCard).getLossMalus();
+                if(diff >= 0) {
+                    RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
+                    System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
+                    l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
+                } else {
+                    if(p.getSpaceshipPlance().countGoods() > 0){
+                        RemoveMostValuable mostValuableData = new RemoveMostValuable(p.getSpaceshipPlance().countGoods(),goodsContainers);
                         System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
                         l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
                     }
-                } else {
-
+                    if(p.getSpaceshipPlance().getnBatteries() > 0){
+                        ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
+                        BatteriesManagement bm = new BatteriesManagement(-diff, pc);
+                        l.onEvent(eventCrafter(GameState.BATTERIES_MANAGEMENT, bm));
+                    }
                 }
             } else {
                 System.out.println("defeatedBySmugglers: mando in WAIT_PLAYER");
@@ -1656,7 +1662,6 @@ public class Controller{
 
     public void waitForNextShot(ClientListener listener) {
         isDone.put(listener,true);
-        // forse containsValue
         if(!isDone.containsValue(false)) {
             if(currentAdventureCard instanceof MeteorSwarmCard)
                 manageCard();
