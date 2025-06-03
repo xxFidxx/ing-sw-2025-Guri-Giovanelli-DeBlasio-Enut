@@ -1881,6 +1881,8 @@ public class Controller{
         Player p = playerbyListener.get(l);
         ComponentTile [][] components = p.getSpaceshipPlance().getComponents();
         int max_lenght = 7;
+
+        System.out.println("position " + position);
         // casella da cui partire
         int x = 0, y = 0;
         switch (direction) {
@@ -1904,12 +1906,17 @@ public class Controller{
                 break;
         }
 
-        if (x < 0 || y < 0 || y >= components.length || x >= components[0].length) {
-            return; // Fuori dai limiti → nessun colpo
-        }
-        ComponentTile hit = components[y][x];
+        System.out.println("y " + y + " x " + x);
 
-        for (int i = 0; i < max_lenght && hit == null; i++) {
+        ComponentTile hit = null;
+
+        if(inBounds(x,y))
+            hit = components[y][x];
+
+
+
+
+        for (int i = 0; i < max_lenght && hit == null ; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
@@ -1924,10 +1931,9 @@ public class Controller{
                     x += 1;
                     break;
             }
-            if (x < 0 || y < 0 || y >= components.length || x >= components[0].length) {
-                return; // Fuori dai limiti → nessun colpo
-            }
-            hit = components[y][x];
+
+            if(inBounds(x,y))
+                hit = components[y][x];
         }
 
         if (hit != null) {
@@ -1937,5 +1943,24 @@ public class Controller{
 
     public void orderPlayers(){
         players.sort(Comparator.comparingInt(player -> player.getPlaceholder().getPosizione()));
+    }
+
+    private boolean inBounds(int x, int y) {
+        // Prima controlla i bound standard
+        boolean standardBounds = (x >= 0 && x < 7 && y >= 0 && y < 5);
+
+        // Poi verifica gli edge case specifici della forma
+        return standardBounds && !edgeCases(y, x);
+    }
+
+    private boolean edgeCases(int y, int x) {
+        if (y == 0) {
+            return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
+        } else if (y == 1) {
+            return x == 0 || x == 6;
+        } else if (y == 4) {
+            return x == 3;
+        }
+        return false;
     }
 }

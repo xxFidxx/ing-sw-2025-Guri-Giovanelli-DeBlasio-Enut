@@ -818,6 +818,10 @@ public class ClientSocket implements VirtualViewSocket {
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
             case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
             case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
+            case REMOVE_MV_GOODS -> {
+                System.out.println("Here are your cargos, you will have to remove the most valuable goods");
+                System.out.println("Press 0 to continue");
+            }
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
         }
         System.out.print("> ");
