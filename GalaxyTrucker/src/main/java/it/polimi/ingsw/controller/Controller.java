@@ -560,6 +560,7 @@ public class Controller{
             }
 
             case MeteorSwarmCard msc -> {
+                System.out.println("manageCard: entro");
                 Projectile[] meteorArray = ((MeteorSwarmCard) currentAdventureCard).getMeteors();
                 int length = meteorArray.length;
                 int i = 0;
@@ -575,8 +576,10 @@ public class Controller{
                 currentDiceThrow = game.throwDices();
                 int size = players.size();
                 Player first = players.get(0);
+                System.out.println("manageCard: attivo activateMeteor per il primo player ");
                 activateMeteor(first);
                 Player second = players.get(1);
+                System.out.println("manageCard: attivo activateMeteor per il secondo player ");
                 activateMeteor(second);
                 if(size >= 3) {
                     Player third = players.get(2);
@@ -655,12 +658,13 @@ public class Controller{
     public void activateMeteor(Player player) {
         switch(currentProjectile){
             case SmallMeteor sm -> {
+                System.out.println("activateMeteor: Small Meteor");
+                ClientListener l = listenerbyPlayer.get(player);
+                Direction direction = currentProjectile.getDirection();
+                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                 boolean check = currentProjectile.activate(player, currentDiceThrow);
                 if(!check) {
-                    Direction direction = currentProjectile.getDirection();
-                    ClientListener l = listenerbyPlayer.get(player);
-                    ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
-                    l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                     ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                     for (ShieldGenerator shield : shields) {
                         if(shield.checkProtection(direction)) {
@@ -669,22 +673,29 @@ public class Controller{
                         }
                     }
                     playerHit(l);
+                } else {
+                    l.onEvent(eventCrafter(GameState.NO_EXPOSED_CONNECTORS, null));
+                    waitForNextShot(l);
                 }
             }
             case BigMeteor bm -> {
+                System.out.println("activateMeteor: Big Meteor");
                 Direction direction = currentProjectile.getDirection();
                 ClientListener l = listenerbyPlayer.get(player);
-                int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
                 ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
                 l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
+                //int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
+                int result = -1;
                 if(result == -1) {
-                    manageCard();
+                    l.onEvent(eventCrafter(GameState.NO_HIT, null));
+                    waitForNextShot(l);
                 }
                 else if(result == 0) {
                     playerHit(l);
                 }
                 else if(result == 1) {
-                    manageCard();
+                    l.onEvent(eventCrafter(GameState.SINGLE_CANNON_PROTECTION, null));
+                    waitForNextShot(l);
                 }
                 else{
                     l.onEvent(eventCrafter(GameState.ASK_CANNON, null));
@@ -892,18 +903,8 @@ public class Controller{
                     listener.onEvent(eventCrafter(GameState.ENEMY_LOST, null));
                     defeatedPlayers.add(currentPlayer);
                     manageCard();
-                    /*ArrayList <GoodsContainer> goodsContainers = new ArrayList<>();
-                    ArrayList<CargoHolds> playerCargos = currentPlayer.getSpaceshipPlance().getCargoHolds();
-                    for (CargoHolds cargo : playerCargos) {
-                        GoodsBlock[] goods = cargo.getGoods();
-                        goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
-                    }
-                    RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentCastedCard).getLossMalus(),goodsContainers);
-                    listener.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));*/
-                    // se non abbiamo abbstanza merci, rimuovere batterie
                 }
                 else {
-                    // tmpPlayers.remove(currentPlayer);
                     listener.onEvent(eventCrafter(GameState.ENEMY_DRAW, null));
                     manageCard();
                 }
@@ -1668,8 +1669,10 @@ public class Controller{
     public void waitForNextShot(ClientListener listener) {
         isDone.put(listener,true);
         if(!isDone.containsValue(false)) {
-            if(currentAdventureCard instanceof MeteorSwarmCard)
+            if(currentAdventureCard instanceof MeteorSwarmCard){
+                isDone.replaceAll((c, v) -> false);
                 manageCard();
+            }
             else{
                 isDone.replaceAll((c, v) -> false);
                 defeatedByPirates();

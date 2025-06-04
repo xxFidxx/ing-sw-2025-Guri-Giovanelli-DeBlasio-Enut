@@ -688,7 +688,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case DIED -> System.out.println("You are on spectator mode because you died");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
-
+            case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
+            case NO_HIT -> System.out.println("You have not been hit");
+            case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
         }
         System.out.print("> ");
     }

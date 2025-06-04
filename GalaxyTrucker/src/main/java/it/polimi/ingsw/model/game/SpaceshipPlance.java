@@ -865,7 +865,7 @@ public class SpaceshipPlance {
             hit = components[y][x];
         }
 
-        if (components[y][x] == null) {
+        if (hit == null) {
             return -1; // se non veniamo colpiti
         }
         if (cannons.contains((Cannon) hit)) {

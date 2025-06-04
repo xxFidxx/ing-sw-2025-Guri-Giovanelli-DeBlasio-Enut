@@ -13,12 +13,12 @@ public class SmallMeteor extends Projectile {
     public boolean activate(Player player, int position) {
 
         if (player.getSpaceshipPlance().checkExposedConnector(direction, position) == false) {
-            return true;
+            return true; // se il player non ha dei connettori esposti in quella direzione e posizione ritorna true
         }
         /*if (player.getSpaceshipPlance().getShieldActivation(direction) == true) {
             return false;
         }*/
-        return false;
+        return false; // altrimenti ritorna false
         // player.getSpaceshipPlance().takeHit(direction, position);
     }
 }

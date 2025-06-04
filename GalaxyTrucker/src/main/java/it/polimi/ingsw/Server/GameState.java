@@ -57,6 +57,9 @@ public enum GameState {
     ENEMY_DRAW,
     NO_DOUBLE_CANNON,
     SCS_DIR_POS,
+    NO_EXPOSED_CONNECTORS,
+    NO_HIT,
+    SINGLE_CANNON_PROTECTION,
     DIED
     }
 
