@@ -1,5 +1,15 @@
 [
   {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 }
+    ]
+  },
+  {
     "type": "PiratesCard",
     "name": "Pirates",
     "level": 1,
@@ -29,16 +39,6 @@
     "lostDays": 1,
     "lostCrew": 3,
     "reward": 5
-  },
-  {
-    "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
-    "level": 1,
-    "meteors": [
-      { "type": 3, "direction": 0 },
-      { "type": 2, "direction": 3 },
-      { "type": 2, "direction": 1 }
-    ]
   },
   {
     "type": "CombatZoneCard",

@@ -658,33 +658,35 @@ public class Controller{
                 boolean check = currentProjectile.activate(player, currentDiceThrow);
                 if(!check) {
                     Direction direction = currentProjectile.getDirection();
+                    ClientListener l = listenerbyPlayer.get(player);
+                    ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
+                    l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                     ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                     for (ShieldGenerator shield : shields) {
                         if(shield.checkProtection(direction)) {
-                            ClientListener l = listenerbyPlayer.get(player);
                             l.onEvent(eventCrafter(GameState.ASK_SHIELD, null));
                             return;
                         }
                     }
-                    ClientListener l = listenerbyPlayer.get(player);
                     playerHit(l);
                 }
             }
             case BigMeteor bm -> {
                 Direction direction = currentProjectile.getDirection();
+                ClientListener l = listenerbyPlayer.get(player);
                 int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
+                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                 if(result == -1) {
                     manageCard();
                 }
                 else if(result == 0) {
-                    ClientListener l = listenerbyPlayer.get(player);
                     playerHit(l);
                 }
                 else if(result == 1) {
                     manageCard();
                 }
                 else{
-                    ClientListener l = listenerbyPlayer.get(player);
                     l.onEvent(eventCrafter(GameState.ASK_CANNON, null));
                 }
             }
@@ -1167,18 +1169,6 @@ public class Controller{
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
-        /*for(Player p : defeatedPlayers){
-            ClientListener l = listenerbyPlayer.get(p);
-            defeatedPlayers.remove(p);
-            ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
-            ArrayList<CargoHolds> playerCargos = p.getSpaceshipPlance().getCargoHolds();
-            for (CargoHolds cargo : playerCargos) {
-                GoodsBlock[] goods = cargo.getGoods();
-                goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(),cargo.getId()));
-            }
-            RemoveMostValuable mostValuableData = new RemoveMostValuable(((SmugglersCard)currentAdventureCard).getLossMalus(),goodsContainers);
-            l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
-        }*/
     }
 
     public void waitForEnemies(ClientListener l){
