@@ -653,12 +653,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     System.out.println("Error " + e.getMessage());
                 }
             }
-            case CREW_MANAGEMENT ->{
+            case CREW_MANAGEMENT -> {
                 System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
                 System.out.println("Press 0 to continue");
             }
             case BATTERIES_MANAGEMENT -> {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
+                System.out.println("Press 0 to continue");
+            }
+            case REMOVE_MV_GOODS -> {
+                System.out.println("Here are your goods, you will have to remove the most valuable ones");
                 System.out.println("Press 0 to continue");
             }
             case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
@@ -674,7 +678,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
-            case ASK_CANNON -> System.out.println("Type 0 to not use your DoubleCannon or 1 to use it");
+            case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
             case ASK_SURRENDER -> System.out.println("Type -1 to surrender or 0 to continue the game");
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
             case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
@@ -690,6 +694,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
             case NO_HIT -> System.out.println("You have not been hit");
+            case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
         }
         System.out.print("> ");
@@ -727,7 +732,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
             case PickableTiles pt -> printPickableTiles(pt.getTilesId());
             case PickedTile ptl -> System.out.println(ptl.getDescription());
-            case Card c -> System.out.println("Card: " + c.getName() + ",level: " + c.getLevel() + "\n");
+            case Card c -> System.out.println("Card: " + c.getName() + ", level: " + c.getLevel() + "\n");
             case Cargos c -> printCargos(c.getCargos());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());

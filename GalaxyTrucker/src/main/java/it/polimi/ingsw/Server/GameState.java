@@ -60,6 +60,7 @@ public enum GameState {
     NO_EXPOSED_CONNECTORS,
     NO_HIT,
     SINGLE_CANNON_PROTECTION,
+    SHOT_HIT,
     DIED
     }
 

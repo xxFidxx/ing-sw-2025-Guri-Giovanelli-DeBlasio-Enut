@@ -845,9 +845,13 @@ public class SpaceshipPlance {
                 break;
         }
 
-        ComponentTile hit = components[y][x];
+        ComponentTile hit = null;
 
-        for (int i = 0; i < max_lenght || hit == null; i++) {
+        if(inBounds(x,y))
+            hit = components[y][x];
+
+
+        for (int i = 0; i < max_lenght && hit == null; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
@@ -862,13 +866,14 @@ public class SpaceshipPlance {
                     x += 1;
                     break;
             }
-            hit = components[y][x];
+            if(inBounds(x,y))
+                hit = components[y][x];
         }
 
         if (hit == null) {
             return -1; // se non veniamo colpiti
         }
-        if (cannons.contains((Cannon) hit)) {
+        if (cannons.contains((Cannon) hit)) { // problema di ClassCastException
             int dirP = direction.ordinal();
             int dirDD = getCannonDirection((Cannon) hit);
             if (dirP == dirDD) {
@@ -1002,10 +1007,14 @@ public class SpaceshipPlance {
                 y = position - 5;
                 break;
         }
+        ComponentTile hit = null;
 
-        ComponentTile hit = components[y][x];
+        if(inBounds(x,y))
+            hit = components[y][x];
 
-        for (int i = 0; i < max_lenght || hit == null; i++) {
+        System.out.println("Entro nel for");
+
+        for (int i = 0; i < max_lenght && hit == null; i++) {
             switch (direction) {
                 case NORTH:
                     y += 1;
@@ -1020,8 +1029,11 @@ public class SpaceshipPlance {
                     x += 1;
                     break;
             }
-            hit = components[y][x];
+            if(inBounds(x,y))
+                hit = components[y][x];
         }
+
+        System.out.println("Esco dal for");
 
         ArrayList<ConnectorType> disallowedConnectors = new ArrayList<>(Arrays.asList(ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL));
 

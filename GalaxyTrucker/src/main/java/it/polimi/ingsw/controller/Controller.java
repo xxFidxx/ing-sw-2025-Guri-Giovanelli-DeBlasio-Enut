@@ -664,6 +664,7 @@ public class Controller{
                 ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
                 l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                 boolean check = currentProjectile.activate(player, currentDiceThrow);
+                System.out.println("Check " + check);
                 if(!check) {
                     ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                     for (ShieldGenerator shield : shields) {
@@ -684,8 +685,8 @@ public class Controller{
                 ClientListener l = listenerbyPlayer.get(player);
                 ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
                 l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
-                //int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
-                int result = -1;
+                int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
+                System.out.println("activateMeteor: result " + result);
                 if(result == -1) {
                     l.onEvent(eventCrafter(GameState.NO_HIT, null));
                     waitForNextShot(l);
@@ -1140,6 +1141,7 @@ public class Controller{
                 int playerGoods = p.getSpaceshipPlance().countGoods();
                 int cardMalus = ((SmugglersCard)currentAdventureCard).getLossMalus();
                 int diff = playerGoods - cardMalus ;
+                System.out.println("defeatedBySmugglers: diff: " + diff);
                 if(diff >= 0) {
                     RemoveMostValuable mostValuableData = new RemoveMostValuable(cardMalus,goodsContainers);
                     System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
@@ -1152,8 +1154,9 @@ public class Controller{
                     }
 
                     int playerBatteries = p.getSpaceshipPlance().getnBatteries();
+                    System.out.println("defeatedBySmugglers: playerBatteries " + playerBatteries);
                     if(playerBatteries > 0){
-                        int diffBatteries = playerBatteries + diff;
+                        int diffBatteries = playerBatteries - diff;
                         ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
                         printSpaceshipbyTile(l,pc.getFirst());
                         BatteriesManagement bm;
@@ -1649,7 +1652,7 @@ public class Controller{
 
     public void playerProtected(ClientListener listener) throws ControllerExceptions{
         Player p = playerbyListener.get(listener);
-        // togliere una batteria dato che ha attivato lo scudo
+        // togliere una batteria dato che ha attivato uno scudo o un doppio cannone
         Player player = playerbyListener.get(listener);
         int batteries = player.getSpaceshipPlance().getnBatteries();
         if(batteries > 0){
@@ -1950,7 +1953,10 @@ public class Controller{
         }
 
         if (hit != null) {
+            l.onEvent(eventCrafter(GameState.SHOT_HIT, null));
             removeAdjust(l, x, y);
+        } else{
+            l.onEvent(eventCrafter(GameState.NO_HIT, null));
         }
     }
 
