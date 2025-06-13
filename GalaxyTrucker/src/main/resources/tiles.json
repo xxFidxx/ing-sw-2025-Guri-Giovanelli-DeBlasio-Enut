@@ -226,5 +226,30 @@
     "type": "Cabin",
     "connectors": [0, 3, 1, 1],
     "isCentral": false
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [3, 3, 3, 3],
+    "protection": [true, true, false, false]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [3, 3, 0, 0],
+    "protection": [false, true, true, false]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [3, 3, 3, 3],
+    "protection": [false, false, true, true]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [3, 3, 3, 3],
+    "protection": [true, false, false, true]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [0, 0, 3, 3],
+    "protection": [true, false, true, true]
   }
 ]
