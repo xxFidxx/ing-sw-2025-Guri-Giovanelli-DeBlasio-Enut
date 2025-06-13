@@ -4,11 +4,11 @@ import it.polimi.ingsw.model.componentTiles.Direction;
 
 import java.io.Serializable;
 
-public class ProjectileDirPos extends DataContainer implements Serializable {
+public class SmallMeteorDirPos extends DataContainer implements Serializable {
     Direction direction;
     int position;
 
-    public ProjectileDirPos(Direction direction, int position) {
+    public SmallMeteorDirPos(Direction direction, int position) {
         this.direction = direction;
         this.position = position;
     }

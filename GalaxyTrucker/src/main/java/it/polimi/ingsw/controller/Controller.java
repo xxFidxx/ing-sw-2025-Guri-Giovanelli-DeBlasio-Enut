@@ -242,7 +242,16 @@ public class Controller{
                 event = new Event(state, (BatteriesManagement) data);
             }
             case SCS_DIR_POS -> {
-                event = new Event(state, (ProjectileDirPos) data);
+                event = new Event(state, (SmallCannonDirPos) data);
+            }
+            case BMS_DIR_POS -> {
+                event = new Event(state, (BigMeteorDirPos) data);
+            }
+            case SMS_DIR_POS -> {
+                event = new Event(state, (SmallMeteorDirPos) data);
+            }
+            case BCS_DIR_POS -> {
+                event = new Event(state, (BigCannonDirPos) data);
             }
 
             default ->event = new Event(state, null); // in cases where you don't have to send data, you just send the current state
@@ -661,8 +670,8 @@ public class Controller{
                 System.out.println("activateMeteor: Small Meteor");
                 ClientListener l = listenerbyPlayer.get(player);
                 Direction direction = currentProjectile.getDirection();
-                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
-                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
+                SmallMeteorDirPos sdr = new SmallMeteorDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.SMS_DIR_POS, sdr));
                 boolean check = currentProjectile.activate(player, currentDiceThrow);
                 System.out.println("Check " + check);
                 if(!check) {
@@ -683,8 +692,8 @@ public class Controller{
                 System.out.println("activateMeteor: Big Meteor");
                 Direction direction = currentProjectile.getDirection();
                 ClientListener l = listenerbyPlayer.get(player);
-                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
-                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
+                BigMeteorDirPos bdr = new BigMeteorDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.BMS_DIR_POS, bdr));
                 int result = player.getSpaceshipPlance().checkProtection(direction, currentDiceThrow);
                 System.out.println("activateMeteor: result " + result);
                 if(result == -1) {
@@ -705,7 +714,7 @@ public class Controller{
             case SmallCannonShot scs -> {
                 Direction direction = currentProjectile.getDirection();
                 ClientListener l = listenerbyPlayer.get(player);
-                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
+                SmallCannonDirPos pdr = new SmallCannonDirPos(direction, currentDiceThrow);
                 l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
                 ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                 for (ShieldGenerator shield : shields) {
@@ -719,8 +728,8 @@ public class Controller{
             case BigCannonShot bcs ->{
                 Direction direction = currentProjectile.getDirection();
                 ClientListener l = listenerbyPlayer.get(player);
-                ProjectileDirPos pdr = new ProjectileDirPos(direction, currentDiceThrow);
-                l.onEvent(eventCrafter(GameState.SCS_DIR_POS, pdr));
+                BigCannonDirPos bdr = new BigCannonDirPos(direction, currentDiceThrow);
+                l.onEvent(eventCrafter(GameState.BCS_DIR_POS, bdr));
                 playerHit(l);
             }
             default -> throw new IllegalStateException("Unexpected value: " + currentProjectile);
@@ -1127,6 +1136,7 @@ public class Controller{
             resetShowAndDraw();
             return;
         }
+        System.out.println("defeatedBySmugglers: defeatedPlayers size: " + defeatedPlayers.size());
         for(ClientListener l : listeners) {
             Player p = playerbyListener.get(l);
             if(defeatedPlayers.contains(p)) {
@@ -1156,7 +1166,8 @@ public class Controller{
                     int playerBatteries = p.getSpaceshipPlance().getnBatteries();
                     System.out.println("defeatedBySmugglers: playerBatteries " + playerBatteries);
                     if(playerBatteries > 0){
-                        int diffBatteries = playerBatteries - diff;
+                        int diffBatteries = playerBatteries + diff;
+                        System.out.println("defeatedBySmugglers: diff Batteries: " + diffBatteries);
                         ArrayList<PowerCenter> pc = p.getSpaceshipPlance().getPowerCenters();
                         printSpaceshipbyTile(l,pc.getFirst());
                         BatteriesManagement bm;

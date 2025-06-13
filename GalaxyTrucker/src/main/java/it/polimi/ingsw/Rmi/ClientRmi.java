@@ -748,7 +748,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
             case RemoveMostValuable removeMostValuable -> printCargosRemove(removeMostValuable.getCargos());
-            case ProjectileDirPos pdr -> System.out.println("You are about to be hit by a projectile from " + pdr.getDirection() + " direction in " + pdr.getPosition() + " position");
+            case SmallCannonDirPos sdr -> System.out.println("You are about to be hit by a small cannon shot from " + sdr.getDirection() + " direction in " + sdr.getPosition() + " position");
+            case BigMeteorDirPos bdr -> System.out.println("You are about to be hit by a big meteor shot from " + bdr.getDirection() + " direction in " + bdr.getPosition() + " position");
+            case SmallMeteorDirPos sdr -> System.out.println("You are about to be hit by a small meteor shot from " + sdr.getDirection() + " direction in " + sdr.getPosition() + " position");
+            case BigCannonDirPos bdr -> System.out.println("You are about to be hit by a big cannon shot from " + bdr.getDirection() + " direction in " + bdr.getPosition() + " position");
             default -> {}
         }
         System.out.print("> ");

@@ -866,14 +866,17 @@ public class SpaceshipPlance {
                     x += 1;
                     break;
             }
-            if(inBounds(x,y))
+            if(inBounds(x,y)) {
                 hit = components[y][x];
+                System.out.println("checkProtection: hit " + hit);
+            }
         }
 
         if (hit == null) {
             return -1; // se non veniamo colpiti
         }
-        if (cannons.contains((Cannon) hit)) { // problema di ClassCastException
+        System.out.println("checkProtection: hit " + hit);
+        if (cannons.contains(hit)) { // problema di ClassCastException
             int dirP = direction.ordinal();
             int dirDD = getCannonDirection((Cannon) hit);
             if (dirP == dirDD) {
