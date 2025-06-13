@@ -39,6 +39,7 @@ public class Controller{
     private final ArrayList<Player> defeatedPlayers;
     private boolean combatZoneFlag;
     private boolean piratesFlag;
+    private boolean smugglersFlag;
     private boolean enemyDefeated;
 
     public Controller() {
@@ -55,6 +56,7 @@ public class Controller{
         this.cards = null;
         this.combatZoneFlag = false;
         this.piratesFlag = false;
+        this.smugglersFlag = false;
         this.enemyDefeated = false;
     }
 
@@ -240,6 +242,9 @@ public class Controller{
 
             case BATTERIES_MANAGEMENT -> {
                 event = new Event(state, (BatteriesManagement) data);
+            }
+            case REMOVE_MV_GOODS -> {
+                event = new Event(state, (RemoveMostValuable) data);
             }
             case SCS_DIR_POS -> {
                 event = new Event(state, (SmallCannonDirPos) data);
@@ -524,6 +529,7 @@ public class Controller{
                 if (tmpPlayers.isEmpty() || cargoended) {
                     System.out.println("manageCard: cargoended " + cargoended);
                     cargoended=false;
+                    smugglersFlag=true;
                     System.out.println("manageCard: vado in defeatedBySmugglers");
                     defeatedBySmugglers();
                     return;
@@ -741,6 +747,13 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.END_CARD, null));
         game.endTurn();
         isDone.replaceAll((c, v) -> false);
+        cargoended=false;
+        combatZoneFlag = false;
+        piratesFlag = false;
+        smugglersFlag = false;
+        enemyDefeated = false;
+        piratesended=false;
+        crewended=false;
         endCard();
         for (Player player : players) {
             player.getSpaceshipPlance().updateLists();
@@ -1140,6 +1153,7 @@ public class Controller{
         for(ClientListener l : listeners) {
             Player p = playerbyListener.get(l);
             if(defeatedPlayers.contains(p)) {
+                System.out.println("defeatedBySmugglers: defeatedPlayers remove ");
                 defeatedPlayers.remove(p);
                 ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
                 ArrayList<CargoHolds> playerCargos = p.getSpaceshipPlance().getCargoHolds();
@@ -1153,12 +1167,12 @@ public class Controller{
                 int diff = playerGoods - cardMalus ;
                 System.out.println("defeatedBySmugglers: diff: " + diff);
                 if(diff >= 0) {
-                    RemoveMostValuable mostValuableData = new RemoveMostValuable(cardMalus,goodsContainers);
+                    RemoveMostValuable mostValuableData = new RemoveMostValuable(cardMalus,goodsContainers, 0);
                     System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
                     l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
                 } else {
                     if(playerGoods > 0){
-                        RemoveMostValuable mostValuableData = new RemoveMostValuable(playerGoods,goodsContainers);
+                        RemoveMostValuable mostValuableData = new RemoveMostValuable(playerGoods,goodsContainers, -diff);
                         System.out.println("defeatedBySmugglers: mando in REMOVE_MV_GOODS");
                         l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, mostValuableData));
                     }
@@ -1526,6 +1540,7 @@ public class Controller{
         //tmpPlayers.remove(player);
         player.setReward(null);
         cargoended = true;
+        System.out.println("Cargo management ended");
         manageCard();
     }
 
@@ -1872,7 +1887,12 @@ public class Controller{
                     fromChargeToManage(listener);
             }
             case SlaversCard sc -> fromChargeToManage(listener);
-            case SmugglersCard sc -> fromChargeToManage(listener);
+            case SmugglersCard sc -> {
+                if(smugglersFlag)
+                    waitForEnemies(listener);
+                else
+                    fromChargeToManage(listener);
+            }
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }

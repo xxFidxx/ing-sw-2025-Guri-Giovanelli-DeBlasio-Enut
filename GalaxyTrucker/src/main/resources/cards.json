@@ -1,5 +1,26 @@
 [
   {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 3,
+    "planets": [
+      [3, 1, 0, 0, 0],
+      [3, 2, 0, 0],
+      [3, 0, 0, 0],
+      [3, 1]
+    ]
+  },
+  {
+    "type": "SmugglersCard",
+    "name": "Smugglers",
+    "level": 1,
+    "cannonStrength": 4,
+    "lostDays": 1,
+    "lossMalus": 2,
+    "reward": [2, 1, 0]
+  },
+  {
     "type": "MeteorSwarmCard",
     "name": "Meteor Swarm",
     "level": 1,
@@ -21,15 +42,6 @@
       { "type": 0, "direction": 0 }
     ],
     "reward": 4
-  },
-  {
-    "type": "SmugglersCard",
-    "name": "Smugglers",
-    "level": 1,
-    "cannonStrength": 4,
-    "lostDays": 1,
-    "lossMalus": 2,
-    "reward": [2, 1, 0]
   },
   {
     "type": "SlaversCard",
@@ -64,18 +76,6 @@
     "type": "OpenSpaceCard",
     "name": "Open Space",
     "level": 1
-  },
-  {
-    "type": "PlanetsCard",
-    "name": "Planets",
-    "level": 1,
-    "lostDays": 3,
-    "planets": [
-      [3, 1, 0, 0, 0],
-      [3, 2, 0, 0],
-      [3, 0, 0, 0],
-      [3, 1]
-    ]
   },
   {
     "type": "AbandonedShipCard",

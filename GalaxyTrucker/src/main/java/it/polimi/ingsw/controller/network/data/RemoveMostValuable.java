@@ -9,9 +9,12 @@ public class RemoveMostValuable extends DataContainer implements Serializable {
     private static final long serialVersionUID = 1L;
     private int nGoods;
     private ArrayList<GoodsContainer> cargos;
-    public RemoveMostValuable(int nGoods, ArrayList<GoodsContainer> cargos) {
+    private int batteriesToRemove;
+
+    public RemoveMostValuable(int nGoods, ArrayList<GoodsContainer> cargos, int batteriesToRemove) {
         this.nGoods = nGoods;
         this.cargos = cargos;
+        this.batteriesToRemove = batteriesToRemove;
     }
 
     public int getNGoods() {
@@ -20,5 +23,9 @@ public class RemoveMostValuable extends DataContainer implements Serializable {
 
     public ArrayList<GoodsContainer> getCargos() {
         return cargos;
+    }
+
+    public int getBatteriesToRemove() {
+        return batteriesToRemove;
     }
 }
