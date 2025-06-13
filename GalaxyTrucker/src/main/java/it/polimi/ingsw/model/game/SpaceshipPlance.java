@@ -717,6 +717,7 @@ public class SpaceshipPlance {
     private void countBatteries(){
         nBatteries=0;
         for(PowerCenter powerCenter : powerCenters){
+            System.out.println(powerCenter);
             for(boolean b: powerCenter.getBatteries())
                 if(b)
                     nBatteries++;
@@ -1418,11 +1419,15 @@ public class SpaceshipPlance {
         if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
             GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
             if (goodIndex >= 0 && goodIndex < cargo1.getGoods().length) {
-                if(cargo1.getGoods()[goodIndex].getValue() >= playerGoods.getFirst().getValue() ){
-                    removeGoods(cargo1, goodIndex);
-                    return true;
+                GoodsBlock goodsBlock = cargo1.getGoods()[goodIndex];
+                if(goodsBlock != null){
+                    if(cargo1.getGoods()[goodIndex].getValue() >= playerGoods.getFirst().getValue() ){
+                        removeGoods(cargo1, goodIndex);
+                        return true;
+                    }else
+                        return false;
                 }else
-                    return false;
+                    throw new CargoManagementException("you cant remove an empty spot");
             } else
                 throw new CargoManagementException("goods index is outbound");
         } else

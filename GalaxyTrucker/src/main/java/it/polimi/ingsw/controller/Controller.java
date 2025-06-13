@@ -1351,19 +1351,19 @@ public class Controller{
         listener.onEvent(eventCrafter(GameState.BYTILE_SHIP, ds));
     }
 
-    public void addGood(ClientListener listener, int cargoIndex, int goodIndex, int rewardIndex) {
+    public void addGood(ClientListener listener, int cargoIndex, int goodIndex, int rewardIndex) throws CargoManagementException {
         Player player = playerbyListener.get(listener);
         game.addGood(player,cargoIndex,goodIndex,rewardIndex);
         checkStorage(listener);
     }
 
-    public void swapGoods(ClientListener listener, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+    public void swapGoods(ClientListener listener, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) throws CargoManagementException {
         Player player = playerbyListener.get(listener);
         game.swapGoods(player,cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
         checkStorage(listener);
     }
 
-    public void removeGood(ClientListener listener, int cargoIndex, int goodIndex) {
+    public void removeGood(ClientListener listener, int cargoIndex, int goodIndex) throws CargoManagementException{
         Player player = playerbyListener.get(listener);
         game.removeGood(player,cargoIndex,goodIndex);
         checkStorage(listener);
@@ -1896,7 +1896,7 @@ public class Controller{
         }
     }
 
-    public boolean removeMVGood(ClientListener listener, int cargoIndex, int goodIndex) {
+    public boolean removeMVGood(ClientListener listener, int cargoIndex, int goodIndex) throws CargoManagementException{
         Player player = playerbyListener.get(listener);
         return player.getSpaceshipPlance().removeMVGood(cargoIndex,goodIndex);
     }

@@ -589,6 +589,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     DataContainer data = currentEvent.getData();
                     int nGoods = ((RemoveMostValuable) data).getNGoods();
                     while ((nGoods > 0)) {
+                            System.out.println("You must remove " + nGoods + " goods");
                             System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();

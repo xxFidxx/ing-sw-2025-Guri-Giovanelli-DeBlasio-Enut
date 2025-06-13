@@ -130,19 +130,19 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void addGood(VirtualViewRmi client,int cargoIndex, int goodIndex, int rewardIndex) {
+    public void addGood(VirtualViewRmi client,int cargoIndex, int goodIndex, int rewardIndex) throws RemoteException, CargoManagementException {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.addGood(listener,cargoIndex,goodIndex,rewardIndex);
     }
 
     @Override
-    public void swapGoods(VirtualViewRmi client,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
+    public void swapGoods(VirtualViewRmi client,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2)  throws RemoteException, CargoManagementException {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.swapGoods(listener,cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
     }
 
     @Override
-    public void removeGood(VirtualViewRmi client,int cargoIndex, int goodIndex) {
+    public void removeGood(VirtualViewRmi client,int cargoIndex, int goodIndex)  throws RemoteException, CargoManagementException {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.removeGood(listener, cargoIndex, goodIndex);
     }
@@ -152,12 +152,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.acceptCard(listener);
     }
-
-//    @Override
-//    public void printSpaceship(VirtualViewRmi client) {
-//        ClientListener listener = clientListeners.get(client);
-//        controller.printSpaceship(listener);
-//    }
 
 
     @Override
@@ -297,7 +291,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public boolean removeMVGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException {
+    public boolean removeMVGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException, CargoManagementException {
         ClientListenerRmi listener = clientListeners.get(clientRmi);
         return controller.removeMVGood(listener,cargoIndex,goodIndex);
     }
