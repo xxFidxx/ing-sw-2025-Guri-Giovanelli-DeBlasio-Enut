@@ -338,7 +338,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nBatteries = ((BatteriesManagement) data).getNBatteries();
-                    while ((nBatteries != 0)) {
+                    while ((nBatteries > 0)) {
                         System.out.println("Ex input: 14 2 -> remove 2 batteries from powerCenter number 14");
                         System.out.println("You have to remove " + "Batteries: " + nBatteries);
                         System.out.print("> ");
@@ -351,7 +351,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 int batteries = Integer.parseInt(parts[1]);
                                     if (batteries <= 2 && batteries > 0) {
                                         if (server.removeBatteries(this, powerCenterId, batteries)) {
-                                            nBatteries--;
+                                            nBatteries-= batteries;
                                             removed = true;
                                         } else {
                                             System.out.println("You have to put a PowerCenter containing a battery");
@@ -588,7 +588,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nGoods = ((RemoveMostValuable) data).getNGoods();
-                    while ((nGoods != 0)) {
+                    while ((nGoods > 0)) {
                             System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();

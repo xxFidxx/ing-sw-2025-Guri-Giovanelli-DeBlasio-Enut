@@ -521,7 +521,7 @@ public class Controller{
             }
 
             case SmugglersCard sg -> {
-                if (tmpPlayers.isEmpty()||cargoended) {
+                if (tmpPlayers.isEmpty() || cargoended) {
                     System.out.println("manageCard: cargoended " + cargoended);
                     cargoended=false;
                     System.out.println("manageCard: vado in defeatedBySmugglers");
