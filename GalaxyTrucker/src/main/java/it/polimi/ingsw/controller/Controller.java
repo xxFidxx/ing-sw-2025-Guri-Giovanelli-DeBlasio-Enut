@@ -21,6 +21,7 @@ public class Controller{
     private Lobby lobby;
     private GameState currentGameState = GameState.IDLE;
     private final List<ClientListener> listeners = new ArrayList<>();
+    private final List<ClientListener> registredListeners = new ArrayList<>();
     private final Object LobbyLock = new Object();
     private final Object GameLock = new Object();
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
@@ -114,8 +115,11 @@ public class Controller{
 
 
         lobby.setPlayersNicknames(nickname);
-        Event event = eventCrafter(GameState.WAIT_LOBBY,null);
-        listener.onEvent(event);
+        registredListeners.add(listener);
+
+        for(ClientListener l: registredListeners){
+            l.onEvent(eventCrafter(GameState.WAIT_LOBBY,null));
+        }
 
         if(lobby.isFull())
             gameInit();
