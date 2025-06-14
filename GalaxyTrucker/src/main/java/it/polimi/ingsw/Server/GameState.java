@@ -64,6 +64,9 @@ public enum GameState {
     NO_HIT,
     SINGLE_CANNON_PROTECTION,
     SHOT_HIT,
+    SAME_EQUIP,
+    SAME_FIRE,
+    SAME_ENGINE,
     DIED
     }
 
