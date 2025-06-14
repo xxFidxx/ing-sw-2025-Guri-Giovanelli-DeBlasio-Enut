@@ -1,5 +1,17 @@
 [
   {
+    "type": "CombatZoneCard",
+    "name": "Combat Zone",
+    "level": 1,
+    "combatZoneType": 0,
+    "lostDays": 3,
+    "lostOther": 2,
+    "cannons": [
+      { "type": 0, "direction": 2 },
+      { "type": 1, "direction": 2 }
+    ]
+  },
+  {
     "type": "PlanetsCard",
     "name": "Planets",
     "level": 1,
@@ -51,18 +63,6 @@
     "lostDays": 1,
     "lostCrew": 3,
     "reward": 5
-  },
-  {
-    "type": "CombatZoneCard",
-    "name": "Combat Zone",
-    "level": 1,
-    "combatZoneType": 0,
-    "lostDays": 3,
-    "lostOther": 2,
-    "cannons": [
-      { "type": 0, "direction": 2 },
-      { "type": 1, "direction": 2 }
-    ]
   },
   {
     "type": "AbandonedStationCard",

@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.resources.*;
 import it.polimi.ingsw.model.game.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Controller{
@@ -611,8 +612,6 @@ public class Controller{
 
             }
 
-
-
             case EpidemicCard ec -> {
                 currentAdventureCard.activate();
                 resetShowAndDraw();
@@ -625,8 +624,10 @@ public class Controller{
 
             case CombatZoneCard czc -> {
                 if(((CombatZoneCard)currentAdventureCard).getType() == CombatZoneType.LOSTCREW){
-                    Player minEquipPlayer = tmpPlayers.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
-                    if(minEquipPlayer != null){
+                    int minEquip = tmpPlayers.stream().mapToInt(Player::getNumEquip).min().orElse(Integer.MAX_VALUE);
+                    List<Player> minEquipPlayers = tmpPlayers.stream().filter(p -> p.getNumEquip() == minEquip).collect(Collectors.toList());
+                    if (minEquipPlayers.size() == 1) {
+                        Player minEquipPlayer = minEquipPlayers.get(0);
                         int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
                         LostDays obj= new LostDays(ld);
                         ClientListener l = listenerbyPlayer.get(minEquipPlayer);
@@ -641,7 +642,7 @@ public class Controller{
                         Player player = playerbyListener.get(listener);
                         int es = player.getEngineStrenght();
                         int numDE = 0;
-                        for(Engine e : currentPlayer.getSpaceshipPlance().getEngines()){
+                        for(Engine e : player.getSpaceshipPlance().getEngines()){
                             if(e instanceof DoubleEngine) {
                                 numDE++;
                             }
@@ -649,6 +650,7 @@ public class Controller{
                         DoubleEngineNumber den = new DoubleEngineNumber(es, numDE);
                         listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, den));
                     }
+
                 } else {
                     for(ClientListener listener : listeners) {
                         Player player = playerbyListener.get(listener);
@@ -777,19 +779,7 @@ public class Controller{
         currentAbandonedShipCard.setActivatedPlayer(p);
         currentAdventureCard.activate();
         crewended=true;
-        int astr = p.getSpaceshipPlance().getnAstronauts();
-        int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
-        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
-        int lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
-        if((astr + al) >= lostCrew) {
-            CrewManagement cm = new CrewManagement(cabins, 0, lostCrew);
-            printSpaceshipbyTile(listener, cabins.getFirst());
-            listener.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
-        } else {
-            CrewManagement cm = new CrewManagement(cabins, 0, astr+al);
-            printSpaceshipbyTile(listener, cabins.getFirst());
-            listener.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
-        }
+        sendToCrewManagement(p);
     }
 
     private void activateAbandonedStationCard(ClientListener listener) {
@@ -967,18 +957,21 @@ public class Controller{
                         combatZoneFlag = true;
                         isDone.put(listener,true);
                         if(!isDone.containsValue(false)){
-                            Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
-                            if(minEnginePlayer != null){
+                            int minEngine = tmpPlayers.stream().mapToInt(Player::getEngineStrenght).min().orElse(Integer.MAX_VALUE);
+                            List<Player> minEnginePlayers = tmpPlayers.stream().filter(p -> p.getEngineStrenght() == minEngine).collect(Collectors.toList());
+                            if (minEnginePlayers.size() == 1) {
+                                Player minEnginePlayer = minEnginePlayers.get(0);
                                 int lostOther = ((CombatZoneCard) currentAdventureCard).getLostOther();
                                 LostCrew lostCrew = new LostCrew(lostOther);
                                 ClientListener l = listenerbyPlayer.get(minEnginePlayer);
                                 handleMinEngine(l);
                                 l.onEvent(eventCrafter(GameState.LOST_CREW, lostCrew));
-                                minEnginePlayer.loseCrew(lostOther);
+                                //minEnginePlayer.loseCrew(lostOther);
+                                sendToCrewManagement(minEnginePlayer);
                             } else {
                                 notifyAllListeners(eventCrafter(GameState.SAME_ENGINE, null));
                             }
-                            combatZoneCannons();
+                            //combatZoneCannons();
                         } else {
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
                         }
@@ -1029,7 +1022,6 @@ public class Controller{
                                 ClientListener l = listenerbyPlayer.get(minEnginePlayer);
                                 handleMinEngine(l);
                                 sendToRemoveMVGoods(minEnginePlayer);
-                                //cargo MV goods
                             } else {
                                 notifyAllListeners(eventCrafter(GameState.SAME_ENGINE, null));
                                 combatZoneLastMinEquip();
@@ -1152,25 +1144,35 @@ public class Controller{
             Player p = playerbyListener.get(l);
             if(defeatedPlayers.contains(p)) {
                 defeatedPlayers.remove(p);
-                int astr = p.getSpaceshipPlance().getnAstronauts();
-                int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
-                ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
-                int lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
-                System.out.println("defeatedBySlavers: mando in CREW_MANAGEMENT");
-                if((astr + al) >= lostCrew) {
-                    CrewManagement cm = new CrewManagement(cabins, 0, lostCrew);
-                    printSpaceshipbyTile(l, cabins.getFirst());
-                    l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
-                } else {
-                    CrewManagement cm = new CrewManagement(cabins, 0, astr+al);
-                    printSpaceshipbyTile(l, cabins.getFirst());
-                    l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
-                }
+                sendToCrewManagement(p);
             } else {
                 System.out.println("defeatedBySlavers: mando in WAIT_PLAYER");
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null));
             }
         }
+    }
+
+    public void sendToCrewManagement(Player p){
+        ClientListener l = listenerbyPlayer.get(p);
+        int astr = p.getSpaceshipPlance().getnAstronauts();
+        int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
+        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
+        int lostCrew;
+        switch(currentAdventureCard){
+            case CombatZoneCard czc -> lostCrew = ((CombatZoneCard)currentAdventureCard).getLostOther();
+            case SlaversCard sc -> lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
+            case AbandonedShipCard asc -> lostCrew = ((AbandonedShipCard)currentAdventureCard).getLostCrew();
+            default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+        }
+        CrewManagement cm;
+        System.out.println("sendToCrewManagement: mando in CREW_MANAGEMENT");
+        if((astr + al) >= lostCrew) {
+            cm = new CrewManagement(cabins, 0, lostCrew);
+        } else {
+            cm = new CrewManagement(cabins, 0, astr+al);
+        }
+        printSpaceshipbyTile(l, cabins.getFirst());
+        l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, cm));
     }
 
     public void defeatedBySmugglers(){
@@ -1202,7 +1204,12 @@ public class Controller{
         }
 
         int playerGoods = p.getSpaceshipPlance().countGoods();
-        int cardMalus = ((SmugglersCard)currentAdventureCard).getLossMalus();
+        int cardMalus = 0;
+        if(currentAdventureCard instanceof SmugglersCard) {
+            cardMalus = ((SmugglersCard)currentAdventureCard).getLossMalus();
+        } else if (currentAdventureCard instanceof CombatZoneCard) {
+            cardMalus = ((CombatZoneCard)currentAdventureCard).getLostOther();
+        }
         int diff = playerGoods - cardMalus ;
         System.out.println("sendToRemoveMVGoods: diff: " + diff);
         if(diff >= 0) {
@@ -1916,7 +1923,12 @@ public class Controller{
     public void endManagement(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         switch(currentAdventureCard){
-            case CombatZoneCard czc -> combatZoneShots(p);
+            case CombatZoneCard czc -> {
+                if(!combatZoneFlag)
+                    fromChargeToManage(listener);
+                else
+                    combatZoneShots(p);
+            }
             case MeteorSwarmCard msc -> waitForNextShot(listener);
             case OpenSpaceCard osc -> fromChargeToManage(listener);
             case PiratesCard pc -> {
@@ -1941,7 +1953,7 @@ public class Controller{
             case SlaversCard sc -> waitForEnemies(listener);
             // controllare a cosa far tornare per asc e czc
             case AbandonedShipCard asc -> manageCard();
-            case CombatZoneCard czc -> fromChargeToManage(listener);
+            case CombatZoneCard czc -> combatZoneCannons();
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
     }

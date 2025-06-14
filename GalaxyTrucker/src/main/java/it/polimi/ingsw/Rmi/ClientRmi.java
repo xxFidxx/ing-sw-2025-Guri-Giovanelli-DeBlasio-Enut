@@ -487,7 +487,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CHOOSE_BATTERY -> {
                 switch (input) {
-                    case "0" -> server.manageCard();
+                    case "0" -> server.fromChargeToManage(this);
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
