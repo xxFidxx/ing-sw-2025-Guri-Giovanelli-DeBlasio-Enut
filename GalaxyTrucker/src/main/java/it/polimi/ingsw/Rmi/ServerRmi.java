@@ -1,7 +1,6 @@
 package it.polimi.ingsw.Rmi;
 
 
-import it.polimi.ingsw.controller.ClientListener;
 import it.polimi.ingsw.controller.ClientListenerRmi;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
@@ -249,9 +248,9 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public boolean removeFigure(VirtualViewRmi clientRmi, int cabinId, String figure) throws RemoteException {
+    public boolean removeFigure(VirtualViewRmi clientRmi, int cabinId) throws RemoteException {
         ClientListenerRmi listener = clientListeners.get(clientRmi);
-        return controller.removeFigure(listener,cabinId,figure);
+        return controller.removeFigure(listener,cabinId);
     }
 
     @Override
@@ -295,5 +294,24 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         ClientListenerRmi listener = clientListeners.get(clientRmi);
         return controller.removeMVGood(listener,cargoIndex,goodIndex);
     }
+
+    @Override
+    public void showDecks(VirtualViewRmi clientRmi)throws RemoteException {
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
+        controller.showDecks(listener);
+    }
+
+    @Override
+    public boolean showCardsbyDeck(VirtualViewRmi clientRmi, int nDeck) throws RemoteException{
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
+        return controller.showCardsbyDeck(listener, nDeck);
+    }
+
+    @Override
+    public void endShowCards(VirtualViewRmi clientRmi, int i) throws RemoteException {
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
+        controller.endShowCards(listener, i);
+    }
+
 }
 

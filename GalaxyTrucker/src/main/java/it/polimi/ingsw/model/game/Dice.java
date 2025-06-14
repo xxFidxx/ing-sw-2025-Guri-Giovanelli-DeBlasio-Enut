@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+
 import java.util.Random;
 
 public class Dice {

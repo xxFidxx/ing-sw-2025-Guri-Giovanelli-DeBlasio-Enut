@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.componentTiles.Direction;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
+import java.io.Serializable;
+
 public class SmallMeteor extends Projectile {
     public SmallMeteor(Game game, Direction direction) {
         super(game, direction);

@@ -3,7 +3,9 @@ import it.polimi.ingsw.model.componentTiles.Direction;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
-public abstract class Projectile {
+import java.io.Serializable;
+
+public abstract class Projectile implements Serializable {
     protected Direction direction;
     protected Game game;
 

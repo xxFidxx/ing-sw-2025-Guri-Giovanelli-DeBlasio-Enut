@@ -4,7 +4,9 @@ import it.polimi.ingsw.model.componentTiles.Direction;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
 
-public class SmallCannonShot extends Projectile {
+import java.io.Serializable;
+
+public class SmallCannonShot extends Projectile{
 
     public SmallCannonShot(Game game, Direction direction) {
         super(game, direction);

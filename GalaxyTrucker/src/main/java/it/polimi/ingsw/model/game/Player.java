@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 

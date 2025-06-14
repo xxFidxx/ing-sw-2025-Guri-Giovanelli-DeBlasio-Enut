@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class Deck {

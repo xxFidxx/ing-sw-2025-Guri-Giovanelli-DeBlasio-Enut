@@ -265,9 +265,9 @@ public class SocketServer implements VirtualServerSocket {
     }
 
 
-    public boolean removeFigure(ObjectOutputStream client, int cabinId, String figure)    {
+    public boolean removeFigure(ObjectOutputStream client, int cabinId)    {
         ClientListenerSocket listener = clientListeners.get(client);
-        return controller.removeFigure(listener,cabinId,figure);
+        return controller.removeFigure(listener,cabinId);
     }
 
 
@@ -316,7 +316,7 @@ public class SocketServer implements VirtualServerSocket {
                     result = addAlienCabin(out, (int)parameters[0], (String)parameters[1]);
                     break;
                 case "removeFigure":
-                    result = removeFigure(out, (int)parameters[0], (String)parameters[1]);
+                    result = removeFigure(out, (int)parameters[0]);
                     break;
                 case "removeBatteries":
                     result = removeBatteries(out, (int)parameters[0], (int)parameters[1]);

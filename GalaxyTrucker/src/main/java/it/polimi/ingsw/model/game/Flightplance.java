@@ -3,6 +3,7 @@ import it.polimi.ingsw.model.AdventureCardFactory;
 import it.polimi.ingsw.model.adventureCards.*;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
 

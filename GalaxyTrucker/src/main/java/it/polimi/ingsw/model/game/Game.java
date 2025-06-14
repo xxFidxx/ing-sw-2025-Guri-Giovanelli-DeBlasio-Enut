@@ -6,9 +6,10 @@ import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.Planet;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Game {
+public class Game{
     private ArrayList<Player> players;
     final private Timer timer;
     final private Dice[] dices;
@@ -72,7 +73,7 @@ public class Game {
         return assemblingTiles;
     }
 
-    public Integer[] getAssemblingTilesId(){
+    public Integer[] getTilesId(){
         return tilesToId(assemblingTiles);
     }
 
@@ -127,16 +128,17 @@ public class Game {
         return tile;
     }
 
-    public ComponentTile pickTileReserveSpot(Player player, int Tileid){
+    public ComponentTile pickTileReserveSpot(Player player, int tileIndex){
 
-        ComponentTile tile;
-        tile = player.getSpaceshipPlance().getReserveSpot().get(Tileid);
+        List<ComponentTile> reserve = player.getSpaceshipPlance().getReserveSpot();
+        ComponentTile tile = (tileIndex >= 0 && tileIndex < reserve.size()) ? reserve.get(tileIndex) : null;
+
 
         if(tile == null )
             return null;
 
         player.setHandTile(tile);
-        tile = player.getSpaceshipPlance().getReserveSpot().remove(Tileid);
+        player.getSpaceshipPlance().getReserveSpot().remove(tile);
 
         return tile;
     }

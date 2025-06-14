@@ -72,7 +72,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void handleEndChooseAliens(VirtualViewRmi clientRmi) throws RemoteException;
 
-    boolean removeFigure(VirtualViewRmi clientRmi, int cabinId, String part) throws RemoteException;
+    boolean removeFigure(VirtualViewRmi clientRmi, int cabinId) throws RemoteException;
 
     void surrender(VirtualViewRmi clientRmi) throws RemoteException;
 
@@ -87,4 +87,10 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void endMVGoodsManagement(VirtualViewRmi clientRmi)throws RemoteException;
 
     boolean removeMVGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
+
+    void showDecks(VirtualViewRmi clientRmi) throws RemoteException;
+
+    boolean showCardsbyDeck(VirtualViewRmi clientRmi, int nDeck) throws  RemoteException;
+
+    void endShowCards(VirtualViewRmi clientRmi, int i) throws RemoteException;
 }

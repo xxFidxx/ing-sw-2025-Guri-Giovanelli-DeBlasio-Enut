@@ -3,7 +3,9 @@ package it.polimi.ingsw.model.adventureCards;
 import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Player;
 
-public abstract class AdventureCard {
+import java.io.Serializable;
+
+public abstract class AdventureCard implements Serializable {
     private String name;
     private int level;
     protected Deck deck;

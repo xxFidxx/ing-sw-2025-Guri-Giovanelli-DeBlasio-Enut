@@ -1,4 +1,5 @@
 package it.polimi.ingsw.Socket.Client;
+import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.Socket.SocketWrapper;
 import it.polimi.ingsw.controller.network.Event;
@@ -340,51 +341,32 @@ public class ClientSocket implements VirtualViewSocket {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int lostCrew = ((CrewManagement) data).getLostCrew();
-                    int lostAliens = ((CrewManagement) data).getLostAliens();
-                    while ((lostCrew != 0 || lostAliens != 0)) {
-                        System.out.println("Ex input:\ncabinId as -> this removes an astronaut\n cabinId al -> this removes an alien");
-                        System.out.println("You have to remove " + "Generic crew: " + lostCrew + " Aliens: " + lostAliens);
+                    while (lostCrew != 0 ) {
+                        System.out.println("Please write the cabinId you want to remove the crew member from");
+                        System.out.println("You have to remove " + "crew: " + lostCrew );
                         System.out.print("> ");
                         String line = scan.nextLine();
                         boolean removed = false;
                         try {
                             String[] parts = line.split(" ");
-                            if (parts.length == 2) {
+                            if (parts.length == 1) {
                                 int cabinId = Integer.parseInt(parts[0]);
-                                if (lostCrew != 0) {
-                                    if (parts[1] != null && (parts[1].equals("as"))) {
-                                        EventSender("removeFigure", new Object[]{cabinId,"as"});
+                                        EventSender("removeFigure", new Object[]{cabinId});
                                         try {
                                             if (handleServerResponse()) {
                                                 lostCrew--;
                                                 removed = true;
+                                            }else{
+                                                System.out.println("You have to put a cabinId containing at least one crew member");
                                             }
                                         } catch (InterruptedException e) {
                                             System.out.println("Interrupted: " + e.getMessage());
                                         }
-                                    } else {
-                                        System.out.println("You have to type as as second parameter, please retry");
-                                    }
-                                } else {
-                                    if (parts[1] != null && (parts[1].equals("al"))) {
-                                        EventSender("removeFigure", new Object[]{cabinId,"al"});
-                                        try {
-                                            if (handleServerResponse()) {
-                                                lostAliens--;
-                                                removed = true;
-                                            }
-                                        } catch (InterruptedException e) {
-                                            System.out.println("Interrupted: " + e.getMessage());
-                                        }
-                                    } else {
-                                        System.out.println("You have to type al as second parameter, please retry");
-                                    }
-                                }
                             } else {
-                                System.out.println("Wrong input. You need to put a number and a string divided by a space\n");
+                                System.out.println("Wrong input. You need to put a number \n");
                             }
                         } catch (NumberFormatException e) {
-                            System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars");
+                            System.out.println("Invalid input, ensure to write only a number");
                         }
                         if (removed)
                             System.out.println("Successfully removed");
@@ -880,7 +862,7 @@ public class ClientSocket implements VirtualViewSocket {
         System.out.print("> ");
     }
 
-    private void printCargosRemove(ArrayList<GoodsContainer> cargos) {
+    public void printCargosRemove(ArrayList<GoodsContainer> cargos) {
         System.out.println("--------------------------------------------------");
 
         for (int i = 0; i < cargos.size(); i++) {
