@@ -841,6 +841,7 @@ public class Controller{
             System.out.println("handleWaitersEnemy: Listener: " + l);
             if (l == listener) {
                 l.onEvent(eventCrafter(GameState.SHOW_ENEMY, null, currentPlayer));
+                l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, currentPlayer));
             } else {
                 System.out.println("handleWaitersEnemy: mando in WAIT_PLAYER");
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
