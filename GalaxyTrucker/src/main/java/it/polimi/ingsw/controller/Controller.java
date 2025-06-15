@@ -245,7 +245,7 @@ public class Controller{
             case CHOOSE_BATTERY -> {
                 int es = player.getEngineStrenght();
                 int numDE = 0;
-                for (Engine e : currentPlayer.getSpaceshipPlance().getEngines()) {
+                for (Engine e : player.getSpaceshipPlance().getEngines()) {
                     if (e instanceof DoubleEngine) {
                         numDE++;
                     }
@@ -270,7 +270,7 @@ public class Controller{
             case CHOOSE_CANNON -> {
                 float fs = player.getFireStrenght();
                 ArrayList<DoubleCannon> doubleCannons = new ArrayList<>();
-                for (Cannon c : currentPlayer.getSpaceshipPlance().getCannons()) {
+                for (Cannon c : player.getSpaceshipPlance().getCannons()) {
                     if (c instanceof DoubleCannon) {
                         doubleCannons.add((DoubleCannon) c);
                     }
@@ -658,6 +658,7 @@ public class Controller{
 
                     for (ClientListener listener : listeners) {
                         Player player = playerbyListener.get(listener);
+                        System.out.println("listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, null, player));");
                         listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, null, player));
                     }
                 } else {
