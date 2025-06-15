@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -142,14 +141,9 @@ public class SpaceshipPlance {
 
                 if (tile != null) {
                     switch (tile) {
-                        case Cannon c -> {
-                            cannons.add(c);
-                        }
+                        case Cannon c -> cannons.add(c);
 
-                        case Engine e -> {
-                            engines.add(e);
-
-                        }
+                        case Engine e -> engines.add(e);
                         case Cabin cab -> {
                             cabins.add(cab);
                             // I reset aliens of previous check, maybe the lifesupport system has been destroyed so I need to do that to ensure the alien doesnt remain on the cabin
@@ -157,10 +151,8 @@ public class SpaceshipPlance {
                             colors[0] = null;
                             colors[1] = null;
                                 for (int dir = 0; dir < 4; dir++) {
-                                    int[] dirx = DIR_X;
-                                    int[] diry = DIR_Y;
-                                    int nx = x + dirx[dir];
-                                    int ny = y + diry[dir];
+                                    int nx = x + DIR_X[dir];
+                                    int ny = y + DIR_Y[dir];
                                     if (inBounds(nx, ny) && components[ny][nx] != null) {
                                         ComponentTile tile2 = components[ny][nx];
                                         if (tile2 instanceof LifeSupportSystem) {
@@ -181,17 +173,11 @@ public class SpaceshipPlance {
                                 if(figures[0] != null && figures[0] instanceof Alien && colors[((Alien) figures[0]).getColor().ordinal()] == null)
                                     figures[0] = null;
                         }
-                        case CargoHolds ch -> {
-                            cargoHolds.add(ch);
-                        }
+                        case CargoHolds ch -> cargoHolds.add(ch);
 
-                        case ShieldGenerator sg -> {
-                            shieldGenerators.add(sg);
-                        }
+                        case ShieldGenerator sg -> shieldGenerators.add(sg);
 
-                        case PowerCenter pc -> {
-                            powerCenters.add(pc);
-                        }
+                        case PowerCenter pc -> powerCenters.add(pc);
 
                         default -> {
                         }
@@ -210,22 +196,6 @@ public class SpaceshipPlance {
 
         // Poi verifica gli edge case specifici della forma
         return standardBounds && !edgeCases(y, x);
-    }
-
-    private void clearVisited() {
-        for (int y = 0; y < ROWS; y++) {
-            for (int x = 0; x < COLS; x++) {
-                visited[y][x] = false;
-            }
-        }
-    }
-
-    private void removeUnvisited() {
-        for (int y = 0; y < ROWS; y++) {
-            for (int x = 0; x < COLS; x++) {
-                if (!visited[y][x]) components[y][x] = null;
-            }
-        }
     }
 
     public boolean checkCorrectness() {
@@ -260,23 +230,20 @@ public class SpaceshipPlance {
     }
 
     private void dfsExploration(int x, int y) {
-        if (!inBounds(x, y) || edgeCases(y, x) ||
-                components[y][x] == null || visited[y][x]) {
+        if (!inBounds(x, y) || components[y][x] == null || visited[y][x]) {
             return;
         }
 
         visited[y][x] = true;
 
-        int[] dirx = DIR_X;
-        int[] diry = DIR_Y;
         ComponentTile tile = components[y][x];
 
         for (int dir = 0; dir < 4; dir++) {
             // Non seguire i connettori smooth
             if (tile.getConnectors()[dir] == ConnectorType.SMOOTH) continue;
 
-            int nx = x + dirx[dir];
-            int ny = y + diry[dir];
+            int nx = x + DIR_X[dir];
+            int ny = y + DIR_Y[dir];
             dfsExploration(nx, ny);
         }
     }
@@ -319,12 +286,11 @@ public class SpaceshipPlance {
         if (tile instanceof Cannon && !isCannonValid(y, x)) return false;
 
 
-        int[] dirx = DIR_X;
-        int[] diry = DIR_Y;  // dy: NORD, EST, SUD, OVEST
+        // dy: NORD, EST, SUD, OVEST
 
         for (int dir = 0; dir < 4; dir++) {
-            int nx = x + dirx[dir];
-            int ny = y + diry[dir];
+            int nx = x + DIR_X[dir];
+            int ny = y + DIR_Y[dir];
 
             if (!inBounds(nx, ny) || components[ny][nx] == null) continue;
 
@@ -337,68 +303,9 @@ public class SpaceshipPlance {
         return true;
     }
 
-    private boolean isConnectionValid(ComponentTile tile, int direction, int nx, int ny) {
-        ConnectorType a = tile.getConnectors()[direction];
-
-        // Caso bordo o tile nulla
-        if (!inBounds(nx, ny)) {
-            return a == ConnectorType.SMOOTH ||
-                    a == ConnectorType.ENGINE ||
-                    a == ConnectorType.CANNON;
-        }
-
-        ComponentTile adjTile = components[ny][nx];
-        if (adjTile == null) return false;
-
-        ConnectorType b = adjTile.getConnectors()[(direction + 2) % 4];
-
-        // Logica di connessione
-        if (a == ConnectorType.SMOOTH) return b == ConnectorType.SMOOTH;
-        if (b == ConnectorType.SMOOTH) return false;
-
-        // Casi speciali
-        if (a == ConnectorType.ENGINE || a == ConnectorType.CANNON) return false;
-        if (b == ConnectorType.ENGINE || b == ConnectorType.CANNON) return false;
-
-        // Match esatto o universale
-        return a == b ||
-                a == ConnectorType.UNIVERSAL ||
-                b == ConnectorType.UNIVERSAL;
-    }
-
-    private boolean isTileWellConnected(int x, int y) {
-        ComponentTile tile = components[y][x];
-        if (tile == null) return true;
-
-        // 1. Controllo orientamento componenti speciali
-        if (tile instanceof Engine && !isEngineValid(y, x)) return false;
-        if (tile instanceof Cannon && !isCannonValid(y, x)) return false;
-
-        // 2. Controllo connessioni con tile adiacenti
-        int[] dx = DIR_X;
-        int[] dy = DIR_Y;
-
-        for (int dir = 0; dir < 4; dir++) {
-            int nx = x + dx[dir];
-            int ny = y + dy[dir];
-
-            if (!inBounds(nx, ny) || components[ny][nx] == null) {
-                continue; // Ignora connettori esposti (non invalidano)
-            }
-
-            ConnectorType a = tile.getConnectors()[dir];
-            ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
-
-            if (!isConnectionValid(a, b)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private boolean isConnectionValid(ConnectorType a, ConnectorType b) {
         //System.out.println(a.toString() + " " + b.toString());
-        boolean prova = true;
+        boolean prova;
         // Regole base di connessione (ignora i casi esposti)
         if (a == ConnectorType.SMOOTH || b == ConnectorType.SMOOTH) {
             prova = (a == b); // Entrambi smooth
@@ -492,14 +399,12 @@ public class SpaceshipPlance {
         addReserveSpot(components[y][x]);
         components[y][x] = null;
 
-        int[] dirx = DIR_X;
-        int[] diry = DIR_Y;
         int partsFound = 0;
 
         // Parte da tutte e 4 le direzioni con iterazioni diverse
         for (int iteration = 0; iteration < 4; iteration++) {
-            int nx = x + dirx[iteration];
-            int ny = y + diry[iteration];
+            int nx = x + DIR_X[iteration];
+            int ny = y + DIR_Y[iteration];
 
             if (inBounds(nx, ny) && !edgeCases(ny, nx) && components[ny][nx] != null) {
                 partsFound += dfsRemove(nx, ny, iteration);
@@ -510,7 +415,7 @@ public class SpaceshipPlance {
     }
 
     private int dfsRemove(int x, int y, int iteration) {
-        if (!inBounds(x, y) || edgeCases(y, x) || visited[y][x] || components[y][x] == null) {
+        if (!inBounds(x, y) || visited[y][x] || components[y][x] == null) {
             return 0;
         }
 
@@ -518,16 +423,14 @@ public class SpaceshipPlance {
         shownComponents[y][x] = iteration;
         int count = 1;
 
-        int[] dirx = DIR_X;
-        int[] diry = DIR_Y;
         ComponentTile tile = components[y][x];
 
         for (int dir = 0; dir < 4; dir++) {
             // Non seguire i connettori smooth
             if (tile.getConnectors()[dir] == ConnectorType.SMOOTH) continue;
 
-            int nx = x + dirx[dir];
-            int ny = y + diry[dir];
+            int nx = x + DIR_X[dir];
+            int ny = y + DIR_Y[dir];
             dfsRemove(nx, ny, iteration);
         }
 
@@ -664,26 +567,22 @@ public class SpaceshipPlance {
     }
 
     public void looseGoods(int lostOther) {
-        int actualLost = 0;
-        if (getStorage() < lostOther)
-            actualLost = getStorage();
-        else
-            actualLost = lostOther;
-
-        ArrayList<GoodsContainer> playerCargos = goodsContainers;
-
-        for (int i = 0; i < actualLost; i++) {
-            int i1 = 0; // indice cargo
-            int j1 = 0; // indice good
-            if (i1 >= 0 && i1 < playerCargos.size()) {
-                GoodsContainer cargo1 = playerCargos.get(i1);
-                if (j1 >= 0 && j1 < cargo1.getGoods().length) {
-                    removeGoods(cargo1, j1);
-                } else
-                    System.out.println("goods index is outbound");
-            } else
-                System.out.println("cargo index is outbound");
-        }
+//        int actualLost = Math.min(getStorage(), lostOther);
+//
+//        ArrayList<GoodsContainer> playerCargos = goodsContainers;
+//
+//        for (int i = 0; i < actualLost; i++) {
+//            int i1 = 0; // indice cargo
+//            int j1 = 0; // indice good
+//            if (i1 >= 0 && i1 < playerCargos.size()) {
+//                GoodsContainer cargo1 = playerCargos.get(i1);
+//                if (j1 >= 0 && j1 < cargo1.getGoods().length) {
+//                    removeGoods(cargo1, j1);
+//                } else
+//                    System.out.println("goods index is outbound");
+//            } else
+//                System.out.println("cargo index is outbound");
+//        }
     }
 
     public ArrayList<CargoHolds> getCargoHolds() {
@@ -724,17 +623,6 @@ public class SpaceshipPlance {
         }
     }
 
-    public int getStorage() {
-        int total = 0;
-        for (CargoHolds c : cargoHolds) {
-            for (GoodsBlock block : c.getGoods()) {
-                if (block != null)
-                    total++;
-            }
-        }
-        return total;
-    }
-
     public int countExposedConnectors() {
 
         exposedConnectors = 0;
@@ -743,14 +631,11 @@ public class SpaceshipPlance {
                 if (inBounds(x, y) && components[y][x] != null) {
                     ComponentTile tile = components[y][x];
 
-                        int[] dirx = DIR_X;
-                        int[] diry = DIR_Y;
-
-                        ConnectorType[] connectors = tile.getConnectors();
+                    ConnectorType[] connectors = tile.getConnectors();
                         for (int i = 0; i < connectors.length; i++) {
                             if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
-                                int x2 = x + dirx[i];
-                                int y2 = y + diry[i];
+                                int x2 = x + DIR_X[i];
+                                int y2 = y + DIR_Y[i];
                                 ComponentTile tile2 = components[y2][x2];
                                 if (tile2 == null)
                                     exposedConnectors++;
@@ -766,59 +651,6 @@ public class SpaceshipPlance {
 
     private boolean askActivateShield(ShieldGenerator shieldGenerator) {
         return true;
-    }
-
-    public void takeHit(Direction direction, int position) {
-        // cammini partendo dalla casella indicata verso il centro
-        // appena trovi un componente lo rimuovi
-        // aggiungere prima i check per la posizione
-        int max_lenght = 7;
-        // casella da cui partire
-        int x = 0, y = 0;
-        switch (direction) {
-            case NORTH:
-                x = position - 4;
-                y = 0;
-                max_lenght = 5;
-                break;
-            case EAST:
-                x = 6;
-                y = position - 5;
-                break;
-            case SOUTH:
-                x = position - 4;
-                y = 4;
-                max_lenght = 5;
-                break;
-            case WEST:
-                x = 0;
-                y = position - 5;
-                break;
-        }
-
-        ComponentTile hit = components[y][x];
-
-        for (int i = 0; i < max_lenght || hit == null; i++) {
-            switch (direction) {
-                case NORTH:
-                    y += 1;
-                    break;
-                case EAST:
-                    x -= 1;
-                    break;
-                case SOUTH:
-                    y -= 1;
-                    break;
-                case WEST:
-                    x += 1;
-                    break;
-            }
-            hit = components[y][x];
-        }
-
-        if (components[y][x] != null) {
-            remove(x, y);
-        }
     }
 
     public int checkProtection(Direction direction, int position) {
@@ -877,16 +709,18 @@ public class SpaceshipPlance {
             return -1; // se non veniamo colpiti
         }
         System.out.println("checkProtection: hit " + hit);
-        if (cannons.contains(hit)) { // problema di ClassCastException
-            int dirP = direction.ordinal();
-            int dirDD = getCannonDirection((Cannon) hit);
-            if (dirP == dirDD) {
-                if (hit instanceof DoubleCannon) {
-                    return 2; // se abbiamo un doppio cannone
+
+        if(hit instanceof Cannon && cannons.contains(hit)){
+                int dirP = direction.ordinal();
+                int dirDD = getCannonDirection((Cannon) hit);
+                if (dirP == dirDD) {
+                    if (hit instanceof DoubleCannon) {
+                        return 2; // se abbiamo un doppio cannone
+                    }
+                    return 1; // se abbiamo un cannone singolo
                 }
-                return 1; // se abbiamo un cannone singolo
-            }
         }
+
         return 0; // se non abbiamo un cannone
     }
 
@@ -897,15 +731,6 @@ public class SpaceshipPlance {
                 return i;
         }
         throw new IllegalStateException("Not a cannon connector in a cannon tile");
-    }
-
-    public boolean getCannonActivation(Direction direction, int position) {
-//        if (checkProtection(direction, position) == true) {
-//            boolean active = askActivateCannon();
-//            if (active) return true;
-//        }
-
-        return false;
     }
 
     private boolean askActivateCannon() {
@@ -919,16 +744,13 @@ public class SpaceshipPlance {
                 ComponentTile tile = components[y][x];
                 if (tile instanceof Cabin) {
 
-                    int[] dirx = DIR_X;
-                    int[] diry = DIR_Y;
-
                     ConnectorType[] connectors = tile.getConnectors();
                     for (int i = 0; i < connectors.length; i++) {
                         // questo approccio funziona perché do per scontato che la nave sia ben connessa a sto punto
                         // Se da quel lato c'è un connettore singolo/doppio/universale vuol dire che è collegato a un'altra casella. Controllo che sia anch'essa una cabina
                         if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
-                            int x2 = x + dirx[i];
-                            int y2 = y + diry[i];
+                            int x2 = x + DIR_X[i];
+                            int y2 = y + DIR_Y[i];
                             ComponentTile tile2 = components[y2][x2];
                             if (tile2 instanceof Cabin){
                                 if (!connectedCabins.contains(tile2)) {
@@ -960,16 +782,6 @@ public class SpaceshipPlance {
         return nPurpleAliens;
     }
 
-    public boolean askPlaceTile() {
-        return true;
-    }
-
-    public void placeTileReserveSpot(ComponentTile tile) {
-        if (reserveSpot.size() < 2)
-            reserveSpot.add(tile);
-        else
-            System.out.println("Full reserve spot");
-    }
 
     public void placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
         if (x < 0 || x > 6 || y < 0 || y > 4 || edgeCases(y, x))
@@ -979,11 +791,6 @@ public class SpaceshipPlance {
         }
         components[y][x] = tile;
         tile.setWellConnected(checkNewTile(x, y));
-    }
-
-    public void placeReserveToComponents(ComponentTile tile, int x, int y) {
-        placeTileComponents(tile, x, y);
-        reserveSpot.remove(tile);
     }
 
 
