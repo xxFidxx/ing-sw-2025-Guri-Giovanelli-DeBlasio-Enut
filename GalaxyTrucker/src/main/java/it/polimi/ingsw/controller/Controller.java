@@ -449,10 +449,19 @@ public class Controller{
             }
             if (cardName != null) {
                 notifyAllListeners(eventCrafter(GameState.DRAW_CARD, card, null));
-                orderPlayers();
-                tmpPlayers = new ArrayList<>(players);
-                isDone.replaceAll((c, v) -> false);
-                manageCard();
+                if(players.size() > 1){
+                    orderPlayers();
+                    tmpPlayers = new ArrayList<>(players);
+                    isDone.replaceAll((c, v) -> false);
+                    manageCard();
+                }else{
+                    if(currentAdventureCard instanceof CombatZoneCard){
+                        drawCard();
+                        notifyAllListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
+                    }
+
+                }
+
             }
 
         } else {

@@ -686,6 +686,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
 
+            case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case DIED -> System.out.println("You are on spectator mode because you died");
         }
         System.out.print("\n> ");
@@ -761,6 +762,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 server.fromChargeToManage(this);
             }
             case DIED -> System.out.println("You are on spectator mode because you died");
+            case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
             case NO_HIT -> System.out.println("You have not been hit");
