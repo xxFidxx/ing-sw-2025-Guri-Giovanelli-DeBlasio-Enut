@@ -4,7 +4,6 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
-import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
@@ -410,7 +409,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
             case EPIDEMIC_MANAGEMENT ->{
                 if (input.equals("0")) {
-                    DataContainer data = currentEvent.getData();
                     while (!server.isEpidemicDone(this)) {
                         System.out.println("Please write the cabinId you want to remove the crew member from");
                         System.out.print("> ");
