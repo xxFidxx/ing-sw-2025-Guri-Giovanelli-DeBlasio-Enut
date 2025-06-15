@@ -324,7 +324,10 @@ public class Controller{
 
             case BATTERIES_MANAGEMENT -> {
                 ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
+
+                if(!pc.isEmpty())
                 printSpaceshipbyTile(listenerbyPlayer.get(player), pc.getFirst());
+
                 event = new Event(state, new BatteriesManagement((int) data, pc));
             }
             case REMOVE_MV_GOODS -> {
@@ -365,7 +368,9 @@ public class Controller{
                     }
                 }
 
+                if(!playerCargos.isEmpty())
                 printSpaceshipbyTile(listenerbyPlayer.get(player), playerCargos.getFirst());
+
                 event = new Event(state, new RemoveMostValuable(cargosToRemove, goodsContainers, batteriesToRemove));
             }
             case SCS_DIR_POS -> {
@@ -1120,7 +1125,9 @@ public class Controller{
         CrewManagement cm;
         System.out.println("sendToCrewManagement: mando in CREW_MANAGEMENT");
 
+        if(!cabins.isEmpty())
         printSpaceshipbyTile(l, cabins.getFirst());
+
         l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostCrew, p));
     }
 
@@ -1293,7 +1300,10 @@ public class Controller{
             }
 
             player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
+
+            if(!playerCargos.isEmpty())
             printSpaceshipbyTile(listener, playerCargos.getFirst());
+
             listener.onEvent(new Event(GameState.CARGO_VIEW, new Cargos(goodsContainers)));
         } else {
             // qua ci sarebbe da gestire se siamo in planets quindi devi aspettare altri oppure in un reward generico quindi lui gestisce e finisce il turno per tutti...
@@ -1431,11 +1441,7 @@ public class Controller{
         } else if (planets.get(i).isBusy()) {
             throw new ControllerExceptions("The chosen planet is busy");
         } else if (!player.getSpaceshipPlance().checkStorage()) {
-            try {
                 throw new CargoManagementException("You got 0 storage space, you can't manage any good");
-            } finally {
-                manageCard();
-            }
         }
 
         // Se tutto va bene
