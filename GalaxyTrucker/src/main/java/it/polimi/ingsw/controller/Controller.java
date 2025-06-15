@@ -321,6 +321,8 @@ public class Controller{
                 if (playersCrew < lostCrew) {
                     lostCrew = playersCrew;
                 }
+
+
                 event = new Event(state, new CrewManagement(cabins, lostCrew));
             }
 
