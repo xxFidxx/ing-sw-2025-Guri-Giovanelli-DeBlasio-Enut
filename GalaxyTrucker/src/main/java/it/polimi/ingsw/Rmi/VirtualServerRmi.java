@@ -93,4 +93,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean showCardsbyDeck(VirtualViewRmi clientRmi, int nDeck) throws  RemoteException;
 
     void endShowCards(VirtualViewRmi clientRmi, int i) throws RemoteException;
+
+    boolean removeFigureEpidemic(VirtualViewRmi clientRmi, int cabinId) throws RemoteException;
+
+    boolean isEpidemicDone(VirtualViewRmi clientRmi) throws RemoteException;
 }

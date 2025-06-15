@@ -219,9 +219,9 @@ public class Controller{
                     }
                 }
 
-                ArrayList<AdventureCardData> cardsToShow = new ArrayList<>();
+                ArrayList<Card> cardsToShow = new ArrayList<>();
                 for(AdventureCard card : advCardsToShow) {
-                    cardsToShow.add(new AdventureCardData(card.getName(), card.getLevel()));
+                    cardsToShow.add(new Card(card.getName(), card.getLevel()));
                 }
 
                 event = new Event(state, new AdventureCardsData(cardsToShow, nDeck));
@@ -1699,6 +1699,35 @@ public class Controller{
         return false;
     }
 
+    public boolean removeFigureEpidemic(ClientListener listener, int cabinId) {
+        Player p = playerbyListener.get(listener);
+        ArrayList<Cabin> interconnectedCabins = p.getSpaceshipPlance().getInterconnectedCabins();
+        for (Cabin c : interconnectedCabins) {
+            if (c.getId() == cabinId) {
+                Figure[] figures = c.getFigures();
+
+                if (figures[1] != null) {
+                    figures[1] = null;
+                    interconnectedCabins.remove(c);
+                    return true;
+                } else if (figures[0] != null) {
+                    figures[0] = null;
+                    interconnectedCabins.remove(c);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isEpidemicDone(ClientListener listener) {
+        Player p = playerbyListener.get(listener);
+        return p.getSpaceshipPlance().checkInterconnectedCabinsEmpty();
+    }
+
+
+
+
     private void checkEarlyEndConditions() {
         List<Player> playersToRemove = new ArrayList<>();
 
@@ -1959,4 +1988,6 @@ public class Controller{
 
         listener.onEvent(eventCrafter(GameState.ASSEMBLY, null, playerbyListener.get(listener)));
     }
+
+
 }

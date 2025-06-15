@@ -15,8 +15,9 @@ public class SpaceshipPlance {
     private final ArrayList<ComponentTile> reserveSpot;
     private final ArrayList<CargoHolds> cargoHolds;
     private final ArrayList<Engine> engines;
-    private ArrayList<Cannon> cannons;
+    private final ArrayList<Cannon> cannons;
     private final ArrayList<Cabin> cabins;
+    private final ArrayList<Cabin> interconnectedCabins;
     private final ArrayList<PowerCenter> powerCenters;
     private final boolean[][] visited;
     private final int[][] shownComponents;
@@ -42,39 +43,22 @@ public class SpaceshipPlance {
         this.shieldGenerators = new ArrayList<>();
         this.cannons = new ArrayList<>();
         this.cabins = new ArrayList<>();
+        this.interconnectedCabins = new ArrayList<>();
         this.cargoHolds = new ArrayList<>();
         this.powerCenters = new ArrayList<>();
         this.engines = new ArrayList<>();
-        this.cannons = new ArrayList<>();
-        // ci creiamo un arraylist di engines per simulare open space card
-        /*this.engines = new ArrayList<>(List.of(
-                new DoubleEngine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 1),
-                new DoubleEngine(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 2),
-                new Engine(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 3),
-                new Engine(new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL}, 4),
-                new Engine(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.DOUBLE, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 5)
-        ));
-        this.cannons = new ArrayList<>(List.of(
-                new DoubleCannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL, ConnectorType.SINGLE}, 6),
-                new DoubleCannon(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 7),
-                new DoubleCannon(new ConnectorType[]{ConnectorType.DOUBLE, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 8),
-                new Cannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.SINGLE, ConnectorType.DOUBLE}, 9),
-                new Cannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL}, 10),
-                new Cannon(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 11),
-                new Cannon(new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.CANNON, ConnectorType.SINGLE, ConnectorType.UNIVERSAL}, 12)
-        ));*/
         this.nAstronauts = 0;
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;
         this.goodsContainers = new ArrayList<>();
 
-        ConnectorType[] cannonConnectors = {
+        ConnectorType[] centralCabinConnectors = {
                 ConnectorType.UNIVERSAL,   // Lato superiore
                 ConnectorType.UNIVERSAL,   // Lato destro
                 ConnectorType.UNIVERSAL,   // Lato inferiore
                 ConnectorType.UNIVERSAL    // Lato sinistro
         };
-        components[2][3] = new Cabin(cannonConnectors, true, 100);
+        components[2][3] = new Cabin(centralCabinConnectors, true, 100);
         ComponentTile tile = components[2][3];
         tile.setWellConnected(true);
     }
@@ -148,6 +132,7 @@ public class SpaceshipPlance {
                             cabins.add(cab);
                             // I reset aliens of previous check, maybe the lifesupport system has been destroyed so I need to do that to ensure the alien doesnt remain on the cabin
                             AlienColor[] colors = cab.getLifeSupportSystemColor();
+                            Figure[] figures = cab.getFigures();
                             colors[0] = null;
                             colors[1] = null;
                                 for (int dir = 0; dir < 4; dir++) {
@@ -155,7 +140,7 @@ public class SpaceshipPlance {
                                     int ny = y + DIR_Y[dir];
                                     if (inBounds(nx, ny) && components[ny][nx] != null) {
                                         ComponentTile tile2 = components[ny][nx];
-                                        if (tile2 instanceof LifeSupportSystem) {
+                                        if (tile2 instanceof LifeSupportSystem || tile2 instanceof Cabin) {
                                             ConnectorType a = tile.getConnectors()[dir];
                                             ConnectorType b = components[ny][nx].getConnectors()[(dir + 2) % 4];
 
@@ -163,13 +148,17 @@ public class SpaceshipPlance {
                                                 // se cambio l'ordine dei colori nell'enum, cambierà anche questo. Basta usare sempre l'ordinal e sarà tutto coerente.
                                                 // la cabina ha un array di AlienColors a 2 posti, metto a true la casella corrispondente al colore dell'alieno, faccio
                                                 // cosi perchè nel caso ci siano 2 colori, sono sicuro che non vado a sovrascrivere la casella contenente già un colore
-                                                colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
+                                                if(tile2 instanceof LifeSupportSystem)
+                                                    colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
+                                                else if(figures.length > 0)
+                                                    // if a cabin has 0 crew, I dont need to use it epidemic card
+                                                    interconnectedCabins.add(cab);
                                             }
                                         }
                                     }
                                 }
-                                Figure[] figures = cab.getFigures();
-                                // if a lifesupport has been removed, it means there is an alien on the cabin but there isnt anymore the corresponding color in the colors array
+                                // if a lifesupport has been removed, it means there is an alien on the cabin but there isn't anymore the corresponding color in the colors array
+                                // this could happen because I put every time colors setted to null, and if there is no more link between cab and life support, the corresponding color is null
                                 if(figures[0] != null && figures[0] instanceof Alien && colors[((Alien) figures[0]).getColor().ordinal()] == null)
                                     figures[0] = null;
                         }
@@ -607,6 +596,10 @@ public class SpaceshipPlance {
 
     public ArrayList<Cabin> getCabins() {
         return cabins;
+    }
+
+    public ArrayList<Cabin> getInterconnectedCabins() {
+        return interconnectedCabins;
     }
 
     public ArrayList<ShieldGenerator> getShields() {
@@ -1096,6 +1089,14 @@ public class SpaceshipPlance {
 
     public ArrayList<ComponentTile> getReserveSpot() {
         return reserveSpot;
+    }
+
+    public boolean checkInterconnectedCabinsEmpty(){
+        return interconnectedCabins.isEmpty();
+    }
+
+    public void removeInterconnectedCabin(Cabin cab){
+         interconnectedCabins.remove(cab);
     }
 
 

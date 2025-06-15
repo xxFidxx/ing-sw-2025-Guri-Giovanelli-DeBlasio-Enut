@@ -408,6 +408,40 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
 
+            case EPIDEMIC_MANAGEMENT ->{
+                if (input.equals("0")) {
+                    DataContainer data = currentEvent.getData();
+                    while (!server.isEpidemicDone(this)) {
+                        System.out.println("Please write the cabinId you want to remove the crew member from");
+                        System.out.print("> ");
+                        String line = scan.nextLine();
+                        boolean removed = false;
+                        try {
+                            String[] parts = line.split(" ");
+                            if (parts.length == 1) {
+                                int cabinId = Integer.parseInt(parts[0]);
+                                if (server.removeFigureEpidemic(this, cabinId)){
+                                    removed = true;
+                                } else {
+                                    System.out.println("You have to put a cabinId containing at least one crew member");
+                                }
+                            } else {
+                                System.out.println("Wrong input. You need to put a number\n");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, ensure to write only a number");
+                        } catch (RemoteException e) {
+                            System.out.println("Error " + e.getMessage());
+                        }
+                        if (removed)
+                            System.out.println("Successfully removed");
+                    }
+                    server.endCrewManagement(this);
+                } else {
+                    System.out.print("Not accepted input, please try again:\n");
+                }
+            }
+
             case BATTERIES_MANAGEMENT ->{
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
@@ -728,6 +762,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
                 System.out.println("Press 0 to continue");
             }
+
+            case EPIDEMIC_MANAGEMENT -> {
+                System.out.println("Here are your interconnected cabins with at least one crew member, you will have to remove a crew member from each of the shown cabins");
+                System.out.println("Press 0 to continue");
+            }
+
             case BATTERIES_MANAGEMENT -> {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
                 System.out.println("Press 0 to continue");
@@ -820,6 +860,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strength, " + "You have " + es.getPlayerStrenght() + " fire strength without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
+            case EpidemicManagement em -> printConnectedCabin(em.getCabins());
             case LostDays ld -> System.out.println("You lose " + ld.getLd() + " flight days");
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
@@ -833,9 +874,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         System.out.print("> ");
     }
 
-    private void printCards(ArrayList<AdventureCardData> adventureCards) {
+    private void printConnectedCabin(ArrayList<Cabin> cabins) {
+        for(Cabin c : cabins){
+            System.out.println(c);
+        }
+    }
+
+    private void printCards(ArrayList<Card> adventureCards) {
         System.out.println();
-        for(AdventureCardData c: adventureCards){
+        for(Card c: adventureCards){
             System.out.println("Card: " + c.getName() + ", level: " + c.getLevel());
         }
         System.out.println();
