@@ -63,6 +63,7 @@ public enum GameState {
     ENEMY_WIN,
     ENEMY_DRAW,
     NO_DOUBLE_CANNON,
+    NO_DOUBLE_ENGINE,
     SCS_DIR_POS,
     BMS_DIR_POS,
     SMS_DIR_POS,

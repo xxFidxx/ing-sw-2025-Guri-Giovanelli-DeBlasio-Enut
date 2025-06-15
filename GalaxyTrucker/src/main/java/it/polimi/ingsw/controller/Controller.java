@@ -251,7 +251,10 @@ public class Controller{
                         numDE++;
                     }
                 }
-                event = new Event(state, new DoubleEngineNumber(es, numDE));
+                if(numDE > 0)
+                    event = new Event(state, new DoubleEngineNumber(es, numDE));
+                else
+                    event = eventCrafter(GameState.NO_DOUBLE_ENGINE, null, null);
             }
 
             case CHOOSE_PLANETS -> {
@@ -282,7 +285,6 @@ public class Controller{
                     System.out.println("handleWaitersEnemy: mando in CHOOSE_CANNON");
                     event = new Event(state, new DoubleCannonList(doubleCannons));
                 } else {
-                    ClientListener listener = listenerbyPlayer.get(player);
                     System.out.println("handleWaitersEnemy: mando in NO_DOUBLE_CANNON");
                     event = eventCrafter(GameState.NO_DOUBLE_CANNON, null, null);
                 }
@@ -321,8 +323,9 @@ public class Controller{
                 if (playersCrew < lostCrew) {
                     lostCrew = playersCrew;
                 }
-
-
+                if (!cabins.isEmpty()) {
+                    printSpaceshipbyTile(listenerbyPlayer.get(player), cabins.getFirst());
+                }
                 event = new Event(state, new CrewManagement(cabins, lostCrew));
             }
 
@@ -783,7 +786,9 @@ public class Controller{
         currentAbandonedShipCard.setActivatedPlayer(p);
         currentAdventureCard.activate();
         crewended=true;
-        sendToCrewManagement(p);
+        //sendToCrewManagement(p);
+        int lostCrew = ((AbandonedShipCard)currentAdventureCard).getLostCrew();
+        listener.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostCrew, p));
     }
 
     private void activateAbandonedStationCard(ClientListener listener) {
@@ -933,9 +938,11 @@ public class Controller{
             case CombatZoneCard czc -> {
                 if (((CombatZoneCard) currentAdventureCard).getType() == CombatZoneType.LOSTCREW) {
                     if (!combatZoneFlag) {
-                        combatZoneFlag = true;
                         isDone.put(listener,true);
                         if(!isDone.containsValue(false)){
+                            System.out.println("fromChargeToManage: combatZoneFlag " + combatZoneFlag);
+                            combatZoneFlag = true;
+                            System.out.println("fromChargeToManage: mi trovo il minEnginePlayer");
                             int minEngine = tmpPlayers.stream().mapToInt(Player::getEngineStrenght).min().orElse(Integer.MAX_VALUE);
                             List<Player> minEnginePlayers = tmpPlayers.stream().filter(p -> p.getEngineStrenght() == minEngine).collect(Collectors.toList());
                             if (minEnginePlayers.size() == 1) {
@@ -945,25 +952,29 @@ public class Controller{
                                 handleMinEngine(l);
                                 l.onEvent(eventCrafter(GameState.LOST_CREW, lostOther,null));
                                 //minEnginePlayer.loseCrew(lostOther);
-                                sendToCrewManagement(minEnginePlayer);
+                                l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostOther, minEnginePlayer));
+                                //sendToCrewManagement(minEnginePlayer);
                             } else {
                                 notifyAllListeners(eventCrafter(GameState.SAME_ENGINE, null, null));
+                                combatZoneCannons();
                             }
                             //combatZoneCannons();
                         } else {
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                         }
                     } else {
-                        combatZoneFlag = false;
                         isDone.put(listener, true);
                         if (!isDone.containsValue(false)) {
-                            Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
-                            if (minFirePlayer != null) {
+                            double minFire = tmpPlayers.stream().mapToDouble(Player::getFireStrenght).min().orElse(Integer.MAX_VALUE);
+                            List<Player> minFirePlayers = tmpPlayers.stream().filter(p -> p.getEngineStrenght() == minFire).collect(Collectors.toList());
+                            if (minFirePlayers.size() == 1) {
+                                Player minFirePlayer = minFirePlayers.get(0);
                                 ClientListener l = listenerbyPlayer.get(minFirePlayer);
                                 handleMinFire(l);
                                 combatZoneShots(minFirePlayer);
                             } else {
                                 notifyAllListeners(eventCrafter(GameState.SAME_FIRE, null, null));
+                                System.out.println("fromChargeToManage: vado in resetShowAndDraw");
                                 resetShowAndDraw();
                             }
                         } else {
@@ -972,9 +983,9 @@ public class Controller{
                     }
                 } else {
                     if (!combatZoneFlag) {
-                        combatZoneFlag = true;
                         isDone.put(listener, true);
                         if (!isDone.containsValue(false)) {
+                            combatZoneFlag = true;
                             Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
                             if (minFirePlayer != null) {
                                 int ld = ((CombatZoneCard) currentAdventureCard).getLostDays();
@@ -991,7 +1002,6 @@ public class Controller{
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                         }
                     } else {
-                        combatZoneFlag = false;
                         isDone.put(listener, true);
                         if (!isDone.containsValue(false)) {
                             Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
@@ -1053,6 +1063,7 @@ public class Controller{
         }
         currentProjectile = shots[i];
         shots[i] = null;
+        currentDiceThrow = game.throwDices();
         activateMeteor(minEquipPlayer);
 
     }
@@ -1106,7 +1117,9 @@ public class Controller{
             Player p = playerbyListener.get(l);
             if (defeatedPlayers.contains(p)) {
                 defeatedPlayers.remove(p);
-                sendToCrewManagement(p);
+                //sendToCrewManagement(p);
+                int lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
+                l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostCrew, p));
             } else {
                 System.out.println("defeatedBySlavers: mando in WAIT_PLAYER");
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
@@ -2010,4 +2023,11 @@ public class Controller{
     }
 
 
+    /*public void fromChargeOrShots(ClientListenerRmi listener) {
+        Player p = playerbyListener.get(listener);
+        if(currentAdventureCard instanceof CombatZoneCard)
+            combatZoneShots(p);
+        else
+            fromChargeToManage(listener);
+    }*/
 }

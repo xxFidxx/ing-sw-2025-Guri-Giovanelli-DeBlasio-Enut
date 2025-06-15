@@ -805,6 +805,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double cannon");
                 server.fromChargeToManage(this);
             }
+            case NO_DOUBLE_ENGINE -> {
+                System.out.println("You don't have any double engine");
+                server.fromChargeToManage(this);
+            }
             case DIED -> System.out.println("You are on spectator mode because you died");
             case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
@@ -812,9 +816,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case NO_HIT -> System.out.println("You have not been hit");
             case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
-            case SAME_EQUIP -> System.out.println("No one is been penalized because there are two players with the same equipment");
-            case SAME_FIRE -> System.out.println("No one is been penalized because there are two players with the same fire strength");
-            case SAME_ENGINE -> System.out.println("No one is been penalized because there are two players with the same engine strength");
+            case SAME_EQUIP -> System.out.println("No one was penalized because there are at least two players with the same equipment");
+            case SAME_FIRE -> System.out.println("No one was penalized because there are at least two players with the same fire strength");
+            case SAME_ENGINE -> System.out.println("No one was penalized because there are at least two players with the same engine strength");
         }
         System.out.print("> ");
     }
