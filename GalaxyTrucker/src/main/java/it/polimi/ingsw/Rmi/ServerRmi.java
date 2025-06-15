@@ -160,7 +160,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void charge(VirtualViewRmi client, int i) throws RemoteException {
+    public void chargeEngines(VirtualViewRmi client, int i) throws RemoteException {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.charge(listener, i);
     }
@@ -261,6 +261,12 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public boolean isEpidemicDone(VirtualViewRmi clientRmi) throws RemoteException {
         ClientListenerRmi listener = clientListeners.get(clientRmi);
         return controller.isEpidemicDone(listener);
+    }
+
+    @Override
+    public void fromMvGoodstoBatteries(VirtualViewRmi clientRmi, int nBatteries) throws RemoteException {
+        ClientListenerRmi listener = clientListeners.get(clientRmi);
+        controller.fromMvGoodstoBatteries(listener, nBatteries);
     }
 
 

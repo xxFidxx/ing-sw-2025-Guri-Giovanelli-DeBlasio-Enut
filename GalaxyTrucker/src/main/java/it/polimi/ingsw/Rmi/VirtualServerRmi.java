@@ -42,7 +42,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException;
 
-    void charge(VirtualViewRmi clientRmi, int i) throws RemoteException;
+    void chargeEngines(VirtualViewRmi clientRmi, int i) throws RemoteException;
 
     void putTileBack(VirtualViewRmi client) throws RemoteException;
 
@@ -97,4 +97,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean removeFigureEpidemic(VirtualViewRmi clientRmi, int cabinId) throws RemoteException;
 
     boolean isEpidemicDone(VirtualViewRmi clientRmi) throws RemoteException;
+
+    void fromMvGoodstoBatteries(VirtualViewRmi clientRmi, int nBatteries) throws RemoteException;
 }

@@ -242,7 +242,8 @@ public class Controller{
                 int al = player.getSpaceshipPlance().getBrownAliens() + player.getSpaceshipPlance().getPurpleAliens();
                 event = new Event(state, new PlayerInfo(nick, pos, cred, astr, al));
             }
-            case CHOOSE_BATTERY -> {
+
+            case CHOOSE_ENGINE -> {
                 int es = player.getEngineStrenght();
                 int numDE = 0;
                 for (Engine e : player.getSpaceshipPlance().getEngines()) {
@@ -252,6 +253,7 @@ public class Controller{
                 }
                 event = new Event(state, new DoubleEngineNumber(es, numDE));
             }
+
             case CHOOSE_PLANETS -> {
                 event = new Event(state, new PlanetsBlock((ArrayList<Planet>) data));
             }
@@ -322,7 +324,7 @@ public class Controller{
                 event = new Event(state, new CrewManagement(cabins, lostCrew));
             }
 
-            case BATTERIES_MANAGEMENT -> {
+            case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
                 ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
 
                 if(!pc.isEmpty())
@@ -663,8 +665,8 @@ public class Controller{
 
                     for (ClientListener listener : listeners) {
                         Player player = playerbyListener.get(listener);
-                        System.out.println("listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, null, player));");
-                        listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, null, player));
+                        System.out.println("listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));");
+                        listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
                     }
                 } else {
                     for (ClientListener listener : listeners) {
@@ -834,7 +836,7 @@ public class Controller{
     public void handleWaitersBattery(ClientListener listener, Player player) {
         for (ClientListener l : listeners) {
             if (l == listener) {
-                listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, null, player));
+                listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
             } else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
@@ -1031,7 +1033,7 @@ public class Controller{
     public void combatZoneEngine() {
         for (ClientListener listener : listeners) {
             Player player = playerbyListener.get(listener);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_BATTERY, null, player));
+            listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
         }
 
     }
@@ -1798,34 +1800,35 @@ public class Controller{
     }
 
     public boolean removeBatteries(ClientListener listener, int powerCenterId, int batteries) {
+
         Player p = playerbyListener.get(listener);
         ArrayList<PowerCenter> powerCenters = p.getSpaceshipPlance().getPowerCenters();
-        boolean error = false;
+
         for (PowerCenter pc : powerCenters) {
             if (pc.getId() == powerCenterId) {
                 boolean[] pcBatteries = pc.getBatteries();
-                while (batteries > 0 && !error) {
-                    if (batteries == 1) {
-                        if (pcBatteries[1]) {
-                            pcBatteries[1] = false;
-                            batteries--;
-                        } else if (pcBatteries[0]) {
-                            pcBatteries[0] = false;
-                            batteries--;
-                        } else
-                            error = true;
-                    } else if (batteries == 2) {
-                        if (pcBatteries[1]) {
-                            pcBatteries[1] = false;
-                            batteries--;
-                        } else
-                            error = true;
-                    } else
-                        error = true;
+                int available = 0;
+
+                for (boolean b : pcBatteries) {
+                    if (b) available++;
                 }
+
+                if (available < batteries) return false;
+
+                // rimuovo da sx a dx
+                int removed = 0;
+                for (int i = 0; i < pcBatteries.length && removed < batteries; i++) {
+                    if (pcBatteries[i]) {
+                        pcBatteries[i] = false;
+                        removed++;
+                    }
+                }
+
+                return true;
             }
         }
-        return !error;
+
+        return false;
     }
 
     public void endManagement(ClientListener listener) {
@@ -1864,6 +1867,13 @@ public class Controller{
             case CombatZoneCard czc -> combatZoneCannons();
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
         }
+    }
+
+    public void fromMvGoodstoBatteries(ClientListener listener, int nBatteries) {
+        if(nBatteries > 0)
+        listener.onEvent(eventCrafter(GameState.REMOVE_EXTRA_BATTERIES, nBatteries, playerbyListener.get(listener)));
+        else
+            endMVGoodsManagement(listener);
     }
 
     public void endMVGoodsManagement(ClientListener listener) {

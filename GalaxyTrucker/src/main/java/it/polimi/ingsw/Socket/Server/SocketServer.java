@@ -356,7 +356,7 @@ public class SocketServer implements VirtualServerSocket {
                 case "addTile":
                     addTile(out, (int)parameters[0], (int)parameters[1]);
                     break;
-                case "charge":
+                case "chargeEngines":
                     charge(out, (int)parameters[0]);
                     break;
                 case "putTileBack":

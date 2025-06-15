@@ -440,7 +440,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
 
-            case BATTERIES_MANAGEMENT ->{
+            case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES ->{
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nBatteries = ((BatteriesManagement) data).getNBatteries();
@@ -455,7 +455,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             if (parts.length == 2) {
                                 int powerCenterId = Integer.parseInt(parts[0]);
                                 int batteries = Integer.parseInt(parts[1]);
-                                    if (batteries <= 2 && batteries > 0) {
+                                    if (batteries > 0 && batteries <= 3 ) {
                                         if (server.removeBatteries(this, powerCenterId, batteries)) {
                                             nBatteries-= batteries;
                                             removed = true;
@@ -463,7 +463,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                             System.out.println("You have to put a PowerCenter containing a battery");
                                         }
                                     } else {
-                                        System.out.println("You have to choose 1 or 2 batteries to remove, please retry");
+                                        System.out.println("You have to choose 1 to 3 batteries to remove, please retry");
                                     }
 
                             } else {
@@ -477,7 +477,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endManagement(this);
+                    if(currentEvent.getState() == GameState.BATTERIES_MANAGEMENT)
+                        server.endManagement(this);
+                    else
+                        server.endMVGoodsManagement(this);
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
@@ -584,16 +587,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
-            case CHOOSE_BATTERY -> {
+            case CHOOSE_ENGINE -> {
                 switch (input) {
                     case "0" -> server.fromChargeToManage(this);
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert the number of double engines to charge: ");
+                            System.out.print("Insert the number of double engines to chargeEngines: ");
                             try {
                                 int numDE = Integer.parseInt(scan.nextLine());
-                                server.charge(this, numDE);
+                                server.chargeEngines(this, numDE);
                                 inputValid = true;
                             } catch (ControllerExceptions e) {
                                 System.out.println(e.getMessage());
@@ -607,6 +610,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
             case CHOOSE_CANNON -> {
                 switch (input) {
                     case "0" -> server.fromChargeToManage(this);
@@ -614,7 +618,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert the index of double cannons to charge: ");
+                            System.out.println("Insert the index of double cannons to chargeEngines: ");
                             System.out.print("> ");
                             String line = scan.nextLine();
                             String[] parts = line.trim().split(" ");
@@ -685,6 +689,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nGoods = ((RemoveMostValuable) data).getNGoods();
+                    int nBatteries = ((RemoveMostValuable) data).getBatteriesToRemove();
                     while ((nGoods > 0)) {
                             System.out.println("You must remove " + nGoods + " goods");
                             System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
@@ -712,7 +717,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    server.endMVGoodsManagement(this);
+                    server.fromMvGoodstoBatteries(this, nBatteries);
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
@@ -766,10 +771,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Press 0 to continue");
             }
 
-            case BATTERIES_MANAGEMENT -> {
+            case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
                 System.out.println("Press 0 to continue");
             }
+
             case REMOVE_MV_GOODS -> {
                 System.out.println("Here are your goods, you will have to remove the most valuable ones");
                 System.out.println("Press 0 to continue");
@@ -783,7 +789,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
-            case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
+            case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to chargeEngines your double engines ");
             case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");

@@ -1,5 +1,4 @@
 package it.polimi.ingsw.Socket.Client;
-import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.Socket.SocketWrapper;
 import it.polimi.ingsw.controller.network.Event;
@@ -561,7 +560,7 @@ public class ClientSocket implements VirtualViewSocket {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
-            case CHOOSE_BATTERY -> {
+            case CHOOSE_ENGINE -> {
                 switch (input) {
                     case "0" -> {
                         EventSender("manageCard" , new Object[0]);
@@ -574,10 +573,10 @@ public class ClientSocket implements VirtualViewSocket {
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert the number of double engines to charge: ");
+                            System.out.print("Insert the number of double engines to chargeEngines: ");
                             try {
                                 int numDE = Integer.parseInt(scan.nextLine());
-                                EventSender("charge" , new Object[]{numDE});
+                                EventSender("chargeEngines" , new Object[]{numDE});
                                 try {
                                     inputValid = handleServerResponse();
                                 } catch (InterruptedException e) {
@@ -605,7 +604,7 @@ public class ClientSocket implements VirtualViewSocket {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert the index of double cannons to charge: ");
+                            System.out.println("Insert the index of double cannons to chargeEngines: ");
                             System.out.print("> ");
                             String line = scan.nextLine();
                             String[] parts = line.trim().split(" ");
@@ -791,7 +790,7 @@ public class ClientSocket implements VirtualViewSocket {
             case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
-            case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
+            case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to chargeEngines your double engines ");
             case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
