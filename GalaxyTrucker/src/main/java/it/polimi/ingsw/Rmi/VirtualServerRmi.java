@@ -50,6 +50,8 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void manageCard() throws RemoteException;
 
+    void handlePlanets(VirtualViewRmi clientRmi) throws RemoteException;
+
     void fromChargeToManage(VirtualViewRmi clientRmi) throws RemoteException ;
 
     void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException ;

@@ -599,22 +599,20 @@ public class Controller{
             }
 
             case PlanetsCard pc -> {
-                if (tmpPlayers.isEmpty()) {
-                    resetShowAndDraw();
-                    return;
-                }
-                game.orderPlayers();
                 currentPlayer = tmpPlayers.getLast();
+                System.out.println("PlanetsCard, currentPlayer: " + currentPlayer);
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 if (game.freePlanets(currentAdventureCard, currentPlanetsCard.getPlanets())) {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    tmpPlayers.remove(currentPlayer);
+                    // tmpPlayers.remove(currentPlayer);
+                    System.out.println("PlanetsCard: mando in handleWaitersPlanets");
                     handleWaitersPlanets(l);
                 } else {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
-                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                    // l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                     tmpPlayers.remove(currentPlayer);
-                    manageCard();
+                    handlePlanets(l);
+                    // manageCard();
                 }
             }
 
@@ -695,6 +693,15 @@ public class Controller{
             }
 
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+        }
+    }
+
+    public void handlePlanets(ClientListener l) {
+        isDone.put(l, true);
+        if(!isDone.containsValue(false)){
+            resetShowAndDraw();
+        } else {
+            l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 
@@ -888,15 +895,15 @@ public class Controller{
     }
 
     private void handleWaitersPlanets(ClientListener listener) {
-        for (Player player: players) {
-            ClientListener l= listenerbyPlayer.get(player);
+        for (Player p: tmpPlayers) {
+            ClientListener l = listenerbyPlayer.get(p);
             if (l == listener) {
+                tmpPlayers.remove(currentPlayer);
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS, currentPlanetsCard.getPlanets(), null));
             } else
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
-
     }
 
     public void fromChargeToManage(ClientListener listener) {
@@ -1541,7 +1548,10 @@ public class Controller{
         player.setReward(null);
         cargoended = true;
         System.out.println("Cargo management ended");
-        manageCard();
+        if(currentAdventureCard instanceof PlanetsCard)
+            handlePlanets(listener);
+        else
+            manageCard();
     }
 
 
@@ -1676,10 +1686,6 @@ public class Controller{
         Direction direction = currentProjectile.getDirection();
         System.out.println("playerHit: mando in takeHit");
         takeHit(listener, direction, currentDiceThrow);
-        if (currentAdventureCard instanceof CombatZoneCard) {
-            combatZoneShots(p);
-        } else
-            waitForNextShot(listener);
     }
 
     public void playerProtected(ClientListener listener) throws ControllerExceptions {
@@ -2021,6 +2027,10 @@ public class Controller{
             removeAdjust(l, x, y);
         } else {
             l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
+            if (currentAdventureCard instanceof CombatZoneCard) {
+                combatZoneShots(p);
+            } else
+                waitForNextShot(l);
         }
     }
 

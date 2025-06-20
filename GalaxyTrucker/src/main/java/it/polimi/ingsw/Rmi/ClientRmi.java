@@ -664,7 +664,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case CHOOSE_PLANETS -> {
                 switch (input) {
-                    case "0" -> server.manageCard();
+                    case "0" -> server.handlePlanets(this);
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
