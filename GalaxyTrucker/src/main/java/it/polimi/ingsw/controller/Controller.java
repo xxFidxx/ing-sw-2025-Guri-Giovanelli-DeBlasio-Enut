@@ -455,9 +455,9 @@ public class Controller{
 
         if (!cards.isEmpty() || players.isEmpty()) {
             Random random = new Random();
-            //int randomNumber = random.nextInt(cards.size());
-            //currentAdventureCard = cards.get(randomNumber);
-            currentAdventureCard = cards.getFirst();
+            int randomNumber = random.nextInt(cards.size());
+            currentAdventureCard = cards.get(randomNumber);
+            //currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
@@ -476,8 +476,8 @@ public class Controller{
                     manageCard();
                 }else{
                     if(currentAdventureCard instanceof CombatZoneCard){
-                        drawCard();
                         notifyAllListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
+                        drawCard();
                     }
 
                 }
@@ -710,6 +710,7 @@ public class Controller{
         isDone.remove(listener);
         System.out.println("handleEarlyEnd " + player);
         players.remove(player);
+        tmpPlayers.remove(player);
         listener.onEvent(eventCrafter(GameState.DIED, null, null));
     }
 
@@ -1820,18 +1821,15 @@ public class Controller{
 
 
     private void checkEarlyEndConditions() {
-        List<Player> playersToRemove = new ArrayList<>();
-
-        for (Player player : players) {
-            System.out.println("Player early condition checked " + player);
+        Iterator<Player> iterator = players.iterator();
+        while (iterator.hasNext()) {
+            Player player = iterator.next();
             if (player.getSpaceshipPlance().getnAstronauts() == 0 ||
                     players.getLast().getPlaceholder().getPosizione() > player.getPlaceholder().getPosizione() + 18) {
-                playersToRemove.add(player);
+                System.out.println("Player early condition checked " + player);
+                iterator.remove();
+                handleEarlyEnd(player);
             }
-        }
-
-        for (Player player : playersToRemove) {
-            handleEarlyEnd(player);
         }
     }
 
@@ -1840,6 +1838,7 @@ public class Controller{
         if (players.isEmpty()) {
             notifyAllListeners(eventCrafter(GameState.END_GAME, null, null));
         } else {
+            isDone.replaceAll((c, v) -> false);
             for (Player player : players) {
                 ClientListener listener = listenerbyPlayer.get(player);
                 listener.onEvent(eventCrafter(GameState.ASK_SURRENDER, null, null));
