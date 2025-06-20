@@ -766,10 +766,8 @@ public class SpaceshipPlance {
         return nAstronauts;
     }
 
-    public int getnBrownAliens() {
-        return nBrownAliens;
+    public int getnBrownAliens() {return nBrownAliens;
     }
-
 
     public int getnPurpleAliens() {
         return nPurpleAliens;

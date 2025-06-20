@@ -1216,14 +1216,15 @@ public class Controller{
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
         if (isDone.get(listener))
-            throw new Exception("The player was already done crafting!\n");
+            return;
 
         int pos;
+        int checkLeader;
         synchronized (isDone) {
             isDone.replace(listener, true);
             synchronized (GameLock) {
                 pos = isDone.keySet().size();
-
+                checkLeader = pos-1;
                 for (Boolean done : isDone.values()) {
                     if (done) {
                         pos--;
@@ -1231,6 +1232,7 @@ public class Controller{
                 }
             }
         }
+
 
         int realpos;
 
@@ -1249,10 +1251,13 @@ public class Controller{
         String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
         listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor, null));
 
+        System.out.println("pos: " + pos);
+        System.out.println("checkLeader: " + checkLeader);
+
         synchronized (isDone) {
             if (!isDone.containsValue(false))
                 handleCraftingEnded();
-            else if(pos==3)
+            else if(checkLeader == pos)
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER_LEADER, null, null));
             else
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
@@ -2067,8 +2072,13 @@ public class Controller{
 
             notifyAllListeners(eventCrafter(GameState.TIMER_DONE, null, null));
 
-            for(ClientListener listener: listeners)
-            listener.onEvent(eventCrafter(GameState.ASSEMBLY, null, playerbyListener.get(listener)));
+            for(ClientListener listener: listeners) {
+                try {
+                    playerIsDoneCrafting(listener);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }).start();
 
         return true;
