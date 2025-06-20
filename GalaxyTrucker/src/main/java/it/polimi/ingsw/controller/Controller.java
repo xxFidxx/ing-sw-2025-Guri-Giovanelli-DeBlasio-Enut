@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.game.Timer;
 import it.polimi.ingsw.model.resources.*;
 import it.polimi.ingsw.model.game.*;
 
@@ -442,6 +443,8 @@ public class Controller{
         for(ClientListener listener: listeners){
             listener.onEvent(eventCrafter(currentGameState, null, playerbyListener.get(listener)));
         }
+
+        game.getTimer().start();
 
     }
 
@@ -1249,6 +1252,8 @@ public class Controller{
         synchronized (isDone) {
             if (!isDone.containsValue(false))
                 handleCraftingEnded();
+            else if(pos==3)
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER_LEADER, null, null));
             else
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
@@ -2037,6 +2042,37 @@ public class Controller{
         }
 
         listener.onEvent(eventCrafter(GameState.ASSEMBLY, null, playerbyListener.get(listener)));
+    }
+
+    public boolean startTimer() {
+
+        Timer timer = game.getTimer();
+        if(timer.isDone())
+            timer.reset();
+        else
+            return false;
+
+
+        new Thread(() -> {
+            while (!timer.isDone()) {
+                System.out.println("Timer: " + timer.getRemainingTime() + " seconds");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println("InterruptedException");
+                    return;
+                }
+            }
+            System.out.println("Timer done");
+
+            notifyAllListeners(eventCrafter(GameState.TIMER_DONE, null, null));
+
+            for(ClientListener listener: listeners)
+            listener.onEvent(eventCrafter(GameState.ASSEMBLY, null, playerbyListener.get(listener)));
+        }).start();
+
+        return true;
+
     }
 
 

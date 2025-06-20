@@ -21,7 +21,7 @@ public class Game{
         for (int i = 0; i < playersName.size(); i++) {
             this.players.add(new Player(playersName.get(i), this, i));
         }
-        this.timer = new Timer();
+        this.timer = new Timer(60);
         this.dices = new Dice[2];
         dices[0] = new Dice();
         dices[1] = new Dice();

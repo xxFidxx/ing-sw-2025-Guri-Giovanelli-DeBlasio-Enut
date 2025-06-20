@@ -117,6 +117,11 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
+    public boolean startTimer() throws RemoteException {
+       return controller.startTimer();
+    }
+
+    @Override
     public void endCrafting(VirtualViewRmi client) throws Exception {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.playerIsDoneCrafting(listener);

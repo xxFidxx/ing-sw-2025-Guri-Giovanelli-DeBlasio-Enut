@@ -2,32 +2,31 @@ package it.polimi.ingsw.model.game;
 
 public class Timer {
     private int time;
-    private long startTime;
+    private long startTimeMillis;
     private boolean done;
 
-    public Timer() {
-        this.time = 0;
-        this.startTime = System.currentTimeMillis();;
+    public Timer(int time) {
+        this.time = time;
+        this.done = true;
+    }
+
+    public void start() {
+        this.startTimeMillis = System.currentTimeMillis();
         this.done = false;
     }
 
-    public int getTime() {
-        return time;
-    }
-
-    public void update() {
+    public int getRemainingTime() {
+        if (done) return time;
         long now = System.currentTimeMillis();
-        int elapsedSeconds = (int) ((now - startTime) / 1000);
-        time = Math.max(0, time - elapsedSeconds);
+        int currTime = (int)((now - startTimeMillis) / 1000);
+        return Math.max(0, time - currTime);
     }
 
     public boolean isDone() {
-        if(time == 0)
-            return true;
-        return false;
+        return getRemainingTime() == 0;
     }
 
     public void reset() {
-        time =  (int) startTime / 1000;
+        start();
     }
 }

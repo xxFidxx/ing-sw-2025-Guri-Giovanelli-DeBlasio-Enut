@@ -67,7 +67,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
     }
 
-
+        // DA METTERE TIMER DOPO CHE IL PRIMO HA FINITO DI ASSEMBLARE LA NAVE!!!!
+    // !!!!
+    // !!!!!
+    ////!!!!!!!!!!
     private void runCli() throws Exception {
         while (true) {
             if (scan.hasNextLine()) {
@@ -328,6 +331,20 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
             case DRAW_CARD ->
                     System.out.println("If you are the leader you will have to choose what to do, else just wait the players ahead are done!");
+            case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
+
+            case WAIT_PLAYER_LEADER -> {
+                if(input.equals("1")){
+                    if(server.startTimer())
+                        System.out.println("Timer started");
+                    else
+                        System.out.println("First timer isn't done yet");
+                }else
+                    System.out.println("Wait for other players are done crafting or start the timer by pressing 1");
+            }
+
+            case TIMER_DONE -> System.out.println("TIMER IS DONE!");
+
 
             case CHOOSE_ALIEN -> {
                 switch (input) {
@@ -783,8 +800,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
+            case WAIT_PLAYER_LEADER -> System.out.println("Wait for other players are done crafting or start the timer by pressing 1");
+            case TIMER_DONE -> System.out.println("TIMER IS DONE!");
             case LEAST_CREW -> System.out.print("You have the least crew");
-            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strength");
             case LEAST_FIRE -> System.out.println("You have the least fire strenght");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
             // case LOST_CREW -> System.out.println("You have the least engine strength");

@@ -99,4 +99,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean isEpidemicDone(VirtualViewRmi clientRmi) throws RemoteException;
 
     void fromMvGoodstoBatteries(VirtualViewRmi clientRmi, int nBatteries) throws RemoteException;
+
+    boolean startTimer() throws RemoteException;
 }
