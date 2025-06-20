@@ -13,7 +13,7 @@ import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.game.Timer;
 import it.polimi.ingsw.model.resources.*;
 import it.polimi.ingsw.model.game.*;
-
+import java.util.Random;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -454,6 +454,9 @@ public class Controller{
 
 
         if (!cards.isEmpty() || players.isEmpty()) {
+            Random random = new Random();
+            //int randomNumber = random.nextInt(cards.size());
+            //currentAdventureCard = cards.get(randomNumber);
             currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
