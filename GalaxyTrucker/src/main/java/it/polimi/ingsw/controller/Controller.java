@@ -895,14 +895,17 @@ public class Controller{
     }
 
     private void handleWaitersPlanets(ClientListener listener) {
-        for (Player p: tmpPlayers) {
+        Iterator<Player> iterator = tmpPlayers.iterator();
+        while (iterator.hasNext()) {
+            Player p = iterator.next();
             ClientListener l = listenerbyPlayer.get(p);
             if (l == listener) {
-                tmpPlayers.remove(currentPlayer);
+                iterator.remove();
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS, currentPlanetsCard.getPlanets(), null));
-            } else
+            } else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+            }
         }
     }
 
@@ -1548,8 +1551,19 @@ public class Controller{
         player.setReward(null);
         cargoended = true;
         System.out.println("Cargo management ended");
-        if(currentAdventureCard instanceof PlanetsCard)
+
+        // reset GoodsContainers as default one, without reward cargo
+        ArrayList<CargoHolds> playerCargos = player.getSpaceshipPlance().getCargoHolds();
+        ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
+        for (CargoHolds cargo : playerCargos) {
+            GoodsBlock[] goods = cargo.getGoods();
+            goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(), cargo.getId()));
+        }
+        player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
+
+        if(currentAdventureCard instanceof PlanetsCard){
             handlePlanets(listener);
+        }
         else
             manageCard();
     }
