@@ -593,7 +593,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "1"->{
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.print("Insert the number of double engines to chargeEngines: ");
+                            System.out.print("Insert the number of double engines to charge: ");
                             try {
                                 int numDE = Integer.parseInt(scan.nextLine());
                                 server.chargeEngines(this, numDE);
@@ -618,7 +618,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert the index of double cannons to chargeEngines: ");
+                            System.out.println("Insert the index of double cannons to charge: ");
                             System.out.print("> ");
                             String line = scan.nextLine();
                             String[] parts = line.trim().split(" ");
@@ -785,13 +785,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
             case LEAST_CREW -> System.out.print("You have the least crew");
             case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
+            case LEAST_FIRE -> System.out.println("You have the least fire strenght");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
-            case LOST_CREW -> System.out.println("You have the least engine strength");
+            // case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
-            case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to chargeEngines your double engines ");
+            case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
-            case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
+            case CHOOSE_CANNON -> System.out.println("Type 0 to skip your turn or 1 to charge your double cannons");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
             case ASK_SURRENDER -> System.out.println("Type -1 to surrender or 0 to continue the game");

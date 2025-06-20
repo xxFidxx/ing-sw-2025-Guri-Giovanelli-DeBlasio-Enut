@@ -58,6 +58,7 @@ public enum GameState {
     CANNON_FIRE,
     LEAST_CREW,
     LEAST_ENGINE,
+    LEAST_FIRE,
     SERVER_RESPONSE,
     ENEMY_LOST,
     ENEMY_WIN,

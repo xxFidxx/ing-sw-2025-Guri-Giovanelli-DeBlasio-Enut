@@ -44,6 +44,7 @@ public class Controller{
     private boolean piratesFlag;
     private boolean smugglersFlag;
     private boolean enemyDefeated;
+    private boolean afterShots;
 
     public Controller() {
         this.game = null;
@@ -61,6 +62,7 @@ public class Controller{
         this.piratesFlag = false;
         this.smugglersFlag = false;
         this.enemyDefeated = false;
+        this.afterShots = false;
         this.busyDecks = new boolean[3];
     }
 
@@ -772,6 +774,7 @@ public class Controller{
         enemyDefeated = false;
         piratesended = false;
         crewended = false;
+        afterShots = false;
         endCard();
         for (Player player : players) {
             player.getSpaceshipPlance().updateLists();
@@ -823,8 +826,10 @@ public class Controller{
     public void handleMinEngine(ClientListener listener) {
         for (ClientListener l : listeners) {
             if (l == listener) {
+                System.out.println("mando in LEAST_ENGINE");
                 l.onEvent(eventCrafter(GameState.LEAST_ENGINE, null, null));
             } else {
+                System.out.println("mando in NOT_MIN_ENGINE");
                 l.onEvent(eventCrafter(GameState.NOT_MIN_ENGINE, null, null));
             }
         }
@@ -833,8 +838,10 @@ public class Controller{
     public void handleMinFire(ClientListener listener) {
         for (ClientListener l : listeners) {
             if (l == listener) {
-                l.onEvent(eventCrafter(GameState.CANNON_FIRE, null, null));
+                System.out.println("mando in LEAST_FIRE");
+                l.onEvent(eventCrafter(GameState.LEAST_FIRE, null, null));
             } else {
+                System.out.println("mando in NOT_MIN_FIRE");
                 l.onEvent(eventCrafter(GameState.NOT_MIN_FIRE, null, null));
             }
         }
@@ -942,6 +949,7 @@ public class Controller{
                         if(!isDone.containsValue(false)){
                             System.out.println("fromChargeToManage: combatZoneFlag " + combatZoneFlag);
                             combatZoneFlag = true;
+                            isDone.replaceAll((c, v) -> false);
                             System.out.println("fromChargeToManage: mi trovo il minEnginePlayer");
                             int minEngine = tmpPlayers.stream().mapToInt(Player::getEngineStrenght).min().orElse(Integer.MAX_VALUE);
                             List<Player> minEnginePlayers = tmpPlayers.stream().filter(p -> p.getEngineStrenght() == minEngine).collect(Collectors.toList());
@@ -965,8 +973,10 @@ public class Controller{
                     } else {
                         isDone.put(listener, true);
                         if (!isDone.containsValue(false)) {
+                            afterShots = true;
                             double minFire = tmpPlayers.stream().mapToDouble(Player::getFireStrenght).min().orElse(Integer.MAX_VALUE);
-                            List<Player> minFirePlayers = tmpPlayers.stream().filter(p -> p.getEngineStrenght() == minFire).collect(Collectors.toList());
+                            System.out.println("minFire: " + minFire);
+                            List<Player> minFirePlayers = tmpPlayers.stream().filter(p -> p.getFireStrenght() == minFire).collect(Collectors.toList());
                             if (minFirePlayers.size() == 1) {
                                 Player minFirePlayer = minFirePlayers.get(0);
                                 ClientListener l = listenerbyPlayer.get(minFirePlayer);
@@ -1058,6 +1068,7 @@ public class Controller{
             i++;
         }
         if (i == length) {
+            System.out.println("combatZoneShots: mando in resetShowAndDraw ");
             resetShowAndDraw();
             return;
         }
@@ -1537,8 +1548,14 @@ public class Controller{
             }
         } else {
             if (stumps <= 1) {
-                waitForNextShot(listener);
+                if(currentAdventureCard instanceof CombatZoneCard){
+                    Player p = playerbyListener.get(listener);
+                    System.out.println("removeAdjust: vado in combatZoneShots");
+                    combatZoneShots(p);
+                } else
+                    waitForNextShot(listener);
             } else {
+                System.out.println("removeAdjust: vado in printSpaceshipParts");
                 printSpaceshipParts(listener);
             }
         }
@@ -1850,7 +1867,7 @@ public class Controller{
         Player p = playerbyListener.get(listener);
         switch(currentAdventureCard){
             case CombatZoneCard czc -> {
-                if(!combatZoneFlag)
+                if(!combatZoneFlag || !afterShots)
                     fromChargeToManage(listener);
                 else
                     combatZoneShots(p);
