@@ -1,17 +1,5 @@
 [
   {
-    "type": "CombatZoneCard",
-    "name": "Combat Zone",
-    "level": 1,
-    "combatZoneType": 0,
-    "lostDays": 3,
-    "lostOther": 2,
-    "cannons": [
-      { "type": 0, "direction": 2 },
-      { "type": 1, "direction": 2 }
-    ]
-  },
-  {
     "type": "PlanetsCard",
     "name": "Planets",
     "level": 1,
@@ -21,6 +9,18 @@
       [3, 2, 0, 0],
       [3, 0, 0, 0],
       [3, 1]
+    ]
+  },
+  {
+    "type": "CombatZoneCard",
+    "name": "Combat Zone",
+    "level": 1,
+    "combatZoneType": 0,
+    "lostDays": 3,
+    "lostOther": 2,
+    "cannons": [
+      { "type": 0, "direction": 2 },
+      { "type": 1, "direction": 2 }
     ]
   },
   {

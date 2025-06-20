@@ -867,10 +867,22 @@ public class SpaceshipPlance {
         int cols = this.components[0].length;
         StringBuilder result = new StringBuilder();
 
-        result.append('\n');
+        result.append("\n    "); // spazio iniziale per la numerazione colonne
+
+        // Intestazione colonne
+        for (int tileCol = 0; tileCol < cols; tileCol++) {
+            result.append(tileCol).append("   ");
+        }
+        result.append("\n");
 
         for (int tileRow = 0; tileRow < rows; tileRow++) {
             for (int line = 0; line < 3; line++) {
+                if (line == 1) {
+                    result.append(tileRow).append(" "); // numero riga a metà tile
+                } else {
+                    result.append("  "); // allinea visivamente le righe
+                }
+
                 for (int tileCol = 0; tileCol < cols; tileCol++) {
                     char[][] tileChars = tileCrafter(this.components[tileRow][tileCol]);
                     if (edgeCases(tileRow, tileCol)) {
@@ -881,7 +893,7 @@ public class SpaceshipPlance {
                         }
                     }
                 }
-                result.append('\n'); // End of one horizontal line across tile row
+                result.append('\n'); // fine riga
             }
         }
 
@@ -931,10 +943,23 @@ public class SpaceshipPlance {
         int cols = this.components[0].length;
         StringBuilder result = new StringBuilder();
 
-        result.append('\n');
+        result.append("\n    "); // spazio iniziale per l’intestazione colonne
+
+        // Intestazione colonne
+        for (int tileCol = 0; tileCol < cols; tileCol++) {
+            result.append(tileCol).append("   ");
+        }
+        result.append("\n");
 
         for (int tileRow = 0; tileRow < rows; tileRow++) {
             for (int line = 0; line < 3; line++) {
+                // Numerazione riga solo sulla seconda riga del blocco tile
+                if (line == 1) {
+                    result.append(tileRow).append(" ");
+                } else {
+                    result.append("  ");
+                }
+
                 for (int tileCol = 0; tileCol < cols; tileCol++) {
                     char[][] tileChars = tileCrafterAdjustments(this.components[tileRow][tileCol]);
                     if (edgeCases(tileRow, tileCol)) {
@@ -945,7 +970,7 @@ public class SpaceshipPlance {
                         }
                     }
                 }
-                result.append('\n'); // End of one horizontal line across tile row
+                result.append('\n');
             }
         }
 

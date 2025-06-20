@@ -23,7 +23,7 @@ public class TileSymbols {
                     
                     Connector Symbols:
                     '┼' – universal
-                    '─' – single
+                    '+' – single
                     '═' – double
                     ' ' – smooth
                     'C' – cannon
@@ -45,7 +45,7 @@ public class TileSymbols {
         ASCII_TILE_SYMBOLS.put("PowerCenter", 'P');
 
         CONNECTOR_SYMBOLS.put("universal", '┼'); // All directions
-        CONNECTOR_SYMBOLS.put("single", '─');    // Horizontal single line
+        CONNECTOR_SYMBOLS.put("single", '+');    // Horizontal single line
         CONNECTOR_SYMBOLS.put("double", '═');    // Horizontal double line
         CONNECTOR_SYMBOLS.put("smooth", ' ');    // No connector
         CONNECTOR_SYMBOLS.put("cannon", 'C');    // Cannon-specific symbol

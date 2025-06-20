@@ -680,15 +680,15 @@ public class Controller{
                         notifyAllListeners(eventCrafter(GameState.SAME_EQUIP, null, null));
                     }
 
-                    for (ClientListener listener : listeners) {
-                        Player player = playerbyListener.get(listener);
+                    for (Player player: players) {
+                        ClientListener l= listenerbyPlayer.get(player);
                         System.out.println("listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));");
-                        listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
+                        l.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
                     }
                 } else {
-                    for (ClientListener listener : listeners) {
-                        Player player = playerbyListener.get(listener);
-                        listener.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, player));
+                    for (Player player: players) {
+                        ClientListener l= listenerbyPlayer.get(player);
+                        l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, player));
                     }
                 }
 
@@ -815,7 +815,8 @@ public class Controller{
     }
 
     public void handleWaitersPlayer(ClientListener listener) {
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null, null));
             } else {
@@ -825,7 +826,8 @@ public class Controller{
     }
 
     public void handleMinEquip(ClientListener listener) {
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 l.onEvent(eventCrafter(GameState.LEAST_CREW, null, null));
             } else {
@@ -835,7 +837,8 @@ public class Controller{
     }
 
     public void handleMinEngine(ClientListener listener) {
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 System.out.println("mando in LEAST_ENGINE");
                 l.onEvent(eventCrafter(GameState.LEAST_ENGINE, null, null));
@@ -847,7 +850,8 @@ public class Controller{
     }
 
     public void handleMinFire(ClientListener listener) {
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 System.out.println("mando in LEAST_FIRE");
                 l.onEvent(eventCrafter(GameState.LEAST_FIRE, null, null));
@@ -859,7 +863,8 @@ public class Controller{
     }
 
     public void handleWaitersBattery(ClientListener listener, Player player) {
-        for (ClientListener l : listeners) {
+        for (Player p: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
             } else {
@@ -869,7 +874,8 @@ public class Controller{
     }
 
     public void handleWaitersEnemy(ClientListener listener) {
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             System.out.println("handleWaitersEnemy: Listener: " + l);
             if (l == listener) {
                 l.onEvent(eventCrafter(GameState.SHOW_ENEMY, null, currentPlayer));
@@ -882,7 +888,8 @@ public class Controller{
     }
 
     private void handleWaitersPlanets(ClientListener listener) {
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+            ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS, currentPlanetsCard.getPlanets(), null));
@@ -893,6 +900,8 @@ public class Controller{
     }
 
     public void fromChargeToManage(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        player.getSpaceshipPlance().updateLists();
         AdventureCard currentCastedCard = currentAdventureCard;
         switch (currentCastedCard) {
             case OpenSpaceCard osc -> {
@@ -1057,16 +1066,16 @@ public class Controller{
     }
 
     public void combatZoneCannons() {
-        for (ClientListener listener : listeners) {
-            Player player = playerbyListener.get(listener);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, player));
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
+            l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, player));
         }
     }
 
     public void combatZoneEngine() {
-        for (ClientListener listener : listeners) {
-            Player player = playerbyListener.get(listener);
-            listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
+            l.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
         }
 
     }
@@ -1135,8 +1144,8 @@ public class Controller{
             resetShowAndDraw();
             return;
         }
-        for (ClientListener l : listeners) {
-            Player p = playerbyListener.get(l);
+        for (Player p: players) {
+           ClientListener l= listenerbyPlayer.get(p);
             if (defeatedPlayers.contains(p)) {
                 defeatedPlayers.remove(p);
                 //sendToCrewManagement(p);
@@ -1176,7 +1185,8 @@ public class Controller{
             return;
         }
         System.out.println("defeatedBySmugglers: defeatedPlayers size: " + defeatedPlayers.size());
-        for (ClientListener l : listeners) {
+        for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
             Player p = playerbyListener.get(l);
             if (defeatedPlayers.contains(p)) {
                 System.out.println("defeatedBySmugglers: defeatedPlayers remove ");
@@ -1277,7 +1287,8 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.CRAFTING_ENDED, null, null));
 
         synchronized (isDone) {
-            for (ClientListener l : listeners) {
+            for (Player player: players) {
+           ClientListener l= listenerbyPlayer.get(player);
                 isDone.put(l, false);
             }
         }
@@ -1615,8 +1626,8 @@ public class Controller{
         isDone.replaceAll((c, v) -> false);
 
 
-        for (ClientListener l : listeners) {
-            Player p = playerbyListener.get(l);
+        for (Player p: players) {
+           ClientListener l= listenerbyPlayer.get(p);
             ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
             ArrayList<CabinAliens> cabinAliens = new ArrayList<>();
             boolean atLeastOneSupport = false;
@@ -1882,7 +1893,11 @@ public class Controller{
     }
 
     public void endManagement(ClientListener listener) {
+
+
         Player p = playerbyListener.get(listener);
+        p.getSpaceshipPlance().updateLists();
+
         switch(currentAdventureCard){
             case CombatZoneCard czc -> {
                 if(!combatZoneFlag || !afterShots)
@@ -1927,6 +1942,8 @@ public class Controller{
     }
 
     public void endMVGoodsManagement(ClientListener listener) {
+        Player player = playerbyListener.get(listener);
+        player.getSpaceshipPlance().updateLists();
         if (currentAdventureCard instanceof SmugglersCard) {
             waitForEnemies(listener);
         } else if (currentAdventureCard instanceof CombatZoneCard) {
