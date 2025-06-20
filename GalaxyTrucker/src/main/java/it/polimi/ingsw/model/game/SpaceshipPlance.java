@@ -762,6 +762,8 @@ public class SpaceshipPlance {
         return connectedCabins;
     }
 
+    public int getCrew(){return nAstronauts + nBrownAliens + nPurpleAliens; }
+
     public int getnAstronauts() {
         return nAstronauts;
     }

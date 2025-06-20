@@ -802,10 +802,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
             case WAIT_PLAYER_LEADER -> System.out.println("Wait for other players are done crafting or start the timer by pressing 1");
             case TIMER_DONE -> System.out.println("TIMER IS DONE!");
-            case LEAST_CREW -> System.out.print("You have the least crew");
-            case LEAST_ENGINE -> System.out.println("You have the least engine strength");
-            case LEAST_FIRE -> System.out.println("You have the least fire strength");
-            case MOVE_PLAYER -> System.out.println("You have the least crew");
+            case LEAST_CREW -> System.out.println("You have the least crew");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
+            case LEAST_FIRE -> System.out.println("You have the least fire strenght");
+            // case MOVE_PLAYER -> System.out.println("You have the least crew");
             // case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");

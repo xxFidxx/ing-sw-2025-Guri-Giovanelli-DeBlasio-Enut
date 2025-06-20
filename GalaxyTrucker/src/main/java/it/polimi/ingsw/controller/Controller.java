@@ -663,8 +663,12 @@ public class Controller{
 
             case CombatZoneCard czc -> {
                 if(((CombatZoneCard)currentAdventureCard).getType() == CombatZoneType.LOSTCREW){
-                    int minEquip = tmpPlayers.stream().mapToInt(Player::getNumEquip).min().orElse(Integer.MAX_VALUE);
-                    List<Player> minEquipPlayers = tmpPlayers.stream().filter(p -> p.getNumEquip() == minEquip).collect(Collectors.toList());
+                    int e1 = tmpPlayers.get(0).getSpaceshipPlance().getCrew();
+                    System.out.println("Num equip1: " + e1);
+                    int e2 = tmpPlayers.get(1).getSpaceshipPlance().getCrew();
+                    System.out.println("Num equip2: " + e2);
+                    int minEquip = tmpPlayers.stream().mapToInt(p -> p.getSpaceshipPlance().getCrew()).min().orElse(Integer.MAX_VALUE);
+                    List<Player> minEquipPlayers = tmpPlayers.stream().filter(p -> p.getSpaceshipPlance().getCrew() == minEquip).collect(Collectors.toList());
                     if (minEquipPlayers.size() == 1) {
                         Player minEquipPlayer = minEquipPlayers.get(0);
                         int ld= ((CombatZoneCard) currentAdventureCard).getLostDays();
@@ -770,6 +774,7 @@ public class Controller{
     }
 
     public void resetShowAndDraw() {
+        System.out.println("resetShowAndDraw: mando in END_CARD");
         notifyAllListeners(eventCrafter(GameState.END_CARD, null, null));
         game.endTurn();
         isDone.replaceAll((c, v) -> false);
