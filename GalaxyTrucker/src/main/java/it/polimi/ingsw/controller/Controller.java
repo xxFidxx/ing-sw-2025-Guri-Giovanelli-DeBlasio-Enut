@@ -450,8 +450,8 @@ public class Controller{
 
 
     public void drawCard() {
+        currentGameState = GameState.TURN_START;
         notifyAllListeners(eventCrafter(GameState.TURN_START, null, null));
-
 
         if (!cards.isEmpty() || players.isEmpty()) {
             Random random = new Random();
@@ -2118,14 +2118,17 @@ public class Controller{
             }
             System.out.println("Timer done");
 
-            notifyAllListeners(eventCrafter(GameState.TIMER_DONE, null, null));
+            if(currentGameState == GameState.ASSEMBLY){
+                notifyAllListeners(eventCrafter(GameState.TIMER_DONE, null, null));
 
-            for(ClientListener listener: listeners) {
-                try {
-                    playerIsDoneCrafting(listener);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                for(ClientListener listener: listeners) {
+                    try {
+                        playerIsDoneCrafting(listener);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+            }
+
             }
         }).start();
 
