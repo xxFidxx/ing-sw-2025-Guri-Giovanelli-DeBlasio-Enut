@@ -1,4 +1,5 @@
 package it.polimi.ingsw.gui;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -20,9 +21,11 @@ public class SceneManager {
 
     // Switch to a scene by key
     public void switchTo(String name) {
-        Scene scene = scenes.get(name);
-        if (scene != null) {
-            stage.setScene(scene);
-        }
+        Platform.runLater(() -> {
+            Scene scene = scenes.get(name);
+            if (scene != null) {
+                stage.setScene(scene);
+            }
+        });
     }
 }

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.gui.LobbyController">
    <children>
@@ -13,26 +14,28 @@
             <Font size="40.0" />
          </font>
       </Label>
-      <Label layoutX="601.0" layoutY="290.0" text="player1">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="602.0" layoutY="360.0" text="player3">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="601.0" layoutY="325.0" text="player2">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="602.0" layoutY="395.0" text="player4">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Button layoutX="1227.0" layoutY="681.0" mnemonicParsing="false" onAction="#handleNext" text="next" />
+      <AnchorPane fx:id="createLobbyPane" prefHeight="720.0" prefWidth="1280.0" visible="false">
+         <children>
+            <Button layoutX="582.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleCreateLobby" prefHeight="25.0" prefWidth="117.0" text="create lobby" />
+            <ChoiceBox fx:id="lobbySizeBox" layoutX="660.0" layoutY="335.0" prefHeight="25.0" prefWidth="39.0" />
+            <Label layoutX="582.0" layoutY="335.0" prefHeight="25.0" prefWidth="72.0" text="lobby size" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="lobbyPane" prefHeight="720.0" prefWidth="1280.0">
+         <children>
+            <Label layoutX="501.0" layoutY="343.0" text="waiting for game to start...">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Button layoutX="1227.0" layoutY="681.0" mnemonicParsing="false" onAction="#handleNext" text="next" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="nicknamePane" prefHeight="720.0" prefWidth="1280.0" visible="false">
+         <children>
+            <Button layoutX="582.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleAddNickname" prefHeight="25.0" prefWidth="117.0" text="add nickname" />
+            <TextField fx:id="nicknameField" layoutX="582.0" layoutY="335.0" prefHeight="25.0" prefWidth="117.0" />
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

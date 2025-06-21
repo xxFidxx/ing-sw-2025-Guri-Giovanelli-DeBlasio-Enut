@@ -4,6 +4,7 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.gui.MainApp;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
@@ -33,7 +34,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     private final Scanner scan = new Scanner(System.in);
     private final Object StateLock = new Object();
     private Event currentEvent;
-
+    private MainApp mainApp;
 
     public ClientRmi(VirtualServerRmi server) throws RemoteException{
         super();
@@ -41,6 +42,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         this.currentEvent = null;
         eventQueue = new LinkedBlockingQueue<>();
         currentState = GameState.IDLE;
+    }
+
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
     }
 
     public static void main(String[] args) throws Exception {
@@ -59,11 +64,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         server.connect(this);
 
         Thread eventThread;
-        eventThread = new Thread(this::handleEvents);
-        eventThread.start();
 
         if (mode == 0) {
+            eventThread = new Thread(this::handleEvents);
+            eventThread.start();
             runCli();
+        }
+        else {
+            eventThread = new Thread(this::handleEventsGUI);
+            eventThread.start();
         }
     }
 
@@ -728,9 +737,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
-                            } catch (Exception e) {
+                            } /*catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
-                            }
+                            }*/
                         if (removed)
                             System.out.println("Successfully removed");
                     }
@@ -744,6 +753,81 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case DIED -> System.out.println("You are on spectator mode because you died");
         }
         System.out.print("\n> ");
+    }
+
+    private void handleStateGUI() throws RemoteException {
+        System.out.print("\n");
+        switch(currentState){
+            case IDLE -> System.out.println("Type 0 to create a lobby");
+            case LOBBY_PHASE -> mainApp.lobbyPhase();
+            case WAIT_LOBBY -> System.out.println("Waiting for other players to join...");
+            case GAME_INIT -> mainApp.gameInit();
+            case ASSEMBLY -> System.out.println("List of available tiles: ");
+            case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
+            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
+            case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
+            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile, type 1 to force draw card phase");
+            case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
+            case SHOW_SHIP -> System.out.println("Here is your spaceship");
+            case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");
+            case CHOOSE_ALIEN -> System.out.println("Press 0 to exit exchange mode, press 1 to enter");
+            case TURN_START -> System.out.println("Here is the flight plance");
+            case DRAW_CARD -> System.out.println("This is the drawn card:");
+            case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
+            case CARGO_MANAGEMENT -> {
+                try{
+                    server.checkStorage(this);
+                } catch (CargoManagementException e){
+                    System.out.println(e.getMessage());
+                } catch (Exception e){
+                    System.out.println("Error " + e.getMessage());
+                }
+            }
+            case CREW_MANAGEMENT -> {
+                System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
+                System.out.println("Press 0 to continue");
+            }
+            case BATTERIES_MANAGEMENT -> {
+                System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
+                System.out.println("Press 0 to continue");
+            }
+            case REMOVE_MV_GOODS -> {
+                System.out.println("Here are your goods, you will have to remove the most valuable ones");
+                System.out.println("Press 0 to continue");
+            }
+            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
+            case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
+            case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
+            case LEAST_CREW -> System.out.print("You have the least crew");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
+            case MOVE_PLAYER -> System.out.println("You have the least crew");
+            case LOST_CREW -> System.out.println("You have the least engine strength");
+            case END_CARD -> System.out.println("End card");
+            case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
+            case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
+            case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
+            case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
+            case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
+            case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
+            case ASK_SURRENDER -> System.out.println("Type -1 to surrender or 0 to continue the game");
+            case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
+            case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
+            case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
+            case ENEMY_LOST -> System.out.println("You have been defeated by the enemies");
+            case ENEMY_WIN -> System.out.println("You defeated the enemies");
+            case ENEMY_DRAW -> System.out.println("You have the same power of enemies");
+            case NO_DOUBLE_CANNON -> {
+                System.out.println("You don't have any double cannon");
+                server.fromChargeToManage(this);
+            }
+            case DIED -> System.out.println("You are on spectator mode because you died");
+            case END_GAME -> System.out.println("Game has ended, below are the stats:");
+            case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
+            case NO_HIT -> System.out.println("You have not been hit");
+            case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
+            case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
+        }
+        System.out.print("> ");
     }
 
     private void handleState() throws RemoteException {
@@ -836,6 +920,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case NO_HIT -> System.out.println("You have not been hit");
             case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
+            default -> System.out.println("Default statement");
             case SAME_EQUIP -> System.out.println("No one was penalized because there are at least two players with the same equipment");
             case SAME_FIRE -> System.out.println("No one was penalized because there are at least two players with the same fire strength");
             case SAME_ENGINE -> System.out.println("No one was penalized because there are at least two players with the same engine strength");
@@ -857,6 +942,26 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         System.out.println("\n--- Game State Updated ---");
                         handleState();
                     }
+                showData(currentEvent.getData());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println("\n> Event thread interrupted");
+                return;
+            } catch (RemoteException e) {
+                System.out.println("\n> You have been disconnected");
+            }
+        }
+    }
+
+    private void handleEventsGUI(){
+        while (true) {
+            try {
+                currentEvent = eventQueue.take();
+                synchronized (StateLock) {
+                    currentState = currentEvent.getState();
+                    System.out.println("\n--- Game State Updated ---");
+                    handleStateGUI();
+                }
                 showData(currentEvent.getData());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -1033,5 +1138,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             System.out.printf("[%s] ",nick);
         }
         System.out.println("\n");
+    }
+
+    public GameState getCurrentState() {
+        return currentState;
     }
 }

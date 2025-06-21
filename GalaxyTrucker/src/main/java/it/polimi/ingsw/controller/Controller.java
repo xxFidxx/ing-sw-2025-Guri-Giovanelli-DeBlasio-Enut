@@ -332,6 +332,11 @@ public class Controller{
                 event = new Event(state, new CrewManagement(cabins, lostCrew));
             }
 
+            case EPIDEMIC_MANAGEMENT -> {
+                ArrayList<Cabin> cabins = player.getSpaceshipPlance().getInterconnectedCabins();
+                event = new Event(state, new CrewManagement(cabins, 0));
+            }
+
             case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
                 ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
 
@@ -454,10 +459,10 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.TURN_START, null, null));
 
         if (!cards.isEmpty() || players.isEmpty()) {
-            Random random = new Random();
-            int randomNumber = random.nextInt(cards.size());
-            currentAdventureCard = cards.get(randomNumber);
-            //currentAdventureCard = cards.getFirst();
+//            Random random = new Random();
+//            int randomNumber = random.nextInt(cards.size());
+//            currentAdventureCard = cards.get(randomNumber);
+            currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
@@ -632,8 +637,8 @@ public class Controller{
                 }
                 currentProjectile = meteorArray[i];
                 meteorArray[i] = null;
-                // currentDiceThrow = game.throwDices();
-                currentDiceThrow = 8;
+                currentDiceThrow = game.throwDices();
+                // currentDiceThrow = 8;
                 int size = players.size();
                 Player first = players.get(0);
                 System.out.println("manageCard: attivo activateMeteor per il primo player ");
@@ -653,13 +658,17 @@ public class Controller{
             }
 
             case EpidemicCard ec -> {
-                currentAdventureCard.activate();
-                resetShowAndDraw();
+                for(Player p : tmpPlayers) {
+                    ClientListener l = listenerbyPlayer.get(p);
+                    l.onEvent(eventCrafter(GameState.EPIDEMIC_MANAGEMENT, null, p));
+                }
             }
 
             case StardustCard sc -> {
-                currentAdventureCard.activate();
-                resetShowAndDraw();
+                for(Player p : tmpPlayers) {
+                    ClientListener l = listenerbyPlayer.get(p);
+
+                }
             }
 
             case CombatZoneCard czc -> {
@@ -1799,18 +1808,18 @@ public class Controller{
 
     public boolean removeFigureEpidemic(ClientListener listener, int cabinId) {
         Player p = playerbyListener.get(listener);
-        ArrayList<Cabin> interconnectedCabins = p.getSpaceshipPlance().getInterconnectedCabins();
+        ArrayList<Cabin> interconnectedCabins = new ArrayList<> (p.getSpaceshipPlance().getInterconnectedCabins());
         for (Cabin c : interconnectedCabins) {
             if (c.getId() == cabinId) {
                 Figure[] figures = c.getFigures();
 
                 if (figures[1] != null) {
                     figures[1] = null;
-                    interconnectedCabins.remove(c);
+                    p.getSpaceshipPlance().removeInterconnectedCabin(c);
                     return true;
                 } else if (figures[0] != null) {
                     figures[0] = null;
-                    interconnectedCabins.remove(c);
+                    p.getSpaceshipPlance().removeInterconnectedCabin(c);
                     return true;
                 }
             }
@@ -1955,7 +1964,17 @@ public class Controller{
             // controllare a cosa far tornare per asc e czc
             case AbandonedShipCard asc -> manageCard();
             case CombatZoneCard czc -> combatZoneCannons();
+            case EpidemicCard ep -> handleEpidemic(listener);
             default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+        }
+    }
+
+    public void handleEpidemic(ClientListener listener) {
+        isDone.put(listener, true);
+        if(!isDone.containsValue(false)){
+            resetShowAndDraw();
+        } else {
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 

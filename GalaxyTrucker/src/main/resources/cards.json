@@ -1,16 +1,23 @@
 [
   {
-    "type": "CombatZoneCard",
-    "name": "Combat Zone",
+    "type": "EpidemicCard",
+    "name": "Epidemic",
+    "level": 2
+  },
+  {
+    "type": "StardustCard",
+    "name": "Stardust",
     "level": 1,
-    "combatZoneType": 1,
-    "lostDays": 4,
-    "lostOther": 3,
-    "cannons": [
-      { "type": 0, "direction": 0 },
-      { "type": 0, "direction": 3 },
-      { "type": 0, "direction": 1 },
-      { "type": 1, "direction": 2 }
+    "lostDays": 1
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 }
     ]
   },
   {
@@ -26,13 +33,17 @@
     ]
   },
   {
-    "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
-    "level": 1,
-    "meteors": [
-      { "type": 3, "direction": 0 },
-      { "type": 2, "direction": 3 },
-      { "type": 2, "direction": 1 }
+    "type": "CombatZoneCard",
+    "name": "Combat Zone",
+    "level": 2,
+    "combatZoneType": 1,
+    "lostDays": 4,
+    "lostOther": 3,
+    "cannons": [
+      { "type": 0, "direction": 0 },
+      { "type": 0, "direction": 3 },
+      { "type": 0, "direction": 1 },
+      { "type": 1, "direction": 2 }
     ]
   },
   {
@@ -99,16 +110,5 @@
     "lostDays": 1,
     "lostCrew": 0,
     "credits": 2
-  },
-  {
-    "type": "StardustCard",
-    "name": "Stardust",
-    "level": 1,
-    "lostDays": 1
-  },
-  {
-    "type": "EpidemicCard",
-    "name": "Epidemic",
-    "level": 2
   }
 ]
