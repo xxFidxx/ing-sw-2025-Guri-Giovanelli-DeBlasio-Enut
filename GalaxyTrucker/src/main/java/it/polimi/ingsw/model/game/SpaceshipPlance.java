@@ -1117,6 +1117,12 @@ public class SpaceshipPlance {
     }
 
     public boolean checkInterconnectedCabinsEmpty(){
+
+        System.out.println("sono entrato in checkInterconnectedCabinsEmpty" + this);
+
+        for(Cabin cabin: interconnectedCabins)
+            System.out.println(cabin);
+
         return interconnectedCabins.isEmpty();
     }
 

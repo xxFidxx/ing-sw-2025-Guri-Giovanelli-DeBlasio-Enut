@@ -1809,6 +1809,12 @@ public class Controller{
     public boolean removeFigureEpidemic(ClientListener listener, int cabinId) {
         Player p = playerbyListener.get(listener);
         ArrayList<Cabin> interconnectedCabins = new ArrayList<> (p.getSpaceshipPlance().getInterconnectedCabins());
+
+        System.out.println("sono entrato in removeFigureEpidemic " + p);
+
+        for(Cabin cabin: interconnectedCabins)
+            System.out.println(cabin + "removeFigureEpidemic");
+
         for (Cabin c : interconnectedCabins) {
             if (c.getId() == cabinId) {
                 Figure[] figures = c.getFigures();
@@ -1816,10 +1822,18 @@ public class Controller{
                 if (figures[1] != null) {
                     figures[1] = null;
                     p.getSpaceshipPlance().removeInterconnectedCabin(c);
+
+                    for(Cabin cabin: interconnectedCabins)
+                        System.out.println(cabin + "removeFigureEpidemic");
+
                     return true;
                 } else if (figures[0] != null) {
                     figures[0] = null;
                     p.getSpaceshipPlance().removeInterconnectedCabin(c);
+
+                    for(Cabin cabin: interconnectedCabins)
+                        System.out.println(cabin + "removeFigureEpidemic");
+
                     return true;
                 }
             }
@@ -1829,6 +1843,7 @@ public class Controller{
 
     public boolean isEpidemicDone(ClientListener listener) {
         Player p = playerbyListener.get(listener);
+        System.out.println("sono entrato in isEpidemicDone " + p);
         return p.getSpaceshipPlance().checkInterconnectedCabinsEmpty();
     }
 
