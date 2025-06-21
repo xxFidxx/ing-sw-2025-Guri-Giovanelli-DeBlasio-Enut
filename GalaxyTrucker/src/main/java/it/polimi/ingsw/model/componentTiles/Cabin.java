@@ -34,6 +34,6 @@ public class Cabin extends ComponentTile implements Serializable {
 
     @Override
     public String toString() {
-        return super.toString() + "isCentral=" + isCentral + " id: " + getId() + Arrays.toString(lifeSupportSystemColors);
+        return super.toString() + "isCentral=" + isCentral + " id: " + getId() + Arrays.toString(figures);
     }
 }
