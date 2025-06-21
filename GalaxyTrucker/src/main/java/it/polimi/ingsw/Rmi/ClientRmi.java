@@ -983,6 +983,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case Card c -> System.out.println("Card: " + c.getName() + ", level: " + c.getLevel());
             case AdventureCardsData adC -> printCards(adC.getAdventureCards());
             case Cargos c -> printCargos(c.getCargos());
+            case CrewManagement cM-> printConnectedCabin(cM.getCabins());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");

@@ -334,7 +334,7 @@ public class Controller{
 
             case EPIDEMIC_MANAGEMENT -> {
                 ArrayList<Cabin> cabins = player.getSpaceshipPlance().getInterconnectedCabins();
-                event = new Event(state, new CrewManagement(cabins, 0));
+                event = new Event(state, new EpidemicManagement(cabins));
             }
 
             case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {

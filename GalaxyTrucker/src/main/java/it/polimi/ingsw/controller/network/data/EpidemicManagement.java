@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class EpidemicManagement extends DataContainer implements Serializable {
     private ArrayList<Cabin> cabins;
 
-    public EpidemicManagement(ArrayList<Cabin> cabins, int lostCrew) {
+    public EpidemicManagement(ArrayList<Cabin> cabins) {
         this.cabins = cabins;
     }
 

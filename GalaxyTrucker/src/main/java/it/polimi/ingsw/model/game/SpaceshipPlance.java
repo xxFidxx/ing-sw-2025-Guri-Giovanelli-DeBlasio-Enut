@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.network.data.EpidemicManagement;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -120,6 +121,7 @@ public class SpaceshipPlance {
         cargoHolds.clear();
         shieldGenerators.clear();
         powerCenters.clear();
+        interconnectedCabins.clear();
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
                 ComponentTile tile = components[y][x];
@@ -151,9 +153,11 @@ public class SpaceshipPlance {
                                                 // cosi perchè nel caso ci siano 2 colori, sono sicuro che non vado a sovrascrivere la casella contenente già un colore
                                                 if(tile2 instanceof LifeSupportSystem)
                                                     colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
-                                                else if(figures.length > 0)
-                                                    // if a cabin has 0 crew, I dont need to use it epidemic card
+                                                else if(figures[0] != null || figures[1] != null){
+                                                    System.out.println("ho una interconnected cab: " + cab + "   altra cab     " + tile2);
+                                                    // if a cabin has 0 crew, I don't need to use it epidemic card
                                                     interconnectedCabins.add(cab);
+                                                }
                                             }
                                         }
                                     }
@@ -1118,7 +1122,7 @@ public class SpaceshipPlance {
 
     public boolean checkInterconnectedCabinsEmpty(){
 
-        System.out.println("sono entrato in checkInterconnectedCabinsEmpty" + this);
+        System.out.println("sono entrato in checkInterconnectedCabinsEmpty");
 
         for(Cabin cabin: interconnectedCabins)
             System.out.println(cabin);
