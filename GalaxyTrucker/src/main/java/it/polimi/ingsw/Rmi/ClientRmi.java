@@ -737,9 +737,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
-                            } catch (Exception e) {
+                            } /*catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
-                            }
+                            }*/
                         if (removed)
                             System.out.println("Successfully removed");
                     }
