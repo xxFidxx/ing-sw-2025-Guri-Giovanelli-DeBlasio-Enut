@@ -459,10 +459,10 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.TURN_START, null, null));
 
         if (!cards.isEmpty() || players.isEmpty()) {
-//            Random random = new Random();
-//            int randomNumber = random.nextInt(cards.size());
-//            currentAdventureCard = cards.get(randomNumber);
-            currentAdventureCard = cards.getFirst();
+            Random random = new Random();
+            int randomNumber = random.nextInt(cards.size());
+            currentAdventureCard = cards.get(randomNumber);
+            // currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
@@ -667,8 +667,11 @@ public class Controller{
             case StardustCard sc -> {
                 for(Player p : tmpPlayers) {
                     ClientListener l = listenerbyPlayer.get(p);
-
+                    int ec = p.getSpaceshipPlance().countExposedConnectors();
+                    l.onEvent(eventCrafter(GameState.MOVE_PLAYER, ec, null));
+                    game.getFlightplance().move(-ec, p);
                 }
+                resetShowAndDraw();
             }
 
             case CombatZoneCard czc -> {

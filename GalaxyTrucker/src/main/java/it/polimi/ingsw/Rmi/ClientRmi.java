@@ -920,7 +920,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case NO_HIT -> System.out.println("You have not been hit");
             case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
-            default -> System.out.println("Default statement");
+            default -> System.out.println("");
             case SAME_EQUIP -> System.out.println("No one was penalized because there are at least two players with the same equipment");
             case SAME_FIRE -> System.out.println("No one was penalized because there are at least two players with the same fire strength");
             case SAME_ENGINE -> System.out.println("No one was penalized because there are at least two players with the same engine strength");

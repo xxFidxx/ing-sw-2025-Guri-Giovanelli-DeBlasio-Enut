@@ -634,9 +634,13 @@ public class SpaceshipPlance {
                             if (connectors[i] != ConnectorType.SMOOTH && connectors[i] != ConnectorType.CANNON && connectors[i] != ConnectorType.ENGINE) {
                                 int x2 = x + DIR_X[i];
                                 int y2 = y + DIR_Y[i];
-                                ComponentTile tile2 = components[y2][x2];
-                                if (tile2 == null)
+                                if(inBounds(x2, y2)) {
+                                    ComponentTile tile2 = components[y2][x2];
+                                    if (tile2 == null)
+                                        exposedConnectors++;
+                                } else {
                                     exposedConnectors++;
+                                }
                             }
                         }
                 }
