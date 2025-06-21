@@ -1,65 +1,281 @@
 [
   {
     "type": "PowerCenter",
-    "connectors": [3, 0, 2, 1],
+    "connectors": [1, 0, 2, 0],
     "capacity": 3
   },
   {
     "type": "PowerCenter",
-    "connectors": [1, 2, 3, 0],
-    "capacity": 2
-  },
-  {
-    "type": "PowerCenter",
-    "connectors": [0, 3, 1, 2],
-    "capacity": 2
-  },
-  {
-    "type": "PowerCenter",
-    "connectors": [2, 1, 0, 3],
+    "connectors": [1, 1, 2, 0],
     "capacity": 3
   },
   {
     "type": "PowerCenter",
-    "connectors": [1, 1, 3, 2],
+    "connectors": [2, 0, 0, 0],
+    "capacity": 3
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [2, 1, 0, 0],
+    "capacity": 3
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [2, 2, 1, 0],
+    "capacity": 3
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [0, 0, 1, 0],
+    "capacity": 3
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 1, 2, 0],
+    "capacity": 2
+  },
+
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 2, 0, 0],
+    "capacity": 2
+  },
+
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 2, 1, 0],
+    "capacity": 2
+  },
+
+  {
+    "type": "PowerCenter",
+    "connectors": [2, 1, 2, 1],
+    "capacity": 2
+  },
+
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 0, 0, 1],
+    "capacity": 2
+  },
+
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 1, 1, 1],
+    "capacity": 2
+  },
+
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 2, 2, 2],
+    "capacity": 2
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [0, 0, 0, 3],
+    "capacity": 2
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [0, 0, 0, 3],
+    "capacity": 2
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [0, 3, 0, 3],
+    "capacity": 2
+  },
+  {
+    "type": "PowerCenter",
+    "connectors": [3, 0, 0, 3],
     "capacity": 2
   },
 
   {
     "type": "CargoHolds",
-    "connectors": [2, 0, 1, 3],
-    "capacity": 1,
-    "isSpecial": true
-  },
-  {
-    "type": "CargoHolds",
-    "connectors": [3, 2, 0, 1],
+    "connectors": [2, 1, 3, 0],
     "capacity": 2,
     "isSpecial": false
   },
   {
     "type": "CargoHolds",
-    "connectors": [0, 1, 3, 2],
+    "connectors": [2, 1, 3, 1],
     "capacity": 2,
     "isSpecial": false
   },
   {
     "type": "CargoHolds",
-    "connectors": [1, 2, 3, 0],
-    "capacity": 1,
-    "isSpecial": true
+    "connectors": [2, 3, 0, 1],
+    "capacity": 2,
+    "isSpecial": false
   },
   {
     "type": "CargoHolds",
-    "connectors": [2, 3, 1, 0],
+    "connectors": [0, 0, 0, 3],
     "capacity": 2,
+    "isSpecial": false
+  },
+
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 0, 0, 3],
+    "capacity": 2,
+    "isSpecial": false
+  },
+
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 1, 0, 3],
+    "capacity": 2,
+    "isSpecial": false
+  },
+
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 2, 0, 3],
+    "capacity": 2,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [3, 0, 0, 3],
+    "capacity": 2,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [2, 1, 2, 3],
+    "capacity": 2,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 0, 0, 1],
+    "capacity": 3,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [1, 0, 1, 0],
+    "capacity": 3,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 0, 0, 2],
+    "capacity": 3,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [2, 0, 2, 0],
+    "capacity": 3,
+    "isSpecial": false
+  },
+
+  {
+    "type": "CargoHolds",
+    "connectors": [1, 0, 2, 1],
+    "capacity": 3,
+    "isSpecial": false
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [2, 0, 1, 2],
+    "capacity": 3,
     "isSpecial": false
   },
 
   {
     "type": "Cabin",
-    "connectors": [0, 3, 1, 2],
+    "connectors": [3, 3, 3, 3],
     "isCentral": true
+  },
+  {
+    "type": "Cabin",
+    "connectors": [3, 3, 3, 3],
+    "isCentral": true
+  },
+  {
+    "type": "Cabin",
+    "connectors": [3, 3, 3, 3],
+    "isCentral": true
+  },
+  {
+    "type": "Cabin",
+    "connectors": [3, 3, 3, 3],
+    "isCentral": true
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 0, 3, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [1, 2, 1, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [1, 2, 2, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [2, 0, 0, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [2, 1, 0, 1],
+    "isCentral": false
+  },
+
+  {
+    "type": "Cabin",
+    "connectors": [2, 1, 2, 1],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 1, 3, 2],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [1, 2, 0, 2],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [2, 1, 2, 2],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [3, 0, 0, 2],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 1, 0, 3],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 1, 1, 3],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [0, 2, 0, 3],
+    "isCentral": false
+  },
+  {
+    "type": "Cabin",
+    "connectors": [1, 0, 1, 3],
+    "isCentral": false
   },
   {
     "type": "Cabin",
@@ -68,40 +284,106 @@
   },
   {
     "type": "Cabin",
-    "connectors": [2, 1, 3, 0],
+    "connectors": [2, 0, 2, 3],
     "isCentral": false
   },
   {
     "type": "Cabin",
-    "connectors": [3, 2, 0, 1],
-    "isCentral": true
-  },
-  {
-    "type": "Cabin",
-    "connectors": [0, 1, 0, 3],
+    "connectors": [2, 2, 0, 3],
     "isCentral": false
   },
 
   {
     "type": "StructuralModule",
-    "connectors": [1, 1, 2, 0]
+    "connectors": [3, 3, 0, 1]
   },
   {
     "type": "StructuralModule",
-    "connectors": [3, 0, 3, 2]
+    "connectors": [1, 3, 0, 3]
   },
   {
     "type": "StructuralModule",
-    "connectors": [2, 2, 1, 3]
+    "connectors": [1, 3, 1, 3]
   },
   {
     "type": "StructuralModule",
-    "connectors": [0, 1, 3, 1]
+    "connectors": [1, 3, 2, 3]
   },
   {
     "type": "StructuralModule",
-    "connectors": [3, 2, 2, 0]
+    "connectors": [2, 3, 0, 3]
   },
+
+  {
+    "type": "StructuralModule",
+    "connectors": [3, 1, 2, 3]
+  },
+
+  {
+    "type": "StructuralModule",
+    "connectors": [3, 2, 0, 3]
+  },
+  {
+    "type": "StructuralModule",
+    "connectors": [3, 2, 2, 3]
+  },
+
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 2, 1, 3],
+    "capacity": 1,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 3, 0, 3],
+    "capacity": 1,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [1, 1, 1, 3],
+    "capacity": 1,
+    "isSpecial": true
+  },
+
+  {
+    "type": "CargoHolds",
+    "connectors": [2, 1, 0, 3],
+    "capacity": 1,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [2, 2, 2, 3],
+    "capacity": 1,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [3, 0, 0, 3],
+    "capacity": 1,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 0, 0, 1],
+    "capacity": 2,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 2, 0, 1],
+    "capacity": 2,
+    "isSpecial": true
+  },
+  {
+    "type": "CargoHolds",
+    "connectors": [0, 0, 0, 2],
+    "capacity": 2,
+    "isSpecial": true
+  },
+
 
   {
     "type": "Engine",
@@ -109,11 +391,7 @@
   },
   {
     "type": "Engine",
-    "connectors": [0, 1, 5, 0]
-  },
-  {
-    "type": "Engine",
-    "connectors": [0, 0, 5, 3]
+    "connectors": [0, 3, 5, 0]
   },
   {
     "type": "Engine",
@@ -121,20 +399,56 @@
   },
   {
     "type": "Engine",
-    "connectors": [0, 2, 5, 1]
+    "connectors": [1, 0, 5, 0]
+  },
+  {
+    "type": "Engine",
+    "connectors": [1, 1, 5, 0]
+  },
+  {
+    "type": "Engine",
+    "connectors": [2, 0, 5, 0]
+  },
+  {
+    "type": "Engine",
+    "connectors": [2, 0, 5, 0]
+  },
+  {
+    "type": "Engine",
+    "connectors": [2, 3, 5, 0]
+  },
+  {
+    "type": "Engine",
+    "connectors": [3, 2, 5, 0]
+  },
+  {
+    "type": "Engine",
+    "connectors": [0, 3, 5, 1]
+  },
+  {
+    "type": "Engine",
+    "connectors": [2, 1, 5, 1]
+  },
+  {
+    "type": "Engine",
+    "connectors": [3, 0, 5, 1]
+  },
+  {
+    "type": "Engine",
+    "connectors": [3, 2, 5, 1]
   },
 
   {
     "type": "DoubleEngine",
-    "connectors": [0, 0, 5, 5]
+    "connectors": [1, 0, 5, 0]
   },
   {
     "type": "DoubleEngine",
-    "connectors": [1, 0, 5, 5]
+    "connectors": [1, 3, 5, 0]
   },
   {
     "type": "DoubleEngine",
-    "connectors": [0, 2, 5, 0]
+    "connectors": [2, 0, 5, 0]
   },
   {
     "type": "DoubleEngine",
@@ -142,8 +456,17 @@
   },
   {
     "type": "DoubleEngine",
-    "connectors": [2, 0, 5, 1]
+    "connectors": [1, 1, 5, 1]
   },
+  {
+    "type": "DoubleEngine",
+    "connectors": [2, 2, 5, 2]
+  },
+  {
+    "type": "DoubleEngine",
+    "connectors": [3, 0, 5, 3]
+  },
+
 
   {
     "type": "DoubleCannon",
@@ -155,15 +478,23 @@
   },
   {
     "type": "DoubleCannon",
-    "connectors": [4, 1, 0, 2]
+    "connectors": [4, 3, 0, 0]
   },
   {
     "type": "DoubleCannon",
-    "connectors": [4, 3, 0, 1]
+    "connectors": [4, 3, 2, 0]
   },
   {
     "type": "DoubleCannon",
-    "connectors": [4, 0, 3, 0]
+    "connectors": [4, 1, 2, 1]
+  },
+  {
+    "type": "DoubleCannon",
+    "connectors": [4, 2, 0, 1]
+  },
+  {
+    "type": "DoubleCannon",
+    "connectors": [4, 2, 1, 2]
   },
 
   {
@@ -172,11 +503,7 @@
   },
   {
     "type": "Cannon",
-    "connectors": [4, 2, 0, 0]
-  },
-  {
-    "type": "Cannon",
-    "connectors": [4, 0, 0, 3]
+    "connectors": [4, 0, 1, 0]
   },
   {
     "type": "Cannon",
@@ -184,7 +511,35 @@
   },
   {
     "type": "Cannon",
-    "connectors": [4, 0, 3, 1]
+    "connectors": [4, 2, 0, 0]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 2, 3, 0]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 3, 1, 0]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 1, 1, 1]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 2, 3, 1]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 1, 3, 2]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 2, 2, 2]
+  },
+  {
+    "type": "Cannon",
+    "connectors": [4, 2, 0, 3]
   },
 
   {
@@ -194,62 +549,95 @@
   },
   {
     "type": "LifeSupportSystem",
-    "connectors": [1, 0, 1, 1],
-    "color": 1
-  },
-  {
-    "type": "LifeSupportSystem",
-    "connectors": [0, 1, 1, 0],
-    "color": 1
-  },
-  {
-    "type": "LifeSupportSystem",
-    "connectors": [1, 1, 1, 0],
-    "color": 1
-  },
-  {
-    "type": "LifeSupportSystem",
-    "connectors": [0, 0, 1, 1],
+    "connectors": [2, 1, 0, 1],
     "color": 0
   },
   {
-    "type": "Cabin",
-    "connectors": [0, 0, 1, 1],
-    "isCentral": false
+    "type": "LifeSupportSystem",
+    "connectors": [0, 0, 0, 3],
+    "color": 0
   },
   {
-    "type": "Cabin",
-    "connectors": [2, 0, 1, 1],
-    "isCentral": false
+    "type": "LifeSupportSystem",
+    "connectors": [0, 0, 1, 3],
+    "color": 0
   },
   {
-    "type": "Cabin",
-    "connectors": [0, 3, 1, 1],
-    "isCentral": false
+    "type": "LifeSupportSystem",
+    "connectors": [0, 2, 0, 3],
+    "color": 0
   },
+
+  {
+    "type": "LifeSupportSystem",
+    "connectors": [1, 2, 0, 2],
+    "color": 1
+  },
+  {
+    "type": "LifeSupportSystem",
+    "connectors": [2, 2, 0, 2],
+    "color": 1
+  },
+  {
+    "type": "LifeSupportSystem",
+    "connectors": [0, 0, 0, 3],
+    "color": 1
+  },
+
+  {
+    "type": "LifeSupportSystem",
+    "connectors": [0, 0, 2, 3],
+    "color": 1
+  },
+  {
+    "type": "LifeSupportSystem",
+    "connectors": [0, 1, 0, 3],
+    "color": 1
+  },
+  {
+    "type": "LifeSupportSystem",
+    "connectors": [2, 0, 0, 3],
+    "color": 1
+  },
+
   {
     "type": "ShieldGenerator",
-    "connectors": [3, 3, 3, 3],
+    "connectors": [0, 1, 3, 1],
     "protection": [true, true, false, false]
   },
   {
     "type": "ShieldGenerator",
-    "connectors": [3, 3, 0, 0],
-    "protection": [false, true, true, false]
+    "connectors": [1, 0, 1, 1],
+    "protection": [true, true, false, false]
   },
   {
     "type": "ShieldGenerator",
-    "connectors": [3, 3, 3, 3],
-    "protection": [false, false, true, true]
+    "connectors": [2, 1, 2, 1],
+    "protection": [true, true, false, false]
   },
   {
     "type": "ShieldGenerator",
-    "connectors": [3, 3, 3, 3],
-    "protection": [true, false, false, true]
+    "connectors": [0, 0, 3, 2],
+    "protection": [true, true, false, false]
   },
   {
     "type": "ShieldGenerator",
-    "connectors": [0, 0, 3, 3],
-    "protection": [true, false, true, true]
+    "connectors": [0, 2, 2, 2],
+    "protection": [true, true, false, false]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [1, 2, 1, 2],
+    "protection": [true, true, false, false]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [0, 0, 1, 3],
+    "protection": [true, true, false, false]
+  },
+  {
+    "type": "ShieldGenerator",
+    "connectors": [0, 2, 2, 3],
+    "protection": [true, true, false, false]
   }
 ]
