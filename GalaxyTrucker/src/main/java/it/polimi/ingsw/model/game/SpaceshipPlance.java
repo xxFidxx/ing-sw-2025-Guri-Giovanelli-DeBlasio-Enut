@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
@@ -1246,7 +1247,11 @@ public class SpaceshipPlance {
             GoodsBlock[] goods = cargo.getGoods();
             Collections.addAll(playerGoods, goods);
         }
-        playerGoods.sort(Comparator.comparingDouble(GoodsBlock::getValue).reversed());
+
+        playerGoods = playerGoods.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingDouble(GoodsBlock::getValue).reversed())
+                .collect(Collectors.toCollection(ArrayList::new));
 
         if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
             GoodsContainer cargo1 = goodsContainers.get(cargoIndex);
