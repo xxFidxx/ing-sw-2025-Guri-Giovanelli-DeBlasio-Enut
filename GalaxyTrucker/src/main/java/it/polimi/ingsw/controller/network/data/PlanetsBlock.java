@@ -8,7 +8,10 @@ import java.util.ArrayList;
 public class PlanetsBlock extends DataContainer implements Serializable {
     private ArrayList<Planet> planets;
 
-    public PlanetsBlock(ArrayList<Planet> planets) {this.planets = planets;}
+    public PlanetsBlock(ArrayList<Planet> planets) {
+        this.planets = planets;
+    }
+
     public ArrayList<Planet> getPlanets() {return planets;}
 
 }
