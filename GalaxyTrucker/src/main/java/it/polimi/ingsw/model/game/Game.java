@@ -89,12 +89,7 @@ public class Game{
         return plance;
     }
 
-    /*public boolean choosePlayer(AdventureCard card, Player player) {
-        if (card.checkCondition(player)) {
-            return true;
-        }
-        return false;
-    }*/
+
 
     public int throwDices() {
         return dices[0].thr() + dices[1].thr();

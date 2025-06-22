@@ -1,15 +1,16 @@
 [
   {
+    "type": "EpidemicCard",
+    "name": "Epidemic",
+    "level": 2
+  },
+  {
     "type": "StardustCard",
     "name": "Stardust",
     "level": 1,
     "lostDays": 1
   },
-  {
-    "type": "EpidemicCard",
-    "name": "Epidemic",
-    "level": 2
-  },
+
   {
     "type": "MeteorSwarmCard",
     "name": "Meteor Swarm",

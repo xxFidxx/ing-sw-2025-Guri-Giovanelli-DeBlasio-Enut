@@ -1,98 +1,150 @@
 package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.Placeholder;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.game.SpaceshipPlance;
+import it.polimi.ingsw.model.resources.Planet;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class GameTest {
 
     private Game game;
-    private AdventureCard card;
+    private AdventureCard mockCard;
 
-    private Player player1;
-    private Player player2;
-    private Player player3;
+
 
     @Before
     public void setUp() {
-        // Creiamo normalmente il Game (passiamo qualsiasi lista di nomi, non importa perché la sovrascriviamo)
-        game = new Game(new ArrayList<>());
+        ArrayList<String> playerNames = new ArrayList<>();
+        playerNames.add("Alice");
+        playerNames.add("Bob");
+        playerNames.add("Charlie");
 
-        card = mock(AdventureCard.class);
+        // Inizializza un vero Game
+        game = new Game(playerNames);
+        mockCard = mock(AdventureCard.class);
+        game.getPlayers().get(0).getPlaceholder().setPosizione(3);
+        game.getPlayers().get(1).getPlaceholder().setPosizione(1);
+        game.getPlayers().get(2).getPlaceholder().setPosizione(2);
+    }
+    @Test
+    public void testFreePlanets_WithOneFreePlanet() {
+        Planet busyPlanet = mock(Planet.class);
+        when(busyPlanet.isBusy()).thenReturn(true);
 
-        player1 = mock(Player.class);
-        player2 = mock(Player.class);
-        player3 = mock(Player.class);
+        Planet freePlanet = mock(Planet.class);
+        when(freePlanet.isBusy()).thenReturn(false);
 
-        ArrayList<Player> players = new ArrayList<>();
-        players.add(player1);
-        players.add(player2);
-        players.add(player3);
 
-        // Usiamo il nuovo setter
-        game.setPlayers(players);
+
+        ArrayList<Planet> planets = new ArrayList<>();
+        planets.add(busyPlanet);
+        planets.add(freePlanet);
+
+        boolean result = game.freePlanets(mockCard, planets);
+
+
+        assertTrue(result);
     }
 
     @Test
-    public void testChoosePlayer_FindsCorrectPlayer() {
-        // Configuriamo i comportamenti: solo player2 soddisfa la condizione e risponde sì
-        when(card.checkCondition(player1)).thenReturn(false);
-        when(card.checkCondition(player2)).thenReturn(true);
-        when(card.checkCondition(player3)).thenReturn(false);
+    public void testFreePlanets_AllBusy() {
+        Planet busy1 = mock(Planet.class);
+        Planet busy2 = mock(Planet.class);
 
-        when(player2.hasResponded()).thenReturn(true);
+        when(busy1.isBusy()).thenReturn(true);
+        when(busy2.isBusy()).thenReturn(true);
 
-        Player chosen = game.choosePlayer(card);
+        ArrayList<Planet> planets = new ArrayList<>();
+        planets.add(busy1);
+        planets.add(busy2);
 
-        assertEquals(player2, chosen);
+        boolean result = game.freePlanets(mockCard, planets);
+        assertFalse(result);
     }
 
     @Test
-    public void testChoosePlayer_NoPlayerSatisfiesCondition() {
-        // Nessun player soddisfa la condizione
-        when(card.checkCondition(player1)).thenReturn(false);
-        when(card.checkCondition(player2)).thenReturn(false);
-        when(card.checkCondition(player3)).thenReturn(false);
-
-        Player chosen = game.choosePlayer(card);
-
-        assertNull(chosen);
+    public void testFreePlanets_EmptyList() {
+        ArrayList<Planet> planets = new ArrayList<>();
+        boolean result = game.freePlanets(mockCard, planets);
+        assertFalse(result);
     }
-
     @Test
-    public void testChoosePlayer_PlayerSatisfiesButRespondsNo() {
-        // Player1 soddisfa la condizione ma risponde no
-        when(card.checkCondition(player1)).thenReturn(true);
-        when(player1.hasResponded()).thenReturn(false);
+    public void testOrderPlayers() {
 
-        when(card.checkCondition(player2)).thenReturn(false);
-        when(card.checkCondition(player3)).thenReturn(false);
+        game.orderPlayers();
 
-        Player chosen = game.choosePlayer(card);
+        // Dopo l'ordinamento: ordine atteso → B (1), C (2), A (3)
+        List<Player> players = game.getPlayers();
 
-        assertNull(chosen);
+        assertEquals("Bob", players.get(0).getNickname());
+        assertEquals("Charlie", players.get(1).getNickname());
+        assertEquals("Alice", players.get(2).getNickname());
     }
-
     @Test
-    public void testChoosePlayer_LastPlayerChosen() {
-        // Simuliamo che player1 e player3 soddisfano entrambi la condizione
-        when(card.checkCondition(player1)).thenReturn(true);
-        when(player1.hasResponded()).thenReturn(true);
+    public void testPickTile_ValidTile() {
+        // Otteniamo un player reale dal gioco
+        Player player = game.getPlayers().get(0); // Alice
 
-        when(card.checkCondition(player2)).thenReturn(false);
+        // Otteniamo l’array di tile disponibili
+        ComponentTile[] assemblingTiles = game.getAssemblingTiles();
 
-        when(card.checkCondition(player3)).thenReturn(true);
-        when(player3.hasResponded()).thenReturn(true);
+        // Assicuriamoci che ci sia almeno una tile disponibile
+        int validIndex = -1;
+        for (int i = 0; i < assemblingTiles.length; i++) {
+            if (assemblingTiles[i] != null) {
+                validIndex = i;
+                break;
+            }
+        }
+        assertTrue("Nessuna tile valida trovata", validIndex != -1);
 
-        // Poiché si itera dall'ultimo verso il primo, deve scegliere player3
-        Player chosen = game.choosePlayer(card);
+        ComponentTile expectedTile = assemblingTiles[validIndex];
 
-        assertEquals(player3, chosen);
+        // Esegui il metodo da testare
+        ComponentTile pickedTile = game.pickTile(player, validIndex);
+
+        // Verifica che la tile sia stata assegnata al player
+        assertEquals(expectedTile, pickedTile);
+        assertEquals(expectedTile, player.getHandTile());
+
+        // Verifica che la tile non sia più nell’array
+        assertNull(game.getAssemblingTiles()[validIndex]);
     }
+    @Test
+    public void testPickTileReserveSpot_ValidIndex() {
+        // Otteniamo un player reale dal gioco
+        Player player = game.getPlayers().get(0); // Alice
+        SpaceshipPlance plance = player.getSpaceshipPlance();
+
+        // Creiamo una tile mock per la riserva
+        ComponentTile mockTile = mock(ComponentTile.class);
+
+        // Inseriamo la tile nella riserva
+        plance.getReserveSpot().clear(); // assicuriamoci sia vuoto
+        plance.getReserveSpot().add(mockTile);
+
+        // Chiamata al metodo da testare
+        ComponentTile result = game.pickTileReserveSpot(player, 0);
+
+        // Verifiche
+        assertEquals(mockTile, result);
+        assertEquals(mockTile, player.getHandTile());
+        assertFalse(plance.getReserveSpot().contains(mockTile));
+    }
+
+
+
+
+
 }
 

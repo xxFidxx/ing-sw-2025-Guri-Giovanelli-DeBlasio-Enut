@@ -31,31 +31,8 @@ public class CombatZoneCard extends AdventureCard  {
     }
 
     public void activate() {
-        ArrayList<Player> players = deck.getFlightPlance().getGame().getPlayers();
-        Game game = deck.getFlightPlance().getGame();
-        int position = 0;
-        if( type == type.LOSTCREW ){
-            Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
-            deck.getFlightPlance().move(-lostDays,minEquipPlayer);
-            Player minEnginePlayer =players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
-            minEnginePlayer.loseCrew(lostOther);
-            Player minFirePlayer = players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
-            for( Projectile cannon : cannons ){
-                position = game.throwDices();
-                cannon.activate(minFirePlayer, position);
-            }
-        }
-        if(type == type.LOSTGOODS){
-            Player minFirePlayer =players.stream().min(Comparator.comparing(Player::getFireStrenght)).orElse(null);
-            deck.getFlightPlance().move(-lostDays,minFirePlayer);
-            Player minEnginePlayer = players.stream().min(Comparator.comparingInt(Player::getEngineStrenght)).orElse(null);
-            minEnginePlayer.getSpaceshipPlance().looseGoods(lostOther);
-            Player minEquipPlayer = players.stream().min(Comparator.comparingInt(Player::getNumEquip)).orElse(null);
-            for( Projectile cannon : cannons ){
-                position = game.throwDices();
-                cannon.activate(minEquipPlayer, position);
-            }
-        }
+
+
 
     }
 

@@ -186,26 +186,7 @@
     "isSpecial": false
   },
 
-  {
-    "type": "Cabin",
-    "connectors": [3, 3, 3, 3],
-    "isCentral": true
-  },
-  {
-    "type": "Cabin",
-    "connectors": [3, 3, 3, 3],
-    "isCentral": true
-  },
-  {
-    "type": "Cabin",
-    "connectors": [3, 3, 3, 3],
-    "isCentral": true
-  },
-  {
-    "type": "Cabin",
-    "connectors": [3, 3, 3, 3],
-    "isCentral": true
-  },
+
   {
     "type": "Cabin",
     "connectors": [0, 0, 3, 1],
