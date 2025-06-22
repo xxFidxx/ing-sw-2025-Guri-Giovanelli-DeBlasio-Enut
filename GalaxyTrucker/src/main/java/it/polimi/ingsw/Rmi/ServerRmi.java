@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.view.VirtualView;
 
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -43,13 +44,21 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public static void main(String[] args) throws RemoteException {
         final String serverName = "ServerRmi";
 
-        VirtualServerRmi server = new ServerRmi();
+        try {
 
-        Registry registry = LocateRegistry.createRegistry(1234);
+            String hotspotIp = "127.0.0.1";
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
 
-        registry.rebind(serverName, server);
 
-        System.out.println("Server bound");
+            Registry registry = LocateRegistry.createRegistry(1234);
+            VirtualServerRmi server = new ServerRmi();
+            registry.rebind(serverName, server);
+
+            System.out.println("Server running on: " + hotspotIp + ":1234");
+        } catch (Exception e) {
+            System.err.println("Server failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 
