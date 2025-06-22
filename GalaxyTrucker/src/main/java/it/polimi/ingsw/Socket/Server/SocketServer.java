@@ -41,19 +41,23 @@ public class SocketServer implements VirtualServerSocket {
     }
 
     public void start() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("SocketServer listening on port: " + port);
-            while (true) {
-                try{
+        try {
+            String hotspotIp = "192.168.203.223";
+            InetAddress bindAddr = InetAddress.getByName(hotspotIp);
+
+            try (ServerSocket serverSocket = new ServerSocket(port, 50, bindAddr)) {
+                System.out.println("Server listening on " + hotspotIp + ":" + port);
+
+                while (true) {
                     Socket clientSocket = serverSocket.accept();
-                    System.out.println(" New client connected: " + clientSocket);
+                    System.out.println("New client connected: " + clientSocket);
                     clientPool.execute(new ClientHandler(clientSocket, this));
-                }catch(Exception e){
-                    System.out.println(" New client disconnected: " + e.getMessage());
                 }
+
             }
-        }catch(Exception e){
-            System.out.println("SocketServer exception: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Server exception: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

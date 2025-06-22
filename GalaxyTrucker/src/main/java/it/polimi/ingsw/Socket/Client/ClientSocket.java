@@ -41,15 +41,23 @@ public class ClientSocket implements VirtualViewSocket {
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        String serverIp = "192.168.203.223";
+        int port = 1234;
         try {
-            Socket socket = new Socket("127.0.0.1", 1234);
-            EventReceiver receiver = new EventReceiver(socket, eventQueue,responseQueue );
+            System.out.println("Connecting to " + serverIp + ":" + port);
+            Socket socket = new Socket(serverIp, port);
+            System.out.println("Connected to server!");
+
+            EventReceiver receiver = new EventReceiver(socket, eventQueue, responseQueue);
             new Thread(receiver).start();
 
             new ClientSocket(socket).run(0);
-        }catch(IOException e){
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Connection failed: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
