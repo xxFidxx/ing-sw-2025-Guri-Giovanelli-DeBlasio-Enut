@@ -1,7 +1,11 @@
 package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.componentTiles.ConnectorType;
+import it.polimi.ingsw.model.componentTiles.DoubleCannon;
+import it.polimi.ingsw.model.componentTiles.DoubleEngine;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Placeholder;
 import it.polimi.ingsw.model.game.Player;
@@ -142,9 +146,116 @@ public class GameTest {
         assertFalse(plance.getReserveSpot().contains(mockTile));
     }
 
+    @Test
+    public void testTilesToId_WithMixedComponentTiles() {
+        // Crea mock delle ComponentTile
+        ComponentTile tile1 = mock(ComponentTile.class);
+        ComponentTile tile2 = mock(ComponentTile.class);
+        ComponentTile tile3 = null;
 
+        // Simula il comportamento dei getId()
+        when(tile1.getId()).thenReturn(10);
+        when(tile2.getId()).thenReturn(20);
 
+        // Prepara l’array da testare
+        ComponentTile[] inputTiles = new ComponentTile[]{tile1, tile3, tile2};
 
+        // Chiama il metodo tilesToId del game
+        Integer[] result = game.tilesToId(inputTiles);
+
+        // Verifiche
+        assertNotNull(result);
+        assertEquals(3, result.length);
+        assertEquals(Integer.valueOf(10), result[0]);
+        assertNull(result[1]);
+        assertEquals(Integer.valueOf(20), result[2]);
+    }
+
+    @Test
+    public void testResetResponded_SetsAllPlayersToFalse() {
+        // Arrange: imposta alcuni player come già responded = true
+        game.getPlayers().get(0).setResponded(true);
+        game.getPlayers().get(1).setResponded(true);
+        game.getPlayers().get(2).setResponded(false);
+
+        // Act: chiama il metodo da testare
+        game.resetResponded();
+
+        // Assert: controlla che tutti siano tornati a false
+        for (Player p : game.getPlayers()) {
+            assertFalse("Player " + p.getNickname() + " dovrebbe avere responded = false", p.hasResponded());
+        }
+    }
+
+    @Test
+    public void testResetDoubleCannons() {
+        // Crea un DoubleCannon "carico"
+        ConnectorType[] connectors = {
+                ConnectorType.CANNON,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH
+        };
+        DoubleCannon doubleCannon = new DoubleCannon(connectors, 42);
+        doubleCannon.setCharged(true); // inizialmente carico
+
+        // Aggiungilo alla nave del primo giocatore (Alice)
+        Player alice = game.getPlayers().get(0);
+        alice.getSpaceshipPlance().getCannons().add(doubleCannon);
+
+        // Assicuriamoci che sia carico
+        assertTrue(doubleCannon.isCharged());
+
+        // Chiamiamo il metodo da testare
+        game.resetDoubleCannons();
+
+        // Verifica che ora il cannone sia "scarico"
+        assertFalse("Il DoubleCannon dovrebbe essere scarico dopo resetDoubleCannons()", doubleCannon.isCharged());
+    }
+
+    @Test
+    public void testResetDoubleEngines() {
+        // Crea un DoubleEngine "carico"
+        ConnectorType[] connectors = {
+                ConnectorType.ENGINE,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH
+        };
+        DoubleEngine doubleEngine = new DoubleEngine(connectors, 101);
+        doubleEngine.setCharged(true); // inizialmente carico
+
+        // Aggiungilo alla nave di un giocatore, ad esempio Bob
+        Player bob = game.getPlayers().get(1);
+        bob.getSpaceshipPlance().getEngines().add(doubleEngine);
+
+        // Assicuriamoci che sia carico prima del reset
+        assertTrue(doubleEngine.isCharged());
+
+        // Invoca il metodo da testare
+        game.resetDoubleEngines();
+
+        // Verifica che ora sia scarico
+        assertFalse("Il DoubleEngine dovrebbe essere scarico dopo resetDoubleEngines()", doubleEngine.isCharged());
+    }
+
+    @Test
+    public void testResetRewards() {
+        // Imposta delle reward simulate per ciascun giocatore
+        for (Player player : game.getPlayers()) {
+            GoodsBlock[] fakeReward = new GoodsBlock[]{mock(GoodsBlock.class)};
+            player.setReward(fakeReward);
+            assertNotNull("Setup fallito: la reward dovrebbe essere inizializzata", player.getReward());
+        }
+
+        // Chiamata al metodo da testare
+        game.resetRewards();
+
+        // Verifica che ogni reward sia stata azzerata (null)
+        for (Player player : game.getPlayers()) {
+            assertNull("La reward dovrebbe essere null dopo resetRewards()", player.getReward());
+        }
+    }
 
 }
 

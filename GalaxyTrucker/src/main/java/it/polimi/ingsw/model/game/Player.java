@@ -91,7 +91,9 @@ public class Player {
     }
     public void setNumEquip(int n){ numAstronauts = n; }
 
-
+    public boolean hasResponded() {
+        return responded;
+    }
 
     public void setResponded(boolean responded) {
             this.responded = responded;

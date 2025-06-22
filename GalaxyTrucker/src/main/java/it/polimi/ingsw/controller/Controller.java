@@ -459,10 +459,10 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.TURN_START, null, null));
 
         if (!cards.isEmpty() || players.isEmpty()) {
-//            Random random = new Random();
-//            int randomNumber = random.nextInt(cards.size());
-//            currentAdventureCard = cards.get(randomNumber);
-             currentAdventureCard = cards.getFirst();
+            Random random = new Random();
+            int randomNumber = random.nextInt(cards.size());
+            currentAdventureCard = cards.get(randomNumber);
+            // currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
@@ -553,10 +553,10 @@ public class Controller{
                     manageCard();
                 } else {
                     ClientListener l = listenerbyPlayer.get(currentPlayer);
+                    tmpPlayers.remove(currentPlayer);
                     if (numDE > 0) {
                         handleWaitersBattery(l, currentPlayer);
                     } else {
-                        tmpPlayers.remove(currentPlayer);
                         fromChargeToManage(l);
                     }
                 }
@@ -884,7 +884,7 @@ public class Controller{
 
     public void handleWaitersBattery(ClientListener listener, Player player) {
         for (Player p: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+           ClientListener l= listenerbyPlayer.get(p);
             if (l == listener) {
                 listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
             } else {

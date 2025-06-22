@@ -179,7 +179,7 @@ public class Game{
         orderPlayers();
     }
 
-    private void resetDoubleCannons() {
+    public void resetDoubleCannons() {
         for(Player p: players){
             ArrayList<Cannon> cannons = p.getSpaceshipPlance().getCannons();
             for(Cannon c: cannons){
@@ -189,7 +189,7 @@ public class Game{
         }
     }
 
-    private void resetDoubleEngines() {
+    public void resetDoubleEngines() {
         for(Player p: players){
             ArrayList<Engine> engines = p.getSpaceshipPlance().getEngines();
             for(Engine e: engines){
@@ -199,7 +199,7 @@ public class Game{
         }
     }
 
-    private void resetRewards() {
+    public void resetRewards() {
         for(Player p: players){
             p.setReward(null);
         }
