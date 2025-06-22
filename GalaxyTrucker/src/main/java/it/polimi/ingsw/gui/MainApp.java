@@ -35,6 +35,7 @@ public class MainApp extends Application {
 
         // Start with the menu scene
         sceneManager.switchTo("home");
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 
