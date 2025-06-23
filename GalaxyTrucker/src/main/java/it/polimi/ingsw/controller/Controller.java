@@ -2194,6 +2194,27 @@ public class Controller{
 
     }
 
+    public int[] guiBoardInfo() {
+
+        int i = 0;
+        int size = players.size() * 2;
+        int[] infos = new int[size];
+        for(Player player: players) {
+            Placeholder p = player.getPlaceholder();
+            while(i< size){
+                infos[i] = p.getColor().getValue();
+                i++;
+                int pos = (p.getPosizione()) % 24;
+                if (pos < 0) {
+                    pos = pos + 24;
+                }
+                infos[i] = pos;
+                i++;
+            }
+        }
+        return infos;
+    }
+
 
     /*public void fromChargeOrShots(ClientListener listener) {
         Player p = playerbyListener.get(listener);

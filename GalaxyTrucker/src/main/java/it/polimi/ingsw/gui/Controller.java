@@ -2,6 +2,8 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 
+import java.rmi.RemoteException;
+
 public abstract class Controller {
     protected SceneManager sceneManager;
     protected ClientRmi clientRmi;
@@ -15,6 +17,6 @@ public abstract class Controller {
 
     public void setMainApp(MainApp mainApp) {this.mainApp = mainApp;}
 
-    public void onLoad() {}
+    public void onLoad() throws RemoteException {}
 
 }

@@ -347,5 +347,9 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.endShowCards(listener, i);
     }
 
+    public int[] guiBoardInfo() throws RemoteException {
+        return controller.guiBoardInfo();
+    }
+
 }
 

@@ -98,4 +98,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     void fromMvGoodstoBatteries(VirtualViewRmi clientRmi, int nBatteries) throws RemoteException;
 
     boolean startTimer() throws RemoteException;
+
+    int[] guiBoardInfo() throws RemoteException;
 }
