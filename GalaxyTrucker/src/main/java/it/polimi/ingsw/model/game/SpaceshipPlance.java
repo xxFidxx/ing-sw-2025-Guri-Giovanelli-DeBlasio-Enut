@@ -90,11 +90,10 @@ public class SpaceshipPlance {
     public ComponentTile getComponent(int y, int x) {
         return components[y][x];
     }
+
     public boolean[][] getVisited() {
         return visited;
     }
-
-
 
     public static int getCOLS() {
         return COLS;
@@ -207,7 +206,7 @@ public class SpaceshipPlance {
         countBatteries();
     }
 
-    private boolean inBounds(int x, int y) {
+    public boolean inBounds(int x, int y) {
         // Prima controlla i bound standard
         boolean standardBounds = (x >= 0 && x < COLS && y >= 0 && y < ROWS);
 
@@ -295,7 +294,7 @@ public class SpaceshipPlance {
         return allValid;
     }
 
-    private boolean isTileValid(int x, int y) {
+    public boolean isTileValid(int x, int y) {
         ComponentTile tile = components[y][x];
 
         // Controllo componenti speciali
@@ -348,12 +347,12 @@ public class SpaceshipPlance {
         return prova;
     }
 
-    private boolean isEngineValid(int y, int x) {
+    public boolean isEngineValid(int y, int x) {
         // Controlla solo orientamento e spazio dietro oppure se lo spazio dietro è nel vuoto
         return components[y][x].getConnectors()[2] == ConnectorType.ENGINE && (!inBounds(x,y+1) || components[y + 1][x] == null);
     }
 
-    private boolean isCannonValid(int y, int x) {
+    public boolean isCannonValid(int y, int x) {
         ConnectorType[] connectors = components[y][x].getConnectors();
 
         for (int direction = 0; direction < 4; direction++) {
