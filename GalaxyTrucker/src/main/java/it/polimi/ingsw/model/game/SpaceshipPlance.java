@@ -81,7 +81,29 @@ public class SpaceshipPlance {
         return nBatteries;
     }
 
-    private boolean edgeCases(int y, int x) {
+    public int[][] getShownComponents() {
+        return shownComponents;
+    }
+    public void setComponent(int y, int x, ComponentTile tile) {
+        components[y][x] = tile;
+    }
+    public ComponentTile getComponent(int y, int x) {
+        return components[y][x];
+    }
+
+    public boolean[][] getVisited() {
+        return visited;
+    }
+
+    public static int getCOLS() {
+        return COLS;
+    }
+
+    public static int getROWS() {
+        return ROWS;
+    }
+
+    public boolean edgeCases(int y, int x) {
         if (y == 0) {
             return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
         } else if (y == 1) {
@@ -92,7 +114,7 @@ public class SpaceshipPlance {
         return false;
     }
 
-    private void initVisited() {
+    public void initVisited() {
         // Imposta visited a false
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -101,7 +123,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void initShownComponents() {
+    public void initShownComponents() {
         // Imposta shownComponents a -1
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -184,7 +206,7 @@ public class SpaceshipPlance {
         countBatteries();
     }
 
-    private boolean inBounds(int x, int y) {
+    public boolean inBounds(int x, int y) {
         // Prima controlla i bound standard
         boolean standardBounds = (x >= 0 && x < COLS && y >= 0 && y < ROWS);
 
@@ -223,7 +245,7 @@ public class SpaceshipPlance {
         return validateRemainingTiles();
     }
 
-    private void dfsExploration(int x, int y) {
+    public void dfsExploration(int x, int y) {
         if (!inBounds(x, y) || components[y][x] == null || visited[y][x]) {
             return;
         }
@@ -242,7 +264,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void removeUnvisitedTiles() {
+    public void removeUnvisitedTiles() {
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
                 if (!visited[y][x]) {
@@ -272,7 +294,7 @@ public class SpaceshipPlance {
         return allValid;
     }
 
-    private boolean isTileValid(int x, int y) {
+    public boolean isTileValid(int x, int y) {
         ComponentTile tile = components[y][x];
 
         // Controllo componenti speciali
@@ -325,12 +347,12 @@ public class SpaceshipPlance {
         return prova;
     }
 
-    private boolean isEngineValid(int y, int x) {
+    public boolean isEngineValid(int y, int x) {
         // Controlla solo orientamento e spazio dietro oppure se lo spazio dietro è nel vuoto
         return components[y][x].getConnectors()[2] == ConnectorType.ENGINE && (!inBounds(x,y+1) || components[y + 1][x] == null);
     }
 
-    private boolean isCannonValid(int y, int x) {
+    public boolean isCannonValid(int y, int x) {
         ConnectorType[] connectors = components[y][x].getConnectors();
 
         for (int direction = 0; direction < 4; direction++) {
