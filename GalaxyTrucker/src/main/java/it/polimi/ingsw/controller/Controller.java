@@ -726,7 +726,7 @@ public class Controller{
 
     private void handleEarlyEnd(Player player) {
         ClientListener listener = listenerbyPlayer.get(player);
-        isDone.remove(listener);
+        isDone.remove(player);
         System.out.println("handleEarlyEnd " + player);
         players.remove(player);
         tmpPlayers.remove(player);
@@ -1271,13 +1271,13 @@ public class Controller{
     }
 
     public void playerIsDoneCrafting(ClientListener listener) throws Exception {
-        if (isDone.get(listener))
+        Player p = playerbyListener.get(listener);
+        if (isDone.get(p))
             return;
 
         int pos;
         int checkLeader;
         synchronized (isDone) {
-            Player p = playerbyListener.get(listener);
             isDone.replace(p, true);
             synchronized (GameLock) {
                 pos = isDone.keySet().size();
@@ -1303,7 +1303,6 @@ public class Controller{
 
 
         Flightplance flightPlance = game.getFlightplance();
-        Player p = playerbyListener.get(listener);
         flightPlance.getPlaceholderByPlayer(p).setPosizione(realpos);
         String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
         listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor, null));
@@ -1910,9 +1909,6 @@ public class Controller{
             if (!isDone.containsValue(false))
                 drawCard();
             else {
-                isDone.forEach((client, value) ->
-                        System.out.println("Client: " + client + " -> Value: " + value)
-                );
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
         }
@@ -1920,7 +1916,7 @@ public class Controller{
 
     public void surrender(ClientListener listener) {
         Player player = playerbyListener.get(listener);
-        isDone.remove(listener);
+        isDone.remove(player);
         players.remove(player);
         player.setSurrended(true);
         listener.onEvent(eventCrafter(GameState.DIED, null, null));
