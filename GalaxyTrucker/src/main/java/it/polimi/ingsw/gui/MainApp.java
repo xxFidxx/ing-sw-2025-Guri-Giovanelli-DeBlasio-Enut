@@ -39,10 +39,10 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-    public void startClient() throws Exception {
+    public void startClient(String serverIp) throws Exception {
         final String serverName = "ServerRmi";
 
-        Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
+        Registry registry = LocateRegistry.getRegistry(serverIp, 1234);
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
         this.clientRmi = new ClientRmi(server);
