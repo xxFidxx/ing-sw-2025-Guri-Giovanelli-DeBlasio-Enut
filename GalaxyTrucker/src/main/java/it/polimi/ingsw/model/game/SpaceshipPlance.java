@@ -81,7 +81,30 @@ public class SpaceshipPlance {
         return nBatteries;
     }
 
-    private boolean edgeCases(int y, int x) {
+    public int[][] getShownComponents() {
+        return shownComponents;
+    }
+    public void setComponent(int y, int x, ComponentTile tile) {
+        components[y][x] = tile;
+    }
+    public ComponentTile getComponent(int y, int x) {
+        return components[y][x];
+    }
+    public boolean[][] getVisited() {
+        return visited;
+    }
+
+
+
+    public static int getCOLS() {
+        return COLS;
+    }
+
+    public static int getROWS() {
+        return ROWS;
+    }
+
+    public boolean edgeCases(int y, int x) {
         if (y == 0) {
             return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
         } else if (y == 1) {
@@ -92,7 +115,7 @@ public class SpaceshipPlance {
         return false;
     }
 
-    private void initVisited() {
+    public void initVisited() {
         // Imposta visited a false
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -101,7 +124,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void initShownComponents() {
+    public void initShownComponents() {
         // Imposta shownComponents a -1
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -223,7 +246,7 @@ public class SpaceshipPlance {
         return validateRemainingTiles();
     }
 
-    private void dfsExploration(int x, int y) {
+    public void dfsExploration(int x, int y) {
         if (!inBounds(x, y) || components[y][x] == null || visited[y][x]) {
             return;
         }
@@ -242,7 +265,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private void removeUnvisitedTiles() {
+    public void removeUnvisitedTiles() {
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
                 if (!visited[y][x]) {
