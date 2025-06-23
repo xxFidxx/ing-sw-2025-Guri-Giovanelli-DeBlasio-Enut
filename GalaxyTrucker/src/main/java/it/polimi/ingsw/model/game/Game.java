@@ -53,7 +53,10 @@ public class Game{
 //        };
 
         try {
-            this.assemblingTiles = ComponentTileFactory.loadTiles(this).toArray(ComponentTile[]::new);
+            List<ComponentTile> assemblingTilesList = ComponentTileFactory.loadTiles(this);
+            assert assemblingTilesList != null;
+            //Collections.shuffle(assemblingTilesList);
+            this.assemblingTiles = assemblingTilesList.toArray(ComponentTile[]::new);
         }
         catch (Exception e) {
             e.printStackTrace();
