@@ -10,7 +10,7 @@ public class GoodsBlock implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public GoodsBlock(ColorType type) {
-        this.value = type.ordinal()+1; // blue (= 0) + 1 = 1 (valore giusto)
+        this.value = type.getValue();
         this.type = type;
     }
     public int getValue() {
