@@ -29,7 +29,7 @@ public class Controller{
     private final boolean[] busyDecks;
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
-    final Map <ClientListener, Boolean> isDone = new HashMap<>();
+    final Map <Player, Boolean> isDone = new HashMap<>();
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
     private ArrayList<Player> players;
@@ -447,7 +447,8 @@ public class Controller{
 
         synchronized (isDone) {
             for (ClientListener l : listeners) {
-                isDone.put(l, false);
+                Player p = playerbyListener.get(l);
+                isDone.put(p, false);
             }
         }
 
@@ -644,7 +645,6 @@ public class Controller{
                 currentProjectile = meteorArray[i];
                 meteorArray[i] = null;
                 currentDiceThrow = game.throwDices();
-                // currentDiceThrow = 8;
                 int size = players.size();
                 Player first = players.get(0);
                 System.out.println("manageCard: attivo activateMeteor per il primo player ");
@@ -714,7 +714,8 @@ public class Controller{
     }
 
     public void handlePlanets(ClientListener l) {
-        isDone.put(l, true);
+        Player p = playerbyListener.get(l);
+                isDone.put(p, true);
         if(!isDone.containsValue(false)){
             resetShowAndDraw();
         } else {
@@ -994,7 +995,7 @@ public class Controller{
             case CombatZoneCard czc -> {
                 if (((CombatZoneCard) currentAdventureCard).getType() == CombatZoneType.LOSTCREW) {
                     if (!combatZoneFlag) {
-                        isDone.put(listener,true);
+                        isDone.put(player,true);
                         if(!isDone.containsValue(false)){
                             System.out.println("fromChargeToManage: combatZoneFlag " + combatZoneFlag);
                             combatZoneFlag = true;
@@ -1020,7 +1021,7 @@ public class Controller{
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                         }
                     } else {
-                        isDone.put(listener, true);
+                        isDone.put(player, true);
                         if (!isDone.containsValue(false)) {
                             afterShots = true;
                             double minFire = tmpPlayers.stream().mapToDouble(Player::getFireStrenght).min().orElse(Integer.MAX_VALUE);
@@ -1042,7 +1043,7 @@ public class Controller{
                     }
                 } else {
                     if (!combatZoneFlag) {
-                        isDone.put(listener, true);
+                        isDone.put(player, true);
                         if (!isDone.containsValue(false)) {
                             combatZoneFlag = true;
                             isDone.replaceAll((c, v) -> false);
@@ -1064,7 +1065,7 @@ public class Controller{
                             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                         }
                     } else {
-                        isDone.put(listener, true);
+                        isDone.put(player, true);
                         if (!isDone.containsValue(false)) {
                             isDone.replaceAll((c, v) -> false);
                             int minEngine = tmpPlayers.stream().mapToInt(Player::getEngineStrenght).min().orElse(Integer.MAX_VALUE);
@@ -1249,7 +1250,8 @@ public class Controller{
         }
 
     public void waitForEnemies(ClientListener l) {
-        isDone.put(l, true);
+        Player p = playerbyListener.get(l);
+                isDone.put(p, true);
         if (!isDone.containsValue(false)) {
             switch (currentAdventureCard) {
                 case SlaversCard sc -> {
@@ -1275,7 +1277,8 @@ public class Controller{
         int pos;
         int checkLeader;
         synchronized (isDone) {
-            isDone.replace(listener, true);
+            Player p = playerbyListener.get(listener);
+            isDone.replace(p, true);
             synchronized (GameLock) {
                 pos = isDone.keySet().size();
                 checkLeader = pos-1;
@@ -1324,8 +1327,7 @@ public class Controller{
 
         synchronized (isDone) {
             for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
-                isDone.put(l, false);
+                isDone.put(player, false);
             }
         }
 
@@ -1338,7 +1340,7 @@ public class Controller{
                 allOk = false;
             } else {
                 p.getSpaceshipPlance().updateLists();
-                isDone.put(l, true);
+                isDone.put(p, true);
                 printSpaceship(l);
             }
         }
@@ -1349,7 +1351,8 @@ public class Controller{
             isDone.entrySet().stream()
                     .filter(Map.Entry::getValue)
                     .forEach(entry -> {
-                        ClientListener l = entry.getKey();
+                        Player p = entry.getKey();
+                        ClientListener l = listenerbyPlayer.get(p);
                         l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                     });
         }
@@ -1613,7 +1616,7 @@ public class Controller{
             if (stumps <= 1) {
                 if (player.getSpaceshipPlance().checkCorrectness()) {
                     player.getSpaceshipPlance().updateLists();
-                    isDone.put(listener, true);
+                    isDone.put(player, true);
                     printSpaceship(listener);
                     if (handleAdjustmentEnded())
                         chooseAliens();
@@ -1656,7 +1659,7 @@ public class Controller{
                 printSpaceshipAdjustment(listener);
             } else {
                 p.getSpaceshipPlance().updateLists();
-                isDone.put(listener, true);
+                isDone.put(p, true);
                 printSpaceship(listener);
                 if (handleAdjustmentEnded())
                     chooseAliens();
@@ -1710,7 +1713,7 @@ public class Controller{
                 printSpaceshipbyTile(l, cabinAliens.getFirst().getCabin());
                 l.onEvent(eventCrafter(GameState.CHOOSE_ALIEN, cabinAliens, null));
             } else {
-                isDone.put(l, true);
+                isDone.put(p, true);
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
         }
@@ -1745,7 +1748,8 @@ public class Controller{
     }
 
     public void waitForNextShot(ClientListener listener) {
-        isDone.put(listener, true);
+        Player p = playerbyListener.get(listener);
+        isDone.put(p, true);
         if (!isDone.containsValue(false)) {
             if (currentAdventureCard instanceof MeteorSwarmCard) {
                 isDone.replaceAll((c, v) -> false);
@@ -1788,7 +1792,8 @@ public class Controller{
     }
 
     public void handleEndChooseAliens(ClientListener listener) {
-        isDone.put(listener, true);
+        Player p = playerbyListener.get(listener);
+        isDone.put(p, true);
 
         // player who didn't have cabins to put aliens in or finished they alien chosen have isDone = true
         if (!isDone.containsValue(false))
@@ -1895,8 +1900,10 @@ public class Controller{
 
     public void handleSurrenderEnded(ClientListener listener) {
 
+        Player p = playerbyListener.get(listener);
+
         synchronized (isDone) {
-            isDone.put(listener, true);
+            isDone.put(p, true);
         }
 
         synchronized (isDone) {
@@ -1995,7 +2002,8 @@ public class Controller{
     }
 
     public void handleEpidemic(ClientListener listener) {
-        isDone.put(listener, true);
+        Player p = playerbyListener.get(listener);
+        isDone.put(p, true);
         if(!isDone.containsValue(false)){
             resetShowAndDraw();
         } else {
