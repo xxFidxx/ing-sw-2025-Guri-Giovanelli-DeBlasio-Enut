@@ -226,7 +226,7 @@ public class Game{
         return result.toString();
     }
 
-    private void rewardSpaceship() {
+    public void rewardSpaceship() {
         ArrayList<Player> sortedList = new ArrayList<>(players);
         int minExposed = sortedList.stream().mapToInt(p -> p.getSpaceshipPlance().countExposedConnectors()).min().getAsInt();
         List<Player> winners = sortedList.stream().filter(p -> p.getSpaceshipPlance().countExposedConnectors() == minExposed).toList();
@@ -244,7 +244,7 @@ public class Game{
         }
     }
 
-    private void rewardCargo() {
+    public void rewardCargo() {
         for (Player p: players) {
             for (CargoHolds c: p.getSpaceshipPlance().getCargoHolds()) {
                 for (int i=0; i < c.getCapacity(); i++) {
@@ -259,14 +259,16 @@ public class Game{
         }
     }
 
-    private void rewardPlaces() {
-        int amount = 5 - players.size();
-        for (Player p: players) {
-            // surrended players dont get position reward
-            if(!p.isSurrended())
-                p.setCredits(players.getFirst().getCredits() + amount);
 
-            amount++;
+    public void rewardPlaces() {
+        int amount = 4;
+        for (int i = players.size()-1; i >= 0 ; i--) {
+            // surrended players dont get position reward
+            Player p = players.get(i);
+            if(!p.isSurrended()){
+                p.setCredits(players.get(i).getCredits() + amount);
+            }
+            amount--;
         }
     }
 }

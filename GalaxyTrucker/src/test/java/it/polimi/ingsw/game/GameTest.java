@@ -2,10 +2,7 @@ package it.polimi.ingsw.game;
 
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
-import it.polimi.ingsw.model.componentTiles.ConnectorType;
-import it.polimi.ingsw.model.componentTiles.DoubleCannon;
-import it.polimi.ingsw.model.componentTiles.DoubleEngine;
+import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Placeholder;
 import it.polimi.ingsw.model.game.Player;
@@ -256,6 +253,111 @@ public class GameTest {
             assertNull("La reward dovrebbe essere null dopo resetRewards()", player.getReward());
         }
     }
+    @Test
+    public void testGetEndStats_IgnoringSideEffects() {
+        // Imposta manualmente i crediti per i giocatori esistenti
+        Player alice = game.getPlayers().get(0); // Alice
+        Player bob = game.getPlayers().get(1);   // Bob
+        Player charlie = game.getPlayers().get(2); // Charlie
+
+        alice.setCredits(10);
+        bob.setCredits(30);
+        charlie.setCredits(20);
+
+        // Chiama il metodo
+        String result = game.getEndStats();
+
+        // Ordine atteso: Bob (30), Charlie (20), Alice (10)
+        String expected =
+                "1. Bob - 30\n" + "2. Charlie - 20\n" + "3. Alice - 10\n";
+
+        // Verifica
+        assertEquals(expected, result);
+    }
+    @Test
+    public void testRewardSpaceship() {
+        Player alice = game.getPlayers().get(0);
+        Player bob = game.getPlayers().get(1);
+        Player charlie = game.getPlayers().get(2);
+
+        // Crea mock di SpaceshipPlance
+        SpaceshipPlance mockAlicePlance = mock(SpaceshipPlance.class);
+        SpaceshipPlance mockBobPlance = mock(SpaceshipPlance.class);
+        SpaceshipPlance mockCharliePlance = mock(SpaceshipPlance.class);
+
+        // Configura il comportamento del mock
+        when(mockAlicePlance.countExposedConnectors()).thenReturn(2);
+        when(mockBobPlance.countExposedConnectors()).thenReturn(3);
+        when(mockCharliePlance.countExposedConnectors()).thenReturn(4);
+
+        // Sostituisci i plance reali con i mock
+        alice.setSpaceshipPlance(mockAlicePlance);
+        bob.setSpaceshipPlance(mockBobPlance);
+        charlie.setSpaceshipPlance(mockCharliePlance);
+
+        game.rewardSpaceship();
+
+        assertEquals(2, alice.getCredits());     // vincitore
+        assertEquals(0, bob.getCredits());
+        assertEquals(0, charlie.getCredits());
+
+    }
+    @Test
+    public void testRewardCargo() {
+        Player alice = game.getPlayers().get(0);
+        Player bob = game.getPlayers().get(1);
+
+        alice.setSurrended(false);
+        bob.setSurrended(true);
+
+        // Mock CargoHolds per Alice con capacità 3
+        CargoHolds aliceCargo = mock(CargoHolds.class);
+        GoodsBlock goodBlue = mock(GoodsBlock.class);
+        GoodsBlock goodGreen = mock(GoodsBlock.class);
+        GoodsBlock goodYellow = mock(GoodsBlock.class);
+
+        when(goodBlue.getValue()).thenReturn(0);    // Blu
+        when(goodGreen.getValue()).thenReturn(1);   // Verde
+        when(goodYellow.getValue()).thenReturn(2);  // Giallo
+
+        GoodsBlock[] aliceGoods = new GoodsBlock[]{goodBlue, goodGreen, goodYellow};
+        when(aliceCargo.getCapacity()).thenReturn(3);
+        when(aliceCargo.getGoods()).thenReturn(aliceGoods);
+
+        // Mock CargoHolds per Bob con capacità 2 e 2 rossi
+        CargoHolds bobCargo = mock(CargoHolds.class);
+        GoodsBlock goodRed1 = mock(GoodsBlock.class);
+        GoodsBlock goodRed2 = mock(GoodsBlock.class);
+
+        when(goodRed1.getValue()).thenReturn(3);      // Rosso
+        when(goodRed2.getValue()).thenReturn(3);      // Rosso
+
+        GoodsBlock[] bobGoods = new GoodsBlock[]{goodRed1, goodRed2};
+        when(bobCargo.getCapacity()).thenReturn(2);
+        when(bobCargo.getGoods()).thenReturn(bobGoods);
+
+        // Mock spaceshipPlance per Alice e Bob
+        SpaceshipPlance alicePlance = mock(SpaceshipPlance.class);
+        SpaceshipPlance bobPlance = mock(SpaceshipPlance.class);
+
+        when(alicePlance.getCargoHolds()).thenReturn(new ArrayList<>(List.of(aliceCargo)));
+        when(bobPlance.getCargoHolds()).thenReturn(new ArrayList<>(List.of(bobCargo)));
+
+        alice.setSpaceshipPlance(alicePlance);
+        bob.setSpaceshipPlance(bobPlance);
+
+        // Esegui il metodo da testare
+        game.rewardCargo();
+
+        // Alice: 0 + 1 + 2 = 3
+        assertEquals(3, alice.getCredits());
+        // Bob: (3 + 3) / 2 = 3 (perché surrender)
+        assertEquals(3, bob.getCredits());
+    }
+
+
+
+
 
 }
 
