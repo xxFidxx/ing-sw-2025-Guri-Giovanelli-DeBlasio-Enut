@@ -487,21 +487,28 @@ public class ClientSocket implements VirtualViewSocket {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
+                            System.out.println("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): or -1 to exit");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();
+                            if(input.equals("-1")) {
+                                inputValid = true;
+                            }
                             try {
                                 String[] parts = inputLine.split(" ");
                                 if (parts.length == 3) {
                                     int cargoIndex = Integer.parseInt(parts[0]);
                                     int goodIndex = Integer.parseInt(parts[1]);
                                     int rewardIndex = Integer.parseInt(parts[2]);
-                                    EventSender("addGood", new Object[]{cargoIndex,goodIndex,rewardIndex});
-                                    try {
-                                        inputValid = handleServerResponse();
-                                    } catch (InterruptedException e) {
-                                        System.out.println("Interrupted: " + e.getMessage());
-                                    }
+                                    if(cargoIndex!=0){
+                                        EventSender("addGood", new Object[]{cargoIndex,goodIndex,rewardIndex});
+                                        try {
+                                            inputValid = handleServerResponse();
+                                        } catch (InterruptedException e) {
+                                            System.out.println("Interrupted: " + e.getMessage());
+                                        }
+                                    }else
+                                        System.out.println("You can't add a good in reward cargo");
+
                                 }else
                                     System.out.println("Wrong input. You need 3 numbers divided by a space \n");
                             } catch (NumberFormatException e) {

@@ -523,49 +523,62 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     case "0" -> {
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): ");
+                            System.out.println("Insert: cargoIndex goodIndex rewardIndex (es. 0 1 2): or -1 to end cargo management");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();
-                            try {
-                                String[] parts = inputLine.split(" ");
-                                if (parts.length == 3) {
-                                    int cargoIndex = Integer.parseInt(parts[0]);
-                                    int goodIndex = Integer.parseInt(parts[1]);
-                                    int rewardIndex = Integer.parseInt(parts[2]);
-
-                                    server.addGood(this, cargoIndex, goodIndex, rewardIndex);
-                                    inputValid = true;
-                                }else
-                                    System.out.println("Wrong input. You need 3 numbers divided by a space \n");
-                            } catch (NumberFormatException e) {
-                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            }catch (CargoManagementException e){
-                                System.out.println("CargoManagementException " + e.getMessage());
-                            }catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
+                            if(inputLine.equals("-1")){
+                                server.endCargoManagement(this);
+                                System.out.print("Cargo management ended:\n");
+                            }else{
+                                try {
+                                    String[] parts = inputLine.split(" ");
+                                    if (parts.length == 3) {
+                                        int cargoIndex = Integer.parseInt(parts[0]);
+                                        int goodIndex = Integer.parseInt(parts[1]);
+                                        int rewardIndex = Integer.parseInt(parts[2]);
+                                        if(cargoIndex != 0){
+                                            server.addGood(this, cargoIndex, goodIndex, rewardIndex);
+                                            inputValid = true;
+                                        }else{
+                                            System.out.println("You can't put a good in reward cargo");
+                                        }
+                                    }else
+                                        System.out.println("Wrong input. You need 3 numbers divided by a space \n");
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                                }catch (CargoManagementException e){
+                                    System.out.println("CargoManagementException " + e.getMessage());
+                                }catch (Exception e) {
+                                    System.out.println("Error " + e.getMessage());
+                                }
                             }
+
                         }
                     }
                     case "1" -> {
                         boolean inputValid = false;
-
                         while(!inputValid){
                             try {
-                                System.out.println("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): ");
+                                System.out.println("Insert: cargoIndex1, cargoIndex2, goodIndex1, goodIndex2 (es. 0 1 2 1): or -1 to end cargo management");
                                 System.out.print("> ");
                                 String inputLine = scan.nextLine();
-                                String[] parts = inputLine.split(" ");
-                                if (parts.length == 4) {
+                                if(inputLine.equals("-1")){
+                                    server.endCargoManagement(this);
+                                    System.out.print("Cargo management ended:\n");
+                                }else {
+                                    String[] parts = inputLine.split(" ");
+                                    if (parts.length == 4) {
 
-                                    int cargoIndex1 = Integer.parseInt(parts[0]);
-                                    int cargoIndex2 = Integer.parseInt(parts[1]);
-                                    int goodIndex1 = Integer.parseInt(parts[2]);
-                                    int goodIndex2 = Integer.parseInt(parts[3]);
+                                        int cargoIndex1 = Integer.parseInt(parts[0]);
+                                        int cargoIndex2 = Integer.parseInt(parts[1]);
+                                        int goodIndex1 = Integer.parseInt(parts[2]);
+                                        int goodIndex2 = Integer.parseInt(parts[3]);
 
-                                    server.swapGoods(this, cargoIndex1, cargoIndex2, goodIndex1, goodIndex2);
-                                    inputValid = true;
-                                }else
-                                    System.out.println("Wrong input. You need 4 numbers divided by a space\n");
+                                        server.swapGoods(this, cargoIndex1, cargoIndex2, goodIndex1, goodIndex2);
+                                        inputValid = true;
+                                    } else
+                                        System.out.println("Wrong input. You need 4 numbers divided by a space\n");
+                                }
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
                             }catch (CargoManagementException e){
@@ -577,28 +590,37 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                     case "2" -> {
                         boolean inputValid = false;
-
                         while(!inputValid){
-                            System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
+                            System.out.println("Insert: cargoIndex goodIndex (es. 0 1): or -1 to end cargo management");
                             System.out.print("> ");
                             String inputLine = scan.nextLine();
-                            try {
-                                String[] parts = inputLine.split(" ");
-                                if (parts.length != 2) {
-                                    System.out.println("Wrong input. You need 2 numbers divided by a space \n");
-                                }else{
-                                    int cargoIndex = Integer.parseInt(parts[0]);
-                                    int goodIndex = Integer.parseInt(parts[1]);
-                                    server.removeGood(this, cargoIndex, goodIndex);
-                                    inputValid = true;
+                            if(inputLine.equals("-1")){
+                                server.endCargoManagement(this);
+                                System.out.print("Cargo management ended:\n");
+                            }else{
+                                try {
+                                    String[] parts = inputLine.split(" ");
+                                    if (parts.length != 2) {
+                                        System.out.println("Wrong input. You need 2 numbers divided by a space \n");
+                                    }else{
+                                        int cargoIndex = Integer.parseInt(parts[0]);
+                                        int goodIndex = Integer.parseInt(parts[1]);
+                                        if(cargoIndex != 0){
+                                            server.removeGood(this, cargoIndex, goodIndex);
+                                            inputValid = true;
+                                        }else{
+                                            System.out.println("You can't put a good in reward cargo");
+                                        }
+                                    }
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                                }catch (CargoManagementException e){
+                                    System.out.println("CargoManagementException " + e.getMessage());
+                                }catch (Exception e) {
+                                    System.out.println("Error " + e.getMessage());
                                 }
-                            } catch (NumberFormatException e) {
-                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            }catch (CargoManagementException e){
-                                System.out.println("CargoManagementException " + e.getMessage());
-                            }catch (Exception e) {
-                                System.out.println("Error " + e.getMessage());
                             }
+
                         }
                     }
 
@@ -781,7 +803,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
             case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
-            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile, type 1 to force draw card phase");
+            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile");
             case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
             case SHOW_SHIP -> System.out.println("Here is your spaceship");
             case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");

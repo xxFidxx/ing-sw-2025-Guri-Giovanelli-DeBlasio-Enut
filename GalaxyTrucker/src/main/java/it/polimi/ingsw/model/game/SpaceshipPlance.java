@@ -326,15 +326,30 @@ public class SpaceshipPlance {
     }
 
     private boolean isEngineValid(int y, int x) {
-        // Controlla solo orientamento e spazio dietro
-        return components[y][x].getConnectors()[2] == ConnectorType.ENGINE &&
-                (y + 1 >= 4 || components[y + 1][x] == null);
+        // Controlla solo orientamento e spazio dietro oppure se lo spazio dietro è nel vuoto
+        return components[y][x].getConnectors()[2] == ConnectorType.ENGINE && (!inBounds(x,y+1) || components[y + 1][x] == null);
     }
 
     private boolean isCannonValid(int y, int x) {
-        // Controlla solo orientamento e spazio davanti
-        return components[y][x].getConnectors()[0] == ConnectorType.CANNON &&
-                (y - 1 < 0 || components[y - 1][x] == null);
+        ConnectorType[] connectors = components[y][x].getConnectors();
+
+        for (int direction = 0; direction < 4; direction++) {
+            if (connectors[direction] == ConnectorType.CANNON) {
+                int newY = y, newX = x;
+
+                switch (direction) {
+                    case 0: newY = y - 1; break; // nord
+                    case 1: newX = x + 1; break; // est
+                    case 2: newY = y + 1; break; // sud
+                    case 3: newX = x - 1; break; // ovest
+                }
+
+                // Verifica che la casella nella direzione del cannone sia vuota o fuori dalla navicella
+                return !inBounds(newX, newY) || components[newY][newX] == null;
+            }
+        }
+
+        return false;
     }
 
 
@@ -352,18 +367,12 @@ public class SpaceshipPlance {
             int adjY = y + DIR_Y[dir];
 
             // Caso 1: Controllo speciale per ENGINE/CANNON
-            if (tile instanceof Engine && dir == 2) { // SOUTH
-                if (y + 1 < ROWS && components[y + 1][x] != null) {
-                    isValid = false;
-                }
-                continue;
+            if (tile instanceof Engine) { // SOUTH
+                isValid = isEngineValid(y,x);
             }
 
             if (tile instanceof Cannon && dir == 0) { // NORTH
-                if (y - 1 >= 0 && components[y - 1][x] != null) {
-                    isValid = false;
-                }
-                continue;
+                isValid = isCannonValid(y,x);
             }
 
             // Caso 2: Connessione con tile adiacente

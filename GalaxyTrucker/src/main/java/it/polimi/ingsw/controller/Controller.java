@@ -613,10 +613,9 @@ public class Controller{
                     System.out.println("PlanetsCard, currentPlayer: " + currentPlayer);
                     PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                     if (game.freePlanets(currentAdventureCard, currentPlanetsCard.getPlanets())) {
-                        ClientListener l = listenerbyPlayer.get(currentPlayer);
                         // tmpPlayers.remove(currentPlayer);
                         System.out.println("PlanetsCard: mando in handleWaitersPlanets");
-                        handleWaitersPlanets(l);
+                        handleWaitersPlanets(currentPlayer);
                     } else {
                         ClientListener l = listenerbyPlayer.get(currentPlayer);
                         // l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
@@ -624,6 +623,9 @@ public class Controller{
                         handlePlanets(l);
                         // manageCard();
                     }
+                }else{
+                    resetShowAndDraw();
+                    return;
                 }
             }
 
@@ -716,8 +718,8 @@ public class Controller{
         if(!isDone.containsValue(false)){
             resetShowAndDraw();
         } else {
-            manageCard();
             l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+            manageCard();
         }
     }
 
@@ -911,19 +913,17 @@ public class Controller{
         }
     }
 
-    private void handleWaitersPlanets(ClientListener listener) {
-        Iterator<Player> iterator = tmpPlayers.iterator();
-        while (iterator.hasNext()) {
-            Player p = iterator.next();
-            ClientListener l = listenerbyPlayer.get(p);
-            if (l == listener) {
-                iterator.remove();
+    private void handleWaitersPlanets(Player chosenPlayer) {
+        for (Player player: players) {
+            ClientListener l = listenerbyPlayer.get(player);
+            if (player == chosenPlayer) {
                 PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS, currentPlanetsCard.getPlanets(), null));
             } else {
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
         }
+        tmpPlayers.remove(chosenPlayer);
     }
 
     public void fromChargeToManage(ClientListener listener) {
