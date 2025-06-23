@@ -15,6 +15,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -42,10 +43,13 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public static void main(String[] args) throws RemoteException {
         final String serverName = "ServerRmi";
 
-        try {
+        try (Scanner scanner = new Scanner(System.in)){
 
-            String hotspotIp = "127.0.0.1";
-            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+            System.out.print("Enter host IP address (leave empty for localhost):");
+            String hotspotIp = scanner.nextLine().trim();
+
+            if (hotspotIp.isEmpty()) hotspotIp = "127.0.0.1";
+            System.setProperty("java.rmi.server.hostname", hotspotIp);
 
 
             Registry registry = LocateRegistry.createRegistry(1234);

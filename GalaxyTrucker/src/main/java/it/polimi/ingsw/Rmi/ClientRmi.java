@@ -57,7 +57,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
         // qua c'è da metterci come primo argomento identificativo registro, visto che voglio testare sulla mia macchina
         // ora l'ip è quello della macchina locale: 127.0.0.1 indirizzo local host
-        Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1234);
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter host IP address (leave empty for localhost): ");
+
+        String ipAddress = scanner.nextLine().trim();
+        if (ipAddress.isEmpty()) ipAddress = "127.0.0.1";
+
+        Registry registry = LocateRegistry.getRegistry(ipAddress, 1234);
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
         new ClientRmi(server).run(0);
