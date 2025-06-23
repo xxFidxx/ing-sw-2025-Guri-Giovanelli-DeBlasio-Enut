@@ -393,6 +393,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 } catch (RemoteException e) {
                                     System.out.println("RemoteException error " + e.getMessage());
                                 }
+                                if(!exit)
+                                    System.out.println("Invalid input, please try again");
                             }
                         }
                     default -> System.out.print("Not accepted input, please try again:\n");

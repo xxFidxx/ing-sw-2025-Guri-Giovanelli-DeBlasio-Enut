@@ -26,6 +26,7 @@ public class  Flightplance {
 
         try {
             List<AdventureCard> cards = AdventureCardFactory.loadCards(this.game);
+            //List<AdventureCard> testCards = new ArrayList<>(cards.subList(0, 12));
             List<AdventureCard> level1Cards = new ArrayList<>(cards.subList(0, 20));
             List<AdventureCard> level2Cards = new ArrayList<>(cards.subList(20, 40));
 
@@ -39,7 +40,7 @@ public class  Flightplance {
                 finalDeck.add(level2Cards.removeFirst());
                 finalDeck.add(level1Cards.removeFirst());
             }
-
+            //this.deck = new Deck(testCards, this);
             this.deck = new Deck(finalDeck, this);
         }
         catch (Exception e) {

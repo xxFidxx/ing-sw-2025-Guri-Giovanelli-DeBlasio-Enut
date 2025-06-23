@@ -363,13 +363,19 @@ public class ClientSocket implements VirtualViewSocket {
                                     EventSender("addAlienCabin", new Object[]{cabinId, alienColor});
                                     try {
                                         exit = handleServerResponse();
+
+                                        if(!exit)
+                                            System.out.println("Invalid input, please try again");
+                                        else
+                                            System.out.println("Successfully exchanged in cabin " + cabinId +  " 2 astronauts for a " + alienColor + " alien");
+
                                     } catch (InterruptedException e) {
                                         System.out.println("Interrupted: " + e.getMessage());
                                     }
                                 } else
-                                    System.out.println("Wrong input. You need a number and the letter b or v divided by a space \n");
+                                    System.out.println("Wrong input. You need a number and the letter b or v divided by a space");
                             } catch (NumberFormatException e) {
-                                System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars \n");
+                                System.out.println("Invalid input, ensure to write only numbers in the right spot and not letters or special chars ");
                             }
                         }
                     }
