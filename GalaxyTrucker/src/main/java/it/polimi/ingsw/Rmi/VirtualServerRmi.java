@@ -19,26 +19,21 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void addNickname(VirtualView client, String nickname) throws RemoteException, LobbyExceptions;
 
-
     void createLobby(int number) throws RemoteException, LobbyExceptions;
 
     void pickTile(VirtualViewRmi clientRmi, int input) throws RemoteException;
-
-    void drawCard() throws RemoteException;
 
     void checkStorage(VirtualViewRmi clientRmi) throws RemoteException, CargoManagementException;
 
     void endCrafting(VirtualViewRmi clientRmi) throws Exception;
 
-    void addGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex, int rewardIndex) throws RemoteException;
+    void addGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex, int rewardIndex) throws RemoteException, CargoManagementException;
 
-    void swapGoods(VirtualViewRmi clientRmi, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) throws RemoteException;
+    void swapGoods(VirtualViewRmi clientRmi, int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) throws RemoteException, CargoManagementException;
 
-    void removeGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
+    void removeGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException, CargoManagementException;
 
     void acceptCard(VirtualViewRmi client) throws RemoteException;
-
-    //void printSpaceship(VirtualViewRmi clientRmi) throws RemoteException;
 
     void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException;
 

@@ -190,7 +190,13 @@ public class Controller{
                     assemblingTilesIds = game.getTilesId();
                 }
                 ArrayList<ComponentTile> reservedTiles = player.getSpaceshipPlance().getReserveSpot();
-                event = new Event(state, new PickableTiles(assemblingTilesIds, reservedTiles));
+
+                ArrayList <PickedTile> reserveTiles = new ArrayList<>();
+
+                for(ComponentTile componentTile: reservedTiles)
+                    reserveTiles.add(new PickedTile(componentTile.toString()));
+
+                event = new Event(state, new PickableTiles(assemblingTilesIds, reserveTiles));
             }
 
             case SHOW_SHIP -> {
@@ -212,13 +218,13 @@ public class Controller{
 
                 switch(nDeck) {
                     case 1 -> {
-                        advCardsToShow = new ArrayList<>(cards.subList(0, 4));
+                        advCardsToShow = new ArrayList<>(cards.subList(0, 3));
                     }
                     case 2 -> {
-                        advCardsToShow = new ArrayList<>(cards.subList(5, 9));
+                        advCardsToShow = new ArrayList<>(cards.subList(4, 7));
                     }
                     case 3 -> {
-                        advCardsToShow = new ArrayList<>(cards.subList(9, 13));
+                        advCardsToShow = new ArrayList<>(cards.subList(8, 11));
                     }
                 }
 
@@ -1555,6 +1561,7 @@ public class Controller{
         ComponentTile tile = player.getHandTile();
 
         if (player.getSpaceshipPlance().getReserveSpot().size() >= 2) {
+            listener.onEvent(eventCrafter(GameState.FULL_RESERVE_SPOT, null, null));
             putTileBack(listener);
         } else {
             player.getSpaceshipPlance().addReserveSpot(tile);
@@ -2113,11 +2120,11 @@ public class Controller{
         return false;
     }
 
-    public void showDecks(ClientListenerRmi listener) {
+    public void showDecks(ClientListener listener) {
         listener.onEvent(eventCrafter(GameState.SHOW_DECKS, null, null));
     }
 
-    public boolean showCardsbyDeck(ClientListenerRmi listener, int nDeck) {
+    public boolean showCardsbyDeck(ClientListener listener, int nDeck) {
         synchronized (busyDecks) {
             if (busyDecks[nDeck - 1]) {
                 return false;
@@ -2129,7 +2136,7 @@ public class Controller{
         return true;
     }
 
-    public void endShowCards(ClientListenerRmi listener, int nDeck) {
+    public void endShowCards(ClientListener listener, int nDeck) {
 
         if(nDeck != -1){
             synchronized (busyDecks) {
@@ -2180,7 +2187,7 @@ public class Controller{
     }
 
 
-    /*public void fromChargeOrShots(ClientListenerRmi listener) {
+    /*public void fromChargeOrShots(ClientListener listener) {
         Player p = playerbyListener.get(listener);
         if(currentAdventureCard instanceof CombatZoneCard)
             combatZoneShots(p);

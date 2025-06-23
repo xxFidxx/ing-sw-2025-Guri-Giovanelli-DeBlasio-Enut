@@ -42,7 +42,7 @@ public class SocketServer implements VirtualServerSocket {
 
     public void start() {
         try {
-            String hotspotIp = "192.168.203.223";
+            String hotspotIp = "127.0.0.1";
             InetAddress bindAddr = InetAddress.getByName(hotspotIp);
 
             try (ServerSocket serverSocket = new ServerSocket(port, 50, bindAddr)) {
@@ -120,194 +120,6 @@ public class SocketServer implements VirtualServerSocket {
     }
 
 
-    public void createLobby(int number) throws   LobbyExceptions {
-        synchronized(controller){
-            controller.createLobby(number);
-        }
-        System.out.println("Lobby created\n");
-    }
-
-    public void pickTile(ObjectOutputStream client, int id)   {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.pickTile(listener, id);
-    }
-
-    public void drawCard()   {
-        controller.drawCard();
-    }
-
-
-    public void endCrafting(ObjectOutputStream client) throws Exception {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.playerIsDoneCrafting(listener);
-    }
-
-
-    public void checkStorage(ObjectOutputStream client) throws   CargoManagementException {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.checkStorage(listener);
-    }
-
-    public void checkStorageOk(ObjectOutputStream client) throws   CargoManagementException {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.checkStorageOk(listener);
-    }
-
-
-
-
-    public void addGood(ObjectOutputStream client,int cargoIndex, int goodIndex, int rewardIndex) {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.addGood(listener,cargoIndex,goodIndex,rewardIndex);
-    }
-
-
-    public void swapGoods(ObjectOutputStream client,int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.swapGoods(listener,cargoIndex1,cargoIndex2,goodIndex1,goodIndex2);
-    }
-
-
-    public void removeGood(ObjectOutputStream client,int cargoIndex, int goodIndex) {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.removeGood(listener, cargoIndex, goodIndex);
-    }
-
-
-    public void acceptCard(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.acceptCard(listener);
-    }
-
-
-    public void addTile(ObjectOutputStream client, int xIndex, int yIndex) throws   SpaceShipPlanceException {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.addTile(listener,xIndex,yIndex);
-    }
-
-
-    public void charge(ObjectOutputStream client, int i)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.charge(listener, i);
-    }
-
-
-    public void putTileBack(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.putTileBack(listener);
-    }
-
-
-    public void choosePlanets(ObjectOutputStream client, int i)  {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.choosePlanets(listener,i);
-    }
-
-
-    public void manageCard()    {
-        controller.manageCard();
-    }
-
-
-    public void addReserveSpot(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.addReserveSpot(listener);
-    }
-
-
-    public void endCargoManagement(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.endCargoManagement(listener);
-    }
-
-
-
-    public void chargeCannons(ObjectOutputStream client, ArrayList<Integer> chosenIndices)   {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.chargeCannons(listener, chosenIndices);
-    }
-
-    public void rotateClockwise(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.rotateClockwise(listener);
-    }
-
-
-    public void removeAdjust(ObjectOutputStream client, int xIndex, int yIndex) throws   SpaceShipPlanceException {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.removeAdjust(listener, xIndex, yIndex);
-    }
-
-
-    public void selectShipPart(ObjectOutputStream client, int part)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.selectShipPart(listener, part);
-    }
-
-
-    public void playerHit(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.playerHit(listener);
-    }
-
-
-    public void playerProtected(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.playerProtected(listener);
-    }
-
-
-    public boolean addAlienCabin(ObjectOutputStream client, int cabinId, String alienColor)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        return controller.addAlienCabin(listener,cabinId,alienColor);
-    }
-
-
-    public void handleEndChooseAliens(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.handleEndChooseAliens(listener);
-    }
-
-
-    public boolean removeFigure(ObjectOutputStream client, int cabinId)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        return controller.removeFigure(listener,cabinId);
-    }
-
-
-    public void surrender(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.surrender(listener);
-    }
-
-
-    public void handleSurrenderEnded(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.handleSurrenderEnded(listener);
-    }
-
-    public boolean removeBatteries(ObjectOutputStream client, int powerCenterId, int batteries)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        return controller.removeBatteries(listener,powerCenterId,batteries);
-    }
-
-
-    public void endManagement(ObjectOutputStream client)    {
-        ClientListenerSocket listener = clientListeners.get(client);
-        controller.endManagement(listener);
-    }
-
-
-    public boolean removeMVGood(ObjectOutputStream client, int cargoIndex, int goodIndex) {
-        ClientListenerSocket listener = clientListeners.get(client);
-        return controller.removeMVGood(listener,cargoIndex,goodIndex);
-    }
-
-    public void endMVGoodsManagement(ObjectOutputStream client)    {
-        ClientListener listener = clientListeners.get(client);
-        controller.endMVGoodsManagement(listener);
-    }
-
 
     @Override
     public void handleCommand(String command, Object[] parameters, ObjectOutputStream out) {
@@ -317,105 +129,174 @@ public class SocketServer implements VirtualServerSocket {
             switch (command) {
                 // Metodi boolean
                 case "addAlienCabin":
-                    result = addAlienCabin(out, (int)parameters[0], (String)parameters[1]);
-                    break;
-                case "removeFigure":
-                    result = removeFigure(out, (int)parameters[0]);
-                    break;
-                case "removeBatteries":
-                    result = removeBatteries(out, (int)parameters[0], (int)parameters[1]);
-                    break;
-                case "removeMVGood":
-                    result = removeMVGood(out, (int)parameters[0], (int)parameters[1]);
+                    result = controller.addAlienCabin(clientListeners.get(out), (int) parameters[0], (String) parameters[1]);
                     break;
 
-                // Metodi void (considerati sempre come success) a meno che ci sia un errore
+                case "removeFigure":
+                    result = controller.removeFigure(clientListeners.get(out), (int) parameters[0]);
+                    break;
+
+                case "removeBatteries":
+                    result = controller.removeBatteries(clientListeners.get(out), (int) parameters[0], (int) parameters[1]);
+                    break;
+
+                case "removeMVGood":
+                    result = controller.removeMVGood(clientListeners.get(out), (int) parameters[0], (int) parameters[1]);
+                    break;
+
                 case "pickTile":
-                    pickTile(out, (int)parameters[0]);
+                    controller.pickTile(clientListeners.get(out), (int) parameters[0]);
                     break;
+
                 case "drawCard":
-                    drawCard();
+                    controller.drawCard();
                     break;
+
                 case "endCrafting":
-                    endCrafting(out);
+                    controller.playerIsDoneCrafting(clientListeners.get(out));
                     break;
+
                 case "checkStorage":
-                    checkStorage(out);
+                    controller.checkStorage(clientListeners.get(out));
                     break;
+
                 case "checkStorageOk":
-                    checkStorageOk(out);
+                    controller.checkStorageOk(clientListeners.get(out));
                     break;
+
                 case "addGood":
-                    addGood(out, (int)parameters[0], (int)parameters[1], (int)parameters[2]);
+                    controller.addGood(clientListeners.get(out), (int) parameters[0], (int) parameters[1], (int) parameters[2]);
                     break;
+
                 case "swapGoods":
-                    swapGoods(out, (int)parameters[0], (int)parameters[1], (int)parameters[2], (int)parameters[3]);
+                    controller.swapGoods(clientListeners.get(out), (int) parameters[0], (int) parameters[1], (int) parameters[2], (int) parameters[3]);
                     break;
+
                 case "removeGood":
-                    removeGood(out, (int)parameters[0], (int)parameters[1]);
+                    controller.removeGood(clientListeners.get(out), (int) parameters[0], (int) parameters[1]);
                     break;
+
                 case "acceptCard":
-                    acceptCard(out);
+                    controller.acceptCard(clientListeners.get(out));
                     break;
+
                 case "addTile":
-                    addTile(out, (int)parameters[0], (int)parameters[1]);
+                    controller.addTile(clientListeners.get(out), (int) parameters[0], (int) parameters[1]);
                     break;
+
                 case "chargeEngines":
-                    charge(out, (int)parameters[0]);
+                    controller.charge(clientListeners.get(out), (int) parameters[0]);
                     break;
+
                 case "putTileBack":
-                    putTileBack(out);
+                    controller.putTileBack(clientListeners.get(out));
                     break;
+
                 case "choosePlanets":
-                    choosePlanets(out, (int)parameters[0]);
+                    controller.choosePlanets(clientListeners.get(out), (int) parameters[0]);
                     break;
+
                 case "manageCard":
-                    manageCard();
+                    controller.manageCard();
                     break;
+
                 case "addReserveSpot":
-                    addReserveSpot(out);
+                    controller.addReserveSpot(clientListeners.get(out));
                     break;
+
                 case "endCargoManagement":
-                    endCargoManagement(out);
+                    controller.endCargoManagement(clientListeners.get(out));
                     break;
+
                 case "chargeCannons":
-                    chargeCannons(out, (ArrayList<Integer>)parameters[0]);
+                    controller.chargeCannons(clientListeners.get(out), (ArrayList<Integer>) parameters[0]);
                     break;
+
                 case "rotateClockwise":
-                    rotateClockwise(out);
+                    controller.rotateClockwise(clientListeners.get(out));
                     break;
+
                 case "removeAdjust":
-                    removeAdjust(out, (int)parameters[0], (int)parameters[1]);
+                    controller.removeAdjust(clientListeners.get(out), (int) parameters[0], (int) parameters[1]);
                     break;
+
                 case "selectShipPart":
-                    selectShipPart(out, (int)parameters[0]);
+                    controller.selectShipPart(clientListeners.get(out), (int) parameters[0]);
                     break;
+
                 case "playerHit":
-                    playerHit(out);
+                    controller.playerHit(clientListeners.get(out));
                     break;
+
                 case "playerProtected":
-                    playerProtected(out);
+                    controller.playerProtected(clientListeners.get(out));
                     break;
+
                 case "handleEndChooseAliens":
-                    handleEndChooseAliens(out);
+                    controller.handleEndChooseAliens(clientListeners.get(out));
                     break;
+
                 case "surrender":
-                    surrender(out);
+                    controller.surrender(clientListeners.get(out));
                     break;
+
                 case "handleSurrenderEnded":
-                    handleSurrenderEnded(out);
+                    controller.handleSurrenderEnded(clientListeners.get(out));
                     break;
+
                 case "endManagement":
-                    endManagement(out);
+                    controller.endManagement(clientListeners.get(out));
                     break;
+
                 case "createLobby":
-                    createLobby((int)parameters[0]);
+                    synchronized (controller){
+                        controller.createLobby((int) parameters[0]);
+                    }
                     break;
+
                 case "addNickname":
-                    addNickname(out, (String)parameters[0]);
+                    addNickname(out, (String) parameters[0]); // mantiene questo perché aggiorna anche mappe lato server
                     break;
+
                 case "endMVGoodsManagement":
-                    endMVGoodsManagement(out);
+                    controller.endMVGoodsManagement(clientListeners.get(out));
+                    break;
+
+                case "fromChargeToManage":
+                    controller.fromChargeToManage(clientListeners.get(out));
+                    break;
+
+                case "endShowCards":
+                    controller.endShowCards(clientListeners.get(out), (int) parameters[0]);
+                    break;
+
+                case "showCardsbyDeck":
+                    result = controller.showCardsbyDeck(clientListeners.get(out), (int) parameters[0]);
+                    break;
+
+                case "showDecks" :
+                    controller.showDecks(clientListeners.get(out));
+                    break;
+
+                case "startTimer":
+                    result = controller.startTimer();
+                    break;
+
+                case "removeFigureEpidemic":
+                    result = controller.removeFigureEpidemic(clientListeners.get(out), (int) parameters[0]);
+                    break;
+
+                case "endCrewManagement":
+                    controller.endCrewManagement(clientListeners.get(out));
+                    break;
+
+                case "handlePlanets":
+                    controller.handlePlanets(clientListeners.get(out));
+                    break;
+
+                case "fromMvGoodstoBatteries":
+                    controller.fromMvGoodstoBatteries(clientListeners.get(out), (int) parameters[0]);
+                    break;
 
                 default:
                     System.out.println("Comando non riconosciuto: '" + command + "' (lunghezza: " + command.length() + ")"); // Debug
@@ -424,8 +305,7 @@ public class SocketServer implements VirtualServerSocket {
                     return;
             }
 
-            notifyClient(out, new Event(GameState.SERVER_RESPONSE,
-                    new ServerResponse(result, false, null)));
+            notifyClient(out, new Event(GameState.SERVER_RESPONSE, new ServerResponse(result, false, null)));
 
         } catch (LobbyExceptions e) {
             handleException(out, command, "Errore lobby", e);

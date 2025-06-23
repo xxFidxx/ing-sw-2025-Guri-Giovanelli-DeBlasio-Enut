@@ -14,7 +14,7 @@ public class TileSymbols {
                     'K' – DoubleCannon
                     'E' – Engine
                     'Y' – DoubleEngine
-                    'X' – StructuralModule
+                    'M' – StructuralModule
                     'L' – LifeSupportSystem
                     'S' – ShieldGenerator
                     'H' – CargoHolds
@@ -37,7 +37,7 @@ public class TileSymbols {
         ASCII_TILE_SYMBOLS.put("DoubleEngine", 'Y');
         ASCII_TILE_SYMBOLS.put("Cabin", 'C');
         //ASCII_TILE_SYMBOLS.put("CentralCabin", 'K');
-        ASCII_TILE_SYMBOLS.put("StructuralModule", 'X');
+        ASCII_TILE_SYMBOLS.put("StructuralModule", 'M');
         ASCII_TILE_SYMBOLS.put("LifeSupportSystem", 'L');
         ASCII_TILE_SYMBOLS.put("ShieldGenerator", 'S');
         ASCII_TILE_SYMBOLS.put("CargoHolds", 'H');

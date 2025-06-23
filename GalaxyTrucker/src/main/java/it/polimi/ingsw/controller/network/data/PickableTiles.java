@@ -9,9 +9,9 @@ public class PickableTiles extends DataContainer implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     Integer[] tiles;
-    ArrayList<ComponentTile> reservedTiles;
+    ArrayList <PickedTile> reservedTiles;
 
-    public PickableTiles(Integer[] tiles, ArrayList<ComponentTile> reservedTiles) {
+    public PickableTiles(Integer[] tiles, ArrayList <PickedTile> reservedTiles) {
         this.tiles = tiles;
         this.reservedTiles = reservedTiles;
     }
@@ -19,5 +19,5 @@ public class PickableTiles extends DataContainer implements Serializable {
     public Integer[] getTilesId(){
         return tiles;
     }
-    public ArrayList<ComponentTile> getReservedTiles(){return reservedTiles;}
+    public ArrayList <PickedTile> getReservedTiles(){return reservedTiles;}
 }

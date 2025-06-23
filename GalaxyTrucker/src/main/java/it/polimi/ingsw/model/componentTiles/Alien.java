@@ -11,4 +11,11 @@ public class Alien extends Figure {
     public AlienColor getColor() {
         return color;
     }
+
+    @Override
+    public String toString() {
+        return "Alien{" +
+                "color=" + color +
+                '}';
+    }
 }

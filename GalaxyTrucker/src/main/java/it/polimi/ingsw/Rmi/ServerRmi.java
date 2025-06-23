@@ -8,8 +8,6 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.view.VirtualView;
-
-import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -118,11 +116,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void pickTile(VirtualViewRmi client, int id) throws RemoteException {
         ClientListenerRmi listener = clientListeners.get(client);
         controller.pickTile(listener, id);
-    }
-
-    @Override
-    public void drawCard() throws RemoteException {
-        controller.drawCard();
     }
 
     @Override

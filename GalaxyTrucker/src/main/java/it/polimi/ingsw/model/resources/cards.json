@@ -1,10 +1,361 @@
 [
   {
+    "type": "StardustCard",
+    "name": "Stardust",
+    "level": 1,
+    "lostDays": 1
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 }
+    ]
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 3,
+    "planets": [
+      [3, 1, 0, 0, 0],
+      [3, 2, 0, 0],
+      [3, 0, 0, 0],
+      [3, 1]
+    ]
+  },
+  {
+    "type": "CombatZoneCard",
+    "name": "Combat Zone",
+    "level": 1,
+    "combatZoneType": 0,
+    "lostDays": 3,
+    "lostOther": 2,
+    "cannons": [
+      { "type": 0, "direction": 2 },
+      { "type": 1, "direction": 2 }
+    ]
+  },
+  {
+    "type": "SmugglersCard",
+    "name": "Smugglers",
+    "level": 1,
+    "cannonStrength": 4,
+    "lostDays": 1,
+    "lossMalus": 2,
+    "reward": [2, 1, 0]
+  },
+  {
+    "type": "PiratesCard",
+    "name": "Pirates",
+    "level": 1,
+    "cannonStrength": 5,
+    "lostDays": 1,
+    "shots": [
+      { "type": 0, "direction": 0 },
+      { "type": 1, "direction": 0 },
+      { "type": 0, "direction": 0 }
+    ],
+    "reward": 4
+  },
+  {
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 1,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
+  },
+  {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
+    "level": 1,
+    "lostDays": 1,
+    "requiredCrew": 5,
+    "reward": [2, 1]
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 1
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 1
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 3,
+    "planets": [
+      [3,3],
+      [3,2,0],
+      [2]
+    ]
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 1
+  },
+  {
+    "type": "AbandonedShipCard",
+    "name": "Abandoned Ship",
+    "level": 1,
+    "lostDays": 1,
+    "lostCrew": 2,
+    "credits": 3
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 3,
+    "planets": [
+      [2, 1, 0, 0],
+      [2,2]
+    ]
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 1,
+    "planets": [
+      [1, 1],
+      [2],
+      [0, 0, 0]
+    ]
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 1,
+    "meteors": [
+      { "type": 2, "direction": 0 },
+      { "type": 2, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 },
+      { "type": 2, "direction": 2 }
+    ]
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 0 },
+      { "type": 3, "direction": 0 }
+    ]
+  },
+  {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
+    "level": 1,
+    "lostDays": 1,
+    "requiredCrew": 6,
+    "reward": [3, 3]
+  },
+  {
+    "type": "StardustCard",
+    "name": "Stardust",
+    "level": 2,
+    "lostDays": 1
+  },
+  {
+    "type": "AbandonedShipCard",
+    "name": "Abandoned Ship",
+    "level": 1,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "credits": 4
+  },
+  {
+    "type": "EpidemicCard",
+    "name": "Epidemic",
+    "level": 2
+  },
+  {
+    "type": "EpidemicCard",
+    "name": "Epidemic",
+    "level": 2
+  },
+  {
+    "type": "CombatZoneCard",
+    "name": "Combat Zone",
+    "level": 2,
+    "combatZoneType": 1,
+    "lostDays": 4,
+    "lostOther": 3,
+    "cannons": [
+      { "type": 0, "direction": 0 },
+      { "type": 0, "direction": 3 },
+      { "type": 0, "direction": 1 },
+      { "type": 1, "direction": 2 }
+    ]
+  },
+  {
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 2,
+    "cannonStrength": 7,
+    "lostDays": 2,
+    "lostCrew": 4,
+    "reward": 8
+  },
+  {
+    "type": "SmugglersCard",
+    "name": "Smugglers",
+    "level": 2,
+    "cannonStrength": 8,
+    "lostDays": 1,
+    "lossMalus": 3,
+    "reward": [3, 2, 2]
+  },
+  {
+    "type": "PiratesCard",
+    "name": "Pirates",
+    "level": 2,
+    "cannonStrength": 6,
+    "lostDays": 2,
+    "shots": [
+      { "type": 1, "direction": 0 },
+      { "type": 0, "direction": 0 },
+      { "type": 1, "direction": 0 }
+    ],
+    "reward": 7
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 2
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 2,
+    "meteors": [
+      { "type": 2, "direction": 0 },
+      { "type": 2, "direction": 0 },
+      { "type": 3, "direction": 3 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 3 }
+    ]
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 2
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 2,
+    "lostDays": 4,
+    "planets": [
+      [3, 3, 3, 2],
+      [3, 3, 1, 1],
+      [3, 0, 0, 0, 0]
+    ]
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 2,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 2 },
+      { "type": 2, "direction": 2 }
+    ]
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 2,
+    "lostDays": 3,
+    "planets": [
+      [3, 3],
+      [1, 1, 1, 1]
+    ]
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space",
+    "level": 2
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm",
+    "level": 2,
+    "meteors": [
+      { "type": 2, "direction": 0 },
+      { "type": 2, "direction": 0 },
+      { "type": 3, "direction": 1 },
+      { "type": 2, "direction": 1 },
+      { "type": 2, "direction": 1 }
+    ]
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 2,
+    "lostDays": 3,
+    "planets": [
+      [1, 1, 1, 1],
+      [2, 2],
+      [0, 0, 0, 0]
+    ]
+  },
+  {
+    "type": "AbandonedShipCard",
+    "name": "Abandoned Ship",
+    "level": 2,
+    "lostDays": 1,
+    "lostCrew": 4,
+    "credits": 6
+  },
+  {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 2,
+    "lostDays": 2,
+    "planets": [
+      [3, 2],
+      [2, 1, 0],
+      [1, 1],
+      [2]
+    ]
+  },
+  {
     "type": "AbandonedShipCard",
     "name": "Abandoned Ship",
     "level": 2,
     "lostDays": 2,
-    "lostCrew": 3,
-    "credits": 10
+    "lostCrew": 5,
+    "credits": 8
+  },
+  {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
+    "level": 2,
+    "lostDays": 1,
+    "requiredCrew": 7,
+    "reward": [3, 2]
+  },
+  {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station",
+    "level": 2,
+    "lostDays": 2,
+    "requiredCrew": 8,
+    "reward": [2, 2, 1]
   }
 ]

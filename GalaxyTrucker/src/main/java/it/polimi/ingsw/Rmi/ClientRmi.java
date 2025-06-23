@@ -134,8 +134,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             System.out.println("Error " + e.getMessage());
                         }
                     }else if(input.equals("-2")){
-                        // fai try catch
-                        server.showDecks(this);
+                        try {
+                            server.showDecks(this);
+                        }catch (Exception e) {
+                            System.out.println("Error " + e.getMessage());
+                        }
                     }else{
                         try {
                             int index = Integer.parseInt(input);
@@ -284,8 +287,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 if (input.equals("0")) {
                     boolean inputValid = false;
                     while (!inputValid) {
-
-                        // da rimuovere l'escape con -1 quando sappiamo che funziona tutto
                         System.out.println("Type -1 to exit or insert coordinates of the tile you want to remove: x y (es. 1 2): ");
                         System.out.print("> ");
                         String inputLine = scan.nextLine();
@@ -319,6 +320,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
+
             }case SELECT_SHIP -> {
                     boolean inputValid = false;
                     while(!inputValid){
@@ -338,6 +340,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case SHOW_SHIP -> System.out.println("Not accepted input, please try again:");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
+            case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!");
             case DRAW_CARD ->
                     System.out.println("If you are the leader you will have to choose what to do, else just wait the players ahead are done!");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
@@ -491,7 +494,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     } else {
                                         System.out.println("You have to choose 1 to 3 batteries to remove, please retry");
                                     }
-
                             } else {
                                 System.out.println("Wrong input. You need to put a PowerCenterId and a nBatteries divided by a space\n");
                             }
@@ -535,7 +537,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     System.out.println("Wrong input. You need 3 numbers divided by a space \n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
+                            }catch (CargoManagementException e){
+                                System.out.println("CargoManagementException " + e.getMessage());
+                            }catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
                             }
                         }
@@ -562,7 +566,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                     System.out.println("Wrong input. You need 4 numbers divided by a space\n");
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
+                            }catch (CargoManagementException e){
+                                System.out.println("CargoManagementException " + e.getMessage());
+                            }catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
                             }
                         }
@@ -586,7 +592,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
-                            } catch (Exception e) {
+                            }catch (CargoManagementException e){
+                                System.out.println("CargoManagementException " + e.getMessage());
+                            }catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
                             }
                         }
@@ -613,6 +621,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
             case CHOOSE_ENGINE -> {
                 switch (input) {
                     case "0" -> server.fromChargeToManage(this);
@@ -675,13 +684,17 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 switch (input) {
                     case "0" -> server.handlePlanets(this);
                     case "1"->{
+                        DataContainer data = currentEvent.getData();
+                        ArrayList<Planet> planets = ((PlanetsBlock) data).getPlanets();
+                        int size = planets.size();
                         boolean inputValid = false;
                         while (!inputValid) {
                             try {
-                                System.out.print("Insert planet index (from 0 to 3): ");
+                                System.out.print("Insert planet index (from 0 to " + (size - 1) + "): ");
                                 int numP = Integer.parseInt(scan.nextLine());
-                                server.choosePlanets(this, numP);
-                                inputValid = true;
+                                    server.choosePlanets(this, numP);
+                                    inputValid = true;
+
                             } catch (ControllerExceptions e) {
                                 System.out.println(e.getMessage());
                             } catch (NumberFormatException e) {
@@ -737,9 +750,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 }
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
-                            } /*catch (Exception e) {
+                            } catch (Exception e) {
                                 System.out.println("Error " + e.getMessage());
-                            }*/
+                            }
                         if (removed)
                             System.out.println("Successfully removed");
                     }
@@ -845,6 +858,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PICK_RESERVED_CARD -> System.out.println("This is the tile you picked from the reserve spot: press 0 to place it in you spaceship plance, 1 rotate it clockwise, 2 to put it back");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
+            case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!");
             case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile, type 1 to force draw card phase");
             case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
             case SHOW_SHIP -> System.out.println("Here is your spaceship");
@@ -920,10 +934,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case NO_HIT -> System.out.println("You have not been hit");
             case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
-            default -> System.out.println("");
             case SAME_EQUIP -> System.out.println("No one was penalized because there are at least two players with the same equipment");
             case SAME_FIRE -> System.out.println("No one was penalized because there are at least two players with the same fire strength");
             case SAME_ENGINE -> System.out.println("No one was penalized because there are at least two players with the same engine strength");
+            default -> System.out.println();
         }
         System.out.print("> ");
     }
@@ -1117,16 +1131,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
 
 
-    public void printPickableTiles(Integer[] tiles, ArrayList<ComponentTile> reservedTiles){
-        System.out.println("\n");
+    public void printPickableTiles(Integer[] tiles, ArrayList<PickedTile> reservedTiles){
+        System.out.println();
         for (Integer tileId : tiles) {
             if (tileId != null)
                 System.out.println("[" + "Tile" + tileId + "]");
         }
 
         int i = 1000;
-        for(ComponentTile tile : reservedTiles){
-            System.out.println("[" + "ReservedTileId " + i + "]     " + tile);
+        for(PickedTile tile : reservedTiles){
+            System.out.println("[" + "ReservedTileId " + i + "]     " + tile.getDescription());
             i++;
         }
 

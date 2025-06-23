@@ -5,8 +5,10 @@ import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
 import it.polimi.ingsw.model.componentTiles.PowerCenter;
+import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.TileSymbols;
@@ -42,7 +44,7 @@ public class ClientSocket implements VirtualViewSocket {
     }
 
     public static void main(String[] args) {
-        String serverIp = "192.168.203.223";
+        String serverIp = "127.0.0.1";
         int port = 1234;
         try {
             System.out.println("Connecting to " + serverIp + ":" + port);
@@ -102,7 +104,6 @@ public class ClientSocket implements VirtualViewSocket {
                             System.out.print("Enter lobby size [2-4]: ");
                             int size = Integer.parseInt(scan.nextLine());
                             EventSender("createLobby", new Object[]{size});
-
                             inputValid = handleServerResponse();
                         } catch (NumberFormatException e) {
                             System.out.print("Error " + e.getMessage() + " please type a number \n");
@@ -128,32 +129,43 @@ public class ClientSocket implements VirtualViewSocket {
             }
             case WAIT_LOBBY -> System.out.print("Waiting for other players to join...");
             case GAME_INIT -> System.out.print("--- GAME STARTED ---\n You will now craft your spaceship!");
+
             case ASSEMBLY -> {
-                if(input.equals("-1")){
-                    EventSender("endCrafting" , new Object[0]);
+                if (input.equals("-1")) {
+                    EventSender("endCrafting", new Object[0]);
                     try {
                         handleServerResponse();
                     } catch (InterruptedException e) {
                         System.out.println("Interrupted: " + e.getMessage());
                     }
-                }else{
+                } else if (input.equals("-2")) {
+                    EventSender("showDecks", new Object[0]);
                     try {
-                        int tileIndex = Integer.parseInt(input);
-                        EventSender("pickTile", new Object[]{tileIndex});
-                        boolean inputValid;
-                        try {
-                            inputValid = handleServerResponse();
+                        handleServerResponse();
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
+                    }
+                } else {
+                    try {
+                        int index = Integer.parseInt(input);
+                        if (index <= 1001) { // limite coerente con ClientRmi
+                            EventSender("pickTile", new Object[]{index});
+                            boolean inputValid = handleServerResponse();
                             if (!inputValid) {
                                 System.out.print("Invalid tile selection, please try again:\n");
                             }
-                        } catch (InterruptedException e) {
-                            System.out.println("Interrupted: " + e.getMessage());
+                        } else {
+                            System.out.println("Outbound index, please retry");
+                            System.out.println("Enter the index of the tile you want to pick, type -1 to end crafting or -2 to watch decks:");
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid input, please enter a valid number for the tile index");
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
                     }
                 }
             }
+
             case PICKED_TILE -> {
                 switch (input) {
                     case "0" -> {
@@ -165,32 +177,72 @@ public class ClientSocket implements VirtualViewSocket {
 
                             try {
                                 String[] parts = inputLine.split(" ");
-                                if(Integer.parseInt(parts[0]) == -1){
-                                    EventSender("endCrafting" , new Object[0]);
-                                    try {
-                                        inputValid = handleServerResponse();
-                                    } catch (InterruptedException e) {
-                                        System.out.println("Interrupted: " + e.getMessage());
-                                    }
-                                }
-                                if (parts.length == 2) {
+                                if (Integer.parseInt(parts[0]) == -1) {
+                                    EventSender("endCrafting", new Object[0]);
+                                    inputValid = handleServerResponse();
+                                } else if (parts.length == 2) {
                                     int xIndex = Integer.parseInt(parts[0]);
                                     int yIndex = Integer.parseInt(parts[1]);
-                                    EventSender("addTile", new Object[]{xIndex,yIndex});
-                                    try {
-                                        inputValid = handleServerResponse();
-                                    } catch (InterruptedException e) {
-                                        System.out.println("Interrupted: " + e.getMessage());
-                                    }
-                                }else
-                                    System.out.println("Wrong input. You need 2 numbers divided by a space \n");
+                                    EventSender("addTile", new Object[]{xIndex, yIndex});
+                                    inputValid = handleServerResponse();
+                                } else {
+                                    System.out.println("Wrong input. You need 2 numbers divided by a space");
+                                }
                             } catch (NumberFormatException e) {
-                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars \n");
+                                System.out.println("Invalid input, use only numbers.");
+                            } catch (InterruptedException e) {
+                                System.out.println("Interrupted: " + e.getMessage());
                             }
                         }
                     }
                     case "1" -> {
-                        EventSender("addReserveSpot" , new Object[0]);
+                        EventSender("rotateClockwise", new Object[0]);
+                        handleServerResponse();
+                    }
+                    case "2" -> {
+                        EventSender("putTileBack", new Object[0]);
+                        handleServerResponse();
+                    }
+                    case "3" -> {
+                        EventSender("addReserveSpot", new Object[0]);
+                        handleServerResponse();
+                    }
+
+                    default -> System.out.print("Not accepted input, please try again:\n");
+                }
+            }
+
+            case PICK_RESERVED_CARD -> {
+                switch (input) {
+                    case "0" -> {
+                        boolean inputValid = false;
+                        while (!inputValid) {
+                            System.out.println("Type -1 to exit crafting or Insert coordinates: x y (es. 1 2): ");
+                            System.out.print("> ");
+                            String inputLine = scan.nextLine();
+
+                            try {
+                                String[] parts = inputLine.split(" ");
+                                if (Integer.parseInt(parts[0]) == -1) {
+                                    EventSender("endCrafting", new Object[0]);
+                                    inputValid = handleServerResponse();
+                                } else if (parts.length == 2) {
+                                    int xIndex = Integer.parseInt(parts[0]);
+                                    int yIndex = Integer.parseInt(parts[1]);
+                                    EventSender("addTile", new Object[]{xIndex, yIndex});
+                                    inputValid = handleServerResponse();
+                                } else {
+                                    System.out.println("Wrong input. You need 2 numbers divided by a space");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
+                            } catch (InterruptedException e) {
+                                System.out.println("Interrupted: " + e.getMessage());
+                            }
+                        }
+                    }
+                    case "1" -> {
+                        EventSender("rotateClockwise", new Object[0]);
                         try {
                             handleServerResponse();
                         } catch (InterruptedException e) {
@@ -198,31 +250,7 @@ public class ClientSocket implements VirtualViewSocket {
                         }
                     }
                     case "2" -> {
-                        EventSender("putTileBack" , new Object[0]);
-                        try {
-                            handleServerResponse();
-                        } catch (InterruptedException e) {
-                            System.out.println("Interrupted: " + e.getMessage());
-                        }
-                    }
-                    case "3" -> {
-                        EventSender("drawCard" , new Object[0]);
-                        try {
-                            handleServerResponse();
-                        } catch (InterruptedException e) {
-                            System.out.println("Interrupted: " + e.getMessage());
-                        }
-                    }
-                    case "4" -> {
-                        EventSender("endCrafting" , new Object[0]);
-                        try {
-                            handleServerResponse();
-                        } catch (InterruptedException e) {
-                            System.out.println("Interrupted: " + e.getMessage());
-                        }
-                    }
-                    case "5" -> {
-                        EventSender("rotateClockwise" , new Object[0]);
+                        EventSender("addReserveSpot", new Object[0]);
                         try {
                             handleServerResponse();
                         } catch (InterruptedException e) {
@@ -232,6 +260,9 @@ public class ClientSocket implements VirtualViewSocket {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
+
+
             case ADJUST_SHIP -> {
                 switch (input) {
                     case "0" -> {
@@ -278,6 +309,7 @@ public class ClientSocket implements VirtualViewSocket {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
             case SELECT_SHIP -> {
                 boolean inputValid = false;
                 while(!inputValid){
@@ -378,7 +410,7 @@ public class ClientSocket implements VirtualViewSocket {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    EventSender("endManagement" , new Object[0]);
+                    EventSender("endCrewManagement" , new Object[0]);
                     try {
                         handleServerResponse();
                     } catch (InterruptedException e) {
@@ -388,7 +420,7 @@ public class ClientSocket implements VirtualViewSocket {
                     System.out.print("Not accepted input, please try again:\n");
                 }
             }
-            case BATTERIES_MANAGEMENT -> {
+            case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
                     int nBatteries = ((BatteriesManagement) data).getNBatteries();
@@ -403,18 +435,20 @@ public class ClientSocket implements VirtualViewSocket {
                             if (parts.length == 2) {
                                 int powerCenterId = Integer.parseInt(parts[0]);
                                 int batteries = Integer.parseInt(parts[1]);
-                                if (batteries <= 2 && batteries > 0) {
+                                if (batteries > 0 && batteries <= 3) {
                                     EventSender("removeBatteries", new Object[]{powerCenterId, batteries});
                                     try {
                                         if (handleServerResponse()) {
-                                            nBatteries--;
+                                            nBatteries-= batteries;
                                             removed = true;
+                                        }else {
+                                            System.out.println("You have to put a PowerCenter containing a battery");
                                         }
                                     } catch (InterruptedException e) {
                                         System.out.println("Interrupted: " + e.getMessage());
                                     }
                                 } else {
-                                    System.out.println("You have to choose 1 or 2 batteries to remove, please retry");
+                                    System.out.println("You have to choose 1 to 3 batteries to remove, please retry");
                                 }
                             } else {
                                 System.out.println("Wrong input. You need to put a PowerCenterId and a nBatteries divided by a space\n");
@@ -425,7 +459,12 @@ public class ClientSocket implements VirtualViewSocket {
                         if (removed)
                             System.out.println("Successfully removed");
                     }
-                    EventSender("endManagement" , new Object[0]);
+
+                    if(currentEvent.getState() == GameState.BATTERIES_MANAGEMENT)
+                        EventSender("endManagement" , new Object[0]);
+                    else
+                        EventSender("endMVGoodsManagement" , new Object[0]);
+
                     try {
                         handleServerResponse();
                     } catch (InterruptedException e) {
@@ -435,6 +474,7 @@ public class ClientSocket implements VirtualViewSocket {
                     System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
             case CARGO_MANAGEMENT -> System.out.print("If you have at least 1 cargo holds block you will manage your goods, else you will just skip this phase\n");
             case CARGO_VIEW -> {
                 switch (input) {
@@ -571,7 +611,7 @@ public class ClientSocket implements VirtualViewSocket {
             case CHOOSE_ENGINE -> {
                 switch (input) {
                     case "0" -> {
-                        EventSender("manageCard" , new Object[0]);
+                        EventSender("fromChargeToManage" , new Object[0]);
                         try {
                             handleServerResponse();
                         } catch (InterruptedException e) {
@@ -601,7 +641,7 @@ public class ClientSocket implements VirtualViewSocket {
             case CHOOSE_CANNON -> {
                 switch (input) {
                     case "0" -> {
-                        EventSender("manageCard" , new Object[0]);
+                        EventSender("fromChargeToManage" , new Object[0]);
                         try {
                             handleServerResponse();
                         } catch (InterruptedException e) {
@@ -612,7 +652,7 @@ public class ClientSocket implements VirtualViewSocket {
                         ArrayList<Integer> chosenIndices = new ArrayList<>();
                         boolean inputValid = false;
                         while (!inputValid) {
-                            System.out.println("Insert the index of double cannons to chargeEngines: ");
+                            System.out.println("Insert the index of double cannons to charge:");
                             System.out.print("> ");
                             String line = scan.nextLine();
                             String[] parts = line.trim().split(" ");
@@ -643,7 +683,7 @@ public class ClientSocket implements VirtualViewSocket {
             case CHOOSE_PLANETS -> {
                 switch (input) {
                     case "0" -> {
-                        EventSender("manageCard" , new Object[0]);
+                        EventSender("handlePlanets" , new Object[0]);
                         try {
                             handleServerResponse();
                         } catch (InterruptedException e) {
@@ -651,17 +691,19 @@ public class ClientSocket implements VirtualViewSocket {
                         }
                     }
                     case "1"->{
-                        boolean inputValid = false;
-                        EventSender("checkStorageOk", new Object[]{});
+                        EventSender("checkStorageOk", new Object[0]);
                         try {
-                            inputValid = !handleServerResponse();
-                        }catch(InterruptedException e){
+                            handleServerResponse();
+                        } catch (InterruptedException e) {
                             System.out.println("Interrupted: " + e.getMessage());
                         }
-
+                        DataContainer data = currentEvent.getData();
+                        ArrayList<Planet> planets = ((PlanetsBlock) data).getPlanets();
+                        int size = planets.size();
+                        boolean inputValid = false;
                         while (!inputValid) {
                             try {
-                                System.out.print("Insert planet index (from 0 to 3): ");
+                                System.out.print("Insert planet index (from 0 to " + (size - 1) + "): ");
                                 int numP = Integer.parseInt(scan.nextLine());
                                 EventSender("choosePlanets", new Object[]{numP});
                                 try {
@@ -708,49 +750,158 @@ public class ClientSocket implements VirtualViewSocket {
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
-            case REMOVE_MV_GOODS ->{
+
+            case SHOW_DECKS -> {
+                if (input.equals("0")) {
+                    boolean inputValid = false;
+                    while (!inputValid) {
+                        System.out.println("Please select the deck you want to watch or type -1 to go back");
+                        System.out.print("> ");
+                        String line = scan.nextLine();
+                        try {
+                            int nDeck = Integer.parseInt(line);
+                            if (nDeck == -1) {
+                                EventSender("endShowCards", new Object[]{-1});
+                                inputValid = handleServerResponse();
+                            } else if (nDeck > 0 && nDeck < 4) {
+                                EventSender("showCardsbyDeck", new Object[]{nDeck});
+                                inputValid = handleServerResponse();
+                                if(!inputValid)
+                                    System.out.println("Another player is looking at this deck, please retry");
+                            } else {
+                                System.out.println("Outbound deck index!");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
+                    }
+                } else {
+                    System.out.print("Not accepted input, please try again:\n");
+                }
+            }
+
+            case SHOW_CARDS -> {
                 if (input.equals("0")) {
                     DataContainer data = currentEvent.getData();
-                    int nGoods = ((RemoveMostValuable) data).getNGoods();
-                    while ((nGoods != 0)) {
-                        System.out.println("Insert: cargoIndex goodIndex (es. 0 1): ");
-                        System.out.print("> ");
-                        String inputLine = scan.nextLine();
-                        boolean removed = false;
-                        try {
-                            String[] parts = inputLine.split(" ");
-                            if (parts.length != 2) {
-                                System.out.println("Wrong input. You need 2 numbers divided by a space");
-                            }else{
-                                int cargoIndex = Integer.parseInt(parts[0]);
-                                int goodIndex = Integer.parseInt(parts[1]);
-                                EventSender("removeMVGood", new Object[]{cargoIndex,goodIndex});
-                                try {
-                                    if (handleServerResponse()) {
-                                        nGoods--;
-                                        removed = true;
-                                    }
-                                } catch (InterruptedException e) {
-                                    System.out.println("Interrupted: " + e.getMessage());
-                                }
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid input, ensure to write only numbers and not letters or special chars");
-                        }
-                        if (removed)
-                            System.out.println("Successfully removed");
-                    }
-                    EventSender("endMVGoodsManagement" , new Object[0]);
+                    int nDeck = ((AdventureCardsData) data).getnDeck();
+                    EventSender("endShowCards", new Object[]{nDeck});
                     try {
                         handleServerResponse();
-                    } catch (InterruptedException e) {
+                    }catch (InterruptedException e) {
                         System.out.println("Interrupted: " + e.getMessage());
                     }
                 } else {
                     System.out.print("Not accepted input, please try again:\n");
                 }
             }
+
+            case WAIT_PLAYER_LEADER -> {
+                if (input.equals("1")) {
+                    EventSender("startTimer", new Object[0]);
+                    try {
+                        boolean success = handleServerResponse();
+                        if (success) {
+                            System.out.println("Timer started");
+                        } else {
+                            System.out.println("First timer isn't done yet");
+                        }
+                    }catch (InterruptedException e) {
+                        System.out.println("Interrupted: " + e.getMessage());
+                    }
+                } else {
+                    System.out.println("Wait for other players or start the timer by pressing 1");
+                }
+            }
+
+            case EPIDEMIC_MANAGEMENT -> {
+                if (input.equals("0")) {
+                    boolean done = false;
+                    while (!done) {
+                        System.out.println("Please write the cabinId you want to remove the crew member from");
+                        System.out.print("> ");
+                        String line = scan.nextLine();
+                        try {
+                            int cabinId = Integer.parseInt(line);
+                            EventSender("removeFigureEpidemic", new Object[]{cabinId});
+                            done = handleServerResponse();
+                            if (done) {
+                                System.out.println("Successfully removed");
+                            } else {
+                                System.out.println("That cabin doesn't contain crew. Retry.");
+                            }
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted: " + e.getMessage());
+                        }
+                    }
+                    EventSender("endCrewManagement", new Object[0]);
+                    handleServerResponse();
+                } else {
+                    System.out.print("Not accepted input, please try again:\n");
+                }
+            }
+
+            case REMOVE_MV_GOODS -> {
+                if (input.equals("0")) {
+                    DataContainer data = currentEvent.getData();
+                    int nGoods = ((RemoveMostValuable) data).getNGoods();
+                    int nBatteries = ((RemoveMostValuable) data).getBatteriesToRemove();
+
+                    while (nGoods > 0) {
+                        System.out.println("You must remove " + nGoods + " goods");
+                        System.out.print("Insert: cargoIndex goodIndex (e.g. 0 1):\n> ");
+                        String line = scan.nextLine();
+                        boolean removed = false;
+
+                        try {
+                            String[] parts = line.trim().split(" ");
+                            if (parts.length != 2) {
+                                System.out.println("Wrong input. You need 2 numbers divided by a space.");
+                            }else{
+                                int cargoIndex = Integer.parseInt(parts[0]);
+                                int goodIndex = Integer.parseInt(parts[1]);
+
+                                EventSender("removeMVGood", new Object[]{cargoIndex, goodIndex});
+                                boolean success = handleServerResponse();
+
+                                if (success) {
+                                    nGoods--;
+                                    removed = true;
+                                } else {
+                                    System.out.println("This was not one of the most valuable goods you have, please select one among them!");
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input, please enter only numeric values.");
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted while waiting for server response: " + e.getMessage());
+                        } catch (Exception e) {
+                            System.out.println("Unexpected error: " + e.getMessage());
+                        }
+
+                        if (removed){
+                            System.out.println("Successfully removed");
+                        }
+                    }
+                    EventSender("fromMvGoodstoBatteries", new Object[]{nBatteries});
+                    try {
+                        handleServerResponse();
+                    } catch (InterruptedException e) {
+                        System.out.println("Interrupted while converting to batteries: " + e.getMessage());
+                    }
+
+                } else {
+                    System.out.println("Not accepted input, please try again:");
+                }
+            }
+
+            case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
+            case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!");
+
+            case TIMER_DONE -> System.out.println("TIMER IS DONE!");
+
         }
+
+
         System.out.print("\n> ");
     }
 
@@ -763,8 +914,13 @@ public class ClientSocket implements VirtualViewSocket {
             case GAME_INIT -> System.out.println("--- GAME STARTED ---\n You will now craft your spaceship!\n" + TileSymbols.symbolExplanation);
             case ASSEMBLY -> System.out.println("List of available tiles: ");
             case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
-            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
+            case SHOW_DECKS -> System.out.println("Here are the decks you can watch:\n[Deck 1] [Deck 2] [Deck 3]\nPlease type 0 to continue");
+            case SHOW_CARDS -> System.out.println("Here are the cards contained in selected deck");
+            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 rotate it clockwise, 2 to put it back, 3 to reserve it");
+            case PICK_RESERVED_CARD -> System.out.println("This is the tile you picked from the reserve spot: press 0 to place it in you spaceship plance, 1 rotate it clockwise, 2 to put it back");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
+            case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
+            case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!");
             case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile, type 1 to force draw card phase");
             case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
             case SHOW_SHIP -> System.out.println("Here is your spaceship");
@@ -774,50 +930,91 @@ public class ClientSocket implements VirtualViewSocket {
             case DRAW_CARD -> System.out.println("This is the drawn card:");
             case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
             case CARGO_MANAGEMENT -> {
-                EventSender("endManagement" , new Object[0]);
+                EventSender("checkStorage" , new Object[0]);
                 try{
                     handleServerResponse();
                 } catch (InterruptedException e) {
                     System.out.println("Interrupted: " + e.getMessage());
                 }
             }
-            case CREW_MANAGEMENT ->{
+            case CREW_MANAGEMENT -> {
                 System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
                 System.out.println("Press 0 to continue");
             }
-            case BATTERIES_MANAGEMENT -> {
+
+            case EPIDEMIC_MANAGEMENT -> {
+                System.out.println("Here are your interconnected cabins with at least one crew member, you will have to remove a crew member from each of the shown cabins");
+                System.out.println("Press 0 to continue");
+            }
+
+            case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
                 System.out.println("Press 0 to continue");
             }
-            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management\n");
+
+            case REMOVE_MV_GOODS -> {
+                System.out.println("Here are your goods, you will have to remove the most valuable ones");
+                System.out.println("Press 0 to continue");
+            }
+            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
-            case LEAST_CREW -> System.out.print("You have the least crew\n");
-            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
-            case MOVE_PLAYER -> System.out.print("You have the least crew\n");
-            case LOST_CREW -> System.out.println("You have the least engine strength");
+            case WAIT_PLAYER_LEADER -> System.out.println("Wait for other players are done crafting or start the timer by pressing 1");
+            case TIMER_DONE -> System.out.println("TIMER IS DONE!");
+            case LEAST_CREW -> System.out.println("You have the least crew");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strength");
+            case LEAST_FIRE -> System.out.println("You have the least fire strength");
+            // case MOVE_PLAYER -> System.out.println("You have the least crew");
+            // case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
-            case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to chargeEngines your double engines ");
+            case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
-            case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
+            case CHOOSE_CANNON -> System.out.println("Type 0 to skip your turn or 1 to charge your double cannons");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
-            case ASK_CANNON -> System.out.println("Type 0 to not use your DoubleCannon or 1 to use it");
+            case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
             case ASK_SURRENDER -> System.out.println("Type -1 to surrender or 0 to continue the game");
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
             case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
             case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
-            case REMOVE_MV_GOODS -> {
-                System.out.println("Here are your cargos, you will have to remove the most valuable goods");
-                System.out.println("Press 0 to continue");
+            case ENEMY_LOST -> System.out.println("You have been defeated by the enemies");
+            case ENEMY_WIN -> System.out.println("You defeated the enemies");
+            case ENEMY_DRAW -> System.out.println("You have the same power of enemies");
+            case NO_DOUBLE_CANNON -> {
+                System.out.println("You don't have any double cannon");
+                EventSender("fromChargeToManage" , new Object[0]);
+                try{
+                    handleServerResponse();
+                } catch (InterruptedException e) {
+                    System.out.println("fromChargeToManage: " + e.getMessage());
+                }
             }
+            case NO_DOUBLE_ENGINE -> {
+                System.out.println("You don't have any double engine");
+                EventSender("checkStorage" , new Object[0]);
+                try{
+                    handleServerResponse();
+                } catch (InterruptedException e) {
+                    System.out.println("Interrupted: " + e.getMessage());
+                }
+            }
+            case DIED -> System.out.println("You are on spectator mode because you died");
+            case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
+            case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
+            case NO_HIT -> System.out.println("You have not been hit");
+            case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
+            case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
+            case SAME_EQUIP -> System.out.println("No one was penalized because there are at least two players with the same equipment");
+            case SAME_FIRE -> System.out.println("No one was penalized because there are at least two players with the same fire strength");
+            case SAME_ENGINE -> System.out.println("No one was penalized because there are at least two players with the same engine strength");
+            default -> System.out.println();
         }
         System.out.print("> ");
     }
 
     @Override
-    public void showUpdate(Event event) throws RemoteException, InterruptedException {
+    public void showUpdate(Event event) throws InterruptedException {
         eventQueue.put(event);
     }
 
@@ -846,10 +1043,12 @@ public class ClientSocket implements VirtualViewSocket {
             return;
         switch(data){
             case LobbyNicks ln ->  printLobbyNicks(ln.getNicks());
-            case PickableTiles pt -> printPickableTiles(pt.getTilesId());
+            case PickableTiles pt -> printPickableTiles(pt.getTilesId(), pt.getReservedTiles());
             case PickedTile ptl -> System.out.println(ptl.getDescription());
-            case Card c -> System.out.println("Card: " + c.getName() + ",level: " + c.getLevel() + "\n");
+            case Card c -> System.out.println("Card: " + c.getName() + ", level: " + c.getLevel());
+            case AdventureCardsData adC -> printCards(adC.getAdventureCards());
             case Cargos c -> printCargos(c.getCargos());
+            case CrewManagement cM-> printConnectedCabin(cM.getCabins());
             case BoardView b -> System.out.println(Arrays.toString(b.getBoard()));
             case PlayerColor pc -> System.out.println("Your color is " + pc.getColor());
             case PlayerInfo pi -> System.out.println("Nickname: " + pi.getNickname() + ", Position: " + pi.getPosition() + ", Credits: " + pi.getCredits() + ", Astronauts: " + pi.getNumAstronauts() + ", Aliens: " + pi.getNumAliens() + "\n");
@@ -860,14 +1059,35 @@ public class ClientSocket implements VirtualViewSocket {
             case EnemyStrenght es -> System.out.println("Enemy has " + es.getEnemyStrenght() + " fire strength, " + "You have " + es.getPlayerStrenght() + " fire strength without double cannons \n" );
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
+            case EpidemicManagement em -> printConnectedCabin(em.getCabins());
             case LostDays ld -> System.out.println("You lose " + ld.getLd() + " flight days");
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());
             case RemoveMostValuable removeMostValuable -> printCargosRemove(removeMostValuable.getCargos());
+            case SmallCannonDirPos sdr -> System.out.println("You are about to be hit by a small cannon shot from " + sdr.getDirection() + " direction in " + sdr.getPosition() + " position");
+            case BigMeteorDirPos bdr -> System.out.println("You are about to be hit by a big meteor shot from " + bdr.getDirection() + " direction in " + bdr.getPosition() + " position");
+            case SmallMeteorDirPos sdr -> System.out.println("You are about to be hit by a small meteor shot from " + sdr.getDirection() + " direction in " + sdr.getPosition() + " position");
+            case BigCannonDirPos bdr -> System.out.println("You are about to be hit by a big cannon shot from " + bdr.getDirection() + " direction in " + bdr.getPosition() + " position");
             default -> {}
         }
         System.out.print("> ");
     }
+
+    private void printConnectedCabin(ArrayList<Cabin> cabins) {
+        for(Cabin c : cabins){
+            System.out.println(c);
+        }
+    }
+
+    private void printCards(ArrayList<Card> adventureCards) {
+        System.out.println();
+        for(Card c: adventureCards){
+            System.out.println("Card: " + c.getName() + ", level: " + c.getLevel());
+        }
+        System.out.println();
+        System.out.println("Type 0 to return to pickable tiles");
+    }
+
 
     public void printCargosRemove(ArrayList<GoodsContainer> cargos) {
         System.out.println("--------------------------------------------------");
@@ -930,15 +1150,15 @@ public class ClientSocket implements VirtualViewSocket {
             GoodsContainer container = cargos.get(i);
             GoodsBlock[] blocks = container.getGoods();
 
+            String header;
             if(i==0){
-                String header = String.format("%sReward Cargo %d:",
+                header = String.format("%sReward Cargo %d:",
                         container.isSpecial() ? "Special " : "", i);
-                System.out.print(header);
             }else {
-                String header = String.format("%sCargo %d id %d:",
+                header = String.format("%sCargo %d id %d:",
                         container.isSpecial() ? "Special " : "", i, container.getId());
-                System.out.print(header);
             }
+            System.out.print(header);
             for (GoodsBlock block : blocks) {
                 String blockValue = (block != null) ?
                         String.valueOf(block.getValue()) : " ";
@@ -962,14 +1182,20 @@ public class ClientSocket implements VirtualViewSocket {
 
 
 
-    public void printPickableTiles(Integer[] tiles){
+    public void printPickableTiles(Integer[] tiles, ArrayList <PickedTile> reservedTiles){
         System.out.println("\n");
-        for (Integer tile : tiles) {
-            if (tile != null)
-                System.out.println("[" + "Tile" + tile + "]");
+        for (Integer tileId : tiles) {
+            if (tileId != null)
+                System.out.println("[" + "Tile" + tileId + "]");
         }
 
-        System.out.println("Enter the index of the tile you want to pick or type -1 to end crafting:");
+        int i = 1000;
+        for(PickedTile tile : reservedTiles){
+            System.out.println("[" + "ReservedTileId " + i + "]     " + tile.getDescription());
+            i++;
+        }
+
+        System.out.println("Enter the index of the tile you want to pick, type -1 to end crafting or -2 to watch decks:");
     }
 
     public void printLobbyNicks(ArrayList<String> nicks){
@@ -978,6 +1204,10 @@ public class ClientSocket implements VirtualViewSocket {
             System.out.printf("[%s] ",nick);
         }
         System.out.println("\n");
+    }
+
+    public GameState getCurrentState() {
+        return currentState;
     }
 
     private boolean handleServerResponse() throws InterruptedException {
@@ -989,13 +1219,13 @@ public class ClientSocket implements VirtualViewSocket {
             return false;
         }
 
-        ServerResponse response = (ServerResponse)event.getData();
+        ServerResponse serverResponse = (ServerResponse)event.getData();
 
-        if (response.isError()) {
-            System.out.println("Error: " + response.getError());
+        if (serverResponse.isError()) {
+            System.out.println("Error: " + serverResponse.getError());
             return false;
         }
-        return true;
+        return serverResponse.getResponse();
     }
 
 }
