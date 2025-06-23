@@ -20,31 +20,28 @@ import java.util.List;
 
 public class AdventureCardFactory {
 
-    public static List<AdventureCard> loadCards(Game game) throws IOException {
-        try {
-            URL resourceUrl = Main.class.getClassLoader().getResource("cards.json");
-            if (resourceUrl == null) {
-                throw new FileNotFoundException("cards.json not found in classpath");
+    public static List<AdventureCard> loadCards(Game game) {
+        try (var inputStream = AdventureCardFactory.class.getClassLoader().getResourceAsStream("cards.json")) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("cards/cards.json non trovato nel classpath!");
             }
-            String filePath = Paths.get(resourceUrl.toURI()).toFile().getAbsolutePath();
 
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(AdventureCard.class, new AdventureCardDeserializer(game))
                     .create();
 
-            try (FileReader reader = new FileReader(filePath)) {
-                Type cardListType = new TypeToken<List<AdventureCard>>(){}.getType();
+            try (var reader = new java.io.InputStreamReader(inputStream, java.nio.charset.StandardCharsets.UTF_8)) {
+                Type cardListType = new TypeToken<List<AdventureCard>>() {}.getType();
                 return gson.fromJson(reader, cardListType);
             }
 
         } catch (Exception e) {
-            System.err.println("Failed to load cards: " + e.getMessage());
+            System.err.println("Errore durante il caricamento delle carte: " + e.getMessage());
             e.printStackTrace();
-
+            return new ArrayList<>(); // Meglio di null, evita NullPointerException
         }
-
-        return null;
     }
+
 
     public static void main(String[] args) {
 
