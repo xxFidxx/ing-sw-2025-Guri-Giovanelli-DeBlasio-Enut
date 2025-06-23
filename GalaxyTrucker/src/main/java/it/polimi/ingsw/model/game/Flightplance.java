@@ -85,7 +85,7 @@ public class  Flightplance {
             for(Player p : Players){
                 int playerPosition = p.getPlaceholder().getPosizione();
                 if(playerPosition >= chosenPlayerPosition + num && playerPosition < chosenPlayerPosition)
-                    extraSteps++;
+                    extraSteps--;
             }
 
         }

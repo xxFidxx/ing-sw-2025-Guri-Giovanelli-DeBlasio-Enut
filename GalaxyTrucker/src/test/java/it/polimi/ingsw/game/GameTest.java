@@ -359,5 +359,70 @@ public class GameTest {
 
 
 
+    @Test
+    public void testPenalizeLostTiles() {
+        // Prendi i giocatori reali
+        Player alice = game.getPlayers().get(0); // Posizione 3
+        Player bob = game.getPlayers().get(1);   // Posizione 1
+        Player charlie = game.getPlayers().get(2); // Posizione 2
+
+        // Imposta crediti iniziali
+        alice.setCredits(10);
+        bob.setCredits(8);
+        charlie.setCredits(5);
+
+        // Aggiungi componenti ai reserveSpot (penalità = numero di componenti)
+        SpaceshipPlance aliceShip = alice.getSpaceshipPlance();
+        SpaceshipPlance bobShip = bob.getSpaceshipPlance();
+        SpaceshipPlance charlieShip = charlie.getSpaceshipPlance();
+
+        // Aggiungi componenti fittizi
+        aliceShip.getReserveSpot().add(mock(ComponentTile.class));      // 1 componente → -1
+        aliceShip.getReserveSpot().add(mock(ComponentTile.class));      // 2 totale → -2
+
+        bobShip.getReserveSpot().add(mock(ComponentTile.class));        // 1 → -1
+
+        // Charlie ha 0 componenti → nessuna penalità
+
+        // Esegui metodo da testare
+        game.penalizeLostTiles();
+
+        // Verifica risultati
+        assertEquals(8, alice.getCredits());  // 10 - 2
+        assertEquals(7, bob.getCredits());    // 8 - 1
+        assertEquals(5, charlie.getCredits()); // 5 - 0
+    }
+
+    @Test
+    public void testRewardPlacesDescending() {
+        // Giocatori reali
+        Player alice = game.getPlayers().get(0);   // Primo nella lista
+        Player bob = game.getPlayers().get(1);     // Secondo
+        Player charlie = game.getPlayers().get(2); // Terzo
+
+        // Imposta crediti iniziali
+        alice.setCredits(5);
+        bob.setCredits(10);
+        charlie.setCredits(20);
+
+        // Bob si arrende → non riceve bonus
+        bob.setSurrended(true);
+
+        // Esegui metodo
+        game.rewardPlaces();
+
+    /*
+        Ordine inverso:
+        i = 2 → Charlie: 20 + 4 = 24
+        i = 1 → Bob: surrended → resta 10
+        i = 0 → Alice: 5 + 2 = 7
+     */
+
+        assertEquals(7, alice.getCredits());
+        assertEquals(10, bob.getCredits());
+        assertEquals(24, charlie.getCredits());
+    }
+
+
 }
 

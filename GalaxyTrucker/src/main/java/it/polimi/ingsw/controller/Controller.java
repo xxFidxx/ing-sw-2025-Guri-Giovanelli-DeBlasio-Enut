@@ -318,6 +318,11 @@ public class Controller{
             case MOVE_PLAYER -> {
                 event = new Event(state, new LostDays((int) data));
             }
+
+            case MOVE_FORWARD -> {
+                event = new Event(state, new ForwardDays((int) data));
+            }
+
             case LOST_CREW -> {
                 event = new Event(state, new LostCrew((int) data));
             }
@@ -504,7 +509,6 @@ public class Controller{
         switch (currentAdventureCard) {
             case AbandonedShipCard asc -> {
                 if (tmpPlayers.isEmpty() || crewended) {
-                    crewended = false;
                     resetShowAndDraw();
                     return;
                 }
@@ -842,7 +846,7 @@ public class Controller{
 
     public void handleWaitersPlayer(ClientListener listener) {
         for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+           ClientListener l = listenerbyPlayer.get(player);
             if (l == listener) {
                 l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null, null));
             } else {
@@ -932,8 +936,11 @@ public class Controller{
         AdventureCard currentCastedCard = currentAdventureCard;
         switch (currentCastedCard) {
             case OpenSpaceCard osc -> {
-                ((OpenSpaceCard) currentCastedCard).setActivatedPlayer(currentPlayer);
-                currentAdventureCard.activate();
+                // ((OpenSpaceCard) currentCastedCard).setActivatedPlayer(currentPlayer);
+                // currentAdventureCard.activate();
+                int power = player.getEngineStrenght();
+                listener.onEvent(eventCrafter(GameState.MOVE_FORWARD, power, null));
+                game.getFlightplance().move(power, player);
                 manageCard();
             }
             case SlaversCard sc -> {

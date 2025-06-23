@@ -1033,6 +1033,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case DoubleCannonList dcl -> printDoubleCannons(dcl.getDoubleCannons());
             case ListCabinAliens lca -> printCabinAliens(lca.getCabinAliens());
             case EpidemicManagement em -> printConnectedCabin(em.getCabins());
+            case ForwardDays fd -> System.out.println("You move forward " + fd.getFd() + " positions");
             case LostDays ld -> System.out.println("You lose " + ld.getLd() + " flight days");
             case LostCrew lc -> System.out.println("You lose " + lc.getLc() + " crew members");
             case BatteriesManagement batteriesManagement -> printPowerCenters(batteriesManagement.getPowerCenters());

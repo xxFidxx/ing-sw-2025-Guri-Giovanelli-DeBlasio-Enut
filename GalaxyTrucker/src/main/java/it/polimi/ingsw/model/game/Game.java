@@ -237,7 +237,7 @@ public class Game{
 
     }
 
-    private void penalizeLostTiles() {
+    public void penalizeLostTiles() {
         for (Player p: players) {
             int penalty = p.getSpaceshipPlance().getReserveSpot().size();
             p.setCredits(p.getCredits() - penalty);

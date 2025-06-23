@@ -24,7 +24,7 @@ public class AbandonedShipCard extends AdventureCard {
     }
 
     public void activate(){
-        activatedPlayer.setNumEquip(activatedPlayer.getNumEquip() - lostCrew);
+
         activatedPlayer.setCredits(activatedPlayer.getCredits() + credits);
         deck.getFlightPlance().move(-lostDays, activatedPlayer);
     }
@@ -46,7 +46,7 @@ public class AbandonedShipCard extends AdventureCard {
     }
 
     public boolean checkCondition(Player p){
-        if(p.getNumEquip() >= lostCrew){
+        if(p.getSpaceshipPlance().getCrew() >= lostCrew){
             return true;
         }
         return false;

@@ -46,12 +46,10 @@ public class AbandonedStationCard extends AdventureCard {
         }
 
         public boolean checkCondition(Player p){
-            if(p.getNumEquip() >= requiredCrew){
+            if(p.getSpaceshipPlance().getCrew() >= requiredCrew){
                 return true;
             }
-            else {
-                return false;
-            }
+            return false;
         }
 
     @Override
