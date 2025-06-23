@@ -9,11 +9,13 @@ public abstract class ComponentTile implements Serializable {
     private int id;
     protected ConnectorType[] connectors; // ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...// ruotati insieme alla carta dovrebbero avere anche tipi speciali tipo cannone etc...
     private boolean isWellConnected;
+    private int rotation;
 
     public ComponentTile(ConnectorType[] connectors, int id) {
         this.connectors = connectors;
         this.isWellConnected = true;
         this.id = id;
+        this.rotation = 0;
     }
 
     public int getId() {
@@ -35,6 +37,7 @@ public abstract class ComponentTile implements Serializable {
         }
 
         connectors[0] = last;
+        rotation += 90;
     }
 
     public void rotateCounterClockwise() {
@@ -45,8 +48,12 @@ public abstract class ComponentTile implements Serializable {
         }
 
         connectors[3] = first;
+        rotation -= 90;
     }
 
+    public int getRotation() {
+        return rotation;
+    }
 
     public ConnectorType[] getConnectors() {
         return connectors;
