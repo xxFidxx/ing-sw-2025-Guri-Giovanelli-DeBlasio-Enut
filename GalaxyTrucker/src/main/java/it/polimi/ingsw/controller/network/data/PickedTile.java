@@ -8,10 +8,12 @@ import java.io.Serializable;
 public class PickedTile extends DataContainer implements Serializable {
     ConnectorType[] connectors;
     String description;
+    int rotation;
 
-    public PickedTile(String description) {
+    public PickedTile(String description, int rotation) {
         super();
         this.description = description;
+        this.rotation = rotation;
     }
 
     public ConnectorType[] getConnectors(){
@@ -20,5 +22,9 @@ public class PickedTile extends DataContainer implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getRotation() {
+        return rotation;
     }
 }

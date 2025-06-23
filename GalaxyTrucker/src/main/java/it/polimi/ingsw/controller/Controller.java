@@ -194,7 +194,7 @@ public class Controller{
                 ArrayList <PickedTile> reserveTiles = new ArrayList<>();
 
                 for(ComponentTile componentTile: reservedTiles)
-                    reserveTiles.add(new PickedTile(componentTile.toString()));
+                    reserveTiles.add(new PickedTile(componentTile.toString(), componentTile.getRotation()));
 
                 event = new Event(state, new PickableTiles(assemblingTilesIds, reserveTiles));
             }
@@ -205,7 +205,7 @@ public class Controller{
 
             case PICKED_TILE,PICK_RESERVED_CARD -> {
                 ComponentTile tile = (ComponentTile) data;
-                event = new Event(state, new PickedTile(tile.toString()));
+                event = new Event(state, new PickedTile(tile.toString(), tile.getRotation()));
             }
 
             case DRAW_CARD -> {

@@ -48,6 +48,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         this.mainApp = mainApp;
     }
 
+    public Event getCurrentEvent() {
+        return currentEvent;
+    }
+
     public static void main(String[] args) throws Exception {
         final String serverName = "ServerRmi";
 
