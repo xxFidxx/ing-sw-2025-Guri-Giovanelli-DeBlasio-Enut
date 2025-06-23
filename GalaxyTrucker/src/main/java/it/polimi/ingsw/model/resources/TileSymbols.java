@@ -10,10 +10,11 @@ public class TileSymbols {
     public static String symbolExplanation =
             """
                     Tile Symbols:
-                    'C' – Cannon / Cabin
+                    'C' – Cabin
+                    'k' – Cannon
                     'K' – DoubleCannon
-                    'E' – Engine
-                    'Y' – DoubleEngine
+                    'e' – Engine
+                    'E' – DoubleEngine
                     'M' – StructuralModule
                     'L' – LifeSupportSystem
                     'S' – ShieldGenerator
@@ -31,10 +32,10 @@ public class TileSymbols {
                     """;
 
     static {
-        ASCII_TILE_SYMBOLS.put("Cannon", 'C');
+        ASCII_TILE_SYMBOLS.put("Cannon", 'k');
         ASCII_TILE_SYMBOLS.put("DoubleCannon", 'K');
-        ASCII_TILE_SYMBOLS.put("Engine", 'E');
-        ASCII_TILE_SYMBOLS.put("DoubleEngine", 'Y');
+        ASCII_TILE_SYMBOLS.put("Engine", 'e');
+        ASCII_TILE_SYMBOLS.put("DoubleEngine", 'E');
         ASCII_TILE_SYMBOLS.put("Cabin", 'C');
         //ASCII_TILE_SYMBOLS.put("CentralCabin", 'K');
         ASCII_TILE_SYMBOLS.put("StructuralModule", 'M');
