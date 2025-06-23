@@ -22,7 +22,7 @@ public class AdventureCardFactory {
 
     public static List<AdventureCard> loadCards(Game game) throws IOException {
         try {
-            URL resourceUrl = Main.class.getClassLoader().getResource("cards.json");
+            URL resourceUrl = Main.class.getClassLoader().getResource("testCards.json");
             if (resourceUrl == null) {
                 throw new FileNotFoundException("cards.json not found in classpath");
             }

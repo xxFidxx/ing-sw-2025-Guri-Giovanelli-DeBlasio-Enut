@@ -1,5 +1,17 @@
 [
   {
+    "type": "PlanetsCard",
+    "name": "Planets",
+    "level": 1,
+    "lostDays": 3,
+    "planets": [
+      [3, 1, 0, 0, 0],
+      [3, 2, 0, 0],
+      [3, 0, 0, 0],
+      [3, 1]
+    ]
+  },
+  {
     "type": "AbandonedShipCard",
     "name": "Abandoned Ship",
     "level": 0,

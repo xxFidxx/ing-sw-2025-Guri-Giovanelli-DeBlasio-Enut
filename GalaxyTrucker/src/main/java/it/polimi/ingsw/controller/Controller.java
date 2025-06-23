@@ -466,10 +466,10 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.TURN_START, null, null));
 
         if (!cards.isEmpty() || players.isEmpty()) {
-            Random random = new Random();
-            int randomNumber = random.nextInt(cards.size());
-            currentAdventureCard = cards.get(randomNumber);
-            // currentAdventureCard = cards.getFirst();
+//            Random random = new Random();
+//            int randomNumber = random.nextInt(cards.size());
+//            currentAdventureCard = cards.get(randomNumber);
+             currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
@@ -488,7 +488,7 @@ public class Controller{
                     manageCard();
                 }else{
                         notifyAllListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
-                        drawCard();
+                        resetShowAndDraw();
                 }
 
             }

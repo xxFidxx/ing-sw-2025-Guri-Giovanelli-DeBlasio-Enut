@@ -26,22 +26,21 @@ public class  Flightplance {
 
         try {
             List<AdventureCard> cards = AdventureCardFactory.loadCards(this.game);
-            //List<AdventureCard> testCards = new ArrayList<>(cards.subList(0, 12));
-            List<AdventureCard> level1Cards = new ArrayList<>(cards.subList(0, 20));
-            List<AdventureCard> level2Cards = new ArrayList<>(cards.subList(20, 40));
-
-            Collections.shuffle(level1Cards);
-            Collections.shuffle(level2Cards);
-
-            List<AdventureCard> finalDeck = new ArrayList<>();
-
-            for (int i = 0; i < 4; i++) {
-                finalDeck.add(level2Cards.removeFirst());
-                finalDeck.add(level2Cards.removeFirst());
-                finalDeck.add(level1Cards.removeFirst());
-            }
-            //this.deck = new Deck(testCards, this);
-            this.deck = new Deck(finalDeck, this);
+//            List<AdventureCard> level1Cards = new ArrayList<>(cards.subList(0, 20));
+//            List<AdventureCard> level2Cards = new ArrayList<>(cards.subList(20, 40));
+//
+//            Collections.shuffle(level1Cards);
+//            Collections.shuffle(level2Cards);
+//
+//            List<AdventureCard> finalDeck = new ArrayList<>();
+//
+//            for (int i = 0; i < 4; i++) {
+//                finalDeck.add(level2Cards.removeFirst());
+//                finalDeck.add(level2Cards.removeFirst());
+//                finalDeck.add(level1Cards.removeFirst());
+//            }
+//            this.deck = new Deck(finalDeck, this);
+            this.deck = new Deck(cards, this);
         }
         catch (Exception e) {
             System.err.println("Failed to load cards: " + e.getMessage());
