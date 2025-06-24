@@ -1,8 +1,12 @@
 package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Server.GameState;
+import it.polimi.ingsw.controller.network.data.DataString;
 import it.polimi.ingsw.controller.network.data.PickedTile;
+import it.polimi.ingsw.controller.network.data.TileData;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -17,7 +21,7 @@ import java.rmi.RemoteException;
 public class AssemblyController extends Controller {
     private static final Image COVERED_CARD_IMAGE, SPACESHIP_IMAGE;
     private int lastIndex = 0;
-
+    private TileData[][] lastSpaceship;
 
     static {
         try (InputStream in = AssemblyController.class.getResourceAsStream("/tiles/coveredTile.jpg")) {
@@ -68,7 +72,9 @@ public class AssemblyController extends Controller {
                 ImageView imageView = new ImageView();
                 imageView.setFitWidth(80);
                 imageView.setFitHeight(80);
+                imageView.setPreserveRatio(true);
                 imageView.setPickOnBounds(true);
+
                 final int c = col;
                 final int r = row;
 
@@ -89,12 +95,10 @@ public class AssemblyController extends Controller {
     }
 
     private void handleSpaceshipClick(ImageView view, int col, int row) throws RemoteException {
-        System.out.println("handled");
         clientRmi.server.addTile(clientRmi, col, row);
         if (clientRmi.getCurrentState() == GameState.ASSEMBLY) {
             tileDisplay.setImage(null);
-            int index = row * 7 + col;
-            loadToSpaceship(view, index);
+            //loadToSpaceship(view, lastIndex);
             coveredTilesGrid.setDisable(false);
             spaceshipGrid.setDisable(true);
         }
@@ -109,37 +113,63 @@ public class AssemblyController extends Controller {
         }
     }
 
-    public void loadToSpaceship(ImageView view, int index) {
-        String imagePath = "/tiles/tile" + index + ".jpg";
-
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-
-        if (imageStream == null) {
-            System.out.println("Image not found: " + imagePath);
-            return;
-        }
-
-        Image image = new Image(imageStream);
-        view.setImage(image);
-    }
-
     public void loadTileImage(int index) {
-        String imagePath = "/tiles/tile" + index + ".jpg";
-
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-
-        if (imageStream == null) {
-            System.out.println("Image not found: " + imagePath);
-            return;
-        }
-
-        Image image = new Image(imageStream);
+        Image image = getImageFromId(index);
         tileDisplay.setImage(image);
 
         int rotation = ((PickedTile) clientRmi.getCurrentEvent().getData()).getRotation();
         tileDisplay.setRotate(rotation);
 
         lastIndex = index;
+    }
+
+    public void setLastSpaceship(TileData[][] tileIds) {
+        this.lastSpaceship = tileIds;
+        Platform.runLater(() -> {
+            updateSpaceship();
+        });
+    }
+
+    private void updateSpaceship() {
+        for (Node node : spaceshipGrid.getChildren()) {
+            if (node instanceof ImageView imageView) {
+                Integer col = GridPane.getColumnIndex(node);
+                Integer row = GridPane.getRowIndex(node);
+
+                int id = lastSpaceship[row][col].getId();
+                int rotation = lastSpaceship[row][col].getRotation();
+
+                imageView.setRotate(rotation);
+                Image img = getImageFromId(id);
+                if (img != null) imageView.setImage(img);
+            }
+        }
+    }
+
+
+    private static void printTileGrid(TileData[][] grid) {
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                TileData tile = grid[row][col];
+                if (tile != null) {
+                    System.out.printf("[id=%d, rot=%d] ", tile.getId(), tile.getRotation());
+                } else {
+                    System.out.print("[null] ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    private Image getImageFromId(int id) {
+        if (id < 0) return null;
+
+        String imagePath = "/tiles/tile" + id + ".jpg";
+
+        InputStream imageStream = getClass().getResourceAsStream(imagePath);
+        Image image = new Image(imageStream);
+
+        return image;
     }
 
     @FXML

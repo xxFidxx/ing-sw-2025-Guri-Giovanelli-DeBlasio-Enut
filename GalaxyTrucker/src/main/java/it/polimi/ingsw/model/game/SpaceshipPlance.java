@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.controller.network.data.EpidemicManagement;
+import it.polimi.ingsw.controller.network.data.TileData;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -886,6 +887,19 @@ public class SpaceshipPlance {
         }
 
         return false;
+    }
+
+    public TileData[][] getTileIds() {
+        TileData[][] result = new TileData[5][7];
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 7; j++) {
+                ComponentTile tile = components[i][j];
+                result[i][j] = (tile != null) ? new TileData(tile.getId(), tile.getRotation()) : new TileData(-1, 0);
+            }
+        }
+
+        return result;
     }
 
     @Override

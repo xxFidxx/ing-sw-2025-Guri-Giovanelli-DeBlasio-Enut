@@ -2,6 +2,7 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
+import it.polimi.ingsw.controller.network.data.TileData;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -80,5 +81,9 @@ public class MainApp extends Application {
 
     public void lobbyPhase() {
         ((LobbyController) controllers.get("lobby")).lobbyPhase();
+    }
+
+    public void updateSpaceship(TileData[][] tileIds) {
+        ((AssemblyController) controllers.get("assembly")).setLastSpaceship(tileIds);
     }
 }

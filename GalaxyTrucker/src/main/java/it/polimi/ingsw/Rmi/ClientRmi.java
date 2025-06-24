@@ -816,7 +816,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile");
             case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
-            case SHOW_SHIP -> System.out.println("Here is your spaceship");
+            case SHOW_SHIP -> mainApp.updateSpaceship(((DataString)getCurrentEvent().getData()).getTileIds());
             case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");
             case CHOOSE_ALIEN -> System.out.println("Press 0 to exit exchange mode, press 1 to enter");
             case TURN_START -> System.out.println("Here is the flight plance");
