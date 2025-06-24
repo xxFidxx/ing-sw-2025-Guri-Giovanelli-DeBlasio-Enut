@@ -7,7 +7,6 @@ import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.gui.MainApp;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
-import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
 import it.polimi.ingsw.model.componentTiles.PowerCenter;
 import it.polimi.ingsw.model.game.CargoManagementException;
@@ -87,10 +86,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
     }
 
-        // DA METTERE TIMER DOPO CHE IL PRIMO HA FINITO DI ASSEMBLARE LA NAVE!!!!
-    // !!!!
-    // !!!!!
-    ////!!!!!!!!!!
     private void runCli() throws Exception {
         while (true) {
             if (scan.hasNextLine()) {
@@ -102,7 +97,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
     }
 
-    // sono da capire dove gestire gli errori di parsing in ingresso
+
     private void handleInput(String input) throws Exception {
         switch (currentState) {
             case IDLE -> {
@@ -153,8 +148,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }else{
                         try {
                             int index = Integer.parseInt(input);
-                            // da aggiungere il check sul limite delle cards normali, per ora siamo fermi a 56 cards
-                            if(index <= 1001){
+
+                            if(index == 1000 || index == 1001 || index >= 0 && index <= 122){
                                 server.pickTile(this, Integer.parseInt(input));
                             }else{
                                 System.out.println("Outbound index, please retry");
@@ -729,7 +724,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 int numP = Integer.parseInt(scan.nextLine());
                                     server.choosePlanets(this, numP);
                                     inputValid = true;
-
+                                    server.manageCard();
                             } catch (ControllerExceptions e) {
                                 System.out.println(e.getMessage());
                             } catch (NumberFormatException e) {
@@ -741,7 +736,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 System.out.println("Error " + e.getMessage());
                             }
                         }
-                        server.manageCard();
                     }
                     default ->{
                         System.out.println("Not accepted input, please try again");
@@ -980,6 +974,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     @Override
     public void showUpdate(Event event) throws RemoteException, InterruptedException {
         eventQueue.put(event);
+    }
+
+    @Override
+    public void ping() throws RemoteException {
+
     }
 
     private void handleEvents(){

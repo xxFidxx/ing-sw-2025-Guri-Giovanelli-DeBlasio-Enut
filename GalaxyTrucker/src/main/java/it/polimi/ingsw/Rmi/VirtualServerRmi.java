@@ -12,12 +12,9 @@ import java.util.ArrayList;
 
 public interface VirtualServerRmi extends Remote, VirtualServer {
 
-    void connect(VirtualView client) throws RemoteException;
+    void connect(VirtualViewRmi client) throws RemoteException;
 
-    // metodi controller:
-
-
-    void addNickname(VirtualView client, String nickname) throws RemoteException, LobbyExceptions;
+    void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions;
 
     void createLobby(int number) throws RemoteException, LobbyExceptions;
 

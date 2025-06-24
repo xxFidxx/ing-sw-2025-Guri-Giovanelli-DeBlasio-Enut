@@ -9,5 +9,7 @@ import java.rmi.RemoteException;
 public interface VirtualViewRmi extends Remote, VirtualView {
     @Override
     void showUpdate(Event event) throws RemoteException, InterruptedException;
+
+    void ping() throws RemoteException;
 }
 
