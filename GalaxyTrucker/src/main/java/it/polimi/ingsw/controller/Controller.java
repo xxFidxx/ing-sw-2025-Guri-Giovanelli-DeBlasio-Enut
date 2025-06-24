@@ -30,6 +30,7 @@ public class Controller{
     final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <Player, Boolean> isDone = new HashMap<>();
+    final Map <Player, Boolean> isDonePirates = new HashMap<>();
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
     private ArrayList<Player> players;
@@ -327,6 +328,10 @@ public class Controller{
                 event = new Event(state, new LostCrew((int) data));
             }
 
+            case GET_CREDITS -> {
+                event = new Event(state, new Credits((int) data));
+            }
+
             case CREW_MANAGEMENT -> {
                 int astr = player.getSpaceshipPlance().getnAstronauts();
                 int al = player.getSpaceshipPlance().getBrownAliens() + player.getSpaceshipPlance().getPurpleAliens();
@@ -601,6 +606,11 @@ public class Controller{
                 if (tmpPlayers.isEmpty() || piratesended) {
                     piratesended = false;
                     piratesFlag = true;
+                    if(!defeatedPlayers.isEmpty()){
+                        for (Player p : defeatedPlayers) {
+                            isDonePirates.put(p, false);
+                        }
+                    }
                     System.out.println("manageCard: vado in defeatedByPirates");
                     defeatedByPirates();//reset and show lo metto in questo metodo
                     return;
@@ -627,10 +637,10 @@ public class Controller{
                         handlePlanets(l);
                         // manageCard();
                     }
-                }else{
+                }/*else{
                     resetShowAndDraw();
                     return;
-                }
+                }*/
             }
 
             case MeteorSwarmCard msc -> {
@@ -652,18 +662,19 @@ public class Controller{
                 Player first = players.get(0);
                 System.out.println("manageCard: attivo activateMeteor per il primo player ");
                 activateMeteor(first);
-                Player second = players.get(1);
-                System.out.println("manageCard: attivo activateMeteor per il secondo player ");
-                activateMeteor(second);
-                if (size >= 3) {
-                    Player third = players.get(2);
-                    activateMeteor(third);
-                    if (size == 4) {
-                        Player fourth = players.get(3);
-                        activateMeteor(fourth);
+                if(size >= 2) {
+                    Player second = players.get(1);
+                    System.out.println("manageCard: attivo activateMeteor per il secondo player ");
+                    activateMeteor(second);
+                    if (size >= 3) {
+                        Player third = players.get(2);
+                        activateMeteor(third);
+                        if (size == 4) {
+                            Player fourth = players.get(3);
+                            activateMeteor(fourth);
+                        }
                     }
                 }
-
             }
 
             case EpidemicCard ec -> {
@@ -718,9 +729,9 @@ public class Controller{
 
     public void handlePlanets(ClientListener l) {
         Player p = playerbyListener.get(l);
-                isDone.put(p, true);
+        isDone.put(p, true);
         if(!isDone.containsValue(false)){
-            resetShowAndDraw();
+            resetShowAndDraw(); // non va bene se alcuni giocatori stanno ancora gestendo le merci di un pianeta
         } else {
             l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             manageCard();
@@ -808,6 +819,7 @@ public class Controller{
         notifyAllListeners(eventCrafter(GameState.END_CARD, null, null));
         game.endTurn();
         isDone.replaceAll((c, v) -> false);
+        isDonePirates.replaceAll((c, v) -> false);
         cargoended = false;
         combatZoneFlag = false;
         piratesFlag = false;
@@ -828,6 +840,10 @@ public class Controller{
         Player p = playerbyListener.get(listener);
         AbandonedShipCard currentAbandonedShipCard = (AbandonedShipCard) currentAdventureCard;
         currentAbandonedShipCard.setActivatedPlayer(p);
+        int ld = currentAbandonedShipCard.getLostDays();
+        listener.onEvent(eventCrafter(GameState.MOVE_PLAYER, ld, null));
+        int c = currentAbandonedShipCard.getReward();
+        listener.onEvent(eventCrafter(GameState.GET_CREDITS, c, null));
         currentAdventureCard.activate();
         crewended=true;
         //sendToCrewManagement(p);
@@ -839,6 +855,8 @@ public class Controller{
         Player p = playerbyListener.get(listener);
         AbandonedStationCard currentAbandonedStationCard = (AbandonedStationCard) currentAdventureCard;
         currentAbandonedStationCard.setActivatedPlayer(p);
+        int ld = currentAbandonedStationCard.getLostDays();
+        listener.onEvent(eventCrafter(GameState.MOVE_PLAYER, ld, null));
         currentAdventureCard.activate();
         cargoended = true;
         listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null, null));
@@ -950,6 +968,10 @@ public class Controller{
                 if (outcome == 1) {
                     listener.onEvent(eventCrafter(GameState.ENEMY_WIN, null, null));
                     enemyDefeated = true;
+                    int ld = ((SlaversCard) currentCastedCard).getLostDays();
+                    listener.onEvent(eventCrafter(GameState.MOVE_PLAYER, ld, null));
+                    int c = ((SlaversCard) currentCastedCard).getReward();
+                    listener.onEvent(eventCrafter(GameState.GET_CREDITS, c, null));
                     manageCard();
                 } else if (outcome == -1) {
                     listener.onEvent(eventCrafter(GameState.ENEMY_LOST, null, null));
@@ -967,6 +989,8 @@ public class Controller{
                 if (outcome == 1) {
                     listener.onEvent(eventCrafter(GameState.ENEMY_WIN, null, null));
                     cargoended = true;
+                    int ld = ((SmugglersCard) currentCastedCard).getLostDays();
+                    listener.onEvent(eventCrafter(GameState.MOVE_PLAYER, ld, null));
                     listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null, null));
                 } else if (outcome == -1) {
                     listener.onEvent(eventCrafter(GameState.ENEMY_LOST, null, null));
@@ -984,6 +1008,10 @@ public class Controller{
                 if (outcome == 1) {
                     listener.onEvent(eventCrafter(GameState.ENEMY_WIN, null, null));
                     piratesended = true;
+                    int ld = ((PiratesCard) currentCastedCard).getLostDays();
+                    listener.onEvent(eventCrafter(GameState.MOVE_PLAYER, ld, null));
+                    int c = ((PiratesCard) currentCastedCard).getReward();
+                    listener.onEvent(eventCrafter(GameState.GET_CREDITS, c, null));
                     manageCard();
                 } else if (((PiratesCard) currentCastedCard).getFightOutcome(currentPlayer) == -1) {
                     System.out.println("fromChargeToManage: vado in ENEMY_LOST");
@@ -1200,27 +1228,6 @@ public class Controller{
         }
     }
 
-    public void sendToCrewManagement(Player p){
-        ClientListener l = listenerbyPlayer.get(p);
-        int astr = p.getSpaceshipPlance().getnAstronauts();
-        int al = p.getSpaceshipPlance().getBrownAliens() + p.getSpaceshipPlance().getPurpleAliens();
-        ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
-        int lostCrew;
-        switch(currentAdventureCard){
-            case CombatZoneCard czc -> lostCrew = ((CombatZoneCard)currentAdventureCard).getLostOther();
-            case SlaversCard sc -> lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
-            case AbandonedShipCard asc -> lostCrew = ((AbandonedShipCard)currentAdventureCard).getLostCrew();
-            default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
-        }
-        CrewManagement cm;
-        System.out.println("sendToCrewManagement: mando in CREW_MANAGEMENT");
-
-        if(!cabins.isEmpty())
-        printSpaceshipbyTile(l, cabins.getFirst());
-
-        l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostCrew, p));
-    }
-
     public void defeatedBySmugglers() {
         if (defeatedPlayers.isEmpty()) {
             resetShowAndDraw();
@@ -1255,7 +1262,7 @@ public class Controller{
 
     public void waitForEnemies(ClientListener l) {
         Player p = playerbyListener.get(l);
-                isDone.put(p, true);
+        isDone.put(p, true);
         if (!isDone.containsValue(false)) {
             switch (currentAdventureCard) {
                 case SlaversCard sc -> {
@@ -1548,6 +1555,8 @@ public class Controller{
         planet.setBusy(true);
         currentPlanetsCard.setActivatedPlayer(player);
         currentPlanetsCard.setChosenPlanet(planet);
+        int ld = ((PlanetsCard) currentAdventureCard).getLostDays();
+        listener.onEvent(eventCrafter(GameState.MOVE_PLAYER, ld, null));
         currentPlanetsCard.activate();
         listener.onEvent(eventCrafter(GameState.CARGO_MANAGEMENT, null, null));
     }
@@ -1634,12 +1643,24 @@ public class Controller{
             }
         } else {
             if (stumps <= 1) {
-                if(currentAdventureCard instanceof CombatZoneCard){
+                switch(currentAdventureCard) {
+                    case CombatZoneCard czc -> {
+                        Player p = playerbyListener.get(listener);
+                        System.out.println("removeAdjust: vado in combatZoneShots");
+                        combatZoneShots(p);
+                    }
+                    case MeteorSwarmCard msc -> waitForNextShot(listener);
+                    case PiratesCard pc -> waitForNextShotPirates(listener);
+                    default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+                }
+                /*if(currentAdventureCard instanceof CombatZoneCard){
                     Player p = playerbyListener.get(listener);
                     System.out.println("removeAdjust: vado in combatZoneShots");
                     combatZoneShots(p);
                 } else
                     waitForNextShot(listener);
+                */
+
             } else {
                 System.out.println("removeAdjust: vado in printSpaceshipParts");
                 printSpaceshipParts(listener);
@@ -1673,7 +1694,21 @@ public class Controller{
             if (!p.getSpaceshipPlance().checkCorrectness()) {
                 printSpaceshipAdjustment(listener);
             } else {
-                waitForNextShot(listener);
+                switch(currentAdventureCard) {
+                    case CombatZoneCard czc -> {
+                        System.out.println("selectShipPart: vado in combatZoneShots");
+                        combatZoneShots(p);
+                    }
+                    case MeteorSwarmCard msc -> waitForNextShot(listener);
+                    case PiratesCard pc -> waitForNextShotPirates(listener);
+                    default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+                }
+                /*if(currentAdventureCard instanceof MeteorSwarmCard){
+                    waitForNextShot(listener);
+                } else {
+                    waitForNextShotPirates(listener);
+                }*/
+                // waitForNextShot(listener);
             }
         }
     }
@@ -1757,12 +1792,21 @@ public class Controller{
             if (currentAdventureCard instanceof MeteorSwarmCard) {
                 isDone.replaceAll((c, v) -> false);
                 manageCard();
-            } else {
+            } /*else {
                 isDone.replaceAll((c, v) -> false);
                 defeatedByPirates();
-            }
+            }*/
         } else {
             listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+        }
+    }
+
+    public void waitForNextShotPirates(ClientListener listener) {
+        Player p = playerbyListener.get(listener);
+        isDonePirates.put(p, true);
+        if (!isDonePirates.containsValue(false)){
+            isDonePirates.replaceAll((c, v) -> false);
+            defeatedByPirates();
         }
     }
 
@@ -1975,7 +2019,7 @@ public class Controller{
             case OpenSpaceCard osc -> fromChargeToManage(listener);
             case PiratesCard pc -> {
                 if (piratesFlag)
-                    waitForNextShot(listener);
+                    waitForNextShotPirates(listener);
                 else
                     fromChargeToManage(listener);
             }
@@ -2098,10 +2142,19 @@ public class Controller{
             removeAdjust(l, x, y);
         } else {
             l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
-            if (currentAdventureCard instanceof CombatZoneCard) {
+            switch(currentAdventureCard) {
+                case CombatZoneCard czc -> {
+                    System.out.println("takeHit: vado in combatZoneShots");
+                    combatZoneShots(p);
+                }
+                case MeteorSwarmCard msc -> waitForNextShot(l);
+                case PiratesCard pc -> waitForNextShotPirates(l);
+                default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
+            }
+            /*if (currentAdventureCard instanceof CombatZoneCard) {
                 combatZoneShots(p);
             } else
-                waitForNextShot(l);
+                waitForNextShot(l); */
         }
     }
 

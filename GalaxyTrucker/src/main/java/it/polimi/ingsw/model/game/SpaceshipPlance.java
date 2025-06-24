@@ -319,7 +319,7 @@ public class SpaceshipPlance {
         return true;
     }
 
-    private boolean isConnectionValid(ConnectorType a, ConnectorType b) {
+    public boolean isConnectionValid(ConnectorType a, ConnectorType b) {
         //System.out.println(a.toString() + " " + b.toString());
         boolean prova;
         // Regole base di connessione (ignora i casi esposti)

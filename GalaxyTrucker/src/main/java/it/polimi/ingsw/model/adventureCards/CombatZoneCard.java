@@ -32,8 +32,6 @@ public class CombatZoneCard extends AdventureCard  {
 
     public void activate() {
 
-
-
     }
 
     public int getLostDays() {

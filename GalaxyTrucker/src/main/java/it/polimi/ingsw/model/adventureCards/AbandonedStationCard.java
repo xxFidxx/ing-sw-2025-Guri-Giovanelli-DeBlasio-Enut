@@ -45,6 +45,8 @@ public class AbandonedStationCard extends AdventureCard {
             return reward;
         }
 
+        public int getLostDays() { return lostDays; }
+
         public boolean checkCondition(Player p){
             if(p.getSpaceshipPlance().getCrew() >= requiredCrew){
                 return true;

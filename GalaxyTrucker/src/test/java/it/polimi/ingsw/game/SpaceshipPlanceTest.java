@@ -224,6 +224,52 @@ public class SpaceshipPlanceTest {
     }
 
     @Test
+    public void testSmoothToSmooth() {
+        assertTrue(spaceship.isConnectionValid(ConnectorType.SMOOTH, ConnectorType.SMOOTH));
+    }
+
+    @Test
+    public void testSmoothToUniversal() {
+        assertFalse(spaceship.isConnectionValid(ConnectorType.SMOOTH, ConnectorType.UNIVERSAL));
+    }
+
+    @Test
+    public void testUniversalToUniversal() {
+        assertTrue(spaceship.isConnectionValid(ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL));
+    }
+
+    @Test
+    public void testUniversalToDouble() {
+        assertTrue(spaceship.isConnectionValid(ConnectorType.UNIVERSAL, ConnectorType.DOUBLE));
+    }
+
+    @Test
+    public void testDoubleToDouble() {
+        assertTrue(spaceship.isConnectionValid(ConnectorType.DOUBLE, ConnectorType.DOUBLE));
+    }
+
+    @Test
+    public void testCannonToUniversal() {
+        assertFalse(spaceship.isConnectionValid(ConnectorType.CANNON, ConnectorType.UNIVERSAL));
+    }
+
+    @Test
+    public void testEngineToDouble() {
+        assertFalse(spaceship.isConnectionValid(ConnectorType.ENGINE, ConnectorType.DOUBLE));
+    }
+
+    @Test
+    public void testUniversalToUniversalSymmetric() {
+        assertTrue(spaceship.isConnectionValid(ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL));
+        assertTrue(spaceship.isConnectionValid(ConnectorType.DOUBLE, ConnectorType.UNIVERSAL));
+    }
+
+    @Test
+    public void testSmoothToCannon() {
+        assertFalse(spaceship.isConnectionValid(ConnectorType.SMOOTH, ConnectorType.CANNON));
+    }
+
+    @Test
     public void testIsTileValid_ValidConnection() {
         // Cabin a [2][3] con UNIVERSAL a est
         ComponentTile cabin = new Cabin(new ConnectorType[]{
@@ -231,10 +277,10 @@ public class SpaceshipPlanceTest {
                 ConnectorType.SMOOTH, ConnectorType.SMOOTH
         }, true, 1);
 
-        // Cargo a [2][4] con UNIVERSAL a ovest
+        // Cargo a [2][4] con DOUBLE a ovest
         ComponentTile cargo = new CargoHolds(new ConnectorType[]{
                 ConnectorType.SMOOTH, ConnectorType.SMOOTH,
-                ConnectorType.SMOOTH, ConnectorType.UNIVERSAL
+                ConnectorType.SMOOTH, ConnectorType.DOUBLE
         }, 2, false, 2);
 
         spaceship.getComponents()[2][3] = cabin;
@@ -245,16 +291,16 @@ public class SpaceshipPlanceTest {
 
     @Test
     public void testIsTileValid_InvalidConnection() {
-        // Cabin con CANNON a est
+        // Cabin con SINGLE a est
         ComponentTile cabin = new Cabin(new ConnectorType[]{
-                ConnectorType.SMOOTH, ConnectorType.CANNON,
+                ConnectorType.SMOOTH, ConnectorType.SINGLE,
                 ConnectorType.SMOOTH, ConnectorType.SMOOTH
         }, true, 3);
 
-        // Cargo con ENGINE a ovest
+        // Cargo con DOUBLE a ovest
         ComponentTile cargo = new CargoHolds(new ConnectorType[]{
                 ConnectorType.SMOOTH, ConnectorType.SMOOTH,
-                ConnectorType.SMOOTH, ConnectorType.ENGINE
+                ConnectorType.SMOOTH, ConnectorType.DOUBLE
         }, 4, false, 3);
 
         spaceship.getComponents()[2][3] = cabin;

@@ -20,8 +20,9 @@ public class OpenSpaceCard extends AdventureCard {
 
     @Override
     public void activate() {
-        int power = activatedPlayer.getEngineStrenght();
-        deck.getFlightPlance().move(power, activatedPlayer);
+
+//        int power = activatedPlayer.getEngineStrenght();
+//        deck.getFlightPlance().move(power, activatedPlayer);
     }
 
     public void setActivatedPlayer(Player activatedPlayer) {

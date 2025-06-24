@@ -48,6 +48,7 @@ public enum GameState {
     ASK_SHIELD,
     FAILED_CARD,
     ASK_CANNON,
+    GET_CREDITS,
     MOVE_PLAYER,
     MOVE_FORWARD,
     BATTERIES_MANAGEMENT,
