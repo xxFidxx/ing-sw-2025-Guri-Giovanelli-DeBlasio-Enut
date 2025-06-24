@@ -69,6 +69,10 @@ public class SpaceshipPlance {
         this.goodsContainers = goodsContainers;
     }
 
+    public ArrayList<GoodsContainer> getGoodsContainers() {
+        return goodsContainers;
+    }
+
     public int getBrownAliens() {
         return this.nBrownAliens;
     }
@@ -277,7 +281,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private boolean validateRemainingTiles() {
+    public boolean validateRemainingTiles() {
         boolean allValid = true;
 
         for (int y = 0; y < ROWS; y++) {
@@ -558,7 +562,7 @@ public class SpaceshipPlance {
             throw new CargoManagementException("cargo index is outbound");
     }
 
-    private void swapGoods(GoodsContainer cargo1, GoodsContainer cargo2, int j1, int j2) {
+    public void swapGoods(GoodsContainer cargo1, GoodsContainer cargo2, int j1, int j2) {
 
         GoodsBlock[] goods1 = cargo1.getGoods();
         GoodsBlock[] goods2 = cargo2.getGoods();
@@ -642,7 +646,7 @@ public class SpaceshipPlance {
         return shieldGenerators;
     }
 
-    private void countBatteries(){
+    public void countBatteries(){
         nBatteries=0;
         for(PowerCenter powerCenter : powerCenters){
             System.out.println(powerCenter);
@@ -766,9 +770,6 @@ public class SpaceshipPlance {
         throw new IllegalStateException("Not a cannon connector in a cannon tile");
     }
 
-    private boolean askActivateCannon() {
-        return true;
-    }
 
     public ArrayList<Cabin> getConnectedCabins() {
         ArrayList<Cabin> connectedCabins = new ArrayList<>();
@@ -808,12 +809,6 @@ public class SpaceshipPlance {
         return nAstronauts;
     }
 
-    public int getnBrownAliens() {return nBrownAliens;
-    }
-
-    public int getnPurpleAliens() {
-        return nPurpleAliens;
-    }
 
 
     public void placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {

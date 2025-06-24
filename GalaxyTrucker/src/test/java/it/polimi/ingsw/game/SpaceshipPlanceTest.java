@@ -4,13 +4,17 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
+import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import it.polimi.ingsw.model.componentTiles.ConnectorType;
 import it.polimi.ingsw.model.componentTiles.Engine;
+import it.polimi.ingsw.model.game.CargoManagementException;
+import it.polimi.ingsw.model.game.ColorType;
 import it.polimi.ingsw.model.game.SpaceshipPlance;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.SpaceshipPlance;
+import it.polimi.ingsw.model.resources.GoodsContainer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -26,6 +30,52 @@ public class SpaceshipPlanceTest {
     @Before
     public void setUp() {
         spaceship = new SpaceshipPlance();
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+        ConnectorType[] cannonConnectors1 = {
+                ConnectorType.SMOOTH,    // NORTH
+                ConnectorType.CANNON,    // EAST
+                ConnectorType.SMOOTH,    // SOUTH
+                ConnectorType.SMOOTH     // WEST
+        };
+        Cannon cannon1 = new Cannon(cannonConnectors1, 1);
+        spaceship.getComponents()[2][5] = cannon1;
+        spaceship.getCannons().add(cannon1);
+
+        // Doppio cannone rivolto a OVEST (indice 3 = OVEST)
+        ConnectorType[] doubleCannonConnectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.CANNON
+        };
+        DoubleCannon doubleCannon = new DoubleCannon(doubleCannonConnectors, 2);
+        spaceship.getComponents()[2][3] = doubleCannon;
+        spaceship.getCannons().add(doubleCannon);
+
+
+        ConnectorType[] CabinConnectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.UNIVERSAL
+        };
+        Cabin cabin = new Cabin(CabinConnectors,false,3);
+        spaceship.getComponents()[1][3] =cabin;
     }
 
     @Test
@@ -409,8 +459,213 @@ public class SpaceshipPlanceTest {
         assertTrue("Tile A deve essere visitata", visited[2][2]);
         assertTrue("Tile B deve essere visitata", visited[2][3]);
     }
+    @Test
+    public void testRemoveUnvisitedTiles_removesCorrectly() {
+        // Setup: connectors universali per semplicità
+        ConnectorType[] connectors = {
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL
+        };
+
+        // Inserisco tile in (1,1), (2,2), (3,3)
+        spaceship.getComponents()[1][1] = new Cabin(connectors, false, 0);
+        spaceship.getComponents()[2][2] = new Cabin(connectors, false, 1);
+        spaceship.getComponents()[3][3] = new Cabin(connectors, false, 2);
+
+        // Imposto visited: solo (1,1) e (3,3) sono visitate
+        spaceship.getVisited()[1][1] = true;
+        spaceship.getVisited()[2][2] = false;
+        spaceship.getVisited()[3][3] = true;
+        spaceship.getVisited()[2][3] = true;
+
+        // Chiamata al metodo pubblico
+        spaceship.removeUnvisitedTiles();
+
+        // Verifica
+        assertNotNull("La tile (1,1) deve rimanere", spaceship.getComponents()[1][1]);
+        assertNull("La tile (2,2) deve essere rimossa", spaceship.getComponents()[2][2]);
+        assertNotNull("La tile (3,3) deve rimanere", spaceship.getComponents()[3][3]);
+
+        // Verifica che la tile rimossa sia finita in reserveSpot
+        assertEquals("Una sola tile deve essere spostata in reserveSpot", 1, spaceship.getReserveSpot().size());
+        assertTrue("La tile rimossa è in reserveSpot", spaceship.getReserveSpot().get(0) instanceof Cabin);
+
+
+    }
+    @Test
+    public void testValidateRemainingTiles_allValid() {
+        ConnectorType[] connectorsCenter = {
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL
+        };
+
+        ConnectorType[] connectorsRight = {
+                ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL
+        };
+
+        spaceship.getComponents()[2][3] = new Cabin(connectorsCenter, false, 0); // centro
+        spaceship.getComponents()[2][4] = new Cabin(connectorsRight, false, 0); // destra
+
+        boolean result = spaceship.validateRemainingTiles();
+
+        assertTrue("Tutte le tile sono ben connesse, deve restituire true", result);
+        assertTrue(spaceship.getComponents()[2][3].isWellConnected());
+        assertTrue(spaceship.getComponents()[2][4].isWellConnected());
+    }
+    @Test
+    public void testSwapValidNonSpecialGoods() throws CargoManagementException {
+        spaceship.handleSwap(0, 0, 0, 1); // swap BLUE <-> GREEN
+
+        GoodsBlock[] goods = spaceship.getGoodsContainers().get(0).getGoods();
+        assertEquals(ColorType.GREEN, goods[0].getType());
+        assertEquals(ColorType.BLUE, goods[1].getType());
+    }
+    @Test(expected = CargoManagementException.class)
+    public void testSwapInvalidRedToGray() throws CargoManagementException {
+        // provo a mettere RED (da container 1) nel grigio (container 0)
+        spaceship.handleSwap(1, 0, 0, 0);
+    }
+    @Test(expected = CargoManagementException.class)
+    public void testSwapOutOfBoundsCargoIndex() throws CargoManagementException {
+        spaceship.handleSwap(0, 2, 0, 0); // cargoIndex2 fuori range
+    }
+    @Test
+    public void testHandleRemove_valid() throws CargoManagementException {
+        spaceship.handleRemove(0, 1); // Rimuovo GREEN
+
+        GoodsBlock[] goods = spaceship.getGoodsContainers().get(0).getGoods();
+        assertNull("Il blocco dovrebbe essere rimosso", goods[1]);
+    }
+    @Test
+    public void testHandleRemove_fromNullSlot() throws CargoManagementException {
+        spaceship.handleRemove(0, 2); // slot già null
+        GoodsBlock[] goods = spaceship.getGoodsContainers().get(0).getGoods();
+        assertNull("Slot dovrebbe restare null", goods[2]);
+    }
+    @Test
+    public void testHandleAdd_yellowToGray_success() throws CargoManagementException {
+        GoodsBlock[] reward = new GoodsBlock[] {
+                new GoodsBlock(ColorType.YELLOW)
+        };
+
+        spaceship.handleAdd(reward, 0, 2, 0); // slot 2 è libero
+
+        GoodsBlock added = spaceship.getGoodsContainers().get(0).getGoods()[2];
+        assertNotNull(added);
+        assertEquals(ColorType.YELLOW, added.getType());
+    }
+    @Test(expected = CargoManagementException.class)
+    public void testHandleAdd_redToGray_fails() throws CargoManagementException {
+        GoodsBlock[] reward = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED)
+        };
+
+        spaceship.handleAdd(reward, 0, 2, 0); // slot libero, ma tipo non ammesso
+    }
+    @Test
+    public void testCountBatteries_withMultiplePowerCenters() {
+
+        // PowerCenter con 3 batterie attive
+        ConnectorType[] connectors = new ConnectorType[] {
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH
+        };
+        PowerCenter pc1 = new PowerCenter(connectors, 3, 1);
+
+        // PowerCenter con 2 batterie, di cui solo una attiva
+        PowerCenter pc2 = new PowerCenter(connectors, 2, 2);
+        pc2.getBatteries()[1] = false;
+
+        // Aggiungili alla nave
+        spaceship.getPowerCenters().add(pc1);
+        spaceship.getPowerCenters().add(pc2);
+
+        // Esegui il conteggio
+        spaceship.countBatteries();
+
+        // pc1: 3 attive, pc2: 1 attiva → totale 4
+        assertEquals(4, spaceship.getnBatteries());
+    }
+    @Test
+    public void testCountExposedConnectors_twoAdjacentTiles_oneConnectorCovered() {
+        SpaceshipPlance spaceship = new SpaceshipPlance();
+
+        ConnectorType[] connectors1 = new ConnectorType[] {
+                ConnectorType.SINGLE, // NORTH
+                ConnectorType.SINGLE, // EAST
+                ConnectorType.SINGLE, // SOUTH
+                ConnectorType.SINGLE  // WEST
+        };
+
+        ConnectorType[] connectors2 = new ConnectorType[] {
+                ConnectorType.SINGLE, // NORTH
+                ConnectorType.SINGLE, // EAST
+                ConnectorType.SINGLE, // SOUTH
+                ConnectorType.SINGLE  // WEST
+        };
+
+        ComponentTile tile1 = new CargoHolds(connectors1, 1, false, 3);
+        ComponentTile tile2 = new CargoHolds(connectors2, 2, false, 3);
+
+        // Posiziono tile1 al centro, tile2 a destra (copre lato EAST di tile1)
+        spaceship.getComponents()[2][2] = tile1;
+        spaceship.getComponents()[2][3] = tile2;
+
+        int exposed = spaceship.countExposedConnectors();
+
+        // 4 (tile1) + 4 (tile2) - 2 (connessione tra i due) = 6
+        assertEquals(6, exposed);
+    }
+    @Test
+    public void testGetCannonDirection() {
+        ConnectorType[] connectors = new ConnectorType[]{
+                ConnectorType.SMOOTH,
+                ConnectorType.CANNON,
+                ConnectorType.SINGLE,
+                ConnectorType.SMOOTH
+        };
+        Cannon cannon = new Cannon(connectors, 1);
+
+        int dir = spaceship.getCannonDirection(cannon);
+        assertEquals(1, dir);
+    }
+    @Test
+    public void testCheckProtectionHitsSingleCannon() {
+        // Esempio: direction EAST, posizione che dovrebbe colpire cannon1 in (2,5)
+        int result = spaceship.checkProtection(Direction.EAST, 7);
+
+        assertEquals("Should hit single cannon and return 1", 1, result);
+    }
+    @Test
+    public void testCheckProtectionHitsDoubleCannonWest() {
+        // Direzione WEST, posizione che colpisce doubleCannon in (2,3)
+
+        int result = spaceship.checkProtection(Direction.WEST, 7);
+        assertEquals("Should hit double cannon and return 2", 2, result);
+    }
+    @Test
+    public void testCheckProtectionHitsNoCannon() {
+        // Posizione senza cannone (ad esempio in posizione vuota o tile non cannon)
+        int result = spaceship.checkProtection(Direction.NORTH, 7);
+        assertEquals("No cannon hit should return 0", 0, result);
+    }
+    @Test
+    public void testCheckProtectionNoHit() {
+        // Direzione e posizione che non colpiscono nulla
+        int result = spaceship.checkProtection(Direction.WEST, 0);
+        assertEquals("No hit should return -1", -1, result);
+    }
+
 
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
