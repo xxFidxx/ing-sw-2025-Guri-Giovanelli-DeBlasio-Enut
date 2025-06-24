@@ -38,6 +38,8 @@ public class PiratesCard extends EnemyCard {
         return shots;
     }
 
+    public int getReward() { return reward; }
+
     @Override
     public String toString() {
         return "PiratesCard{" +

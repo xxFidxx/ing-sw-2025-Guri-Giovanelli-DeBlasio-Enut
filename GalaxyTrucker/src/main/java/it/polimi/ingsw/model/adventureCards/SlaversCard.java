@@ -31,4 +31,6 @@ public class SlaversCard extends EnemyCard  {
     public int getLostCrew(){
         return lostCrew;
     }
+
+    public int getReward(){ return reward; }
 }
