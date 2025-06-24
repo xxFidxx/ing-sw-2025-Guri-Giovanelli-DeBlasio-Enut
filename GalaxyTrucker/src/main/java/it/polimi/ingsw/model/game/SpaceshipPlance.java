@@ -89,6 +89,7 @@ public class SpaceshipPlance {
     public int[][] getShownComponents() {
         return shownComponents;
     }
+
     public void setComponent(int y, int x, ComponentTile tile) {
         components[y][x] = tile;
     }
@@ -380,6 +381,45 @@ public class SpaceshipPlance {
     }
 
 
+//    public boolean checkNewTile(int x, int y) {
+//        if (edgeCases(y, x) || !inBounds(x, y) || components[y][x] == null) {
+//            return false;
+//        }
+//
+//        ComponentTile tile = components[y][x];
+//        boolean isValid = true;
+//
+//        // Controlla tutti e 4 i connettori
+//        for (int dir = 0; dir < 4; dir++) {
+//            int adjX = x + DIR_X[dir];
+//            int adjY = y + DIR_Y[dir];
+//
+//            // Caso 1: Controllo speciale per ENGINE/CANNON
+//            if (tile instanceof Engine) { // SOUTH
+//                isValid = isEngineValid(y,x);
+//            }
+//
+//            if (tile instanceof Cannon && dir == 0) { // NORTH
+//                isValid = isCannonValid(y,x);
+//            }
+//
+//            // Caso 2: Connessione con tile adiacente
+//            if (inBounds(adjX, adjY) && !edgeCases(adjY, adjX)) {
+//                ComponentTile adjTile = components[adjY][adjX];
+//
+//                if (adjTile != null) {
+//                    ConnectorType current = tile.getConnectors()[dir];
+//                    ConnectorType adjacent = adjTile.getConnectors()[(dir + 2) % 4];
+//
+//                    if (!isConnectionValid(current, adjacent)) {
+//                        isValid = false;
+//                    }
+//                }
+//            }
+//        }
+//        return isValid;
+//    }
+
     public boolean checkNewTile(int x, int y) {
         if (edgeCases(y, x) || !inBounds(x, y) || components[y][x] == null) {
             return false;
@@ -388,29 +428,29 @@ public class SpaceshipPlance {
         ComponentTile tile = components[y][x];
         boolean isValid = true;
 
+        // Caso 1: Controllo speciale per ENGINE/CANNON
+        if (tile instanceof Engine) { // SOUTH
+            isValid = isEngineValid(y,x);
+        }
+
+        if (tile instanceof Cannon) { // NORTH
+            isValid = isCannonValid(y,x);
+        }
+
         // Controlla tutti e 4 i connettori
-        for (int dir = 0; dir < 4; dir++) {
+        for (int dir = 0; dir < 4 && isValid; dir++) {
             int adjX = x + DIR_X[dir];
             int adjY = y + DIR_Y[dir];
 
-            // Caso 1: Controllo speciale per ENGINE/CANNON
-            if (tile instanceof Engine) { // SOUTH
-                isValid = isEngineValid(y,x);
-            }
-
-            if (tile instanceof Cannon && dir == 0) { // NORTH
-                isValid = isCannonValid(y,x);
-            }
-
             // Caso 2: Connessione con tile adiacente
-            if (inBounds(adjX, adjY) && !edgeCases(adjY, adjX)) {
+            if (inBounds(adjX, adjY)) {
                 ComponentTile adjTile = components[adjY][adjX];
 
                 if (adjTile != null) {
                     ConnectorType current = tile.getConnectors()[dir];
                     ConnectorType adjacent = adjTile.getConnectors()[(dir + 2) % 4];
 
-                    if (!isConnectionValid(current, adjacent)) {
+                    if (!isConnectionValid(current, adjacent)){
                         isValid = false;
                     }
                 }

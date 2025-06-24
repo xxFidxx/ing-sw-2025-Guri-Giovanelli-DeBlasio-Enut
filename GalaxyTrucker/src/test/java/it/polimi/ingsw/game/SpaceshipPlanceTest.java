@@ -1,9 +1,6 @@
 package it.polimi.ingsw.game;
 import static org.junit.Assert.*;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
@@ -13,7 +10,6 @@ import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.ColorType;
 import it.polimi.ingsw.model.game.SpaceshipPlance;
 import it.polimi.ingsw.model.componentTiles.*;
-import it.polimi.ingsw.model.game.SpaceshipPlance;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +26,14 @@ public class SpaceshipPlanceTest {
     @Before
     public void setUp() {
         spaceship = new SpaceshipPlance();
+
+        ComponentTile[][] grid = spaceship.getComponents();
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                grid[y][x] = null;
+            }
+        }
+
         GoodsBlock[] goods1 = new GoodsBlock[] {
                 new GoodsBlock(ColorType.BLUE),
                 new GoodsBlock(ColorType.GREEN),
@@ -613,6 +617,55 @@ public class SpaceshipPlanceTest {
         // 4 (tile1) + 4 (tile2) - 2 (connessione tra i due) = 6
         assertEquals(6, exposed);
     }
+
+    @Test
+    public void testValidTileConnection() {
+        // UNIVERSAL <-> UNIVERSAL
+        ConnectorType[] connectorsA = {ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH};
+        ConnectorType[] connectorsB = {ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH};
+
+        spaceship.getComponents()[2][2] = new StructuralModule(connectorsA, 1);
+        spaceship.getComponents()[1][2] = new StructuralModule(connectorsB, 2);
+
+        assertTrue(spaceship.checkNewTile(2, 2));
+    }
+
+    @Test
+    public void testInvalidEngineBlockedBehind() {
+        ConnectorType[] connectors = {ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.ENGINE, ConnectorType.SMOOTH};
+        spaceship.getComponents()[2][3] = new Engine(connectors, 1);
+        spaceship.getComponents()[3][3] = new StructuralModule(new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH}, 2);
+
+        assertFalse(spaceship.checkNewTile(3, 2));
+    }
+
+    @Test
+    public void testInvalidCannonBlockedInFront() {
+        ConnectorType[] connectors = {ConnectorType.CANNON, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH};
+        spaceship.getComponents()[2][2] = new Cannon(connectors, 1);
+        spaceship.getComponents()[1][2] = new StructuralModule(new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH}, 2);
+
+        assertFalse(spaceship.checkNewTile(2, 2));
+    }
+
+    @Test
+    public void testInvalidConnectionType() {
+        ConnectorType[] connectorsA = {ConnectorType.SINGLE, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH};
+        ConnectorType[] connectorsB = {ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.DOUBLE, ConnectorType.SMOOTH};
+
+        spaceship.getComponents()[2][2] = new StructuralModule(connectorsA, 1);
+        spaceship.getComponents()[1][2] = new StructuralModule(connectorsB, 2);
+
+        assertFalse(spaceship.checkNewTile(2, 2));
+    }
+
+    @Test
+    public void testTileOnEdgeCaseReturnsFalse() {
+        ConnectorType[] connectors = {ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
+        spaceship.getComponents()[0][0] = new StructuralModule(connectors, 1); // edge case: (0,0)
+
+        assertFalse(spaceship.checkNewTile(0, 0));
+    }
     @Test
     public void testGetCannonDirection() {
         ConnectorType[] connectors = new ConnectorType[]{
@@ -626,6 +679,84 @@ public class SpaceshipPlanceTest {
         int dir = spaceship.getCannonDirection(cannon);
         assertEquals(1, dir);
     }
+
+    @Test
+    public void testNullComponentReturnsFalse() {
+        assertFalse(spaceship.checkNewTile(2, 2)); // nessuna tile lì
+    }
+
+    @Test
+    public void testRemoveAndSelectPart() {
+        ComponentTile[][] grid = spaceship.getComponents();
+
+        // Tile centrale
+        grid[2][2] = new StructuralModule(
+                new ConnectorType[] {
+                        ConnectorType.UNIVERSAL, // N
+                        ConnectorType.UNIVERSAL, // E
+                        ConnectorType.UNIVERSAL, // S
+                        ConnectorType.UNIVERSAL  // W
+                }, 0
+        );
+
+        // Tile a nord (iteration 0)
+        grid[1][2] = new StructuralModule(
+                new ConnectorType[] {
+                        ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH
+                }, 1
+        );
+
+        // Tile a est (iteration 1)
+        grid[2][3] = new StructuralModule(
+                new ConnectorType[] {
+                        ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL
+                }, 2
+        );
+
+        // Tile a sud (iteration 2)
+        grid[3][2] = new StructuralModule(
+                new ConnectorType[] {
+                        ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH
+                }, 3
+        );
+
+        // Tile a ovest (iteration 3)
+        grid[2][1] = new StructuralModule(
+                new ConnectorType[] {
+                        ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL
+                }, 4
+        );
+
+        // Rimuove il centro e genera i "tronconi"
+        int removed = spaceship.remove(2, 2);
+        assertEquals(4, removed);
+
+        // Mostra i tronconi generati
+        int[][] shown = spaceship.getShownComponents();
+
+        // Conta i tronconi distinti rilevati
+        Set<Integer> tronconi = new HashSet<>();
+        for (int y = 0; y < shown.length; y++) {
+            for (int x = 0; x < shown[0].length; x++) {
+                if (shown[y][x] != -1) {
+                    tronconi.add(shown[y][x]);
+                }
+            }
+        }
+
+        assertEquals(4, tronconi.size());
+
+        // Simula la scelta del troncone 2 (quello a sud, iteration=2)
+        spaceship.selectPart(2);
+
+        // Verifica che solo il sud sia rimasto
+        assertNull(grid[2][2]); // centro
+        assertNull(grid[1][2]); // nord
+        assertNull(grid[2][3]); // est
+        assertNotNull(grid[3][2]); // sud (chosen)
+        assertNull(grid[2][1]); // ovest
+    }
+
     @Test
     public void testCheckProtectionHitsSingleCannon() {
         // Esempio: direction EAST, posizione che dovrebbe colpire cannon1 in (2,5)
@@ -658,6 +789,7 @@ public class SpaceshipPlanceTest {
 
 
 }
+
 
 
 

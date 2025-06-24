@@ -731,7 +731,7 @@ public class Controller{
         Player p = playerbyListener.get(l);
         isDone.put(p, true);
         if(!isDone.containsValue(false)){
-            resetShowAndDraw(); // non va bene se alcuni giocatori stanno ancora gestendo le merci di un pianeta
+            resetShowAndDraw();
         } else {
             l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             manageCard();
@@ -1807,6 +1807,8 @@ public class Controller{
         if (!isDonePirates.containsValue(false)){
             isDonePirates.replaceAll((c, v) -> false);
             defeatedByPirates();
+        } else {
+            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 
