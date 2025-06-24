@@ -1371,7 +1371,7 @@ public class Controller{
 
     private String[] handleBoardView() {
 
-        String[] boardView = new String[18];
+        String[] boardView = new String[24];
         Arrays.fill(boardView, "[]");
 
 
@@ -1379,9 +1379,9 @@ public class Controller{
         for (Player player : players) {
             Placeholder p = player.getPlaceholder();
 
-            int pos = (p.getPosizione()) % 18;
+            int pos = (p.getPosizione()) % 24;
             if (pos < 0) {
-                pos = pos + 18;
+                pos = pos + 24;
             }
             // prendo solo la prima lettera di ogni enum
             boardView[pos] = ("[" + p.getColor().name().charAt(0) + "]");
@@ -2245,6 +2245,27 @@ public class Controller{
 
         return true;
 
+    }
+
+    public int[] guiBoardInfo() {
+
+        int i = 0;
+        int size = players.size() * 2;
+        int[] infos = new int[size];
+        for(Player player: players) {
+            Placeholder p = player.getPlaceholder();
+            while(i< size){
+                infos[i] = p.getColor().getValue();
+                i++;
+                int pos = (p.getPosizione()) % 24;
+                if (pos < 0) {
+                    pos = pos + 24;
+                }
+                infos[i] = pos;
+                i++;
+            }
+        }
+        return infos;
     }
 
 
