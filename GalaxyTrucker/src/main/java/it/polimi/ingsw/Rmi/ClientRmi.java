@@ -149,7 +149,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         try {
                             int index = Integer.parseInt(input);
 
-                            if(index == 1000 || index == 1001 || index >= 0 && index <= 122){
+                            if(index == 1000 || index == 1001 || index >= 0 && index <= 151){
                                 server.pickTile(this, Integer.parseInt(input));
                             }else{
                                 System.out.println("Outbound index, please retry");

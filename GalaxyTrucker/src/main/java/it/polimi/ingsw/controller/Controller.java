@@ -13,7 +13,7 @@ import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.game.Timer;
 import it.polimi.ingsw.model.resources.*;
 import it.polimi.ingsw.model.game.*;
-import java.util.Random;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,9 +24,7 @@ public class Controller{
     private GameState currentGameState = GameState.IDLE;
     private final List<ClientListener> listeners = new ArrayList<>();
     private final List<ClientListener> registredListeners = new ArrayList<>();
-    public final List<ClientListener> realListeners = new ArrayList<>();
-    private final Object LobbyLock = new Object();
-    private final Object GameLock = new Object();
+    private final List<ClientListener> realListeners = new ArrayList<>();
     private final boolean[] busyDecks;
     public final Map<ClientListener, Player> playerbyListener = new HashMap<>();
     public final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
@@ -34,9 +32,11 @@ public class Controller{
     final Map <Player, Boolean> isDonePirates = new HashMap<>();
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
-    public ArrayList<Player> players;
+    private ArrayList<Player> players;
+    final private ArrayList<Placeholder> placeholders;
     private ArrayList<Player> disconnectedPlayers;
     private ArrayList<Player> reconnectedPlayers;
+    private ArrayList<Player> donecraftingPlayers;
     private boolean cargoended;
     private boolean piratesended;
     private boolean crewended;
@@ -59,8 +59,10 @@ public class Controller{
         this.currentAdventureCard = null;
         this.currentPlayer = null;
         this.players = null;
+        this.placeholders = new ArrayList<>();
         this.disconnectedPlayers = new ArrayList<>();
         this.reconnectedPlayers = new ArrayList<>();
+        this.donecraftingPlayers = new ArrayList<>();
         this.cargoended = false;
         this.piratesended = false;
         this.crewended = false;
@@ -223,16 +225,13 @@ public class Controller{
         switch (state) {
             case WAIT_LOBBY -> {
                 ArrayList<String> nicks;
-                synchronized (LobbyLock) {
                     nicks = lobby.getPlayersNicknames();
-                }
                 event = new Event(state, new LobbyNicks(nicks));
             }
             case ASSEMBLY -> {
                 Integer[] assemblingTilesIds;
-                synchronized (GameLock) {
                     assemblingTilesIds = game.getTilesId();
-                }
+
                 ArrayList<ComponentTile> reservedTiles = player.getSpaceshipPlance().getReserveSpot();
 
                 ArrayList <PickedTile> reserveTiles = new ArrayList<>();
@@ -513,9 +512,9 @@ public class Controller{
 
     }
 
-
-    public void drawCard() {
-
+    public void restoreReconnectedPlayers(){
+        lastMethodCalled = null;
+        System.out.println("lastMethodCalled = null;");
         List<Player> playersToRestore = new ArrayList<>(reconnectedPlayers);
 
         for (Player player : playersToRestore) {
@@ -525,6 +524,43 @@ public class Controller{
             isDonePirates.put(player, false);
             reconnectedPlayers.remove(player);
         }
+
+        boolean allOk = true;
+
+        for(Player player: players){
+            isDone.put(player,true);
+        }
+
+        for (Player p : playersToRestore) {
+            ClientListener l = listenerbyPlayer.get(p);
+            if (!p.getSpaceshipPlance().isCorrect() || !p.getSpaceshipPlance().checkCorrectness()) {
+                printSpaceshipAdjustment(l);
+                allOk = false;
+            } else {
+                players.add(p);
+                isDone.put(p, true);
+            }
+        }
+
+        if (allOk) {
+            resetIsDoneDraw();
+        } else {
+            for(Player p: players){
+                ClientListener l = listenerbyPlayer.get(p);
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+            }
+        }
+    }
+
+    private void resetIsDoneDraw() {
+        for(Player p: players){
+            isDone.put(p, false);
+        }
+        drawCard();
+    }
+
+
+    public void drawCard() {
 
         currentGameState = GameState.TURN_START;
         notifyAllRealListeners(eventCrafter(GameState.TURN_START, null, null));
@@ -554,7 +590,6 @@ public class Controller{
                     notifyAllRealListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
                     resetShowAndDraw();
                 }
-
             }
 
         } else {
@@ -587,8 +622,6 @@ public class Controller{
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
-
-
             }
 
             case AbandonedStationCard asc -> {
@@ -874,6 +907,8 @@ public class Controller{
                     ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                     for (ShieldGenerator shield : shields) {
                         if (shield.checkProtection(direction)) {
+                            lastMethodCalled = "checkProtection";
+                            System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
                             l.onEvent(eventCrafter(GameState.ASK_SHIELD, null, null));
                             return;
                         }
@@ -900,6 +935,8 @@ public class Controller{
                     l.onEvent(eventCrafter(GameState.SINGLE_CANNON_PROTECTION, null, null));
                     waitForNextShot(l);
                 } else {
+                    lastMethodCalled = "checkProtection";
+                    System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
                     l.onEvent(eventCrafter(GameState.ASK_CANNON, null, null));
                 }
             }
@@ -910,6 +947,8 @@ public class Controller{
                 ArrayList<ShieldGenerator> shields = player.getSpaceshipPlance().getShields();
                 for (ShieldGenerator shield : shields) {
                     if (shield.checkProtection(direction)) {
+                        lastMethodCalled = "checkProtection";
+                        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
                         l.onEvent(eventCrafter(GameState.ASK_SHIELD, null, null));
                         return;
                     }
@@ -980,6 +1019,7 @@ public class Controller{
     public void handleWaitersPlayer(ClientListener listener) {
 
         lastMethodCalled = "handleWaitersPlayer";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
 
         if(listener != null){
             for (Player player: players) {
@@ -1034,6 +1074,7 @@ public class Controller{
     public void handleWaitersBattery(ClientListener listener, Player player) {
 
         lastMethodCalled = "handleWaitersBattery";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
 
         if(listener != null){
             for (Player p: players) {
@@ -1051,6 +1092,7 @@ public class Controller{
     public void handleWaitersEnemy(ClientListener listener) {
 
         lastMethodCalled = "handleWaitersEnemy";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
 
         if(listener!=null){
             for (Player player: players) {
@@ -1070,6 +1112,7 @@ public class Controller{
     private void handleWaitersPlanets(Player chosenPlayer) {
 
         lastMethodCalled = "handleWaitersPlanets";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
 
         if(!(disconnectedPlayers.contains(chosenPlayer))){
             for (Player player: tmpPlayers) {
@@ -1442,6 +1485,8 @@ public class Controller{
             cardMalus = ((CombatZoneCard)currentAdventureCard).getLostOther();
         }
 
+        lastMethodCalled = "sendToRemoveMVGoods";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
         l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, cardMalus, p));
         }
 
@@ -1475,27 +1520,63 @@ public class Controller{
     }
 
     public void playerIsDoneCrafting(ClientListener listener){
-        Player p = null;
-        int pos = 0, checkLeader = 0;
 
-        if(listener!=null){
-            lastMethodCalled = "playerIsDoneCrafting";
-            System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
-            p = playerbyListener.get(listener);
-            synchronized (isDone) {
-                    isDone.replace(p, true);
-                synchronized (GameLock) {
-                    pos = isDone.keySet().size();
-                    checkLeader = pos-1;
-                    for (Boolean done : isDone.values()) {
-                        if (done) {
-                            pos--;
-                        }
-                    }
-                }
+        lastMethodCalled = "playerIsDoneCrafting";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
+
+        if(currentGameState == GameState.ASSEMBLY){
+            if(listener != null){
+                Player player = playerbyListener.get(listener);
+                donecraftingPlayers.add(player);
+                isDone.put(player, true);
+                if (!isDone.containsValue(false))
+                    handleCraftingEnded();
+                else if(donecraftingPlayers.size() == 1)
+                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER_LEADER, null, null));
+                else
+                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+            }else{
+                if (!isDone.containsValue(false) || (lobby.getNumPlayers() == (donecraftingPlayers.size() + disconnectedPlayers.size())))
+                    handleCraftingEnded();
             }
 
+        }else {
+            // it means I am entring here from restorePlayers
+            if (listener != null) {
+                Player player = playerbyListener.get(listener);
+                isDone.put(player, true);
+                players.add(player);
+                if (!isDone.containsValue(false))
+                    resetIsDoneDraw();
+                else
+                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+            } else {
+                if (!isDone.containsValue(false))
+                    resetIsDoneDraw();
+            }
+        }
+    }
 
+    private void handleCraftingEnded() {
+
+        currentGameState = GameState.CRAFTING_ENDED;
+        int pos = 0;
+        ArrayList<Player> disconnected = new ArrayList<>(disconnectedPlayers);
+
+
+        // it means he disconnected after submitting isDonecrafting
+        for(Player player: donecraftingPlayers){
+            System.out.println("player " + player);
+            if(disconnected.contains(player))
+                disconnected.remove(player);
+        }
+
+        int ndisconnected = disconnected.size();
+
+        while (!donecraftingPlayers.isEmpty()) {
+            Player player = donecraftingPlayers.getFirst();
+            pos = ndisconnected + donecraftingPlayers.size();
+            pos--;
             int realpos;
 
             switch (pos) {
@@ -1506,35 +1587,45 @@ public class Controller{
                 default -> realpos = 7;
             }
 
+            Flightplance flightPlance = game.getFlightplance();
+            Placeholder placeholder = flightPlance.getPlaceholderByPlayer(player);
+            placeholder.setPosizione(realpos);
+            placeholders.add(placeholder);
+
+            if(!disconnectedPlayers.contains(player)){
+                ClientListener listener = listenerbyPlayer.get(player);
+                String playerColor = flightPlance.getPlaceholderByPlayer(player).getColor().name();
+                listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor, null));
+            }
+
+            System.out.println("position: " + realpos);
+
+            donecraftingPlayers.removeFirst();
+        }
+
+        while (!disconnected.isEmpty()) {
+            Player player = disconnected.getFirst();
+            pos = disconnected.size();
+            pos--;
+            int realpos;
+
+            switch (pos) {
+                case 0 -> realpos = 0;
+                case 1 -> realpos = 1;
+                case 2 -> realpos = 3;
+                case 3 -> realpos = 6;
+                default -> realpos = 7;
+            }
+
+            System.out.println("position: " + realpos + "disconnectednick " + player.getNickname());
 
             Flightplance flightPlance = game.getFlightplance();
-            flightPlance.getPlaceholderByPlayer(p).setPosizione(realpos);
-            String playerColor = flightPlance.getPlaceholderByPlayer(p).getColor().name();
-            listener.onEvent(eventCrafter(GameState.PLAYER_COLOR, playerColor, null));
+            Placeholder placeholder = flightPlance.getPlaceholderByPlayer(player);
+            placeholder.setPosizione(realpos);
+            placeholders.add(placeholder);
 
-            System.out.println("pos: " + pos);
-            System.out.println("checkLeader: " + checkLeader);
+            disconnected.removeFirst();
         }
-
-
-
-
-        synchronized (isDone) {
-            if(listener != null){
-                if (!isDone.containsValue(false))
-                    handleCraftingEnded();
-                else if(checkLeader == pos)
-                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER_LEADER, null, null));
-                else
-                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
-            }else{
-                if (!isDone.containsValue(false))
-                    handleCraftingEnded();
-            }
-        }
-    }
-
-    private void handleCraftingEnded() {
 
         notifyAllRealListeners(eventCrafter(GameState.CRAFTING_ENDED, null, null));
 
@@ -1580,9 +1671,7 @@ public class Controller{
 
 
         // 3) Li “sparo” nella board in base alla loro posizione
-        for (Player player : players) {
-            Placeholder p = player.getPlaceholder();
-
+        for (Placeholder p : placeholders ) {
             int pos = (p.getPosizione()) % 24;
             if (pos < 0) {
                 pos = pos + 24;
@@ -1685,6 +1774,8 @@ public class Controller{
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().tileGridToStringAdjustments();
         DataString ds = new DataString(complete_ship);
+        lastMethodCalled = "printSpaceshipAdjustment";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
         listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds, null));
     }
 
@@ -1877,6 +1968,8 @@ public class Controller{
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().tileGridToStringParts();
         DataString ds = new DataString(complete_ship);
+        lastMethodCalled = "printSpaceshipParts";
+        System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
         listener.onEvent(eventCrafter(GameState.SELECT_SHIP, ds, null));
     }
 
@@ -1963,7 +2056,7 @@ public class Controller{
 
         // if everyone went to waitPlayer, so isDone is all true
         if (!isDone.containsValue(false)) {
-            drawCard();
+            restoreReconnectedPlayers();
         }
 
     }
@@ -1971,7 +2064,7 @@ public class Controller{
     public void playerHit(ClientListener listener) {
         Direction direction = currentProjectile.getDirection();
         System.out.println("playerHit: mando in takeHit");
-        takeHit(listener, direction, currentDiceThrow);
+        takeHit(playerbyListener.get(listener), direction, currentDiceThrow);
     }
 
     public void playerProtected(ClientListener listener) throws ControllerExceptions {
@@ -2067,7 +2160,7 @@ public class Controller{
 
         // player who didn't have cabins to put aliens in or finished they alien chosen have isDone = true
         if (!isDone.containsValue(false))
-            drawCard();
+            restoreReconnectedPlayers();
         else{
             if(listener!=null)
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
@@ -2161,13 +2254,10 @@ public class Controller{
                 listener.onEvent(eventCrafter(GameState.ASK_SURRENDER, null, null));
             }
         }
-
     }
 
     private boolean handleAdjustmentEnded() {
-        synchronized (isDone) {
             return !isDone.containsValue(false);
-        }
     }
 
     public void handleSurrenderEnded(ClientListener listener) {
@@ -2183,7 +2273,7 @@ public class Controller{
 
         synchronized (isDone) {
             if (!isDone.containsValue(false))
-                drawCard();
+                restoreReconnectedPlayers();
             else {
                 if(listener!=null)
                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
@@ -2298,8 +2388,10 @@ public class Controller{
     }
 
     public void endMVGoodsManagement(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
-        player.getSpaceshipPlance().updateLists();
+        if(listener!= null){
+            Player player = playerbyListener.get(listener);
+            player.getSpaceshipPlance().updateLists();
+        }
         if (currentAdventureCard instanceof SmugglersCard) {
             waitForEnemies(listener);
         } else if (currentAdventureCard instanceof CombatZoneCard) {
@@ -2312,13 +2404,16 @@ public class Controller{
         return player.getSpaceshipPlance().removeMVGood(cargoIndex, goodIndex);
     }
 
-    public void takeHit(ClientListener l, Direction direction, int position) {
+    public void takeHit(Player p, Direction direction, int position) {
         // cammini partendo dalla casella indicata verso il centro
         // appena trovi un componente lo rimuovi
         // aggiungere prima i check per la posizione
-        Player p = playerbyListener.get(l);
         ComponentTile[][] components = p.getSpaceshipPlance().getComponents();
         int max_lenght = 7;
+
+        ClientListener l = null;
+        if(!disconnectedPlayers.contains(p))
+            l=listenerbyPlayer.get(p);
 
         System.out.println("position " + position);
         // casella da cui partire
@@ -2373,10 +2468,14 @@ public class Controller{
         }
 
         if (hit != null) {
-            l.onEvent(eventCrafter(GameState.SHOT_HIT, null, null));
-            removeAdjust(l, x, y);
+            if(l!=null){
+                l.onEvent(eventCrafter(GameState.SHOT_HIT, null, null));
+                removeAdjust(l, x, y);
+            }
         } else {
+            if(l!=null)
             l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
+
             switch(currentAdventureCard) {
                 case CombatZoneCard czc -> {
                     System.out.println("takeHit: vado in combatZoneShots");
@@ -2509,16 +2608,16 @@ public class Controller{
         defeatedPlayers.remove(disconnectedPlayer);
         realListeners.remove(listener);
 
-        // if he reconnects has the same status as before
         if(players.size() != 1){
+            // the last who reconnects after pause has the same status as before
             isDone.remove(disconnectedPlayer);
             isDonePirates.remove(disconnectedPlayer);
-            checklastMethodCalled();
+            checklastMethodCalled(disconnectedPlayer);
         }
 
     }
 
-    private void checklastMethodCalled() {
+    private void checklastMethodCalled(Player disconnectedPlayer) {
         if(lastMethodCalled == null)
             return;
 
@@ -2534,7 +2633,7 @@ public class Controller{
             case "waitForEnemies":
                 waitForEnemies(null);
                 break;
-            case "playerIsDoneCrafting":
+            case "playerIsDoneCrafting","printSpaceshipAdjustment","printSpaceshipParts":
                 playerIsDoneCrafting(null);
                 break;
             case "waitForNextShot":
@@ -2558,6 +2657,10 @@ public class Controller{
             case "handleWaitersPlanets":
                 endCargoManagement(null);
                 break;
+            case "sendToRemoveMVGoods":
+                endMVGoodsManagement(null);
+            case "checkProtection":
+                takeHit(disconnectedPlayer,currentProjectile.getDirection(),currentDiceThrow);
 
             default:
                 break;
@@ -2580,6 +2683,16 @@ public class Controller{
             reconnectedPlayers.add(player);
 
             System.out.println("Player " + nickname + " reconnected.");
+
+            if(currentGameState == GameState.ASSEMBLY){
+                players.add(player);
+                realListeners.add(listenerbyPlayer.get(player));
+                isDone.put(player, false);
+                isDonePirates.put(player, false);
+                reconnectedPlayers.remove(player);
+                listener.onLastEvent();
+            }
+
         } else {
             System.out.println("No matching disconnected player for nickname: " + nickname);
         }

@@ -18,4 +18,8 @@ public class ClientListenerRmi implements EventListenerInterface, ClientListener
     public void onEvent(Event event) {
         server.notifyClient(client, event);
     }
+
+    public void onLastEvent() {
+        server.notifyLastClient(client);
+    }
 }

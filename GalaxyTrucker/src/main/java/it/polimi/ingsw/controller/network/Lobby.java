@@ -5,13 +5,17 @@ import it.polimi.ingsw.controller.LobbyExceptions;
 import java.util.ArrayList;
 
 public class Lobby {
-    private ArrayList<String> playersNicknames;
-    private  int numPlayers;
+    private final ArrayList<String> playersNicknames;
+    private final int numPlayers;
     private boolean isFull;
 
     public Lobby(int numPlayers) {
         this.playersNicknames = new ArrayList<>();
         this.numPlayers = numPlayers;
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
     }
 
     public ArrayList<String> getPlayersNicknames() {

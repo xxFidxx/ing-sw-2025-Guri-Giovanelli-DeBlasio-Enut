@@ -94,7 +94,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                         }
                 }
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -481,5 +481,18 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         return controller.guiBoardInfo();
     }
 
+    public void notifyLastClient(VirtualViewRmi client) {
+        try {
+            Event event = lastEventSent.get(nicknamebyClient.get(client));
+            client.showUpdate(event);
+            System.out.println("Saving event for nickname: '" + nicknamebyClient.get(client) + "' with state: " + event.getState());
+
+        } catch (RemoteException e) {
+            System.out.println("Client disconnected: " + e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Thread Interrupt");
+        }
+    }
 }
 
