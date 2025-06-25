@@ -51,7 +51,7 @@ public class Controller{
     private boolean enemyDefeated;
     private boolean afterShots;
     private String lastMethodCalled;
-    private boolean pause;
+    private volatile boolean pause;
 
     public Controller() {
         this.game = null;
@@ -75,6 +75,14 @@ public class Controller{
         this.busyDecks = new boolean[3];
         this.lastMethodCalled = null;
         this.pause = false;
+    }
+
+    public boolean getPause(){
+        return pause;
+    }
+
+    public void setPause(boolean pause){
+        this.pause = pause;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -1780,6 +1788,7 @@ public class Controller{
     }
 
     public void endCargoManagement(ClientListener listener) {
+
         if(listener!=null){
             Player player = playerbyListener.get(listener);
             //tmpPlayers.remove(player);
@@ -2557,7 +2566,7 @@ public class Controller{
             disconnectedPlayers.remove(player);
             reconnectedPlayers.add(player);
 
-            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+            listener.onEvent(eventCrafter(GameState.WAIT_RECONNECT, null, null));
 
             System.out.println("Player " + nickname + " reconnected.");
         } else {
@@ -2566,6 +2575,32 @@ public class Controller{
     }
 
     public void pause() {
+        final long timeout = 30000;
+        final long startTime = System.currentTimeMillis();
+        System.out.println("wonGameForDisconessions timer set: " + timeout + " ms");
 
+        while (pause) {
+            long currentTimeMillis = System.currentTimeMillis() - startTime;
+            System.out.println("wonGameForDisconessions timer: " + currentTimeMillis + " ms");
+            if (currentTimeMillis >= timeout) {
+                System.out.println("Timer expired");
+                wonGameForDisconessions();
+                return;
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+    }
+
+    private void wonGameForDisconessions(){
+        synchronized (realListeners) {
+            ClientListener listener = realListeners.getFirst();
+            listener.onEvent(eventCrafter(GameState.WON_FOR_DISCONESSION, null, null));
+        }
     }
 }

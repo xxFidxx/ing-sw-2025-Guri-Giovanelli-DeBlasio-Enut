@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Rmi;
 
 
+import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.ClientListenerRmi;
 import it.polimi.ingsw.controller.Controller;
 import it.polimi.ingsw.controller.LobbyExceptions;
@@ -81,7 +82,11 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                             client.ping();
                         } catch (RemoteException e) {
                             System.out.println("Client " + client + " failed to ping");
-                            handleDisconnect(client);
+                            try {
+                                handleDisconnect(client);
+                            } catch (Exception ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                 }
                 try {
@@ -94,7 +99,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         }).start();
     }
 
-        private void handleDisconnect(VirtualViewRmi client) {
+        private void handleDisconnect(VirtualViewRmi client) throws Exception {
             String disconnectedNick = nicknamebyClient.get(client);
             nicknamebyClient.remove(client);
 
@@ -110,21 +115,44 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                 realClients.remove(client);
             }
 
-
+            checkPauseGame();
         }
 
-        private void handleReconnect(String nickname, VirtualViewRmi client) {
+    private void checkPauseGame() throws Exception {
+        synchronized (realClients) {
+            synchronized (controller) {
+                if (realClients.size() == 1) {
+                    VirtualView client = realClients.getFirst();
+                    client.showUpdate(new Event(GameState.PAUSED_GAME, null));
+
+                    new Thread(() -> {
+                        synchronized (controller) {
+                            controller.setPause(true);
+                            controller.pause();
+                        }
+                    }).start();
+                }
+            }
+        }
+    }
+
+    private void handleReconnect(String nickname, VirtualViewRmi client) {
 
             synchronized (lock){
                 clientbyNickname.replace(nickname, client);
                 disconnectedPlayersNicks.remove(nickname);
                 realClientListeners.put(client, clientListeners.get(client));
                 realClients.add(client);
+                nicknamebyClient.put(client, nickname);
             }
 
-            nicknamebyClient.put(client, nickname);
 
             ClientListenerRmi listener = realClientListeners.get(client);
+
+            synchronized (controller) {
+                if(controller.getPause())
+                    controller.setPause(false);
+            }
 
             if(listener!=null){
                 controller.handleReconnect(listener, nickname);

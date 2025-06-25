@@ -793,6 +793,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
             case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case DIED -> System.out.println("You are on spectator mode because you died");
+            case PAUSED_GAME -> System.out.println("Game has been paused, we will wait for 30 seconds for someone to join again, else you will automatically win!");
+            case WAIT_RECONNECT -> System.out.println("Wait for the other players to end the turn, then you will join them again!");
+            case WON_FOR_DISCONESSION -> System.out.println("You won because everyone except you disconnected!");
         }
         System.out.print("\n> ");
     }
@@ -862,12 +865,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double cannon");
                 server.fromChargeToManage(this);
             }
-            case DIED -> System.out.println("You are on spectator mode because you died");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
             case NO_HIT -> System.out.println("You have not been hit");
             case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
+            case DIED -> System.out.println("You are on spectator mode because you died");
+            case PAUSED_GAME -> System.out.println("Game has been paused, a 30 seconds timer has been set to wait for someone to join again, else you will automatically win");
+            case WAIT_RECONNECT -> System.out.println("Welcome back!\nWait for other players to end the turn, then you will join them again!");
+            case WON_FOR_DISCONESSION -> System.out.println("You won because everyone except you disconnected!");
         }
         System.out.print("> ");
     }
@@ -956,7 +962,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double engine");
                 server.fromChargeToManage(this);
             }
-            case DIED -> System.out.println("You are on spectator mode because you died");
             case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
@@ -966,6 +971,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case SAME_EQUIP -> System.out.println("No one was penalized because there are at least two players with the same equipment");
             case SAME_FIRE -> System.out.println("No one was penalized because there are at least two players with the same fire strength");
             case SAME_ENGINE -> System.out.println("No one was penalized because there are at least two players with the same engine strength");
+            case DIED -> System.out.println("You are on spectator mode because you died");
+            case PAUSED_GAME -> System.out.println("Game has been paused, a 30 seconds timer has been set to wait for someone to join again, else you will automatically win");
+            case WAIT_RECONNECT -> System.out.println("Welcome back!\nWait for other players to end the turn, then you will join them again!");
+            case WON_FOR_DISCONESSION -> System.out.println("You won because everyone except you disconnected!");
             default -> System.out.println();
         }
         System.out.print("> ");

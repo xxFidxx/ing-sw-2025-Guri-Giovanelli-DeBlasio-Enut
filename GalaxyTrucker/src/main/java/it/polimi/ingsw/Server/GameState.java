@@ -81,7 +81,10 @@ public enum GameState {
     SAME_EQUIP,
     SAME_FIRE,
     SAME_ENGINE,
-    CHOOSE_BATTERY, DIED
+    CHOOSE_BATTERY, WON_FOR_DISCONESSION,
+    PAUSED_GAME,
+    WAIT_RECONNECT,
+    DIED
     }
 
 
