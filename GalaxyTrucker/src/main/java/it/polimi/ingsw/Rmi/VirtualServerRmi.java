@@ -14,7 +14,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void connect(VirtualViewRmi client) throws RemoteException;
 
-    void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions;
+    void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions, InterruptedException;
 
     void createLobby(int number) throws RemoteException, LobbyExceptions;
 

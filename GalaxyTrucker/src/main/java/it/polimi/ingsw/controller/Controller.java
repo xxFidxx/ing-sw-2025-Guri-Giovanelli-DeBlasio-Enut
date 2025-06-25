@@ -2493,8 +2493,7 @@ public class Controller{
 
     public void handleDisconnect(ClientListenerRmi listener) {
         Player disconnectedPlayer = playerbyListener.get(listener);
-        isDone.remove(disconnectedPlayer);
-        isDonePirates.remove(disconnectedPlayer);
+
         disconnectedPlayers.add(disconnectedPlayer);
         players.remove(disconnectedPlayer);
         playerbyListener.remove(listener);
@@ -2502,7 +2501,13 @@ public class Controller{
         defeatedPlayers.remove(disconnectedPlayer);
         realListeners.remove(listener);
 
-        checklastMethodCalled();
+        // if he reconnects has the same status as before
+        if(players.size() != 1){
+            isDone.remove(disconnectedPlayer);
+            isDonePirates.remove(disconnectedPlayer);
+            checklastMethodCalled();
+        }
+
     }
 
     private void checklastMethodCalled() {
@@ -2566,8 +2571,6 @@ public class Controller{
             disconnectedPlayers.remove(player);
             reconnectedPlayers.add(player);
 
-            listener.onEvent(eventCrafter(GameState.WAIT_RECONNECT, null, null));
-
             System.out.println("Player " + nickname + " reconnected.");
         } else {
             System.out.println("No matching disconnected player for nickname: " + nickname);
@@ -2601,6 +2604,25 @@ public class Controller{
         synchronized (realListeners) {
             ClientListener listener = realListeners.getFirst();
             listener.onEvent(eventCrafter(GameState.WON_FOR_DISCONESSION, null, null));
+        }
+    }
+
+    public void handleReconnectPause(ClientListenerRmi listener, String nickname) {
+        Optional<Player> optionalPlayer = disconnectedPlayers.stream()
+                .filter(player -> player.getNickname().equals(nickname))
+                .findFirst();
+
+        if (optionalPlayer.isPresent()) {
+            Player player = optionalPlayer.get();
+            listenerbyPlayer.put(player, listener);
+            playerbyListener.put(listener, player);
+            disconnectedPlayers.remove(player);
+            players.add(player);
+            realListeners.add(listenerbyPlayer.get(player));
+
+            System.out.println("Player " + nickname + " reconnected.");
+        } else {
+            System.out.println("No matching disconnected player for nickname: " + nickname);
         }
     }
 }

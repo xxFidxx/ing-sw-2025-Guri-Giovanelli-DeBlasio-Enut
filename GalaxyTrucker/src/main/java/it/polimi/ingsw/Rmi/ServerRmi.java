@@ -23,10 +23,12 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final Controller controller;
     final List<VirtualViewRmi> clients;
     final List<VirtualViewRmi> realClients;
+    final List<String> nicknames;
     final Map<VirtualViewRmi, ClientListenerRmi> clientListeners;
     final Map<VirtualViewRmi, ClientListenerRmi> realClientListeners;
     final Map<String,VirtualViewRmi> clientbyNickname;
     final Map<VirtualViewRmi,String> nicknamebyClient;
+    final Map<String, Event> lastEventSent;
     final ArrayList<String> disconnectedPlayersNicks;
     private final Object lock = new Object();
     int lobbySize;
@@ -39,11 +41,13 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         super();
         this.clientListeners = new ConcurrentHashMap<>();
         this.realClientListeners = new ConcurrentHashMap<>();
+        this.nicknames = new CopyOnWriteArrayList<>();
         this.nicknamebyClient = new ConcurrentHashMap<>();
         this.controller = new Controller();
         this.clients = new ArrayList<>();
         this.realClients = new CopyOnWriteArrayList<>();
         this.clientbyNickname = new ConcurrentHashMap<>();
+        this.lastEventSent = new ConcurrentHashMap<>();
         this.disconnectedPlayersNicks = new ArrayList<>();
         this.lobbySize = 0;
 
@@ -120,26 +124,25 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     private void checkPauseGame() throws Exception {
         synchronized (realClients) {
-            synchronized (controller) {
-                if (realClients.size() == 1) {
-                    VirtualView client = realClients.getFirst();
-                    client.showUpdate(new Event(GameState.PAUSED_GAME, null));
+            if (realClients.size() == 1) {
+                VirtualView client = realClients.getFirst();
+                client.showUpdate(new Event(GameState.PAUSED_GAME, null));
 
-                    new Thread(() -> {
-                        synchronized (controller) {
-                            controller.setPause(true);
-                            controller.pause();
-                        }
-                    }).start();
-                }
+
+                new Thread(() -> {
+                    synchronized (controller) {
+                        controller.setPause(true);
+                    }
+                    controller.pause();
+                }).start();
             }
         }
     }
 
-    private void handleReconnect(String nickname, VirtualViewRmi client) {
+    synchronized void handleReconnect(String nickname, VirtualViewRmi client) throws RemoteException, InterruptedException {
 
             synchronized (lock){
-                clientbyNickname.replace(nickname, client);
+                clientbyNickname.put(nickname, client);
                 disconnectedPlayersNicks.remove(nickname);
                 realClientListeners.put(client, clientListeners.get(client));
                 realClients.add(client);
@@ -149,9 +152,25 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
             ClientListenerRmi listener = realClientListeners.get(client);
 
+            if(listener != null){
+                client.showUpdate(new Event(GameState.WAIT_RECONNECT, null));
+            }
+
             synchronized (controller) {
-                if(controller.getPause())
+                if(controller.getPause()){
                     controller.setPause(false);
+
+                    for(String nick: nicknames){
+                        if(!disconnectedPlayersNicks.contains(nick)){
+                            VirtualViewRmi realClient = clientbyNickname.get(nick);
+                            System.out.println("client " + nicknamebyClient.get(realClient));
+                            Event last = lastEventSent.get(nick);
+                            System.out.println("Last event is: " + (last == null ? "null" : last.getState()));
+                            notifyClient(realClient,last);
+                        }
+                    }
+                    controller.handleReconnectPause(listener, nickname);
+                }
             }
 
             if(listener!=null){
@@ -164,6 +183,11 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     public void notifyClient(VirtualViewRmi client, Event event) {
         try {
             client.showUpdate(event);
+            if(realClients.contains(client)){
+                String nickname = nicknamebyClient.get(client);
+                System.out.println("Saving event for nickname: '" + nickname + "' with state: " + event.getState());
+                lastEventSent.put(nickname, event);
+            }
         } catch (RemoteException e) {
             System.out.println("Client disconnected: " + e);
         } catch (InterruptedException e) {
@@ -186,17 +210,18 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions {
+    public void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions, InterruptedException {
         if((realClients.size() + disconnectedPlayersNicks.size()) < lobbySize ){
+            realClients.add(client);
             ClientListenerRmi clientListenerRmi = clientListeners.get(client);
+            realClientListeners.put(client, clientListenerRmi);
+            nicknames.add(nickname);
+            clientbyNickname.put(nickname, client);
+            nicknamebyClient.put(client,nickname);
             synchronized(controller){
                 controller.addNickname(clientListenerRmi,nickname);
             }
             System.out.println("Nickname added\n");
-            realClients.add(client);
-            realClientListeners.put(client, clientListenerRmi);
-            clientbyNickname.put(nickname, client);
-            nicknamebyClient.put(client,nickname);
         }else{
             System.out.println("Nickname given: " + nickname);
             System.out.println("Nickname in use:");

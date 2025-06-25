@@ -43,7 +43,7 @@ public class LobbyController extends Controller {
     }
 
     @FXML
-    private void handleAddNickname() throws RemoteException {
+    private void handleAddNickname() throws RemoteException, InterruptedException {
         clientRmi.server.addNickname(clientRmi, nicknameField.getText());
 
         nicknamePane.setVisible(false);
