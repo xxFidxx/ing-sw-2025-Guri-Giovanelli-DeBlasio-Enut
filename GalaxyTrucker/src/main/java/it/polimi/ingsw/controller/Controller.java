@@ -375,6 +375,9 @@ public class Controller{
             }
 
             case CREW_MANAGEMENT -> {
+                lastMethodCalled = "crewManagement";
+                System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
+
                 int astr = player.getSpaceshipPlance().getnAstronauts();
                 int al = player.getSpaceshipPlance().getBrownAliens() + player.getSpaceshipPlance().getPurpleAliens();
                 ArrayList<Cabin> cabins = player.getSpaceshipPlance().getCabins();
@@ -391,6 +394,9 @@ public class Controller{
             }
 
             case EPIDEMIC_MANAGEMENT -> {
+                lastMethodCalled = "epidemicManagement";
+                System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
+
                 ArrayList<Cabin> cabins = player.getSpaceshipPlance().getInterconnectedCabins();
                 event = new Event(state, new EpidemicManagement(cabins));
             }
@@ -2661,6 +2667,10 @@ public class Controller{
                 endMVGoodsManagement(null);
             case "checkProtection":
                 takeHit(disconnectedPlayer,currentProjectile.getDirection(),currentDiceThrow);
+            case "crewManagement":
+                endCrewManagement(null);
+            case "epidemicManagement":
+                handleEpidemic(null);
 
             default:
                 break;
