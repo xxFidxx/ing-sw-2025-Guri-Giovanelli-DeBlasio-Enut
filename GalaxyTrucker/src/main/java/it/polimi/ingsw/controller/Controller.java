@@ -24,17 +24,17 @@ public class Controller{
     private GameState currentGameState = GameState.IDLE;
     private final List<ClientListener> listeners = new ArrayList<>();
     private final List<ClientListener> registredListeners = new ArrayList<>();
-    private final List<ClientListener> realListeners = new ArrayList<>();
+    public final List<ClientListener> realListeners = new ArrayList<>();
     private final Object LobbyLock = new Object();
     private final Object GameLock = new Object();
     private final boolean[] busyDecks;
-    final Map<ClientListener, Player> playerbyListener = new HashMap<>();
-    final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
+    public final Map<ClientListener, Player> playerbyListener = new HashMap<>();
+    public final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <Player, Boolean> isDone = new HashMap<>();
     final Map <Player, Boolean> isDonePirates = new HashMap<>();
     private AdventureCard currentAdventureCard;
     private Player currentPlayer;
-    private ArrayList<Player> players;
+    public ArrayList<Player> players;
     private ArrayList<Player> disconnectedPlayers;
     private ArrayList<Player> reconnectedPlayers;
     private boolean cargoended;
@@ -43,7 +43,7 @@ public class Controller{
     private Projectile currentProjectile;
     private int currentDiceThrow;
     private ArrayList<Player> tmpPlayers;
-    private List<AdventureCard> cards;
+    public List<AdventureCard> cards;
     private final ArrayList<Player> defeatedPlayers;
     private boolean combatZoneFlag;
     private boolean piratesFlag;
@@ -75,6 +75,14 @@ public class Controller{
         this.busyDecks = new boolean[3];
         this.lastMethodCalled = null;
         this.pause = false;
+    }
+
+    public GameState getCurrentGameState(){
+        return currentGameState;
+    }
+
+    public AdventureCard getCurrentAdventureCard(){
+        return currentAdventureCard;
     }
 
     public boolean getPause(){
@@ -525,7 +533,7 @@ public class Controller{
 //            Random random = new Random();
 //            int randomNumber = random.nextInt(cards.size());
 //            currentAdventureCard = cards.get(randomNumber);
-             currentAdventureCard = cards.getFirst();
+            currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
             int cardLevel = currentAdventureCard.getLevel();
             Card card = new Card(cardName, cardLevel);
@@ -543,8 +551,8 @@ public class Controller{
                     isDone.replaceAll((c, v) -> false);
                     manageCard();
                 }else{
-                        notifyAllRealListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
-                        resetShowAndDraw();
+                    notifyAllRealListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
+                    resetShowAndDraw();
                 }
 
             }
@@ -762,8 +770,8 @@ public class Controller{
 
             case EpidemicCard ec -> {
                 for(Player p : players) {
-                        ClientListener l = listenerbyPlayer.get(p);
-                        l.onEvent(eventCrafter(GameState.EPIDEMIC_MANAGEMENT, null, p));
+                    ClientListener l = listenerbyPlayer.get(p);
+                    l.onEvent(eventCrafter(GameState.EPIDEMIC_MANAGEMENT, null, p));
                 }
             }
 
@@ -833,14 +841,14 @@ public class Controller{
             Player p = playerbyListener.get(l);
             isDone.put(p, true);
         }
-            if(!isDone.containsValue(false)){
-                resetShowAndDraw();
-            } else {
-                if(l!=null)
+        if(!isDone.containsValue(false)){
+            resetShowAndDraw();
+        } else {
+            if(l!=null)
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
 
-                manageCard();
-            }
+            manageCard();
+        }
     }
 
     private void handleEarlyEnd(Player player) {

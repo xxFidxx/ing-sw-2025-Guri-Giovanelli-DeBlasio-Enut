@@ -23,7 +23,7 @@ public class SpaceshipPlance {
     private final ArrayList<Cabin> interconnectedCabins;
     private final ArrayList<PowerCenter> powerCenters;
     private final boolean[][] visited;
-    private final int[][] shownComponents;
+    private int[][] shownComponents;
     private final ArrayList<ShieldGenerator> shieldGenerators;
     private int nAstronauts;
     private int nBrownAliens;
@@ -88,6 +88,10 @@ public class SpaceshipPlance {
 
     public int[][] getShownComponents() {
         return shownComponents;
+    }
+
+    public void setShownComponents(int[][] grid) {
+        this.shownComponents = grid;
     }
 
     public void setComponent(int y, int x, ComponentTile tile) {
@@ -382,45 +386,6 @@ public class SpaceshipPlance {
     }
 
 
-//    public boolean checkNewTile(int x, int y) {
-//        if (edgeCases(y, x) || !inBounds(x, y) || components[y][x] == null) {
-//            return false;
-//        }
-//
-//        ComponentTile tile = components[y][x];
-//        boolean isValid = true;
-//
-//        // Controlla tutti e 4 i connettori
-//        for (int dir = 0; dir < 4; dir++) {
-//            int adjX = x + DIR_X[dir];
-//            int adjY = y + DIR_Y[dir];
-//
-//            // Caso 1: Controllo speciale per ENGINE/CANNON
-//            if (tile instanceof Engine) { // SOUTH
-//                isValid = isEngineValid(y,x);
-//            }
-//
-//            if (tile instanceof Cannon && dir == 0) { // NORTH
-//                isValid = isCannonValid(y,x);
-//            }
-//
-//            // Caso 2: Connessione con tile adiacente
-//            if (inBounds(adjX, adjY) && !edgeCases(adjY, adjX)) {
-//                ComponentTile adjTile = components[adjY][adjX];
-//
-//                if (adjTile != null) {
-//                    ConnectorType current = tile.getConnectors()[dir];
-//                    ConnectorType adjacent = adjTile.getConnectors()[(dir + 2) % 4];
-//
-//                    if (!isConnectionValid(current, adjacent)) {
-//                        isValid = false;
-//                    }
-//                }
-//            }
-//        }
-//        return isValid;
-//    }
-
     public boolean checkNewTile(int x, int y) {
         if (edgeCases(y, x) || !inBounds(x, y) || components[y][x] == null) {
             return false;
@@ -637,25 +602,6 @@ public class SpaceshipPlance {
         cardReward[k] = null;
     }
 
-    public void looseGoods(int lostOther) {
-//        int actualLost = Math.min(getStorage(), lostOther);
-//
-//        ArrayList<GoodsContainer> playerCargos = goodsContainers;
-//
-//        for (int i = 0; i < actualLost; i++) {
-//            int i1 = 0; // indice cargo
-//            int j1 = 0; // indice good
-//            if (i1 >= 0 && i1 < playerCargos.size()) {
-//                GoodsContainer cargo1 = playerCargos.get(i1);
-//                if (j1 >= 0 && j1 < cargo1.getGoods().length) {
-//                    removeGoods(cargo1, j1);
-//                } else
-//                    System.out.println("goods index is outbound");
-//            } else
-//                System.out.println("cargo index is outbound");
-//        }
-    }
-
     public ArrayList<CargoHolds> getCargoHolds() {
         return cargoHolds;
     }
@@ -725,11 +671,6 @@ public class SpaceshipPlance {
         }
 
         return exposedConnectors;
-    }
-
-
-    private boolean askActivateShield(ShieldGenerator shieldGenerator) {
-        return true;
     }
 
     public int checkProtection(Direction direction, int position) {
@@ -893,8 +834,6 @@ public class SpaceshipPlance {
         if(inBounds(x,y))
             hit = components[y][x];
 
-        System.out.println("Entro nel for");
-
         for (int i = 0; i < max_lenght && hit == null; i++) {
             switch (direction) {
                 case NORTH:
@@ -913,8 +852,6 @@ public class SpaceshipPlance {
             if(inBounds(x,y))
                 hit = components[y][x];
         }
-
-        System.out.println("Esco dal for");
 
         ArrayList<ConnectorType> disallowedConnectors = new ArrayList<>(Arrays.asList(ConnectorType.SINGLE, ConnectorType.DOUBLE, ConnectorType.UNIVERSAL));
 
@@ -1108,7 +1045,7 @@ public class SpaceshipPlance {
         return lines;
     }
 
-    private char connectorToChar(ConnectorType ct) {
+    public char connectorToChar(ConnectorType ct) {
         switch (ct) {
             case UNIVERSAL -> {
                 return TileSymbols.CONNECTOR_SYMBOLS.get("universal");
@@ -1134,7 +1071,7 @@ public class SpaceshipPlance {
         }
     }
 
-    private String tiletoString(ComponentTile tile) {
+    public String tiletoString(ComponentTile tile) {
         if (tile != null) {
             switch (tile) {
                 case DoubleCannon dc -> {

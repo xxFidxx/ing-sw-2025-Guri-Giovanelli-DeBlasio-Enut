@@ -3,15 +3,14 @@ package it.polimi.ingsw.game;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.*;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.game.Placeholder;
-import it.polimi.ingsw.model.game.Player;
-import it.polimi.ingsw.model.game.SpaceshipPlance;
+import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.resources.Planet;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -254,26 +253,64 @@ public class GameTest {
         }
     }
     @Test
-    public void testGetEndStats_IgnoringSideEffects() {
-        // Imposta manualmente i crediti per i giocatori esistenti
-        Player alice = game.getPlayers().get(0); // Alice
-        Player bob = game.getPlayers().get(1);   // Bob
-        Player charlie = game.getPlayers().get(2); // Charlie
+    public void testGetEndStatsCorrectOrderAndCredits() {
+        // Setup cargo
+        Player alice = game.getPlayers().get(0);
+        Player bob = game.getPlayers().get(1);
+        Player charlie = game.getPlayers().get(2);
 
-        alice.setCredits(10);
-        bob.setCredits(30);
-        charlie.setCredits(20);
+        // Alice con YELLOW (3) e BLUE (1)
+        CargoHolds aliceCargo = new CargoHolds(new ConnectorType[4], 0, false, 2);
+        aliceCargo.getGoods()[0] = new GoodsBlock(ColorType.YELLOW); // 3
+        aliceCargo.getGoods()[1] = new GoodsBlock(ColorType.BLUE);   // 1
+        alice.getSpaceshipPlance().placeTileComponents(aliceCargo, 3, 3);
 
-        // Chiama il metodo
-        String result = game.getEndStats();
+        // Bob con GREEN (2)
+        CargoHolds bobCargo = new CargoHolds(new ConnectorType[4], 1, false, 1);
+        bobCargo.getGoods()[0] = new GoodsBlock(ColorType.GREEN);    // 2
+        bob.getSpaceshipPlance().placeTileComponents(bobCargo, 4, 2);
 
-        // Ordine atteso: Bob (30), Charlie (20), Alice (10)
-        String expected =
-                "1. Bob - 30\n" + "2. Charlie - 20\n" + "3. Alice - 10\n";
+        // Charlie si arrende
+        charlie.setSurrended(true);
 
-        // Verifica
-        assertEquals(expected, result);
-    }
+        // Aggiorna liste
+        alice.getSpaceshipPlance().updateLists();
+        bob.getSpaceshipPlance().updateLists();
+        charlie.getSpaceshipPlance().updateLists();
+
+        // Penalità tiles perse
+        alice.getSpaceshipPlance().getReserveSpot().add(new Cannon(new ConnectorType[4], 0));
+        bob.getSpaceshipPlance().getReserveSpot().add(new Engine(new ConnectorType[4], 1));
+        bob.getSpaceshipPlance().getReserveSpot().add(new Engine(new ConnectorType[4], 2));
+
+        // Verifica l'output generato
+        String stats = game.getEndStats();
+        System.out.println(stats); // opzionale per ispezione visiva
+
+        Map<String, Integer> playerCredits = new HashMap<>();
+        for (Player p : game.getPlayers()) {
+            playerCredits.put(p.getNickname(), p.getCredits());
+        }
+
+        // Calcoli:
+        // Alice: +2 (corsa) +3+1 (cargo) -1 (tile persa) +2 (spaceship) = **7**
+        // Bob:   +3 (corsa) +2 (cargo) -2 (tiles perse) +2 (spaceship) = **5**
+        // Charlie: surrende, no cargo, no corsa, no spaceship = **0**
+
+        assertEquals(Integer.valueOf(7), playerCredits.get("Alice"));
+        assertEquals(Integer.valueOf(5), playerCredits.get("Bob"));
+        assertEquals(Integer.valueOf(0), playerCredits.get("Charlie"));
+
+        // Verifica ordine corretto
+        assertTrue(stats.indexOf("Alice") < stats.indexOf("Bob"));
+        assertTrue(stats.indexOf("Bob") < stats.indexOf("Charlie"));
+
+        // Verifica presenza formato numerato
+        assertTrue(stats.contains("1. "));
+        assertTrue(stats.contains("2. "));
+        assertTrue(stats.contains("3. "));
+    };
+
     @Test
     public void testRewardSpaceship() {
         Player alice = game.getPlayers().get(0);

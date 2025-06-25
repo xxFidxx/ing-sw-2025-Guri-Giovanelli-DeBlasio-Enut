@@ -55,6 +55,10 @@ public abstract class ComponentTile implements Serializable {
         return rotation;
     }
 
+    public void setRotation(int rotation) {
+        this.rotation = rotation;
+    }
+
     public ConnectorType[] getConnectors() {
         return connectors;
     }

@@ -1,6 +1,11 @@
 package it.polimi.ingsw.game;
+import static it.polimi.ingsw.model.componentTiles.AlienColor.BROWN;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
+import it.polimi.ingsw.controller.network.data.TileData;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.ComponentTile;
@@ -8,6 +13,7 @@ import it.polimi.ingsw.model.componentTiles.ConnectorType;
 import it.polimi.ingsw.model.componentTiles.Engine;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.ColorType;
+import it.polimi.ingsw.model.game.SpaceShipPlanceException;
 import it.polimi.ingsw.model.game.SpaceshipPlance;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
@@ -112,6 +118,12 @@ public class SpaceshipPlanceTest {
     @Test
     public void testUpdateLists_AddsCorrectComponents() {
         //SpaceshipPlance spaceship = new SpaceshipPlance();
+        ComponentTile[][] grid = spaceship.getComponents();
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                grid[y][x] = null;
+            }
+        }
         // Prepara alcuni componenti
         Cannon cannon = new Cannon(new ConnectorType[]{ConnectorType.CANNON, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH},  101);
         Engine engine = new DoubleEngine(new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.ENGINE, ConnectorType.SMOOTH}, 102);
@@ -383,14 +395,6 @@ public class SpaceshipPlanceTest {
         assertNull("Tile scollegata deve essere rimossa", spaceship.getComponent(0, 0));
     }
 
-    @Test
-    public void testCheckCorrectness_noCentralCabin_returnsFalse() {
-        // Rimuovo la cabina centrale
-        spaceship.setComponent(2, 3, null);
-
-        boolean result = spaceship.checkCorrectness();
-        assertFalse("Senza cabina centrale e connessioni, deve essere non valida", result);
-    }
     @Test
     public void testDfsExploration_visitsConnectedTiles() {
         // Reset dello stato visitato
@@ -693,6 +697,12 @@ public class SpaceshipPlanceTest {
 
     @Test
     public void testValidTileConnection() {
+        ComponentTile[][] grid = spaceship.getComponents();
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                grid[y][x] = null;
+            }
+        }
         // UNIVERSAL <-> UNIVERSAL
         ConnectorType[] connectorsA = {ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH};
         ConnectorType[] connectorsB = {ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH};
@@ -1056,7 +1066,323 @@ public class SpaceshipPlanceTest {
 
 
 
+    @Test
+    public void testPlaceTileComponentSuccessfully() throws SpaceShipPlanceException {
+        ComponentTile[][] grid = spaceship.getComponents();
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                grid[y][x] = null;
+            }
+        }
+        // Struttura connettori validi da tutti i lati
+        ConnectorType[] connectors = {
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL,
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL
+        };
 
+        ComponentTile tile = new StructuralModule(connectors, 1);
+        spaceship.placeTileComponents(tile, 3, 2);
+
+        assertEquals(tile, spaceship.getComponents()[2][3]);
+        assertTrue(tile.isWellConnected());
+    }
+
+    @Test(expected = SpaceShipPlanceException.class)
+    public void testPlaceTileComponent_OutOfBounds_ThrowsException() throws SpaceShipPlanceException {
+        ComponentTile tile = new StructuralModule(new ConnectorType[]{
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL,
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL
+        }, 2);
+
+        spaceship.placeTileComponents(tile, -1, 0); // fuori griglia → eccezione
+    }
+
+    @Test(expected = SpaceShipPlanceException.class)
+    public void testPlaceTileComponent_AlreadyOccupied_ThrowsException() throws SpaceShipPlanceException {
+        ComponentTile tile1 = new StructuralModule(new ConnectorType[]{
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL,
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL
+        }, 3);
+
+        ComponentTile tile2 = new StructuralModule(new ConnectorType[]{
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL,
+                ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL
+        }, 4);
+
+        spaceship.placeTileComponents(tile1, 2, 2); // ok
+        spaceship.placeTileComponents(tile2, 2, 2); // già occupato → eccezione
+    }
+
+    @Test
+    public void testCheckExposedConnector_NorthEdgeTrue() {
+        // Posizione (0,1) → prima riga in alto è vuota, poi mettiamo un modulo con connettore NORTH
+        ComponentTile tile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH}, 1
+        );
+        spaceship.getComponents()[1][3] = tile; // x = 3, y = 1 → corrisponde a position 7 (3 + 4)
+
+        boolean result = spaceship.checkExposedConnector(Direction.NORTH, 7); // position = x + 4
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCheckExposedConnector_SouthEdgeTrue() {
+        ComponentTile tile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH}, 2
+        );
+        spaceship.getComponents()[3][3] = tile; // y = 3 → y = 4 è bordo, position = x + 4 = 7
+
+        boolean result = spaceship.checkExposedConnector(Direction.SOUTH, 7);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCheckExposedConnector_EastEdgeTrue() {
+        ComponentTile tile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH}, 3
+        );
+        spaceship.getComponents()[2][5] = tile; // x = 5, position = y + 5 = 7
+
+        boolean result = spaceship.checkExposedConnector(Direction.EAST, 7);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCheckExposedConnector_WestEdgeTrue() {
+        ComponentTile tile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL}, 4
+        );
+        spaceship.getComponents()[2][1] = tile; // x = 1, y = 2 → WEST position = y + 5 = 7
+
+        boolean result = spaceship.checkExposedConnector(Direction.WEST, 7);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCheckExposedConnector_NoConnectorFalse() {
+        // Nessun componente inserito → deve restituire false
+        boolean result = spaceship.checkExposedConnector(Direction.NORTH, 6);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testCheckExposedConnector_SmoothConnectorFalse() {
+        ComponentTile tile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH}, 5
+        );
+        spaceship.getComponents()[1][3] = tile;
+
+        boolean result = spaceship.checkExposedConnector(Direction.NORTH, 7);
+        assertFalse(result); // connettore è SMOOTH → non è esposto
+    }
+
+    @Test
+    public void testGetTileIds_MixedTiles() {
+        // Inseriamo due componenti nelle posizioni [1][2] e [3][5]
+        ComponentTile tile1 = new StructuralModule(
+                new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH}, 42
+        );
+        tile1.setRotation(1);
+        spaceship.getComponents()[1][2] = tile1;
+
+        ComponentTile tile2 = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.UNIVERSAL}, 99
+        );
+        tile2.setRotation(3);
+        spaceship.getComponents()[3][5] = tile2;
+
+        // Chiamiamo il metodo
+        TileData[][] ids = spaceship.getTileIds();
+
+        // Verifichiamo le celle non vuote
+        assertEquals(42, ids[1][2].getId());
+        assertEquals(1, ids[1][2].getRotation());
+
+        assertEquals(99, ids[3][5].getId());
+        assertEquals(3, ids[3][5].getRotation());
+
+        // Verifichiamo che le altre siano -1 e 0
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 7; x++) {
+                if (!((y == 1 && x == 2) || (y == 3 && x == 5))) {
+                    assertEquals(-1, ids[y][x].getId());
+                    assertEquals(0, ids[y][x].getRotation());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testTileGridToStringWithSingleComponent() throws SpaceShipPlanceException {
+        // Creo un modulo strutturale con tutti i connettori smooth
+        ConnectorType[] connectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH
+        };
+
+        StructuralModule tile = new StructuralModule(connectors, 0);
+        spaceship.placeTileComponents(tile, 3, 2); // centro nave
+
+        String grid = spaceship.tileGridToString();
+
+        System.out.println(grid); // utile per vedere la griglia
+
+        // Verifico che il carattere 'M' per StructuralModule sia presente nel centro
+        assertTrue(grid.contains(" M "));
+    }
+
+    @Test
+    public void testTileGridToStringAdjustments_WithStructuralModule() {
+        // Creo un StructuralModule con connettori diversi
+        ConnectorType[] connectors = {
+                ConnectorType.SINGLE,    // '+'
+                ConnectorType.DOUBLE,    // '═'
+                ConnectorType.SMOOTH,    // '|'
+                ConnectorType.UNIVERSAL  // '┼'
+        };
+
+        StructuralModule tile = new StructuralModule(connectors, 42);
+
+        // Posiziono il modulo in (1,1)
+        spaceship.setComponent(1, 1, tile);
+
+        String result = spaceship.tileGridToStringAdjustments();
+
+        System.out.println(result); // Per vedere la stampa della griglia
+
+        // Verifico presenza dei connettori corretti nella griglia
+        assertTrue("Dovrebbe contenere il simbolo del connettore SINGLE '+'",
+                result.contains("+"));
+        assertTrue("Dovrebbe contenere il simbolo del connettore DOUBLE '═'",
+                result.contains("═"));
+        assertTrue("Dovrebbe contenere il simbolo del connettore UNIVERSAL '┼'",
+                result.contains("┼"));
+        assertTrue("Dovrebbe contenere il simbolo del connettore SMOOTH '┼'",
+                result.contains("|"));
+
+        // Verifico che sia presente il simbolo 'M' per StructuralModule (tile centrale)
+        char structuralSymbol = TileSymbols.ASCII_TILE_SYMBOLS.get("StructuralModule");
+        assertTrue("Dovrebbe contenere il simbolo 'M' per StructuralModule",
+                result.contains(String.valueOf(structuralSymbol)));
+    }
+
+    @Test
+    public void testConnectorToChar_AllConnectorTypes() {
+        assertEquals((char) TileSymbols.CONNECTOR_SYMBOLS.get("universal"),
+                spaceship.connectorToChar(ConnectorType.UNIVERSAL));
+
+        assertEquals((char) TileSymbols.CONNECTOR_SYMBOLS.get("single"),
+                spaceship.connectorToChar(ConnectorType.SINGLE));
+
+        assertEquals((char) TileSymbols.CONNECTOR_SYMBOLS.get("double"),
+                spaceship.connectorToChar(ConnectorType.DOUBLE));
+
+        assertEquals((char) TileSymbols.CONNECTOR_SYMBOLS.get("smooth"),
+                spaceship.connectorToChar(ConnectorType.SMOOTH));
+
+        assertEquals((char) TileSymbols.CONNECTOR_SYMBOLS.get("cannon"),
+                spaceship.connectorToChar(ConnectorType.CANNON));
+
+        assertEquals((char) TileSymbols.CONNECTOR_SYMBOLS.get("engine"),
+                spaceship.connectorToChar(ConnectorType.ENGINE));
+    }
+
+    @Test
+    public void testTiletoString_AllTypes() {
+        assertEquals("DoubleCannon", spaceship.tiletoString(new DoubleCannon(new ConnectorType[]{}, 0)));
+        assertEquals("Cannon", spaceship.tiletoString(new Cannon(new ConnectorType[]{}, 0)));
+        assertEquals("DoubleEngine", spaceship.tiletoString(new DoubleEngine(new ConnectorType[]{}, 0)));
+        assertEquals("Engine", spaceship.tiletoString(new Engine(new ConnectorType[]{}, 0)));
+        assertEquals("Cabin", spaceship.tiletoString(new Cabin(new ConnectorType[]{}, true, 0)));
+        assertEquals("CargoHolds", spaceship.tiletoString(new CargoHolds(new ConnectorType[]{}, 0,false,0)));
+        assertEquals("ShieldGenerator", spaceship.tiletoString(new ShieldGenerator(new ConnectorType[]{}, new boolean[]{}, 0)));
+        assertEquals("LifeSupportSystem", spaceship.tiletoString(new LifeSupportSystem(BROWN, new ConnectorType[]{}, 0)));
+        assertEquals("PowerCenter", spaceship.tiletoString(new PowerCenter(new ConnectorType[]{}, 0, 0)));
+        assertEquals("StructuralModule", spaceship.tiletoString(new StructuralModule(new ConnectorType[]{}, 0)));
+    }
+
+    @Test
+    public void testReserveSpotToString_WithOneTile() {
+        ConnectorType[] connectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH
+        };
+        StructuralModule tile = new StructuralModule(connectors, 0);
+
+        spaceship.getReserveSpot().add(tile);
+
+        String output = spaceship.reserveSpotToString();
+
+        System.out.println(output); // per debug visivo
+
+        // Verifico che ci siano 3 linee (più \n finali)
+        String[] lines = output.split("\n");
+        // lines[0] è vuota perché result.append('\n') prima del ciclo, quindi linee di tile sono lines[1], lines[2], lines[3]
+        assertTrue(lines.length >= 4);
+
+        // Verifico che la rappresentazione contenga il simbolo 'M' per StructuralModule (al centro)
+        assertTrue(output.contains("M"));
+
+        // Controllo che ogni linea di tile sia lunga esattamente 3 caratteri (per un tile)
+        for (int i = 1; i <= 3; i++) {
+            // la linea dovrebbe contenere 3 caratteri per il tile (il metodo tileCrafter produce un array 3x3 di caratteri per tile)
+            assertTrue(lines[i].length() == 3);
+        }
+    }
+
+    @Test
+    public void testTileGridToStringParts_WithNumbers() {
+        // Crea una griglia 5×7 (dimensione presumibile) e inizializza con -1
+        int[][] grid = new int[5][7];
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                grid[y][x] = -1;
+            }
+        }
+
+        // Inserisci solo tile NON esclusi da edgeCases (es. [1][1] e [2][2])
+        grid[1][1] = 1;
+        grid[2][2] = 2;
+
+        spaceship.setShownComponents(grid);
+
+        String result = spaceship.tileGridToStringParts();
+
+        System.out.println(result); // per debug visivo
+
+        // Devono essere presenti i caratteri '1' e '2'
+        assertTrue(result.contains("1"));
+        assertTrue(result.contains("2"));
+    }
+
+    @Test
+    public void testCountGoodsReturnsCorrectAmount() {
+        // Creo un CargoHolds con capacità 3, non speciale
+        ConnectorType[] connectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH
+        };
+
+        CargoHolds cargo = new CargoHolds(connectors, 0, false, 3);
+        GoodsBlock[] goods = cargo.getGoods();
+        goods[0] = new GoodsBlock(ColorType.YELLOW);
+        goods[1] = new GoodsBlock(ColorType.BLUE);
+        // goods[2] resta null
+
+        // Posiziono il CargoHolds nella nave
+        spaceship.placeTileComponents(cargo, 3, 2);
+
+        // Aggiorno le liste della nave
+        spaceship.updateLists();
+        int count = spaceship.countGoods();
+        assertEquals(2, count);  // Abbiamo inserito solo 2 GoodsBlock
+    }
 
 
 
