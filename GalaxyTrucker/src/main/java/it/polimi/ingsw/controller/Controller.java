@@ -961,6 +961,8 @@ public class Controller{
 
     public void handleWaitersPlayer(ClientListener listener) {
 
+        lastMethodCalled = "handleWaitersPlayer";
+
         if(listener != null){
             for (Player player: players) {
                 ClientListener l = listenerbyPlayer.get(player);
@@ -1013,6 +1015,8 @@ public class Controller{
 
     public void handleWaitersBattery(ClientListener listener, Player player) {
 
+        lastMethodCalled = "handleWaitersBattery";
+
         if(listener != null){
             for (Player p: players) {
                 ClientListener l= listenerbyPlayer.get(p);
@@ -1027,6 +1031,9 @@ public class Controller{
     }
 
     public void handleWaitersEnemy(ClientListener listener) {
+
+        lastMethodCalled = "handleWaitersEnemy";
+
         if(listener!=null){
             for (Player player: players) {
                 ClientListener l= listenerbyPlayer.get(player);
@@ -2492,7 +2499,7 @@ public class Controller{
             case "handlePlanets":
                 handlePlanets(null);
                 break;
-            case "fromChargeToManage":
+            case "fromChargeToManage", "handleWaitersBattery","handleWaitersEnemy":
                 fromChargeToManage(null);
                 break;
             case "waitForEnemies":
@@ -2515,6 +2522,9 @@ public class Controller{
                 break;
             case "handleEpidemic":
                 handleEpidemic(null);
+                break;
+            case "handleWaitersPlayer":
+                manageCard();
                 break;
             default:
                 break;
