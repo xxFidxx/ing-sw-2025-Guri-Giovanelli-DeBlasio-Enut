@@ -32,6 +32,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final ArrayList<String> disconnectedPlayersNicks;
     private final Object lock = new Object();
     int lobbySize;
+    boolean gameEnded;
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
     // bisogna gestire bene cosa succede in caso di disconnessione durante le chiamate ai metodi
@@ -50,6 +51,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         this.lastEventSent = new ConcurrentHashMap<>();
         this.disconnectedPlayersNicks = new ArrayList<>();
         this.lobbySize = 0;
+        this.gameEnded = false;
 
         checkPings();
     }
@@ -188,6 +190,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                 System.out.println("Saving event for nickname: '" + nickname + "' with state: " + event.getState());
                 lastEventSent.put(nickname, event);
             }
+            if(event.getState() == GameState.END_GAME)
+                gameEnded=true;
         } catch (RemoteException e) {
             System.out.println("Client disconnected: " + e);
         } catch (InterruptedException e) {
@@ -198,43 +202,46 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     @Override
     public void connect(VirtualViewRmi client) throws RemoteException {
-        synchronized (clients) {
-            clients.add(client);
+        if(!gameEnded){
+            synchronized (clients) {
+                clients.add(client);
+            }
+            ClientListenerRmi clientListenerRmi = new ClientListenerRmi( client, this);
+            clientListeners.put(client, clientListenerRmi);
+            synchronized(controller){
+                controller.addEventListener(clientListenerRmi);
+            }
+            System.out.println("Client connected");
         }
-        ClientListenerRmi clientListenerRmi = new ClientListenerRmi( client, this);
-        clientListeners.put(client, clientListenerRmi);
-        synchronized(controller){
-            controller.addEventListener(clientListenerRmi);
-        }
-        System.out.println("Client connected");
     }
 
     @Override
     public void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions, InterruptedException {
-        if((realClients.size() + disconnectedPlayersNicks.size()) < lobbySize ){
-            realClients.add(client);
-            ClientListenerRmi clientListenerRmi = clientListeners.get(client);
-            realClientListeners.put(client, clientListenerRmi);
-            nicknames.add(nickname);
-            clientbyNickname.put(nickname, client);
-            nicknamebyClient.put(client,nickname);
-            synchronized(controller){
-                controller.addNickname(clientListenerRmi,nickname);
+        if(!gameEnded){
+            if((realClients.size() + disconnectedPlayersNicks.size()) < lobbySize ){
+                realClients.add(client);
+                ClientListenerRmi clientListenerRmi = clientListeners.get(client);
+                realClientListeners.put(client, clientListenerRmi);
+                nicknames.add(nickname);
+                clientbyNickname.put(nickname, client);
+                nicknamebyClient.put(client,nickname);
+                synchronized(controller){
+                    controller.addNickname(clientListenerRmi,nickname);
+                }
+                System.out.println("Nickname added\n");
+            }else{
+                System.out.println("Nickname given: " + nickname);
+                System.out.println("Nickname in use:");
+                for(String str : disconnectedPlayersNicks){
+                    System.out.println(str);
+                }
+                if(disconnectedPlayersNicks.contains(nickname)){
+                    handleReconnect(nickname, client);
+                }
+                else
+                    throw new LobbyExceptions("Sorry, your nickname doesn't match with any of disconnected players ones, you can't join");
             }
-            System.out.println("Nickname added\n");
-        }else{
-            System.out.println("Nickname given: " + nickname);
-            System.out.println("Nickname in use:");
-            for(String str : disconnectedPlayersNicks){
-                System.out.println(str);
-            }
-            if(disconnectedPlayersNicks.contains(nickname)){
-                handleReconnect(nickname, client);
-            }
-            else
-                throw new LobbyExceptions("Sorry, your nickname doesn't match with any of disconnected players ones, you can't join");
         }
-
     }
 
 

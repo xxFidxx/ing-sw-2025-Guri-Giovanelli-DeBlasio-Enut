@@ -2252,6 +2252,8 @@ public class Controller{
     private void endTurn() {
         checkEarlyEndConditions();
         if (players.isEmpty()) {
+            for(Player player: reconnectedPlayers)
+                realListeners.add(listenerbyPlayer.get(player));
             notifyAllRealListeners(eventCrafter(GameState.END_GAME, null, null));
         } else {
             isDone.replaceAll((c, v) -> false);
