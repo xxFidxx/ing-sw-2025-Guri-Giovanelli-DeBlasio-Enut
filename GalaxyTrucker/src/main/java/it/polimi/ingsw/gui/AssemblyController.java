@@ -1,7 +1,6 @@
 package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Server.GameState;
-import it.polimi.ingsw.controller.network.data.DataString;
 import it.polimi.ingsw.controller.network.data.PickedTile;
 import it.polimi.ingsw.controller.network.data.TileData;
 import javafx.application.Platform;
@@ -32,7 +31,7 @@ public class AssemblyController extends Controller {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load covered card image", e);
         }
-        try (InputStream in = AssemblyController.class.getResourceAsStream("/spaceship.jpg")) {
+        try (InputStream in = AssemblyController.class.getResourceAsStream("/boards/spaceship.jpg")) {
             File tempFile = File.createTempFile("spaceship", ".jpg");
             tempFile.deleteOnExit();
             Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
