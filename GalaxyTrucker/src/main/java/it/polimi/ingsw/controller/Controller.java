@@ -51,6 +51,7 @@ public class Controller{
     private boolean enemyDefeated;
     private boolean afterShots;
     private String lastMethodCalled;
+    private boolean pause;
 
     public Controller() {
         this.game = null;
@@ -73,6 +74,7 @@ public class Controller{
         this.afterShots = false;
         this.busyDecks = new boolean[3];
         this.lastMethodCalled = null;
+        this.pause = false;
     }
 
     public void addEventListener(ClientListener listener) {
@@ -1051,6 +1053,8 @@ public class Controller{
 
     private void handleWaitersPlanets(Player chosenPlayer) {
 
+        lastMethodCalled = "handleWaitersPlanets";
+
         if(!(disconnectedPlayers.contains(chosenPlayer))){
             for (Player player: tmpPlayers) {
                 ClientListener l = listenerbyPlayer.get(player);
@@ -1776,20 +1780,23 @@ public class Controller{
     }
 
     public void endCargoManagement(ClientListener listener) {
-        Player player = playerbyListener.get(listener);
-        //tmpPlayers.remove(player);
-        player.setReward(null);
-        cargoended = true;
-        System.out.println("Cargo management ended");
+        if(listener!=null){
+            Player player = playerbyListener.get(listener);
+            //tmpPlayers.remove(player);
+            player.setReward(null);
+            cargoended = true;
+            System.out.println("Cargo management ended");
 
-        // reset GoodsContainers as default one, without reward cargo
-        ArrayList<CargoHolds> playerCargos = player.getSpaceshipPlance().getCargoHolds();
-        ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
-        for (CargoHolds cargo : playerCargos) {
-            GoodsBlock[] goods = cargo.getGoods();
-            goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(), cargo.getId()));
+            // reset GoodsContainers as default one, without reward cargo
+            ArrayList<CargoHolds> playerCargos = player.getSpaceshipPlance().getCargoHolds();
+            ArrayList<GoodsContainer> goodsContainers = new ArrayList<>();
+            for (CargoHolds cargo : playerCargos) {
+                GoodsBlock[] goods = cargo.getGoods();
+                goodsContainers.add(new GoodsContainer(goods, cargo.isSpecial(), cargo.getId()));
+            }
+            player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
         }
-        player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
+
 
         if(currentAdventureCard instanceof PlanetsCard){
             handlePlanets(listener);
@@ -2526,6 +2533,10 @@ public class Controller{
             case "handleWaitersPlayer":
                 manageCard();
                 break;
+            case "handleWaitersPlanets":
+                endCargoManagement(null);
+                break;
+
             default:
                 break;
         }
@@ -2552,5 +2563,9 @@ public class Controller{
         } else {
             System.out.println("No matching disconnected player for nickname: " + nickname);
         }
+    }
+
+    public void pause() {
+
     }
 }
