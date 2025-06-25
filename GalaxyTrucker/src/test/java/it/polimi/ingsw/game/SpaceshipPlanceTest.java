@@ -33,53 +33,6 @@ public class SpaceshipPlanceTest {
                 grid[y][x] = null;
             }
         }
-
-        GoodsBlock[] goods1 = new GoodsBlock[] {
-                new GoodsBlock(ColorType.BLUE),
-                new GoodsBlock(ColorType.GREEN),
-                null
-        };
-        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
-
-        // Container rosso (2 slot) - può contenere solo RED
-        GoodsBlock[] goods2 = new GoodsBlock[] {
-                new GoodsBlock(ColorType.RED),
-                new GoodsBlock(ColorType.RED)
-        };
-        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
-
-        spaceship.getGoodsContainers().add(grayContainer); // index 0
-        spaceship.getGoodsContainers().add(redContainer);// index 1
-        ConnectorType[] cannonConnectors1 = {
-                ConnectorType.SMOOTH,    // NORTH
-                ConnectorType.CANNON,    // EAST
-                ConnectorType.SMOOTH,    // SOUTH
-                ConnectorType.SMOOTH     // WEST
-        };
-        Cannon cannon1 = new Cannon(cannonConnectors1, 1);
-        spaceship.getComponents()[2][5] = cannon1;
-        spaceship.getCannons().add(cannon1);
-
-        // Doppio cannone rivolto a OVEST (indice 3 = OVEST)
-        ConnectorType[] doubleCannonConnectors = {
-                ConnectorType.SMOOTH,
-                ConnectorType.SMOOTH,
-                ConnectorType.SMOOTH,
-                ConnectorType.CANNON
-        };
-        DoubleCannon doubleCannon = new DoubleCannon(doubleCannonConnectors, 2);
-        spaceship.getComponents()[2][3] = doubleCannon;
-        spaceship.getCannons().add(doubleCannon);
-
-
-        ConnectorType[] CabinConnectors = {
-                ConnectorType.SMOOTH,
-                ConnectorType.SMOOTH,
-                ConnectorType.SMOOTH,
-                ConnectorType.UNIVERSAL
-        };
-        Cabin cabin = new Cabin(CabinConnectors,false,3);
-        spaceship.getComponents()[1][3] =cabin;
     }
 
     @Test
@@ -516,6 +469,23 @@ public class SpaceshipPlanceTest {
     }
     @Test
     public void testSwapValidNonSpecialGoods() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         spaceship.handleSwap(0, 0, 0, 1); // swap BLUE <-> GREEN
 
         GoodsBlock[] goods = spaceship.getGoodsContainers().get(0).getGoods();
@@ -524,15 +494,66 @@ public class SpaceshipPlanceTest {
     }
     @Test(expected = CargoManagementException.class)
     public void testSwapInvalidRedToGray() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         // provo a mettere RED (da container 1) nel grigio (container 0)
         spaceship.handleSwap(1, 0, 0, 0);
     }
     @Test(expected = CargoManagementException.class)
     public void testSwapOutOfBoundsCargoIndex() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         spaceship.handleSwap(0, 2, 0, 0); // cargoIndex2 fuori range
     }
     @Test
     public void testHandleRemove_valid() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         spaceship.handleRemove(0, 1); // Rimuovo GREEN
 
         GoodsBlock[] goods = spaceship.getGoodsContainers().get(0).getGoods();
@@ -540,12 +561,46 @@ public class SpaceshipPlanceTest {
     }
     @Test
     public void testHandleRemove_fromNullSlot() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         spaceship.handleRemove(0, 2); // slot già null
         GoodsBlock[] goods = spaceship.getGoodsContainers().get(0).getGoods();
         assertNull("Slot dovrebbe restare null", goods[2]);
     }
     @Test
     public void testHandleAdd_yellowToGray_success() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         GoodsBlock[] reward = new GoodsBlock[] {
                 new GoodsBlock(ColorType.YELLOW)
         };
@@ -558,6 +613,23 @@ public class SpaceshipPlanceTest {
     }
     @Test(expected = CargoManagementException.class)
     public void testHandleAdd_redToGray_fails() throws CargoManagementException {
+        GoodsBlock[] goods1 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.BLUE),
+                new GoodsBlock(ColorType.GREEN),
+                null
+        };
+        GoodsContainer grayContainer = new GoodsContainer(goods1, false, 1); // isSpecial = false
+
+        // Container rosso (2 slot) - può contenere solo RED
+        GoodsBlock[] goods2 = new GoodsBlock[] {
+                new GoodsBlock(ColorType.RED),
+                new GoodsBlock(ColorType.RED)
+        };
+        GoodsContainer redContainer = new GoodsContainer(goods2, true, 2); // isSpecial = true
+
+        spaceship.getGoodsContainers().add(grayContainer); // index 0
+        spaceship.getGoodsContainers().add(redContainer);// index 1
+
         GoodsBlock[] reward = new GoodsBlock[] {
                 new GoodsBlock(ColorType.RED)
         };
@@ -759,6 +831,15 @@ public class SpaceshipPlanceTest {
 
     @Test
     public void testCheckProtectionHitsSingleCannon() {
+        ConnectorType[] cannonConnectors1 = {
+                ConnectorType.SMOOTH,    // NORTH
+                ConnectorType.CANNON,    // EAST
+                ConnectorType.SMOOTH,    // SOUTH
+                ConnectorType.SMOOTH     // WEST
+        };
+        Cannon cannon1 = new Cannon(cannonConnectors1, 1);
+        spaceship.getComponents()[2][5] = cannon1;
+        spaceship.getCannons().add(cannon1);
         // Esempio: direction EAST, posizione che dovrebbe colpire cannon1 in (2,5)
         int result = spaceship.checkProtection(Direction.EAST, 7);
 
@@ -766,6 +847,16 @@ public class SpaceshipPlanceTest {
     }
     @Test
     public void testCheckProtectionHitsDoubleCannonWest() {
+        // Doppio cannone rivolto a OVEST (indice 3 = OVEST)
+        ConnectorType[] doubleCannonConnectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.CANNON
+        };
+        DoubleCannon doubleCannon = new DoubleCannon(doubleCannonConnectors, 2);
+        spaceship.getComponents()[2][3] = doubleCannon;
+        spaceship.getCannons().add(doubleCannon);
         // Direzione WEST, posizione che colpisce doubleCannon in (2,3)
 
         int result = spaceship.checkProtection(Direction.WEST, 7);
@@ -773,6 +864,14 @@ public class SpaceshipPlanceTest {
     }
     @Test
     public void testCheckProtectionHitsNoCannon() {
+        ConnectorType[] CabinConnectors = {
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH,
+                ConnectorType.UNIVERSAL
+        };
+        Cabin cabin = new Cabin(CabinConnectors,false,3);
+        spaceship.getComponents()[1][3] =cabin;
         // Posizione senza cannone (ad esempio in posizione vuota o tile non cannon)
         int result = spaceship.checkProtection(Direction.NORTH, 7);
         assertEquals("No cannon hit should return 0", 0, result);
