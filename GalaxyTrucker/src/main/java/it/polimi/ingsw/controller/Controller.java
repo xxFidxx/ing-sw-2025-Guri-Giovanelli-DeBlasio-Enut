@@ -828,6 +828,7 @@ public class Controller{
             } else {
                 if(l!=null)
                 l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+
                 manageCard();
             }
     }
@@ -959,14 +960,18 @@ public class Controller{
     }
 
     public void handleWaitersPlayer(ClientListener listener) {
-        for (Player player: players) {
-           ClientListener l = listenerbyPlayer.get(player);
-            if (l == listener) {
-                l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null, null));
-            } else {
-                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+
+        if(listener != null){
+            for (Player player: players) {
+                ClientListener l = listenerbyPlayer.get(player);
+                if (l == listener) {
+                    l.onEvent(eventCrafter(GameState.CHOOSE_PLAYER, null, null));
+                } else {
+                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                }
             }
         }
+
     }
 
     public void handleMinEquip(ClientListener listener) {
@@ -1007,38 +1012,47 @@ public class Controller{
     }
 
     public void handleWaitersBattery(ClientListener listener, Player player) {
-        for (Player p: players) {
-           ClientListener l= listenerbyPlayer.get(p);
-            if (l == listener) {
-                listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
-            } else {
-                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+
+        if(listener != null){
+            for (Player p: players) {
+                ClientListener l= listenerbyPlayer.get(p);
+                if (l == listener) {
+                    listener.onEvent(eventCrafter(GameState.CHOOSE_ENGINE, null, player));
+                } else {
+                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                }
             }
         }
+
     }
 
     public void handleWaitersEnemy(ClientListener listener) {
-        for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
-            System.out.println("handleWaitersEnemy: Listener: " + l);
-            if (l == listener) {
-                l.onEvent(eventCrafter(GameState.SHOW_ENEMY, null, currentPlayer));
-                l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, currentPlayer));
-            } else {
-                System.out.println("handleWaitersEnemy: mando in WAIT_PLAYER");
-                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+        if(listener!=null){
+            for (Player player: players) {
+                ClientListener l= listenerbyPlayer.get(player);
+                System.out.println("handleWaitersEnemy: Listener: " + l);
+                if (l == listener) {
+                    l.onEvent(eventCrafter(GameState.SHOW_ENEMY, null, currentPlayer));
+                    l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, currentPlayer));
+                } else {
+                    System.out.println("handleWaitersEnemy: mando in WAIT_PLAYER");
+                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                }
             }
         }
     }
 
     private void handleWaitersPlanets(Player chosenPlayer) {
-        for (Player player: players) {
-            ClientListener l = listenerbyPlayer.get(player);
-            if (player == chosenPlayer) {
-                PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
-                l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS, currentPlanetsCard.getPlanets(), null));
-            } else {
-                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+
+        if(!(disconnectedPlayers.contains(chosenPlayer))){
+            for (Player player: tmpPlayers) {
+                ClientListener l = listenerbyPlayer.get(player);
+                if (player == chosenPlayer) {
+                    PlanetsCard currentPlanetsCard = (PlanetsCard) currentAdventureCard;
+                    l.onEvent(eventCrafter(GameState.CHOOSE_PLANETS, currentPlanetsCard.getPlanets(), null));
+                } else {
+                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                }
             }
         }
         tmpPlayers.remove(chosenPlayer);
@@ -1171,11 +1185,13 @@ public class Controller{
                                 //combatZoneCannons();
                             } else {
                                 if(listener != null)
-                                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                             }
                         } else {
+
                             if(player!= null)
                             isDone.put(player, true);
+
                             if (!isDone.containsValue(false)) {
                                 afterShots = true;
                                 double minFire = players.stream().mapToDouble(Player::getFireStrenght).min().orElse(Integer.MAX_VALUE);
@@ -1192,14 +1208,17 @@ public class Controller{
                                     resetShowAndDraw();
                                 }
                             } else {
+
                                 if(listener != null)
                                 listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                             }
                         }
                     } else {
                         if (!combatZoneFlag) {
+
                             if(player!= null)
                             isDone.put(player, true);
+
                             if (!isDone.containsValue(false)) {
                                 combatZoneFlag = true;
                                 isDone.replaceAll((c, v) -> false);
@@ -2456,7 +2475,7 @@ public class Controller{
         disconnectedPlayers.add(disconnectedPlayer);
         players.remove(disconnectedPlayer);
         playerbyListener.remove(listener);
-        listenerbyPlayer.remove(disconnectedPlayer);
+        listenerbyPlayer.put(disconnectedPlayer,null);
         defeatedPlayers.remove(disconnectedPlayer);
         realListeners.remove(listener);
 
