@@ -109,6 +109,7 @@ public class SpaceshipPlance {
         return ROWS;
     }
 
+
     public boolean edgeCases(int y, int x) {
         if (y == 0) {
             return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
@@ -1288,7 +1289,7 @@ public class SpaceshipPlance {
         return result.toString();
     }
 
-    private char[][] tileCrafterbyTile(ComponentTile tile, ComponentTile tileToShow) {
+    public char[][] tileCrafterbyTile(ComponentTile tile, ComponentTile tileToShow) {
         char[][] lines = {
                 {'┌', '-', '-', '-', '┐'},  // Riga superiore
                 {'|', ' ', ' ', ' ', '|'},   // Riga centrale superiore

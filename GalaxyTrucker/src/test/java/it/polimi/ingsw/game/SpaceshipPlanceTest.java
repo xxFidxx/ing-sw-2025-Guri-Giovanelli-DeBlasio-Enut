@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.game.ColorType;
 import it.polimi.ingsw.model.game.SpaceshipPlance;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
+import it.polimi.ingsw.model.resources.TileSymbols;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -882,6 +883,178 @@ public class SpaceshipPlanceTest {
         int result = spaceship.checkProtection(Direction.WEST, 0);
         assertEquals("No hit should return -1", -1, result);
     }
+    @Test
+    public void testCheckInterconnectedCabinsEmptyInitially() {
+        SpaceshipPlance spaceship = new SpaceshipPlance();
+
+        // all'inizio dovrebbe essere vuoto
+        assertTrue(spaceship.checkInterconnectedCabinsEmpty());
+    }
+
+
+    @Test
+    public void testInterconnectedCabinRealConnection() {
+        // Step 1: setup
+        SpaceshipPlance spaceship = new SpaceshipPlance();
+
+        // Cabina centrale è già a (2, 3), ha connettori UNIVERSAL su tutti i lati.
+
+        // Step 2: creiamo una cabina a destra (2, 4) che si collega tramite lato sinistro
+        ConnectorType[] rightCabinConnectors = new ConnectorType[] {
+                ConnectorType.SMOOTH,         // NORTH
+                ConnectorType.SMOOTH,         // EAST
+                ConnectorType.SMOOTH,         // SOUTH
+                ConnectorType.UNIVERSAL       // WEST (si connette alla cabina centrale)
+        };
+
+        Cabin rightCabin = new Cabin(rightCabinConnectors, false, 200);
+        rightCabin.setWellConnected(true);  // opzionale, se il tuo sistema lo usa
+        spaceship.getComponents()[2][4] = rightCabin;
+
+        // Step 3: aggiungiamo la cabina alla lista interconnectedCabins
+        spaceship.getInterconnectedCabins().add(rightCabin);
+
+        // Step 4: verifichiamo che non sia vuota
+        assertFalse("La lista interconnectedCabins non dovrebbe essere vuota", spaceship.checkInterconnectedCabinsEmpty());
+
+        // Step 5: rimuoviamo la cabina
+        spaceship.removeInterconnectedCabin(rightCabin);
+
+        // Step 6: verifichiamo che ora sia vuota
+        assertTrue("La lista interconnectedCabins dovrebbe essere vuota dopo la rimozione", spaceship.checkInterconnectedCabinsEmpty());
+    }
+    @Test
+    public void testTileGridToStringTile() {
+        // Arrange
+        SpaceshipPlance spaceship = new SpaceshipPlance();
+
+        // Create a dummy tile to be placed in the grid
+        ConnectorType[] connectors = {
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH
+        };
+
+        Cabin cabin = new Cabin(connectors, false, 42);
+        spaceship.getComponents()[2][2] = cabin;
+
+        // Another tile to place
+        Cabin highlightedCabin = new Cabin(connectors, false, 43);
+        spaceship.getComponents()[2][3] = highlightedCabin;
+
+        // Act
+        String gridString = spaceship.tileGridToStringTile(highlightedCabin);
+
+        // Assert
+        assertNotNull("Grid string should not be null", gridString);
+        assertFalse("Grid string should not be empty", gridString.trim().isEmpty());
+
+        // Optional: print it for visual inspection
+        System.out.println(gridString);
+
+        // If tileCrafterbyTile uses tileToShow to highlight the tile in a custom way,
+        // we can assert specific characters (e.g., a symbol or border)
+        // For now, generic string presence test:
+        assertTrue("Should contain a tile representation", gridString.contains(" "));
+    }
+    @Test
+    public void testTileCrafterbyTile_IDCenteredAndConnectors() {
+        // Arrange
+        ConnectorType[] connectors = new ConnectorType[] {
+                ConnectorType.UNIVERSAL,  // Top
+                ConnectorType.SINGLE,     // Right
+                ConnectorType.DOUBLE,     // Bottom
+                ConnectorType.SMOOTH      // Left
+        };
+
+        Cabin tile = new Cabin(connectors, false, 42);
+        Cabin tileToShow = tile; // È lo stesso, quindi deve mostrare l'ID
+
+        SpaceshipPlance spaceship = new SpaceshipPlance();
+
+        // Act
+        char[][] result = spaceship.tileCrafterbyTile(tile, tileToShow);
+
+        // Assert
+        assertEquals("┌", String.valueOf(result[0][0])); // Angolo superiore sinistro
+        assertEquals('U', result[0][2]); // Connettore sopra
+        assertEquals('S', result[2][4]); // Connettore destra
+        assertEquals('D', result[4][2]); // Connettore sotto
+        assertEquals(' ', result[2][1]); // Prima dello ID
+        assertEquals('4', result[2][2]); // ID parte 1
+        assertEquals('2', result[2][3]); // ID parte 2
+    }
+
+    @Test
+    public void testTileCrafterbyTile_OtherTile_ShowsSymbol() {
+        // Arrange
+        ConnectorType[] connectors = new ConnectorType[] {
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH,
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH
+        };
+
+        Cabin tile = new Cabin(connectors, false, 10);
+        Engine tileToShow = new Engine(connectors, 20); // Tipo diverso → deve mostrare simbolo
+
+        SpaceshipPlance spaceship = new SpaceshipPlance();
+
+        // Assicurati che la mappa ASCII contenga una lettera per Cabin (es. 'C')
+        TileSymbols.ASCII_TILE_SYMBOLS.put("CABIN", 'C');
+
+        // Act
+        char[][] result = spaceship.tileCrafterbyTile(tile, tileToShow);
+
+        // Assert centrale
+        assertEquals('C', result[2][2]); // Simbolo ASCII per CABIN al centro
+    }
+    @Test
+    public void testRemoveMVGood_ValidRedCargoHold() {
+        // CargoHold speciale con capacità 2 (valido per rosso)
+        ConnectorType[] connectors = new ConnectorType[] {
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH
+        };
+        CargoHolds redHold = new CargoHolds(connectors, 101, true, 2);
+        redHold.getGoods()[0] = new GoodsBlock(ColorType.RED);
+        spaceship.getCargoHolds().add(redHold);
+
+        // GoodsContainer con blocco rosso da rimuovere
+        GoodsBlock[] goods = { new GoodsBlock(ColorType.RED) };
+        GoodsContainer container = new GoodsContainer(goods, false, 1);
+        spaceship.getGoodsContainers().add(container);
+
+        boolean result = spaceship.removeMVGood(0, 0);
+
+        assertTrue("Dovrebbe rimuovere il blocco rosso perché esiste un CargoHold valido", result);
+    }
+    @Test
+    public void testCountGoods() {
+        // Setup: crea CargoHolds con vari GoodsBlock
+        ConnectorType[] connectors = new ConnectorType[] {
+                ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH
+        };
+
+        CargoHolds cargo1 = new CargoHolds(connectors, 1, false, 3);
+        cargo1.getGoods()[0] = new GoodsBlock(ColorType.BLUE);
+        cargo1.getGoods()[1] = new GoodsBlock(ColorType.GREEN);
+        cargo1.getGoods()[2] = null;
+
+        CargoHolds cargo2 = new CargoHolds(connectors, 2, true, 2);
+        cargo2.getGoods()[0] = new GoodsBlock(ColorType.RED);
+        cargo2.getGoods()[1] = null;
+
+        spaceship.getCargoHolds().clear();
+        spaceship.getCargoHolds().add(cargo1);
+        spaceship.getCargoHolds().add(cargo2);
+
+        // Il metodo dovrebbe contare 3 GoodsBlock non nulli
+        int count = spaceship.countGoods();
+
+        assertEquals(3, count);
+    }
+
+
+
+
+
 
 
 
