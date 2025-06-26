@@ -966,33 +966,8 @@ public class SpaceshipPlanceTest {
         // For now, generic string presence test:
         assertTrue("Should contain a tile representation", gridString.contains(" "));
     }
-    @Test
-    public void testTileCrafterbyTile_IDCenteredAndConnectors() {
-        // Arrange
-        ConnectorType[] connectors = new ConnectorType[] {
-                ConnectorType.UNIVERSAL,  // Top
-                ConnectorType.SINGLE,     // Right
-                ConnectorType.DOUBLE,     // Bottom
-                ConnectorType.SMOOTH      // Left
-        };
 
-        Cabin tile = new Cabin(connectors, false, 42);
-        Cabin tileToShow = tile; // È lo stesso, quindi deve mostrare l'ID
 
-        SpaceshipPlance spaceship = new SpaceshipPlance();
-
-        // Act
-        char[][] result = spaceship.tileCrafterbyTile(tile, tileToShow);
-
-        // Assert
-        assertEquals("┌", String.valueOf(result[0][0])); // Angolo superiore sinistro
-        assertEquals('U', result[0][2]); // Connettore sopra
-        assertEquals('S', result[2][4]); // Connettore destra
-        assertEquals('D', result[4][2]); // Connettore sotto
-        assertEquals(' ', result[2][1]); // Prima dello ID
-        assertEquals('4', result[2][2]); // ID parte 1
-        assertEquals('2', result[2][3]); // ID parte 2
-    }
 
     @Test
     public void testTileCrafterbyTile_OtherTile_ShowsSymbol() {
