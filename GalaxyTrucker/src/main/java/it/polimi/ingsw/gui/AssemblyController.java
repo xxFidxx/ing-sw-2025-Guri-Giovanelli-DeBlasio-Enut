@@ -2,13 +2,17 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.data.DataString;
+import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.PickedTile;
 import it.polimi.ingsw.controller.network.data.TileData;
+import it.polimi.ingsw.model.componentTiles.AlienColor;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
 import java.io.File;
@@ -45,7 +49,12 @@ public class AssemblyController extends Controller {
     @FXML private GridPane coveredTilesGrid;
     @FXML private ImageView tileDisplay;
     @FXML private GridPane spaceshipGrid;
+    @FXML private GridPane reserveGrid;
     @FXML private ImageView spaceshipDisplay;
+    @FXML private Button endCraftingButton;
+    @FXML private AnchorPane assemblyPane;
+    @FXML private AnchorPane chooseAliensPane;
+    @FXML private GridPane cabinsGrid;
 
     public void initialize() {
         for (int row = 0; row < 12; row++) {
@@ -92,6 +101,26 @@ public class AssemblyController extends Controller {
 
         spaceshipDisplay.setImage(SPACESHIP_IMAGE);
         spaceshipGrid.setDisable(true);
+
+        for (int col = 0; col < 2; col++) {
+            ImageView imageView = new ImageView();
+            imageView.setFitWidth(80);
+            imageView.setFitHeight(80);
+            imageView.setPreserveRatio(true);
+            imageView.setPickOnBounds(true);
+
+            final int c = col + 1000;
+
+            imageView.setOnMouseClicked(event -> {
+                try {
+                    handleTileClick(c);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            reserveGrid.add(imageView, col, 0);
+        }
     }
 
     private void handleSpaceshipClick(ImageView view, int col, int row) throws RemoteException {
@@ -100,6 +129,7 @@ public class AssemblyController extends Controller {
             tileDisplay.setImage(null);
             //loadToSpaceship(view, lastIndex);
             coveredTilesGrid.setDisable(false);
+            reserveGrid.setDisable(false);
             spaceshipGrid.setDisable(true);
         }
     }
@@ -109,6 +139,15 @@ public class AssemblyController extends Controller {
         if (clientRmi.getCurrentState() == GameState.PICKED_TILE) {
             loadTileImage(index);
             coveredTilesGrid.setDisable(true);
+            reserveGrid.setDisable(true);
+            spaceshipGrid.setDisable(false);
+        }
+        else if (clientRmi.getCurrentState() == GameState.PICK_RESERVED_CARD) {
+            int id = lastSpaceship[0][5 + index - 1000].getId();
+            lastSpaceship[0][5 + index - 1000] = new TileData(-1, 0);
+            loadTileImage(id);
+            coveredTilesGrid.setDisable(true);
+            reserveGrid.setDisable(true);
             spaceshipGrid.setDisable(false);
         }
     }
@@ -138,6 +177,19 @@ public class AssemblyController extends Controller {
 
                 int id = lastSpaceship[row][col].getId();
                 int rotation = lastSpaceship[row][col].getRotation();
+
+                imageView.setRotate(rotation);
+                Image img = getImageFromId(id);
+                if (img != null) imageView.setImage(img);
+            }
+        }
+
+        for (Node node : reserveGrid.getChildren()) {
+            if (node instanceof ImageView imageView) {
+                Integer col = GridPane.getColumnIndex(node);
+
+                int id = lastSpaceship[0][col + 5].getId();
+                int rotation = lastSpaceship[0][col + 5].getRotation();
 
                 imageView.setRotate(rotation);
                 Image img = getImageFromId(id);
@@ -188,14 +240,113 @@ public class AssemblyController extends Controller {
         clientRmi.server.putTileBack(clientRmi);
         tileDisplay.setImage(null);
         coveredTilesGrid.setDisable(false);
+        reserveGrid.setDisable(false);
         spaceshipGrid.setDisable(true);
     }
 
     @FXML
     private void handleStore() throws RemoteException {
         clientRmi.server.addReserveSpot(clientRmi);
+        tileDisplay.setImage(null);
         coveredTilesGrid.setDisable(false);
+        reserveGrid.setDisable(false);
         spaceshipGrid.setDisable(true);
     }
 
+    @FXML
+    private void handleEndCrafting() throws Exception {
+        clientRmi.server.endCrafting(clientRmi);
+    }
+
+    public void adjustShip(TileData[][] tileIds) {
+        this.lastSpaceship = tileIds;
+        updateSpaceship();
+
+        coveredTilesGrid.setDisable(true);
+        reserveGrid.setDisable(true);
+        spaceshipGrid.setDisable(false);
+        endCraftingButton.setVisible(true);
+
+        for (Node node : spaceshipGrid.getChildren()) {
+            if (node instanceof ImageView imageView) {
+                Integer col = GridPane.getColumnIndex(node);
+                Integer row = GridPane.getRowIndex(node);
+
+                imageView.setOnMouseClicked(event -> {
+                    try {
+                        clientRmi.server.removeAdjust(clientRmi, col, row);
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
+    }
+
+    public void selectShip(TileData[][] tileIds) {
+        this.lastSpaceship = tileIds;
+        updateSpaceship();
+
+        coveredTilesGrid.setDisable(true);
+        reserveGrid.setDisable(true);
+        spaceshipGrid.setDisable(false);
+
+        for (Node node : spaceshipGrid.getChildren()) {
+            if (node instanceof ImageView imageView) {
+                Integer col = GridPane.getColumnIndex(node);
+                Integer row = GridPane.getRowIndex(node);
+
+                imageView.setOnMouseClicked(event -> {
+                    try {
+                        clientRmi.server.selectShipPart(clientRmi, 0);;
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
+    }
+
+    public void chooseAlien(ListCabinAliens cabinAliens) {
+        assemblyPane.setVisible(false);
+        chooseAliensPane.setVisible(true);
+
+        for (int row = 0; row < 2; row++) {
+            for (int col = 0; col < 5; col++) {
+                final int index = row * 5 + col;
+                if (index > cabinAliens.getCabinAliens().size()) {
+                    break;
+                }
+
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(100);
+                imageView.setFitHeight(100);
+                imageView.setPreserveRatio(true);
+                imageView.setPickOnBounds(false);
+
+                imageView.setOnMouseClicked(event -> {
+                    try {
+                        clientRmi.server.addAlienCabin(clientRmi, index, "b");
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+
+                int id = cabinAliens.getCabinAliens().get(index).getCabin().getId();
+                int rotation = cabinAliens.getCabinAliens().get(index).getCabin().getRotation();
+                Image img = getImageFromId(id);
+                imageView.setRotate(rotation);
+                imageView.setImage(img);
+
+                cabinsGrid.add(imageView, col, row);
+            }
+        }
+    }
+
+    @FXML
+    private void handleDoneChooseAliens() throws RemoteException {
+        clientRmi.server.handleEndChooseAliens(clientRmi);
+        sceneManager.switchTo("game");
+    }
 }

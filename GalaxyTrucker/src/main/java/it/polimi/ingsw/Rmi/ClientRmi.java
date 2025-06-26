@@ -811,11 +811,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
             case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
-            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile");
-            case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
+            case ADJUST_SHIP -> mainApp.adjustShip(((DataString)getCurrentEvent().getData()).getTileIds());
+            case SELECT_SHIP -> mainApp.selectShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SHOW_SHIP -> mainApp.updateSpaceship(((DataString)getCurrentEvent().getData()).getTileIds());
             case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");
-            case CHOOSE_ALIEN -> System.out.println("Press 0 to exit exchange mode, press 1 to enter");
+            case CHOOSE_ALIEN -> mainApp.chooseAlien((ListCabinAliens) getCurrentEvent().getData());
             case TURN_START -> System.out.println("Here is the flight plance");
             case DRAW_CARD -> System.out.println("This is the drawn card:");
             case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");

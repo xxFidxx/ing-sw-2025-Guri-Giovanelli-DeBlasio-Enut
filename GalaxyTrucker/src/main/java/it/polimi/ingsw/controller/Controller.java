@@ -1684,7 +1684,7 @@ public class Controller{
     public void printSpaceshipAdjustment(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().tileGridToStringAdjustments();
-        DataString ds = new DataString(complete_ship);
+        DataString ds = new DataString(complete_ship, player.getSpaceshipPlance().getTileIds());
         listener.onEvent(eventCrafter(GameState.ADJUST_SHIP, ds, null));
     }
 
@@ -1876,7 +1876,7 @@ public class Controller{
     private void printSpaceshipParts(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().tileGridToStringParts();
-        DataString ds = new DataString(complete_ship);
+        DataString ds = new DataString(complete_ship, player.getSpaceshipPlance().getTileIds());
         listener.onEvent(eventCrafter(GameState.SELECT_SHIP, ds, null));
     }
 

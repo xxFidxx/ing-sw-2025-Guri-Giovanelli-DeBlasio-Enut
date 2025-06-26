@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
+import java.awt.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -870,6 +871,11 @@ public class SpaceshipPlance {
                 ComponentTile tile = components[i][j];
                 result[i][j] = (tile != null) ? new TileData(tile.getId(), tile.getRotation()) : new TileData(-1, 0);
             }
+        }
+
+        for (int i=0; (i < this.reserveSpot.size()) && (i < 2); i++) {
+            ComponentTile c = this.reserveSpot.get(i);
+            result[0][5+i] = (c != null) ? new TileData(c.getId(), c.getRotation()) : new TileData(-1, 0);
         }
 
         return result;

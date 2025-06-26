@@ -2,19 +2,19 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
+import it.polimi.ingsw.controller.network.data.CabinAliens;
+import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,5 +85,23 @@ public class MainApp extends Application {
 
     public void updateSpaceship(TileData[][] tileIds) {
         ((AssemblyController) controllers.get("assembly")).setLastSpaceship(tileIds);
+    }
+
+    public void adjustShip(TileData[][] tileIds) {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).adjustShip(tileIds);
+        });
+    }
+
+    public void selectShip(TileData[][] tileIds) {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).selectShip(tileIds);
+        });
+    }
+
+    public void chooseAlien(ListCabinAliens cabinAliens) {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).chooseAlien(cabinAliens);
+        });
     }
 }
