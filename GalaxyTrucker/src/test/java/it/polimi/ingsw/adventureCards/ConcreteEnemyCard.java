@@ -1,15 +1,14 @@
 package it.polimi.ingsw.adventureCards;
 
 import it.polimi.ingsw.model.adventureCards.EnemyCard;
-import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Player;
 
-public class DummyEnemyCard extends EnemyCard {
+public class ConcreteEnemyCard extends EnemyCard {
     public boolean rewardCalled = false;
     public boolean penalizeCalled = false;
 
-    public DummyEnemyCard(String name, int level, Deck deck, int cannonStrength, int lostDays) {
-        super(name, level, deck, cannonStrength, lostDays);
+    public ConcreteEnemyCard(String name, int level, int cannonStrength, int lostDays) {
+        super(name, level, cannonStrength, lostDays);
     }
 
     @Override

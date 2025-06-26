@@ -261,6 +261,7 @@ public class Game{
 
 
     public void rewardPlaces() {
+        orderPlayers();
         int amount = 4;
         for (int i = players.size()-1; i >= 0 ; i--) {
             // surrended players dont get position reward

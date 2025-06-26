@@ -26,8 +26,8 @@ public class Controller{
     private final List<ClientListener> registredListeners = new ArrayList<>();
     private final List<ClientListener> realListeners = new ArrayList<>();
     private final boolean[] busyDecks;
-    public final Map<ClientListener, Player> playerbyListener = new HashMap<>();
-    public final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
+    private final Map<ClientListener, Player> playerbyListener = new HashMap<>();
+    private final Map<Player, ClientListener> listenerbyPlayer = new HashMap<>();
     final Map <Player, Boolean> isDone = new HashMap<>();
     final Map <Player, Boolean> isDonePirates = new HashMap<>();
     private AdventureCard currentAdventureCard;
@@ -43,7 +43,7 @@ public class Controller{
     private Projectile currentProjectile;
     private int currentDiceThrow;
     private ArrayList<Player> tmpPlayers;
-    public List<AdventureCard> cards;
+    private List<AdventureCard> cards;
     private final ArrayList<Player> defeatedPlayers;
     private boolean combatZoneFlag;
     private boolean piratesFlag;
@@ -79,13 +79,22 @@ public class Controller{
         this.pause = false;
     }
 
+    // Setter e getter utili per il testing
+    public void setPlayers(ArrayList<Player> players) { this.players = players;}
+    public void addRealListener(ClientListener listener) { realListeners.add(listener);}
+    public void addRealListeners(Collection<ClientListener> listeners) { this.realListeners.addAll(listeners);}
+    public void addPlayerListenerPair(ClientListener listener, Player player) {
+        playerbyListener.put(listener, player);
+        listenerbyPlayer.put(player, listener);
+    }
+    public void setCards(List<AdventureCard> cards) { this.cards = new LinkedList<>(cards);}
     public GameState getCurrentGameState(){
         return currentGameState;
     }
-
     public AdventureCard getCurrentAdventureCard(){
         return currentAdventureCard;
     }
+
 
     public boolean getPause(){
         return pause;
