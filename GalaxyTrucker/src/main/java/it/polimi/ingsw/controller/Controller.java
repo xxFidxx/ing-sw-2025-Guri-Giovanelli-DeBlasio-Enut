@@ -941,7 +941,7 @@ public class Controller{
                     playerHit(l);
                 } else {
                     l.onEvent(eventCrafter(GameState.NO_EXPOSED_CONNECTORS, null, null));
-                    waitForNextShot(l);
+                    waitForNextShotMetheor(l);
                 }
             }
             case BigMeteor bm -> {
@@ -953,12 +953,12 @@ public class Controller{
                 System.out.println("activateMeteor: result " + result);
                 if (result == -1) {
                     l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
-                    waitForNextShot(l);
+                    waitForNextShotMetheor(l);
                 } else if (result == 0) {
                     playerHit(l);
                 } else if (result == 1) {
                     l.onEvent(eventCrafter(GameState.SINGLE_CANNON_PROTECTION, null, null));
-                    waitForNextShot(l);
+                    waitForNextShotMetheor(l);
                 } else {
                     lastMethodCalled = "checkProtection";
                     System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
@@ -1984,7 +1984,7 @@ public class Controller{
                             System.out.println("removeAdjust: vado in combatZoneShots");
                             combatZoneShots(p);
                         }
-                        case MeteorSwarmCard msc -> waitForNextShot(listener);
+                        case MeteorSwarmCard msc -> waitForNextShotMetheor(listener);
                         case PiratesCard pc -> waitForNextShotPirates(listener);
                         default -> throw new IllegalStateException();
                     }
@@ -2036,7 +2036,7 @@ public class Controller{
                             System.out.println("selectShipPart: vado in combatZoneShots");
                             combatZoneShots(p);
                         }
-                        case MeteorSwarmCard msc -> waitForNextShot(listener);
+                        case MeteorSwarmCard msc -> waitForNextShotMetheor(listener);
                         case PiratesCard pc -> waitForNextShotPirates(listener);
                         default -> {
                             isDone.put(playerbyListener.get(listener), true);
@@ -2129,7 +2129,7 @@ public class Controller{
         }
     }
 
-    public void waitForNextShot(ClientListener listener) {
+    public void waitForNextShotMetheor(ClientListener listener) {
         if(listener!=null){
             lastMethodCalled = "waitForNextShot";
             System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
@@ -2393,7 +2393,7 @@ public class Controller{
                 else
                     combatZoneShots(p);
             }
-            case MeteorSwarmCard msc -> waitForNextShot(listener);
+            case MeteorSwarmCard msc -> waitForNextShotMetheor(listener);
             case OpenSpaceCard osc -> fromChargeToManage(listener);
             case PiratesCard pc -> {
                 if (piratesFlag)
@@ -2540,7 +2540,7 @@ public class Controller{
                     System.out.println("takeHit: vado in combatZoneShots");
                     combatZoneShots(p);
                 }
-                case MeteorSwarmCard msc -> waitForNextShot(l);
+                case MeteorSwarmCard msc -> waitForNextShotMetheor(l);
                 case PiratesCard pc -> waitForNextShotPirates(l);
                 default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
             }
@@ -2641,11 +2641,9 @@ public class Controller{
     public int[] guiBoardInfo() {
 
         int i = 0;
-        int size = players.size() * 2;
+        int size = placeholders.size() * 2;
         int[] infos = new int[size];
-        for(Player player: players) {
-            Placeholder p = player.getPlaceholder();
-            while(i< size){
+        for(Placeholder p: placeholders){
                 infos[i] = p.getColor().getValue();
                 i++;
                 int pos = (p.getPosizione()) % 24;
@@ -2654,9 +2652,16 @@ public class Controller{
                 }
                 infos[i] = pos;
                 i++;
-            }
         }
         return infos;
+    }
+
+    public HashMap<String,Integer> guiPlayersColors(){
+        HashMap<String,Integer> playerColor = new HashMap<>();
+        for(Player player: players){
+            playerColor.put(player.getNickname(), player.getPlaceholder().getColor().getValue());
+        }
+        return playerColor;
     }
 
     public void handleDisconnect(ClientListenerRmi listener) {
@@ -2708,7 +2713,7 @@ public class Controller{
                 playerIsDoneCrafting(null);
                 break;
             case "waitForNextShot":
-                waitForNextShot(null);
+                waitForNextShotMetheor(null);
                 break;
             case "waitForNextShotPirates":
                 waitForNextShotPirates(null);

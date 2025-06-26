@@ -816,7 +816,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case SHOW_SHIP -> mainApp.updateSpaceship(((DataString)getCurrentEvent().getData()).getTileIds());
             case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");
             case CHOOSE_ALIEN -> mainApp.chooseAlien((ListCabinAliens) getCurrentEvent().getData());
-            case TURN_START -> System.out.println("Here is the flight plance");
+            case TURN_START ->{
+                mainApp.turnStart(server.guiBoardInfo(), server.playerColors());
+            }
             case DRAW_CARD -> System.out.println("This is the drawn card:");
             case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
             case CARGO_MANAGEMENT -> {
@@ -936,8 +938,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_PLAYER_LEADER -> System.out.println("Wait for other players are done crafting or start the timer by pressing 1");
             case TIMER_DONE -> System.out.println("TIMER IS DONE!");
             case LEAST_CREW -> System.out.println("You have the least crew");
-            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
-            case LEAST_FIRE -> System.out.println("You have the least fire strenght");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strength");
+            case LEAST_FIRE -> System.out.println("You have the least fire strength");
             // case MOVE_PLAYER -> System.out.println("You have the least crew");
             // case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");

@@ -497,6 +497,11 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         return controller.guiBoardInfo();
     }
 
+    @Override
+    public HashMap<String, Integer> playerColors() throws RemoteException {
+        return controller.guiPlayersColors();
+    }
+
     public void notifyLastClient(VirtualViewRmi client) {
         try {
             Event event = lastEventSent.get(nicknamebyClient.get(client));

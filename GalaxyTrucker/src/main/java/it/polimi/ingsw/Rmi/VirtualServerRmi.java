@@ -4,11 +4,11 @@ import it.polimi.ingsw.Server.VirtualServer;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
-import it.polimi.ingsw.view.VirtualView;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface VirtualServerRmi extends Remote, VirtualServer {
 
@@ -97,4 +97,6 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
     boolean startTimer() throws RemoteException;
 
     int[] guiBoardInfo() throws RemoteException;
+
+    HashMap<String,Integer> playerColors() throws RemoteException;
 }

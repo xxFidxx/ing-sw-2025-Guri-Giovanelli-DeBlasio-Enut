@@ -2,7 +2,6 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
-import it.polimi.ingsw.controller.network.data.CabinAliens;
 import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
 import javafx.application.Application;
@@ -104,4 +103,14 @@ public class MainApp extends Application {
             ((AssemblyController) controllers.get("assembly")).chooseAlien(cabinAliens);
         });
     }
+
+    public void turnStart(int [] boardInfo, HashMap<String, Integer> playerColor) {
+            sceneManager.switchTo("game");
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).updateBoard(boardInfo);
+            ((GameController) controllers.get("game")).setPlayerColorArea(playerColor);
+        });
+    }
+
+
 }

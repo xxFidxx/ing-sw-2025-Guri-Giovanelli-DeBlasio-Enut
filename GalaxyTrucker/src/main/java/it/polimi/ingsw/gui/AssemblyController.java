@@ -231,7 +231,7 @@ public class AssemblyController extends Controller {
         }catch (Exception e){
             ShowTextUtils.showTextVolatile("Exception",e.getMessage());
         }
-        sceneManager.switchTo("game");
+        //sceneManager.switchTo("game");
     }
 
     @FXML
