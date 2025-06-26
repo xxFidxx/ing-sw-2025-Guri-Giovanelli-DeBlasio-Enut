@@ -34,3 +34,6 @@ The SpaceshipPlance returns the respective values.
 7) Notify the Client to Update the View:
 The Controller triggers the event SHOW_SHIP via listener.onEvent(SHOW_SHIP).
 The Server then tells the Client to update the view with showUpdate(SHOW_SHIP).
+
+8) Sends the Client to the next state:
+The Controller triggers the ASSEMBLY event to continue the assembly phase → showUpdate(ASSEMBLY) is sent to the Client.

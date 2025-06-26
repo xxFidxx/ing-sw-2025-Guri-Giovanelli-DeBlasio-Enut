@@ -206,12 +206,12 @@ public class Controller{
 
         if (tileId >= 1000) {
             if(tileId == 1000)
-            tile = game.pickTileReserveSpot(player, 0);
+                tile = game.pickTileReserveSpot(player, 0);
             else if(tileId == 1001)
                 tile = game.pickTileReserveSpot(player, 1);
 
             if(tile!=null)
-            listener.onEvent(eventCrafter(GameState.PICK_RESERVED_CARD, tile, player));
+                listener.onEvent(eventCrafter(GameState.PICK_RESERVED_CARD, tile, player));
             else{
                 listener.onEvent(eventCrafter(GameState.VOID_RESERVED_SPOT, null, null));
                 listener.onEvent(eventCrafter(GameState.ASSEMBLY, null, player));

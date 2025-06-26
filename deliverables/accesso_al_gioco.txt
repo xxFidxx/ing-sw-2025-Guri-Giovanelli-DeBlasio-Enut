@@ -1,0 +1,49 @@
+Sequence Diagram Description – "Access to the Game"
+This sequence diagram represents the process of a client accessing or creating a game lobby in a multiplayer system. The interaction involves four main components:
+
+Client
+
+Server
+
+
+1. Creating the Lobby
+The Client sends a createLobby(size) request to the Server.
+
+The Server forwards this request as createLobby(number) to the Controller.
+
+Conditional Check 1: [lobby != null]
+If a lobby is already created (lobby != null), the Server returns the message "lobby is already set" to the Client.
+
+Otherwise, the system transitions into the LOBBY_PHASE:
+
+The Server notifies the listener: listener.OnEvent(LOBBY_PHASE)
+
+The Client updates its view: showUpdate(LOBBY_PHASE)
+
+2. Adding a Nickname
+The Client sends a nickname via addNickname(client, input) to the Server.
+
+Conditional Check 2: [realClients.size() < lobbySize]
+If there is room in the lobby:
+
+The Server adds the client to the list: realClients.add(Client)
+
+Then it invokes addNickname(ClientListenerRmi, nickname) on the Controller
+
+The Controller forwards this to the Lobby: setPlayersNicknames(nickname)
+
+3. Game Initialization or Waiting
+Conditional Check 3: [lobby.isFull()]
+If the lobby is full:
+
+The Controller initializes the game using: gameInit()
+
+The Server notifies: listener.OnEvent(GAME_INIT)
+
+The Client updates: showUpdate(GAME_INIT)
+
+Otherwise:
+
+The Server triggers: listener.OnEvent(WAIT_LOBBY)
+
+The Client updates: showUpdate(WAIT_LOBBY)

@@ -8,10 +8,6 @@ import java.util.Stack;
 
 public class StardustCard extends AdventureCard  {
 
-    public StardustCard(String name, int level, int lostDays, Deck deck) {
-        super(name, level,deck);
-    }
-
     public StardustCard(String name, int level, int lostDays) {
         super(name, level);
     }

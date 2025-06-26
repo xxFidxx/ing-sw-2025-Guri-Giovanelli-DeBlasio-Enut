@@ -118,7 +118,7 @@ public class Game{
             tile = assemblingTiles[Tileid];
         }
 
-        if(assemblingTiles[Tileid] == null )
+        if(assemblingTiles[Tileid] == null)
             return null;
 
         player.setHandTile(tile);
@@ -132,7 +132,7 @@ public class Game{
         ComponentTile tile = (tileIndex >= 0 && tileIndex < reserve.size()) ? reserve.get(tileIndex) : null;
 
 
-        if(tile == null )
+        if(tile == null)
             return null;
 
         player.setHandTile(tile);

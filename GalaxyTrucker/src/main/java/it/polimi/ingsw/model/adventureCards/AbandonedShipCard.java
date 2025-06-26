@@ -9,13 +9,6 @@ public class AbandonedShipCard extends AdventureCard {
     private int credits;
     private Player activatedPlayer;
 
-    public AbandonedShipCard(String name, int level, int lostDays, int lostCrew,  int credits, Deck deck) {
-        super(name, level, deck);
-        this.lostDays = lostDays;
-        this.lostCrew = lostCrew;
-        this.credits = credits;
-    }
-
     public AbandonedShipCard(String name, int level, int lostDays, int lostCrew,  int credits) {
         super(name, level);
         this.lostDays = lostDays;

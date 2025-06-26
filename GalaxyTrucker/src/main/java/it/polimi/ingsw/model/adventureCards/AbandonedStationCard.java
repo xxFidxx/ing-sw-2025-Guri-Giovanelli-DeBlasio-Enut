@@ -12,14 +12,6 @@ public class AbandonedStationCard extends AdventureCard {
         private GoodsBlock[] reward;
         private Player activatedPlayer;
 
-
-        public AbandonedStationCard(String name, int level, Deck deck, int lostDays, int requiredCrew, GoodsBlock[] reward) {
-            super(name, level, deck);
-            this.lostDays = lostDays;
-            this.requiredCrew = requiredCrew;
-            this.reward = reward;
-        }
-
         public AbandonedStationCard(String name, int level, int lostDays, int requiredCrew, GoodsBlock[] reward) {
             super(name, level);
             this.lostDays = lostDays;

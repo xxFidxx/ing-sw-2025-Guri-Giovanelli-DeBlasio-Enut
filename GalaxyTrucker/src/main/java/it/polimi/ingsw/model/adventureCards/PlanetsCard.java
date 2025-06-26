@@ -13,12 +13,6 @@ public class PlanetsCard extends AdventureCard {
     private Player activatedPlayer;
     private Planet chosenPlanet;
 
-    public PlanetsCard(String name, int level, ArrayList<Planet> planets, int lostDays, Deck deck) {
-        super(name, level, deck);
-        this.lostDays = lostDays;
-        this.planets = planets;
-    }
-
     public PlanetsCard(String name, int level, ArrayList<Planet> planets, int lostDays) {
         super(name, level);
         this.lostDays = lostDays;

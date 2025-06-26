@@ -13,12 +13,6 @@ public abstract class EnemyCard extends AdventureCard {
     private int lostDays;
     private Player activatedPlayer;
 
-    public EnemyCard(String name, int level, Deck deck, int cannonStrength, int lostDays) {
-        super(name, level, deck);
-        this.cannonStrength = cannonStrength;
-        this.lostDays = lostDays;
-    }
-
     public EnemyCard(String name, int level, int cannonStrength, int lostDays) {
         super(name, level);
         this.cannonStrength = cannonStrength;
