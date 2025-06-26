@@ -844,7 +844,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
             case LEAST_CREW -> System.out.print("You have the least crew");
-            case LEAST_ENGINE -> System.out.println("You have the least engine strenght");
+            case LEAST_ENGINE -> System.out.println("You have the least engine strength");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
             case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");

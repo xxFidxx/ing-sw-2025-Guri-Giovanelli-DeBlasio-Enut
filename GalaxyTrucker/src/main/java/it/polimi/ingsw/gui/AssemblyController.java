@@ -225,7 +225,12 @@ public class AssemblyController extends Controller {
     }
 
     @FXML
-    private void handleNext() {
+    private void handleNext(){
+        try{
+            clientRmi.server.endCrafting(clientRmi);
+        }catch (Exception e){
+            ShowTextUtils.showTextVolatile("Exception",e.getMessage());
+        }
         sceneManager.switchTo("game");
     }
 
