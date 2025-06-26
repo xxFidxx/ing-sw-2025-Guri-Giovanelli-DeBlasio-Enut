@@ -532,8 +532,8 @@ public class Controller{
 
     public void restoreReconnectedPlayers(){
         lastMethodCalled = null;
-        currentGameState = GameState.TURN_START;
         System.out.println("lastMethodCalled = null;");
+        currentGameState = GameState.TURN_START;
         List<Player> playersToRestore = new ArrayList<>(reconnectedPlayers);
 
         for (Player player : playersToRestore) {
@@ -2600,6 +2600,7 @@ public class Controller{
     public boolean startTimer() {
 
         Timer timer = game.getTimer();
+
         if(timer.isDone())
             timer.reset();
         else
@@ -2618,17 +2619,18 @@ public class Controller{
             }
             System.out.println("Timer done");
 
-            if(currentGameState == GameState.ASSEMBLY){
-                notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
+                if(currentGameState == GameState.ASSEMBLY){
+                    notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
 
-                for(ClientListener listener: realListeners) {
-                    try {
-                        playerIsDoneCrafting(listener);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-            }
-
+                    for(ClientListener listener: realListeners) {
+                        if(!isDone.get(playerbyListener.get(listener))){
+                            try {
+                                playerIsDoneCrafting(listener);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                }
             }
         }).start();
 
@@ -2684,7 +2686,6 @@ public class Controller{
             isDonePirates.remove(disconnectedPlayer);
             checklastMethodCalled(disconnectedPlayer);
         }
-
     }
 
     private void checklastMethodCalled(Player disconnectedPlayer) {
