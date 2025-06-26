@@ -1798,7 +1798,6 @@ public class Controller{
     public void printSpaceshipAdjustment(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().tileGridToStringAdjustments();
-        DataString ds = new DataString(complete_ship);
         lastMethodCalled = "printSpaceshipAdjustment";
         System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
         DataString ds = new DataString(complete_ship, player.getSpaceshipPlance().getTileIds());
@@ -2000,7 +1999,6 @@ public class Controller{
     private void printSpaceshipParts(ClientListener listener) {
         Player player = playerbyListener.get(listener);
         String complete_ship = player.getSpaceshipPlance().tileGridToStringParts();
-        DataString ds = new DataString(complete_ship);
         lastMethodCalled = "printSpaceshipParts";
         System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
         DataString ds = new DataString(complete_ship, player.getSpaceshipPlance().getTileIds());
