@@ -1,2 +1,0 @@
-Il server contiene una lista con tutte le carte componenti ancora disponibili.
-Questa lista viene stampata al client. Il client può scegliere se piazzare una carta sulla propria navicella (e poi una volta li ruotarla, vedi agganciare carta componente). Inoltre può scegliere di metterla in deposito, se c'è ancora spazio disponibile. Tutto questo mentre si è nella fase di costruzione della navicella.
