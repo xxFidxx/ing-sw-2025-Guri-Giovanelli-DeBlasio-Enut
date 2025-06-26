@@ -81,6 +81,8 @@ public class Controller{
 
     // Setter e getter utili per il testing
     public void setPlayers(ArrayList<Player> players) { this.players = players;}
+    public void setTmpPlayers(ArrayList<Player> tmpPlayers) { this.tmpPlayers = tmpPlayers;}
+    public ArrayList<Player> getTmpPlayers() { return tmpPlayers; }
     public void addRealListener(ClientListener listener) { realListeners.add(listener);}
     public void addRealListeners(Collection<ClientListener> listeners) { this.realListeners.addAll(listeners);}
     public void addPlayerListenerPair(ClientListener listener, Player player) {
@@ -94,6 +96,7 @@ public class Controller{
     public AdventureCard getCurrentAdventureCard(){
         return currentAdventureCard;
     }
+    public void setCurrentAdventureCard(AdventureCard currentAdventureCard) { this.currentAdventureCard = currentAdventureCard;}
 
 
     public boolean getPause(){
@@ -671,7 +674,6 @@ public class Controller{
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
-
             }
 
             case OpenSpaceCard osc -> {
@@ -705,7 +707,6 @@ public class Controller{
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
-
             }
 
             case SlaversCard sl -> {
@@ -909,7 +910,7 @@ public class Controller{
         }
     }
 
-    private void handleEarlyEnd(Player player) {
+    public void handleEarlyEnd(Player player) {
         ClientListener listener = listenerbyPlayer.get(player);
         isDone.remove(player);
         System.out.println("handleEarlyEnd " + player);
@@ -941,7 +942,7 @@ public class Controller{
                     playerHit(l);
                 } else {
                     l.onEvent(eventCrafter(GameState.NO_EXPOSED_CONNECTORS, null, null));
-                    waitForNextShotMetheor(l);
+                    waitForNextShotMeteor(l);
                 }
             }
             case BigMeteor bm -> {
@@ -953,12 +954,12 @@ public class Controller{
                 System.out.println("activateMeteor: result " + result);
                 if (result == -1) {
                     l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
-                    waitForNextShotMetheor(l);
+                    waitForNextShotMeteor(l);
                 } else if (result == 0) {
                     playerHit(l);
                 } else if (result == 1) {
                     l.onEvent(eventCrafter(GameState.SINGLE_CANNON_PROTECTION, null, null));
-                    waitForNextShotMetheor(l);
+                    waitForNextShotMeteor(l);
                 } else {
                     lastMethodCalled = "checkProtection";
                     System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
@@ -1025,7 +1026,6 @@ public class Controller{
         listener.onEvent(eventCrafter(GameState.GET_CREDITS, c, null));
         currentAdventureCard.activate();
         crewended=true;
-        //sendToCrewManagement(p);
         int lostCrew = ((AbandonedShipCard)currentAdventureCard).getLostCrew();
         listener.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostCrew, p));
     }
@@ -1410,7 +1410,7 @@ public class Controller{
         while (i < length && shots[i] == null) {
             i++;
         }
-        if (i == length) {
+        if (i == length || minEquipPlayer == null) {
             System.out.println("combatZoneShots: mando in resetShowAndDraw ");
             resetShowAndDraw();
             return;
@@ -1566,7 +1566,7 @@ public class Controller{
             }
 
         }else {
-            // it means I am entring here from restorePlayers
+            // it means I am entering here from restorePlayers
             if (listener != null) {
                 Player player = playerbyListener.get(listener);
                 isDone.put(player, true);
@@ -1980,18 +1980,25 @@ public class Controller{
                 }else{
                     switch(currentAdventureCard) {
                         case CombatZoneCard czc -> {
-                            Player p = playerbyListener.get(listener);
+                            Player p = null;
+                            if(listener != null)
+                                p = playerbyListener.get(listener);
                             System.out.println("removeAdjust: vado in combatZoneShots");
                             combatZoneShots(p);
                         }
-                        case MeteorSwarmCard msc -> waitForNextShotMetheor(listener);
+                        case MeteorSwarmCard msc -> waitForNextShotMeteor(listener);
                         case PiratesCard pc -> waitForNextShotPirates(listener);
                         default -> throw new IllegalStateException();
                     }
                 }
             } else {
-                System.out.println("removeAdjust: vado in printSpaceshipParts");
-                printSpaceshipParts(listener);
+                if(listener != null) {
+                    System.out.println("removeAdjust: vado in printSpaceshipParts");
+                    printSpaceshipParts(listener);
+                } else {
+                    if (handleAdjustmentEnded())
+                        resetIsDoneDraw();
+                }
             }
         }
     }
@@ -2036,7 +2043,7 @@ public class Controller{
                             System.out.println("selectShipPart: vado in combatZoneShots");
                             combatZoneShots(p);
                         }
-                        case MeteorSwarmCard msc -> waitForNextShotMetheor(listener);
+                        case MeteorSwarmCard msc -> waitForNextShotMeteor(listener);
                         case PiratesCard pc -> waitForNextShotPirates(listener);
                         default -> {
                             isDone.put(playerbyListener.get(listener), true);
@@ -2129,7 +2136,7 @@ public class Controller{
         }
     }
 
-    public void waitForNextShotMetheor(ClientListener listener) {
+    public void waitForNextShotMeteor(ClientListener listener) {
         if(listener!=null){
             lastMethodCalled = "waitForNextShot";
             System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
@@ -2138,16 +2145,11 @@ public class Controller{
         }
 
         if (!isDone.containsValue(false)) {
-            if (currentAdventureCard instanceof MeteorSwarmCard) {
-                isDone.replaceAll((c, v) -> false);
-                manageCard();
-            } /*else {
-                isDone.replaceAll((c, v) -> false);
-                defeatedByPirates();
-            }*/
+            isDone.replaceAll((c, v) -> false);
+            manageCard();
         } else {
             if(listener!=null)
-            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 
@@ -2164,7 +2166,7 @@ public class Controller{
             defeatedByPirates();
         } else {
             if(listener!=null)
-            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 
@@ -2393,7 +2395,7 @@ public class Controller{
                 else
                     combatZoneShots(p);
             }
-            case MeteorSwarmCard msc -> waitForNextShotMetheor(listener);
+            case MeteorSwarmCard msc -> waitForNextShotMeteor(listener);
             case OpenSpaceCard osc -> fromChargeToManage(listener);
             case PiratesCard pc -> {
                 if (piratesFlag)
@@ -2533,14 +2535,14 @@ public class Controller{
             }
         } else {
             if(l!=null)
-            l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
+                l.onEvent(eventCrafter(GameState.NO_HIT, null, null));
 
             switch(currentAdventureCard) {
                 case CombatZoneCard czc -> {
                     System.out.println("takeHit: vado in combatZoneShots");
                     combatZoneShots(p);
                 }
-                case MeteorSwarmCard msc -> waitForNextShotMetheor(l);
+                case MeteorSwarmCard msc -> waitForNextShotMeteor(l);
                 case PiratesCard pc -> waitForNextShotPirates(l);
                 default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
             }
@@ -2713,7 +2715,7 @@ public class Controller{
                 playerIsDoneCrafting(null);
                 break;
             case "waitForNextShot":
-                waitForNextShotMetheor(null);
+                waitForNextShotMeteor(null);
                 break;
             case "waitForNextShotPirates":
                 waitForNextShotPirates(null);
