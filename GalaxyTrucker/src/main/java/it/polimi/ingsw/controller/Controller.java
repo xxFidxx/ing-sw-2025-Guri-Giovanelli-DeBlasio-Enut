@@ -23,7 +23,7 @@ public class Controller{
     private Lobby lobby;
     private GameState currentGameState = GameState.IDLE;
     private final List<ClientListener> listeners = new ArrayList<>();
-    private final List<ClientListener> registredListeners = new ArrayList<>();
+    private final HashMap<ClientListener,String> registredListeners = new HashMap<>();
     private final List<ClientListener> realListeners = new ArrayList<>();
     private final boolean[] busyDecks;
     public final Map<ClientListener, Player> playerbyListener = new HashMap<>();
@@ -158,23 +158,26 @@ public class Controller{
         notifyAllListeners(event);
     }
 
-    public void addNickname(ClientListener listener, String nickname) throws LobbyExceptions {
+    public boolean addNickname(ClientListener listener, String nickname) throws LobbyExceptions {
         if (lobby == null)
             throw new LobbyExceptions("Not existing lobby");
 
         if(GameState.LOBBY_PHASE.equals(currentGameState)){
             lobby.setPlayersNicknames(nickname);
-            registredListeners.add(listener);
+            registredListeners.put(listener,nickname);
             realListeners.add(listener);
 
-            for (ClientListener l : registredListeners) {
+            for (ClientListener l : registredListeners.keySet()) {
                 l.onEvent(eventCrafter(GameState.WAIT_LOBBY, null, null));
             }
 
             if (lobby.isFull()) {
                 gameInit();
+                return true;
             }
+            return false;
         }
+        return true;
     }
 
     public void addTile(ClientListener listener, int xIndex, int yIndex) throws SpaceShipPlanceException {
@@ -520,15 +523,14 @@ public class Controller{
 
     public void restoreReconnectedPlayers(){
         lastMethodCalled = null;
+        currentGameState = GameState.TURN_START;
         System.out.println("lastMethodCalled = null;");
         List<Player> playersToRestore = new ArrayList<>(reconnectedPlayers);
 
         for (Player player : playersToRestore) {
-            players.add(player);
             realListeners.add(listenerbyPlayer.get(player));
             isDone.put(player, false);
             isDonePirates.put(player, false);
-            reconnectedPlayers.remove(player);
         }
 
         boolean allOk = true;
@@ -545,6 +547,7 @@ public class Controller{
             } else {
                 players.add(p);
                 isDone.put(p, true);
+                reconnectedPlayers.remove(p);
             }
         }
 
@@ -552,13 +555,20 @@ public class Controller{
             resetIsDoneDraw();
         } else {
             for(Player p: players){
-                ClientListener l = listenerbyPlayer.get(p);
-                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                    ClientListener l = listenerbyPlayer.get(p);
+                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
         }
     }
 
     private void resetIsDoneDraw() {
+
+        for(Player player: reconnectedPlayers){
+            players.add(player);
+        }
+
+        reconnectedPlayers.clear();
+
         for(Player p: players){
             isDone.put(p, false);
         }
@@ -568,7 +578,7 @@ public class Controller{
 
     public void drawCard() {
 
-        currentGameState = GameState.TURN_START;
+
         notifyAllRealListeners(eventCrafter(GameState.TURN_START, null, null));
 
         if (!cards.isEmpty() || players.isEmpty()) {
@@ -1952,17 +1962,24 @@ public class Controller{
             }
         } else {
             if (stumps <= 1) {
-                switch(currentAdventureCard) {
-                    case CombatZoneCard czc -> {
-                        Player p = playerbyListener.get(listener);
-                        System.out.println("removeAdjust: vado in combatZoneShots");
-                        combatZoneShots(p);
+                if( currentGameState == GameState.TURN_START){
+                    isDone.put(player,true);
+                    if (handleAdjustmentEnded())
+                        resetIsDoneDraw();
+                    else
+                        listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                }else{
+                    switch(currentAdventureCard) {
+                        case CombatZoneCard czc -> {
+                            Player p = playerbyListener.get(listener);
+                            System.out.println("removeAdjust: vado in combatZoneShots");
+                            combatZoneShots(p);
+                        }
+                        case MeteorSwarmCard msc -> waitForNextShot(listener);
+                        case PiratesCard pc -> waitForNextShotPirates(listener);
+                        default -> throw new IllegalStateException();
                     }
-                    case MeteorSwarmCard msc -> waitForNextShot(listener);
-                    case PiratesCard pc -> waitForNextShotPirates(listener);
-                    default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
                 }
-
             } else {
                 System.out.println("removeAdjust: vado in printSpaceshipParts");
                 printSpaceshipParts(listener);
@@ -1998,14 +2015,28 @@ public class Controller{
             if (!p.getSpaceshipPlance().checkCorrectness()) {
                 printSpaceshipAdjustment(listener);
             } else {
-                switch(currentAdventureCard) {
-                    case CombatZoneCard czc -> {
-                        System.out.println("selectShipPart: vado in combatZoneShots");
-                        combatZoneShots(p);
+                if( currentGameState == GameState.TURN_START){
+                    isDone.put(playerbyListener.get(listener),true);
+                    if (handleAdjustmentEnded())
+                        resetIsDoneDraw();
+                    else
+                        listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                }else {
+                    switch (currentAdventureCard) {
+                        case CombatZoneCard czc -> {
+                            System.out.println("selectShipPart: vado in combatZoneShots");
+                            combatZoneShots(p);
+                        }
+                        case MeteorSwarmCard msc -> waitForNextShot(listener);
+                        case PiratesCard pc -> waitForNextShotPirates(listener);
+                        default -> {
+                            isDone.put(playerbyListener.get(listener), true);
+                            if (handleAdjustmentEnded())
+                                resetIsDoneDraw();
+                            else
+                                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                        }
                     }
-                    case MeteorSwarmCard msc -> waitForNextShot(listener);
-                    case PiratesCard pc -> waitForNextShotPirates(listener);
-                    default -> throw new IllegalStateException("Unexpected value: " + currentAdventureCard);
                 }
                 /*if(currentAdventureCard instanceof MeteorSwarmCard){
                     waitForNextShot(listener);
@@ -2265,7 +2296,18 @@ public class Controller{
     }
 
     private boolean handleAdjustmentEnded() {
-            return !isDone.containsValue(false);
+
+        Map<String, Boolean> nicknameMap = isDone.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getNickname(),
+                        Map.Entry::getValue
+                ));
+
+        nicknameMap.forEach((nickname, done) ->
+                System.out.println(nickname + " -> " + done)
+        );
+
+        return !isDone.containsValue(false);
     }
 
     public void handleSurrenderEnded(ClientListener listener) {
@@ -2607,6 +2649,17 @@ public class Controller{
     }
 
     public void handleDisconnect(ClientListenerRmi listener) {
+        if(currentGameState == GameState.LOBBY_PHASE){
+            lobby.removePlayerNickname(registredListeners.get(listener));
+            registredListeners.remove(listener);
+            realListeners.remove(listener);
+
+            for (ClientListener l : registredListeners.keySet()) {
+                l.onEvent(eventCrafter(GameState.WAIT_LOBBY, null, null));
+            }
+
+            return;
+        }
         Player disconnectedPlayer = playerbyListener.get(listener);
 
         disconnectedPlayers.add(disconnectedPlayer);

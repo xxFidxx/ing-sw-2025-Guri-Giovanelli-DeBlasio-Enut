@@ -36,7 +36,18 @@ public class Lobby {
         if(playersNicknames.size() == numPlayers) {
             isFull = true;
         }
+
     }
+
+    public void removePlayerNickname(String name){
+        if (playersNicknames.contains(name)) {
+            playersNicknames.remove(name);
+        }else{
+            System.out.println("Nome non trovato tra quelli in lobby: " + name);
+        }
+    }
+
+
 
     public boolean isFull() {
         return isFull;

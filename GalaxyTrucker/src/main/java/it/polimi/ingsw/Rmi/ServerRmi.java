@@ -32,6 +32,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final ArrayList<String> disconnectedPlayersNicks;
     private final Object lock = new Object();
     int lobbySize;
+    boolean gameStarted;
     boolean gameEnded;
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
@@ -52,6 +53,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         this.disconnectedPlayersNicks = new ArrayList<>();
         this.lobbySize = 0;
         this.gameEnded = false;
+        this.gameStarted = false;
 
         checkPings();
     }
@@ -116,15 +118,22 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
             synchronized (lock) {
                 clientbyNickname.remove(disconnectedNick);
-                disconnectedPlayersNicks.add(disconnectedNick);
                 realClientListeners.remove(client);
                 realClients.remove(client);
             }
+
+            if(gameStarted)
+                disconnectedPlayersNicks.add(disconnectedNick);
 
             checkPauseGame();
         }
 
     private void checkPauseGame() throws Exception {
+
+        if(!gameStarted){
+            return;
+        }
+
         synchronized (realClients) {
             if (realClients.size() == 1) {
                 VirtualView client = realClients.getFirst();
@@ -218,7 +227,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     @Override
     public void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions, InterruptedException {
         if(!gameEnded){
-            if((realClients.size() + disconnectedPlayersNicks.size()) < lobbySize ){
+            if(!gameStarted){
                 realClients.add(client);
                 ClientListenerRmi clientListenerRmi = clientListeners.get(client);
                 realClientListeners.put(client, clientListenerRmi);
@@ -226,7 +235,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                 clientbyNickname.put(nickname, client);
                 nicknamebyClient.put(client,nickname);
                 synchronized(controller){
-                    controller.addNickname(clientListenerRmi,nickname);
+                    gameStarted = controller.addNickname(clientListenerRmi,nickname);
                 }
                 System.out.println("Nickname added\n");
             }else{
