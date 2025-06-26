@@ -14,14 +14,6 @@ public class CombatZoneCard extends AdventureCard  {
     private int lostOther;
     private Projectile[] cannons;
 
-    public CombatZoneCard(String name, int level, int lostDays, int lostOther, Projectile[] cannons, Deck deck, CombatZoneType type) {
-        super(name, level, deck);
-        this.lostDays = lostDays;
-        this.lostOther = lostOther;
-        this.cannons = cannons;
-        this.type = type;
-    }
-
     public CombatZoneCard(String name, int level, int lostDays, int lostOther, Projectile[] cannons, CombatZoneType type) {
         super(name, level);
         this.lostDays = lostDays;

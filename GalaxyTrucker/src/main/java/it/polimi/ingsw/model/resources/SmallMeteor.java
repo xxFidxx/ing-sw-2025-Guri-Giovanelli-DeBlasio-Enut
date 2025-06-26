@@ -17,10 +17,6 @@ public class SmallMeteor extends Projectile {
         if (player.getSpaceshipPlance().checkExposedConnector(direction, position) == false) {
             return true; // se il player non ha dei connettori esposti in quella direzione e posizione ritorna true
         }
-        /*if (player.getSpaceshipPlance().getShieldActivation(direction) == true) {
-            return false;
-        }*/
         return false; // altrimenti ritorna false
-        // player.getSpaceshipPlance().takeHit(direction, position);
     }
 }

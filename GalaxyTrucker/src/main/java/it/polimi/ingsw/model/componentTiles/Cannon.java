@@ -3,8 +3,7 @@ package it.polimi.ingsw.model.componentTiles;
 
 import java.io.Serializable;
 
-public class Cannon extends ComponentTile implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Cannon extends ComponentTile {
     protected float power;
 
     public Cannon(ConnectorType[] connectors,int id) {

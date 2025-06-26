@@ -1,5 +1,15 @@
 [
   {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm 2",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 }
+    ]
+  },
+  {
     "type": "PlanetsCard",
     "name": "Planets 1",
     "level": 1,
@@ -28,16 +38,6 @@
     "name": "Stardust",
     "level": 1,
     "lostDays": 1
-  },
-  {
-    "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm 2",
-    "level": 1,
-    "meteors": [
-      { "type": 3, "direction": 0 },
-      { "type": 2, "direction": 3 },
-      { "type": 2, "direction": 1 }
-    ]
   },
   {
     "type": "SmugglersCard",

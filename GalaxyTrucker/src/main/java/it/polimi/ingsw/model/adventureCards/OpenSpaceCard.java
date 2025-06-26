@@ -10,10 +10,6 @@ import java.util.Comparator;
 public class OpenSpaceCard extends AdventureCard {
     private Player activatedPlayer;
 
-    public OpenSpaceCard(String name, int level, Deck deck) {
-        super(name, level, deck);
-    }
-
     public OpenSpaceCard(String name, int level) {
         super(name, level);
     }

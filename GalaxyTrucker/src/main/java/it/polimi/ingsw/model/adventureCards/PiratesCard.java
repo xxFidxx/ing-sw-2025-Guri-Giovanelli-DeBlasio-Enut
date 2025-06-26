@@ -12,12 +12,6 @@ public class PiratesCard extends EnemyCard {
     private Projectile[] shots; //liste o array?
     private int reward;
 
-    public PiratesCard(String name, int level, Deck deck, int cannonStrength, int lostDays, Projectile[] shots, int reward) {
-        super(name, level, deck, cannonStrength, lostDays);
-        this.shots = shots;
-        this.reward = reward;
-    }
-
     public PiratesCard(String name, int level, int cannonStrength, int lostDays, Projectile[] shots, int reward) {
         super(name, level, cannonStrength, lostDays);
         this.shots = shots;

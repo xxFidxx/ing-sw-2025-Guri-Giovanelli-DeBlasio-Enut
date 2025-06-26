@@ -74,7 +74,8 @@ public class ControllerTest {
 
         controller.drawCard();
 
-        assertEquals(GameState.TURN_START, controller.getCurrentGameState());
+        verify(listener1).onEvent(argThat(event -> event.getState() == GameState.TURN_START));
+        verify(listener2).onEvent(argThat(event -> event.getState() == GameState.TURN_START));
 
         // Verifica che venga notificata la carta pescata
         verify(listener1).onEvent(argThat(event -> event.getState() == GameState.DRAW_CARD));

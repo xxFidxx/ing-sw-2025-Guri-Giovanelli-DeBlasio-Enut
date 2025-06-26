@@ -2,8 +2,7 @@ package it.polimi.ingsw.model.componentTiles;
 
 import java.io.Serializable;
 
-public class DoubleCannon extends Cannon implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class DoubleCannon extends Cannon {
     private boolean isCharged;
 
     public DoubleCannon(ConnectorType[] connectors,int id) {

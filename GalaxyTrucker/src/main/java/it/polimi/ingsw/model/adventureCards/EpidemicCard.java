@@ -9,10 +9,6 @@ import java.util.ArrayList;
 
 public class EpidemicCard extends AdventureCard  {
 
-    public EpidemicCard(String name, int level, Deck deck){
-        super(name, level, deck);
-    }
-
     public EpidemicCard(String name, int level){
         super(name, level);
     }
