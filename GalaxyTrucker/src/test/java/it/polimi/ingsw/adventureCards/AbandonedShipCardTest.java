@@ -1,76 +1,84 @@
 package it.polimi.ingsw.adventureCards;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
 import it.polimi.ingsw.model.game.Deck;
 import it.polimi.ingsw.model.game.Flightplance;
-import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.Player;
-import static org.mockito.Mockito.*;
-
+import it.polimi.ingsw.model.game.SpaceshipPlance;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 
 public class AbandonedShipCardTest {
 
-    private Game game;
-    private Flightplance flightPlance;
-    private Deck deck;
-    private Player player;
     private AbandonedShipCard card;
+    private Player mockPlayer;
+    private Deck mockDeck;
+    private Flightplance mockFlightPlance;
+    private SpaceshipPlance mockSpaceshipPlance;
 
-//    @Before
-//    public void setUp() {
-//        game = mock(Game.class);
-//        flightPlance = mock(Flightplance.class);
-//        deck = mock(Deck.class);
-//        player = mock(Player.class);
-//
-//        when(deck.getFlightPlance()).thenReturn(flightPlance);
-//        when(flightPlance.getGame()).thenReturn(game);
-//        when(game.choosePlayer(any())).thenReturn(player);
-//
-//        // Creo la carta con lostDays = 1, lostCrew = 3, credits = 4
-//        card = new AbandonedShipCard("Nave", 1, 1, 3, 4, deck);
-//    }
+    @Before
+    public void setUp() {
+        // Crea la carta con 1 giorni persi, 2 membri equipaggio persi, 3 crediti guadagnati
+        card = new AbandonedShipCard("Abandoned Ship", 1, 1, 2, 3);
 
-//    @Test
-//    public void testActivate_shouldApplyEffectsToPlayer() {
-//        when(player.getNumEquip()).thenReturn(5); // Equipaggio iniziale
-//        when(player.getCredits()).thenReturn(3);  // Crediti iniziali
-//
-//        card.activate();
-//
-//        verify(game).choosePlayer(card);
-//        verify(player).setNumEquip(2);     // 5 - 3
-//        verify(player).setCredits(7);      // 3 + 4
-//        verify(flightPlance).move(-1, player); // lostDays = 1
-//    }
+        // Mock delle dipendenze
+        mockPlayer = mock(Player.class);
+        mockDeck = mock(Deck.class);
+        mockFlightPlance = mock(Flightplance.class);
+        mockSpaceshipPlance = mock(SpaceshipPlance.class);
 
-//    @Test
-//    public void testActivate_withNullPlayer_shouldDoNothing() {
-//        when(game.choosePlayer(card)).thenReturn(null);
-//
-//        card.activate();
-//
-//        verify(player, never()).setNumEquip(anyInt());
-//        verify(player, never()).setCredits(anyInt());
-//        verify(flightPlance, never()).move(anyInt(), any());
-//    }
+        when(mockPlayer.getSpaceshipPlance()).thenReturn(mockSpaceshipPlance);
 
-//    @Test
-//    public void testCheckCondition_whenPlayerHasEnoughCrew_shouldReturnTrue() {
-//        when(player.getNumEquip()).thenReturn(3); // Uguale a lostCrew
-//        assertTrue(card.checkCondition(player));
-//
-//        when(player.getNumEquip()).thenReturn(5); // Maggiore di lostCrew
-//        assertTrue(card.checkCondition(player));
-//    }
+        // Iniettiamo il mock della plancia nel deck
+        when(mockDeck.getFlightPlance()).thenReturn(mockFlightPlance);
 
-//    @Test
-//    public void testCheckCondition_whenPlayerHasNotEnoughCrew_shouldReturnFalse() {
-//        when(player.getNumEquip()).thenReturn(2); // Minore di lostCrew
-//        assertFalse(card.checkCondition(player));
-//    }
+        // Impostiamo il deck nella superclasse
+        card.setDeck(mockDeck);
+
+        // Impostiamo il giocatore attivato
+        card.setActivatedPlayer(mockPlayer);
+    }
+
+    @Test
+    public void testActivate_addsCreditsAndMovesBackDays() {
+        // Simula che il giocatore abbia inizialmente 10 crediti
+        when(mockPlayer.getCredits()).thenReturn(10);
+
+        // Attiva la carta
+        card.activate();
+
+        // Verifica che i crediti siano aggiornati correttamente
+        verify(mockPlayer).setCredits(13); // 10 + 3
+
+        // Verifica che il giocatore venga spostato indietro di 2 giorni
+        verify(mockFlightPlance).move(-1, mockPlayer);
+    }
+
+    @Test
+    public void testCheckCondition_returnsTrue_whenEnoughCrew() {
+        // Crew is 3, which is >= lostCrew (2)
+        when(mockSpaceshipPlance.getCrew()).thenReturn(3);
+
+        assertTrue(card.checkCondition(mockPlayer));
+    }
+
+    @Test
+    public void testCheckCondition_returnsTrue_whenExactlyEnoughCrew() {
+        // Crew is exactly 2
+        when(mockSpaceshipPlance.getCrew()).thenReturn(2);
+
+        assertTrue(card.checkCondition(mockPlayer));
+    }
+
+    @Test
+    public void testCheckCondition_returnsFalse_whenNotEnoughCrew() {
+        // Crew is 1, which is < lostCrew (2)
+        when(mockSpaceshipPlance.getCrew()).thenReturn(1);
+
+        assertFalse(card.checkCondition(mockPlayer));
+    }
+
 }

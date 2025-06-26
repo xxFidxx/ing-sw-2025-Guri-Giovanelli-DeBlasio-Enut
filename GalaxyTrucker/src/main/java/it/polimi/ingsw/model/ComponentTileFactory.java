@@ -14,7 +14,7 @@ import java.util.List;
 public class ComponentTileFactory {
 
     public static List<ComponentTile> loadTiles(Game game) {
-        try (var inputStream = ComponentTileFactory.class.getClassLoader().getResourceAsStream("tiles.json")) {
+        try (var inputStream = ComponentTileFactory.class.getClassLoader().getResourceAsStream("jsons/tiles.json")) {
             if (inputStream == null) {
                 throw new IllegalArgumentException("tiles/tiles.json non trovato nel classpath!");
             }

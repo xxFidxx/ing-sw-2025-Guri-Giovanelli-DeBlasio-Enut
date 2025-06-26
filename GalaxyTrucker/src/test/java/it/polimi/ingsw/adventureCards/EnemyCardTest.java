@@ -1,102 +1,90 @@
 package it.polimi.ingsw.adventureCards;
 
-import it.polimi.ingsw.model.adventureCards.EnemyCard;
-import it.polimi.ingsw.model.game.Deck;
-import it.polimi.ingsw.model.game.Flightplance;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.game.Player;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import it.polimi.ingsw.model.game.Deck;
+import it.polimi.ingsw.model.game.Flightplance;
+import it.polimi.ingsw.model.game.Player;
+import org.junit.Before;
+import org.junit.Test;
 
 public class EnemyCardTest {
-    private Deck deck;
-    private Flightplance flightPlance;
-    private Game game;
-    private Player strongPlayer;
-    private Player weakPlayer;
-    private DummyEnemyCard card;
+
+    private ConcreteEnemyCard dummyCard;
+    private Player mockPlayer;
+    private Deck mockDeck;
+    private Flightplance mockFlightPlance;
 
     @Before
     public void setUp() {
-        deck = mock(Deck.class);
-        flightPlance = mock(Flightplance.class);
-        game = mock(Game.class);
-        strongPlayer = mock(Player.class);
-        weakPlayer = mock(Player.class);
+        mockPlayer = mock(Player.class);
+        mockDeck = mock(Deck.class);
+        mockFlightPlance = mock(Flightplance.class);
 
-        when(deck.getFlightPlance()).thenReturn(flightPlance);
-        when(flightPlance.getGame()).thenReturn(game);
-        doNothing().when(game).orderPlayers();
+        when(mockDeck.getFlightPlance()).thenReturn(mockFlightPlance);
 
-
-        ArrayList<Player> players = new ArrayList<>();
-        players.add(weakPlayer);
-        players.add(strongPlayer);
-        when(game.getPlayers()).thenReturn(players);
-
-        when(strongPlayer.getFireStrenght()).thenReturn(5f);
-        when(weakPlayer.getFireStrenght()).thenReturn(2f);
-
-        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 3, 1); // cannonStrength = 3
+        // cannonStrength = 5, lostDays = 2
+        dummyCard = new ConcreteEnemyCard("Dummy", 1, 5, 2);
+        dummyCard.setActivatedPlayer(mockPlayer);
+        dummyCard.setDeck(mockDeck);
     }
 
     @Test
-    public void testActivate_playerWins_shouldCallReward() {
-        card.activate();
+    public void testGetFightOutcome_playerWins() {
+        when(mockPlayer.getFireStrenght()).thenReturn(6f); // > cannonStrength
 
-        assertTrue(card.rewardCalled);
-        assertFalse(card.penalizeCalled);
-
-        verify(flightPlance).move(-1, strongPlayer);
+        int outcome = dummyCard.getFightOutcome(mockPlayer);
+        assertEquals(1, outcome);
     }
 
     @Test
-    public void testActivate_playersLose_shouldCallPenalize() {
-        // Tutti i player sono deboli
-        when(strongPlayer.getFireStrenght()).thenReturn(1f);
-        when(weakPlayer.getFireStrenght()).thenReturn(2f);
+    public void testGetFightOutcome_playerLoses() {
+        when(mockPlayer.getFireStrenght()).thenReturn(3f); // < cannonStrength
 
-        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 5, 1); // cannonStrength = 5
-
-        card.activate();
-
-        assertFalse(card.rewardCalled);
-        assertTrue(card.penalizeCalled);
+        int outcome = dummyCard.getFightOutcome(mockPlayer);
+        assertEquals(-1, outcome);
     }
 
     @Test
-    public void testActivate_playersTie_shouldDoNothing() {
-        // Entrambi pareggiano con cannonStrength = 3
-        when(strongPlayer.getFireStrenght()).thenReturn(3f);
-        when(weakPlayer.getFireStrenght()).thenReturn(3f);
+    public void testGetFightOutcome_tie() {
+        when(mockPlayer.getFireStrenght()).thenReturn(5f); // = cannonStrength
 
-        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 3, 1);
-
-        card.activate();
-
-        assertFalse(card.rewardCalled);
-        assertFalse(card.penalizeCalled);
+        int outcome = dummyCard.getFightOutcome(mockPlayer);
+        assertEquals(0, outcome);
     }
 
-    /*@Test
-    public void testActivate_firstPlayerLoses_secondPlayerWins() {
-        when(strongPlayer.getFireStrenght()).thenReturn(3f);
-        when(weakPlayer.getFireStrenght()).thenReturn(7f);
+    @Test
+    public void testActivate_playerWins_callsRewardAndMovesBack() {
+        when(mockPlayer.getFireStrenght()).thenReturn(6f); // > cannonStrength
 
-        card = new DummyEnemyCard("Dummy Enemy", 1, deck, 5, 1);
+        dummyCard.activate();
 
-        card.activate();
+        assertTrue(dummyCard.rewardCalled);
+        assertFalse(dummyCard.penalizeCalled);
+        verify(mockFlightPlance).move(-2, mockPlayer);
+    }
 
-        verify(card).penalize(strongPlayer);
-        verify(card).reward(weakPlayer);
-        verify(flightPlance).move(-1, weakPlayer);
-    }*/
+    @Test
+    public void testActivate_playerLoses_callsPenalize() {
+        when(mockPlayer.getFireStrenght()).thenReturn(3f); // < cannonStrength
+
+        dummyCard.activate();
+
+        assertFalse(dummyCard.rewardCalled);
+        assertTrue(dummyCard.penalizeCalled);
+        verify(mockFlightPlance, never()).move(anyInt(), any());
+    }
+
+    @Test
+    public void testActivate_tie_callsNothing() {
+        when(mockPlayer.getFireStrenght()).thenReturn(5f); // = cannonStrength
+
+        dummyCard.activate();
+
+        assertFalse(dummyCard.rewardCalled);
+        assertFalse(dummyCard.penalizeCalled);
+        verify(mockFlightPlance, never()).move(anyInt(), any());
+    }
 }
+

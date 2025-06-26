@@ -1,28 +1,12 @@
 [
   {
-    "type": "StardustCard",
-    "name": "Stardust",
-    "level": 1,
-    "lostDays": 1
-  },
-  {
-    "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
-    "level": 1,
-    "meteors": [
-      { "type": 3, "direction": 0 },
-      { "type": 2, "direction": 3 },
-      { "type": 2, "direction": 1 }
-    ]
-  },
-  {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 1",
     "level": 1,
     "lostDays": 3,
     "planets": [
       [3, 1, 0, 0, 0],
-      [3, 2, 0, 0],
+      [3, 2, 0],
       [3, 0, 0, 0],
       [3, 1]
     ]
@@ -37,6 +21,22 @@
     "cannons": [
       { "type": 0, "direction": 2 },
       { "type": 1, "direction": 2 }
+    ]
+  },
+  {
+    "type": "StardustCard",
+    "name": "Stardust",
+    "level": 1,
+    "lostDays": 1
+  },
+  {
+    "type": "MeteorSwarmCard",
+    "name": "Meteor Swarm 2",
+    "level": 1,
+    "meteors": [
+      { "type": 3, "direction": 0 },
+      { "type": 2, "direction": 3 },
+      { "type": 2, "direction": 1 }
     ]
   },
   {
@@ -72,7 +72,7 @@
   },
   {
     "type": "AbandonedStationCard",
-    "name": "Abandoned Station",
+    "name": "Abandoned Station 1",
     "level": 1,
     "lostDays": 1,
     "requiredCrew": 5,
@@ -80,17 +80,27 @@
   },
   {
     "type": "OpenSpaceCard",
-    "name": "Open Space",
+    "name": "Open Space 1",
     "level": 1
   },
   {
     "type": "OpenSpaceCard",
-    "name": "Open Space",
+    "name": "Open Space 2",
+    "level": 1
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space 3",
+    "level": 1
+  },
+  {
+    "type": "OpenSpaceCard",
+    "name": "Open Space 4",
     "level": 1
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 2",
     "level": 1,
     "lostDays": 3,
     "planets": [
@@ -98,11 +108,6 @@
       [3,2,0],
       [2]
     ]
-  },
-  {
-    "type": "OpenSpaceCard",
-    "name": "Open Space",
-    "level": 1
   },
   {
     "type": "AbandonedShipCard",
@@ -114,7 +119,7 @@
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 3",
     "level": 1,
     "lostDays": 3,
     "planets": [
@@ -124,7 +129,7 @@
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 4",
     "level": 1,
     "lostDays": 1,
     "planets": [
@@ -135,7 +140,7 @@
   },
   {
     "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
+    "name": "Meteor Swarm 1",
     "level": 1,
     "meteors": [
       { "type": 2, "direction": 0 },
@@ -147,7 +152,7 @@
   },
   {
     "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
+    "name": "Meteor Swarm 3",
     "level": 1,
     "meteors": [
       { "type": 3, "direction": 0 },
@@ -157,7 +162,7 @@
   },
   {
     "type": "AbandonedStationCard",
-    "name": "Abandoned Station",
+    "name": "Abandoned Station 2",
     "level": 1,
     "lostDays": 1,
     "requiredCrew": 6,
@@ -171,7 +176,7 @@
   },
   {
     "type": "AbandonedShipCard",
-    "name": "Abandoned Ship",
+    "name": "Abandoned Ship 2",
     "level": 1,
     "lostDays": 1,
     "lostCrew": 3,
@@ -234,12 +239,12 @@
   },
   {
     "type": "OpenSpaceCard",
-    "name": "Open Space",
+    "name": "Open Space 1",
     "level": 2
   },
   {
     "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
+    "name": "Meteor Swarm 1",
     "level": 2,
     "meteors": [
       { "type": 2, "direction": 0 },
@@ -251,12 +256,12 @@
   },
   {
     "type": "OpenSpaceCard",
-    "name": "Open Space",
+    "name": "Open Space 2",
     "level": 2
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 4",
     "level": 2,
     "lostDays": 4,
     "planets": [
@@ -267,7 +272,7 @@
   },
   {
     "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
+    "name": "Meteor Swarm 2",
     "level": 2,
     "meteors": [
       { "type": 3, "direction": 0 },
@@ -278,7 +283,7 @@
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 3",
     "level": 2,
     "lostDays": 3,
     "planets": [
@@ -288,12 +293,12 @@
   },
   {
     "type": "OpenSpaceCard",
-    "name": "Open Space",
+    "name": "Open Space 3",
     "level": 2
   },
   {
     "type": "MeteorSwarmCard",
-    "name": "Meteor Swarm",
+    "name": "Meteor Swarm 3",
     "level": 2,
     "meteors": [
       { "type": 2, "direction": 0 },
@@ -305,7 +310,7 @@
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 1",
     "level": 2,
     "lostDays": 3,
     "planets": [
@@ -316,7 +321,7 @@
   },
   {
     "type": "AbandonedShipCard",
-    "name": "Abandoned Ship",
+    "name": "Abandoned Ship 1",
     "level": 2,
     "lostDays": 1,
     "lostCrew": 4,
@@ -324,7 +329,7 @@
   },
   {
     "type": "PlanetsCard",
-    "name": "Planets",
+    "name": "Planets 2",
     "level": 2,
     "lostDays": 2,
     "planets": [
@@ -336,7 +341,7 @@
   },
   {
     "type": "AbandonedShipCard",
-    "name": "Abandoned Ship",
+    "name": "Abandoned Ship 2",
     "level": 2,
     "lostDays": 2,
     "lostCrew": 5,
@@ -344,7 +349,7 @@
   },
   {
     "type": "AbandonedStationCard",
-    "name": "Abandoned Station",
+    "name": "Abandoned Station 1",
     "level": 2,
     "lostDays": 1,
     "requiredCrew": 7,
@@ -352,7 +357,7 @@
   },
   {
     "type": "AbandonedStationCard",
-    "name": "Abandoned Station",
+    "name": "Abandoned Station 2",
     "level": 2,
     "lostDays": 2,
     "requiredCrew": 8,

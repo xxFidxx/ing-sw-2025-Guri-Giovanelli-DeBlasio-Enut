@@ -51,21 +51,20 @@ public class ControllerTest {
         listener2 = mock(ClientListener.class);
 
         // Aggiungi ai map
-        controller.playerbyListener.put(listener1, player1);
-        controller.playerbyListener.put(listener2, player2);
-        controller.listenerbyPlayer.put(player1, listener1);
-        controller.listenerbyPlayer.put(player2, listener2);
+        controller.addPlayerListenerPair(listener1, player1);
+        controller.addPlayerListenerPair(listener2, player2);
 
         // Aggiungi alla lista giocatori
-        controller.players = new ArrayList<>(Arrays.asList(player1, player2));
-        controller.realListeners.addAll(Arrays.asList(listener1, listener2));
+        controller.setPlayers(new ArrayList<>(Arrays.asList(player1, player2)));
+        controller.addRealListeners(Arrays.asList(listener1, listener2));
 
         // Mock della carta avventura
         card = mock(AdventureCard.class);
         when(card.getName()).thenReturn("Pirates");
         when(card.getLevel()).thenReturn(1);
 
-        controller.cards = new LinkedList<>(Collections.singletonList(card));
+        controller.setCards(Collections.singletonList(card));
+
     }
 
     @Test
@@ -95,8 +94,8 @@ public class ControllerTest {
         when(gameMock.getEndStats()).thenReturn("test stats");
 
         controller.setGame(gameMock);
-        controller.cards = new LinkedList<>(); // lista vuota
-        controller.realListeners.add(listener1); // aggiungi listener per la notifica
+        controller.setCards(new LinkedList<>());  // lista vuota
+        controller.addRealListener(listener1); // aggiungi listener per la notifica
 
         controller.drawCard();
 
@@ -106,7 +105,6 @@ public class ControllerTest {
                         event.getData() instanceof DataString &&
                         ((DataString) event.getData()).getText().equals("test stats")
         ));
-
     }
 
 

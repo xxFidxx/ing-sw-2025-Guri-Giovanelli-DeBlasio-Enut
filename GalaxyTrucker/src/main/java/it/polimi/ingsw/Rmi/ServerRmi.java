@@ -32,6 +32,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     final ArrayList<String> disconnectedPlayersNicks;
     private final Object lock = new Object();
     int lobbySize;
+    boolean gameStarted;
+    boolean gameEnded;
 
     // per fare più partite in contemporanea dovrei fare una mappatura Map<Controller, String> dove a ogni controller leghi una lobby o un game
     // bisogna gestire bene cosa succede in caso di disconnessione durante le chiamate ai metodi
@@ -50,6 +52,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         this.lastEventSent = new ConcurrentHashMap<>();
         this.disconnectedPlayersNicks = new ArrayList<>();
         this.lobbySize = 0;
+        this.gameEnded = false;
+        this.gameStarted = false;
 
         checkPings();
     }
@@ -94,7 +98,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                         }
                 }
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -114,15 +118,22 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
             synchronized (lock) {
                 clientbyNickname.remove(disconnectedNick);
-                disconnectedPlayersNicks.add(disconnectedNick);
                 realClientListeners.remove(client);
                 realClients.remove(client);
             }
+
+            if(gameStarted)
+                disconnectedPlayersNicks.add(disconnectedNick);
 
             checkPauseGame();
         }
 
     private void checkPauseGame() throws Exception {
+
+        if(!gameStarted){
+            return;
+        }
+
         synchronized (realClients) {
             if (realClients.size() == 1) {
                 VirtualView client = realClients.getFirst();
@@ -188,6 +199,8 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
                 System.out.println("Saving event for nickname: '" + nickname + "' with state: " + event.getState());
                 lastEventSent.put(nickname, event);
             }
+            if(event.getState() == GameState.END_GAME)
+                gameEnded=true;
         } catch (RemoteException e) {
             System.out.println("Client disconnected: " + e);
         } catch (InterruptedException e) {
@@ -198,43 +211,46 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     @Override
     public void connect(VirtualViewRmi client) throws RemoteException {
-        synchronized (clients) {
-            clients.add(client);
+        if(!gameEnded){
+            synchronized (clients) {
+                clients.add(client);
+            }
+            ClientListenerRmi clientListenerRmi = new ClientListenerRmi( client, this);
+            clientListeners.put(client, clientListenerRmi);
+            synchronized(controller){
+                controller.addEventListener(clientListenerRmi);
+            }
+            System.out.println("Client connected");
         }
-        ClientListenerRmi clientListenerRmi = new ClientListenerRmi( client, this);
-        clientListeners.put(client, clientListenerRmi);
-        synchronized(controller){
-            controller.addEventListener(clientListenerRmi);
-        }
-        System.out.println("Client connected");
     }
 
     @Override
     public void addNickname(VirtualViewRmi client, String nickname) throws RemoteException, LobbyExceptions, InterruptedException {
-        if((realClients.size() + disconnectedPlayersNicks.size()) < lobbySize ){
-            realClients.add(client);
-            ClientListenerRmi clientListenerRmi = clientListeners.get(client);
-            realClientListeners.put(client, clientListenerRmi);
-            nicknames.add(nickname);
-            clientbyNickname.put(nickname, client);
-            nicknamebyClient.put(client,nickname);
-            synchronized(controller){
-                controller.addNickname(clientListenerRmi,nickname);
+        if(!gameEnded){
+            if(!gameStarted){
+                realClients.add(client);
+                ClientListenerRmi clientListenerRmi = clientListeners.get(client);
+                realClientListeners.put(client, clientListenerRmi);
+                nicknames.add(nickname);
+                clientbyNickname.put(nickname, client);
+                nicknamebyClient.put(client,nickname);
+                synchronized(controller){
+                    gameStarted = controller.addNickname(clientListenerRmi,nickname);
+                }
+                System.out.println("Nickname added\n");
+            }else{
+                System.out.println("Nickname given: " + nickname);
+                System.out.println("Nickname in use:");
+                for(String str : disconnectedPlayersNicks){
+                    System.out.println(str);
+                }
+                if(disconnectedPlayersNicks.contains(nickname)){
+                    handleReconnect(nickname, client);
+                }
+                else
+                    throw new LobbyExceptions("Sorry, your nickname doesn't match with any of disconnected players ones, you can't join");
             }
-            System.out.println("Nickname added\n");
-        }else{
-            System.out.println("Nickname given: " + nickname);
-            System.out.println("Nickname in use:");
-            for(String str : disconnectedPlayersNicks){
-                System.out.println(str);
-            }
-            if(disconnectedPlayersNicks.contains(nickname)){
-                handleReconnect(nickname, client);
-            }
-            else
-                throw new LobbyExceptions("Sorry, your nickname doesn't match with any of disconnected players ones, you can't join");
         }
-
     }
 
 
@@ -481,5 +497,18 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         return controller.guiBoardInfo();
     }
 
+    public void notifyLastClient(VirtualViewRmi client) {
+        try {
+            Event event = lastEventSent.get(nicknamebyClient.get(client));
+            client.showUpdate(event);
+            System.out.println("Saving event for nickname: '" + nicknamebyClient.get(client) + "' with state: " + event.getState());
+
+        } catch (RemoteException e) {
+            System.out.println("Client disconnected: " + e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Thread Interrupt");
+        }
+    }
 }
 

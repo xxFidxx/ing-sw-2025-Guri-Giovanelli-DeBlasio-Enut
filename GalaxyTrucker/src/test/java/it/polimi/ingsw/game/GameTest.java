@@ -35,7 +35,17 @@ public class GameTest {
         game.getPlayers().get(0).getPlaceholder().setPosizione(3);
         game.getPlayers().get(1).getPlaceholder().setPosizione(1);
         game.getPlayers().get(2).getPlaceholder().setPosizione(2);
+
+        for (Player p : game.getPlayers()) {
+            ComponentTile[][] grid = p.getSpaceshipPlance().getComponents();
+            for (int y = 0; y < grid.length; y++) {
+                for (int x = 0; x < grid[0].length; x++) {
+                    grid[y][x] = null;
+                }
+            }
+        }
     }
+
     @Test
     public void testFreePlanets_WithOneFreePlanet() {
         Planet busyPlanet = mock(Planet.class);
@@ -252,64 +262,70 @@ public class GameTest {
             assertNull("La reward dovrebbe essere null dopo resetRewards()", player.getReward());
         }
     }
+
     @Test
-    public void testGetEndStatsCorrectOrderAndCredits() {
-        // Setup cargo
-        Player alice = game.getPlayers().get(0);
-        Player bob = game.getPlayers().get(1);
-        Player charlie = game.getPlayers().get(2);
+    public void testGetEndStats_fullFlow() throws SpaceShipPlanceException {
 
-        // Alice con YELLOW (3) e BLUE (1)
-        CargoHolds aliceCargo = new CargoHolds(new ConnectorType[4], 0, false, 2);
-        aliceCargo.getGoods()[0] = new GoodsBlock(ColorType.YELLOW); // 3
-        aliceCargo.getGoods()[1] = new GoodsBlock(ColorType.BLUE);   // 1
-        alice.getSpaceshipPlance().placeTileComponents(aliceCargo, 3, 3);
+        Player alice = game.getPlayers().get(0); // posizione 3
+        Player bob = game.getPlayers().get(1);   // posizione 1
+        Player charlie = game.getPlayers().get(2); // posizione 2
 
-        // Bob con GREEN (2)
-        CargoHolds bobCargo = new CargoHolds(new ConnectorType[4], 1, false, 1);
-        bobCargo.getGoods()[0] = new GoodsBlock(ColorType.GREEN);    // 2
-        bob.getSpaceshipPlance().placeTileComponents(bobCargo, 4, 2);
+        // ========== 1. rewardSpaceship() ==========
+        // Alice: 0 exposed connectors (solo SMOOTH)
+        ComponentTile aliceTile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH},
+                100);
+        alice.getSpaceshipPlance().placeTileComponents(aliceTile, 3, 2); // posizione centrale valida
 
-        // Charlie si arrende
+        // Bob e Charlie: almeno 1 connettore esposto
+        StructuralModule bobTile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH},
+                101);
+        bob.getSpaceshipPlance().placeTileComponents(bobTile, 3, 2);
+
+        StructuralModule charlieTile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SINGLE, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH},
+                102);
+        charlie.getSpaceshipPlance().placeTileComponents(charlieTile, 3, 2);
+
+        // ========== 2. penalizeLostTiles() ==========
+        // Bob ha 1 tessera nella riserva → penalità -1
+        StructuralModule reserveTile = new StructuralModule(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH},
+                200);
+        bob.getSpaceshipPlance().getReserveSpot().add(reserveTile);
+
+        // ========== 3. rewardCargo() ==========
+        // Charlie ha 2 merci: una RED (4), una BLUE (1) → totale 5 → dimezzato (surrended) = +2
         charlie.setSurrended(true);
+        CargoHolds cargo = new CargoHolds(
+                new ConnectorType[]{ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH, ConnectorType.SMOOTH},
+                300, false, 3);
+        cargo.getGoods()[0] = new GoodsBlock(ColorType.RED);
+        cargo.getGoods()[1] = new GoodsBlock(ColorType.BLUE);
+        charlie.getSpaceshipPlance().getCargoHolds().add(cargo);
 
-        // Aggiorna liste
-        alice.getSpaceshipPlance().updateLists();
-        bob.getSpaceshipPlance().updateLists();
-        charlie.getSpaceshipPlance().updateLists();
+        // ========== 4. rewardPlaces() ==========
+        // Alice (pos 3) → +4, Charlie (pos 2, surrended) → 0, Bob (pos 1) → +2
 
-        // Penalità tiles perse
-        alice.getSpaceshipPlance().getReserveSpot().add(new Cannon(new ConnectorType[4], 0));
-        bob.getSpaceshipPlance().getReserveSpot().add(new Engine(new ConnectorType[4], 1));
-        bob.getSpaceshipPlance().getReserveSpot().add(new Engine(new ConnectorType[4], 2));
-
-        // Verifica l'output generato
+        // ========== Esegui ==========
         String stats = game.getEndStats();
-        System.out.println(stats); // opzionale per ispezione visiva
 
-        Map<String, Integer> playerCredits = new HashMap<>();
-        for (Player p : game.getPlayers()) {
-            playerCredits.put(p.getNickname(), p.getCredits());
-        }
+        // ========== Asserzioni ==========
+        // Crediti totali:
+        // Alice = 4 (posizione) + 2 (spaceship) = 6
+        // Bob = 2 (posizione) -1 (lost tile) = 1
+        // Charlie = 2 (cargo dimezzato), niente posizione, niente spaceship = 2
 
-        // Calcoli:
-        // Alice: +2 (corsa) +3+1 (cargo) -1 (tile persa) +2 (spaceship) = **7**
-        // Bob:   +3 (corsa) +2 (cargo) -2 (tiles perse) +2 (spaceship) = **5**
-        // Charlie: surrende, no cargo, no corsa, no spaceship = **0**
+        String expected = """
+        1. Alice - 6
+        2. Charlie - 2
+        3. Bob - 1
+        """;
 
-        assertEquals(Integer.valueOf(7), playerCredits.get("Alice"));
-        assertEquals(Integer.valueOf(5), playerCredits.get("Bob"));
-        assertEquals(Integer.valueOf(0), playerCredits.get("Charlie"));
+        assertEquals(expected.trim(), stats.trim());
+    }
 
-        // Verifica ordine corretto
-        assertTrue(stats.indexOf("Alice") < stats.indexOf("Bob"));
-        assertTrue(stats.indexOf("Bob") < stats.indexOf("Charlie"));
-
-        // Verifica presenza formato numerato
-        assertTrue(stats.contains("1. "));
-        assertTrue(stats.contains("2. "));
-        assertTrue(stats.contains("3. "));
-    };
 
     @Test
     public void testRewardSpaceship() {
@@ -393,9 +409,6 @@ public class GameTest {
     }
 
 
-
-
-
     @Test
     public void testPenalizeLostTiles() {
         // Prendi i giocatori reali
@@ -450,14 +463,14 @@ public class GameTest {
 
     /*
         Ordine inverso:
-        i = 2 → Charlie: 20 + 4 = 24
+        i = 2 → Charlie: 20 + 3 = 23
         i = 1 → Bob: surrended → resta 10
-        i = 0 → Alice: 5 + 2 = 7
+        i = 0 → Alice: 5 + 4 = 9
      */
 
-        assertEquals(7, alice.getCredits());
+        assertEquals(9, alice.getCredits());
         assertEquals(10, bob.getCredits());
-        assertEquals(24, charlie.getCredits());
+        assertEquals(23, charlie.getCredits());
     }
 
 

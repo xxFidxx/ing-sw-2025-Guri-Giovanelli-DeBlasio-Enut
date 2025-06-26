@@ -149,7 +149,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         try {
                             int index = Integer.parseInt(input);
 
-                            if(index == 1000 || index == 1001 || index >= 0 && index <= 122){
+                            if(index == 1000 || index == 1001 || index >= 0 && index <= 151){
                                 server.pickTile(this, Integer.parseInt(input));
                             }else{
                                 System.out.println("Outbound index, please retry");
@@ -809,7 +809,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case GAME_INIT -> mainApp.gameInit();
             case ASSEMBLY -> System.out.println("List of available tiles: ");
             case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
-            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 to reserve it, 2 to put it back, 3 to draw a card, 4 to end the crafting, 5 to rotate it clockwise\n");
+            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 rotate it clockwise, 2 to put it back, 3 to reserve it");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case ADJUST_SHIP -> mainApp.adjustShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SELECT_SHIP -> mainApp.selectShip(((DataString)getCurrentEvent().getData()).getTileIds());
@@ -894,7 +894,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
             case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!");
-            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile, type 1 to force draw card phase");
+            case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile");
             case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
             case SHOW_SHIP -> System.out.println("Here is your spaceship");
             case BYTILE_SHIP -> System.out.println("Here is your spaceship with ids of interested tiles");

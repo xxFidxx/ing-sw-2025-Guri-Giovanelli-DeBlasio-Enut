@@ -36,6 +36,7 @@ public class SpaceshipPlance {
     private static final int COLS = 7;
     private static final int[] DIR_X = {0, 1, 0, -1};
     private static final int[] DIR_Y = {-1, 0, 1, 0};
+    private boolean isCorrect;
 
 
     public SpaceshipPlance() {
@@ -55,6 +56,7 @@ public class SpaceshipPlance {
         this.nBrownAliens = 0;
         this.nPurpleAliens = 0;
         this.goodsContainers = new ArrayList<>();
+        this.isCorrect = false;
 
         ConnectorType[] centralCabinConnectors = {
                 ConnectorType.UNIVERSAL,   // Lato superiore
@@ -69,6 +71,10 @@ public class SpaceshipPlance {
 
     public void setGoodsContainers(ArrayList<GoodsContainer> goodsContainers) {
         this.goodsContainers = goodsContainers;
+    }
+
+    public boolean isCorrect(){
+        return isCorrect;
     }
 
     public ArrayList<GoodsContainer> getGoodsContainers() {
@@ -254,7 +260,8 @@ public class SpaceshipPlance {
         removeUnvisitedTiles();
 
         // 3. Fase di validazione: controlla le connessioni delle tile rimanenti
-        return validateRemainingTiles();
+        isCorrect = validateRemainingTiles();
+        return isCorrect;
     }
 
     public void dfsExploration(int x, int y) {

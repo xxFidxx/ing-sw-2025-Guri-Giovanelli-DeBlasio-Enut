@@ -36,7 +36,7 @@ public class AssemblyController extends Controller {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load covered card image", e);
         }
-        try (InputStream in = AssemblyController.class.getResourceAsStream("/spaceship.jpg")) {
+        try (InputStream in = AssemblyController.class.getResourceAsStream("/boards/spaceship.jpg")) {
             File tempFile = File.createTempFile("spaceship", ".jpg");
             tempFile.deleteOnExit();
             Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

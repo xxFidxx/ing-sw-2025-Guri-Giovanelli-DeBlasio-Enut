@@ -1,3 +1,0 @@
-Il server tramite listindex riconosce il ComponentTile in questione, che passerà come paramentro alla SpaceShip.
-Una volta posizionata la Tile, il client non ha più bisogno di specificare la Tile, ma solamente posizione nella sua spaceship Plance, il Server sa che in quella specifica posizione c'è quella specifica Tile.
-Il client passa il parametro direction che la spaceship interpreterà come clockwise o anticlockwise,chiamando il relativo metodo.
