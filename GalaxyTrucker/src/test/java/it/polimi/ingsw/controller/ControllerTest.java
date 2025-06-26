@@ -4,6 +4,11 @@ import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.DataString;
 import it.polimi.ingsw.model.adventureCards.AdventureCard;
+import it.polimi.ingsw.model.adventureCards.CombatZoneCard;
+import it.polimi.ingsw.model.adventureCards.PiratesCard;
+import it.polimi.ingsw.model.componentTiles.Cabin;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
+import it.polimi.ingsw.model.componentTiles.Direction;
 import it.polimi.ingsw.model.game.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,6 +110,25 @@ public class ControllerTest {
                         event.getData() instanceof DataString &&
                         ((DataString) event.getData()).getText().equals("test stats")
         ));
+    }
+    @Test
+    public void testTakeHit_HitComponentFromNorth() {
+        // Setup: griglia 5x7 con un componente nella traiettoria
+        ComponentTile[][] mockGrid = new ComponentTile[5][7];
+        Cabin mockedCabin = mock(Cabin.class);
+        mockGrid[1][1] = mockedCabin; // componente colpibile a y=1, x=1
+
+        // Configura spaceship mock
+        when(spaceship.getComponents()).thenReturn(mockGrid);
+
+        // Posizione di partenza: position 5 da NORD => x=1, y=0, direzione NORD
+        controller.takeHit(player1, Direction.NORTH, 5);
+
+        // Verifica che l'evento SHOT_HIT sia stato inviato
+        verify(listener1).onEvent(argThat(event -> event.getState().equals(GameState.SHOT_HIT)));
+
+        // Verifica che il metodo removeAdjust sia stato invocato per rimuovere il componente
+        verify(controller).removeAdjust(eq(listener1), eq(1), eq(1)); // x=1, y=1
     }
 
 
