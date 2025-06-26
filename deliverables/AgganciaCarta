@@ -1,0 +1,36 @@
+This sequence illustrates the interactions between the client, server, controller, player, and spaceship when a player attempts to place a tile during their turn.
+
+1) Client Initiates Tile Placement:
+The Client sends a request to the Server to add a tile at position (xIndex, yIndex).
+
+2) Server Forwards the Request:
+The Server passes the request to the Controller, along with the listener reference.
+
+3) Controller Gathers Necessary Data:
+
+It asks the Player for the current tile in hand (getHandTile()), and the Player returns it.
+
+Then it retrieves the SpaceshipPlance (the spaceship grid) from the Player.
+
+4) Attempt to Place the Tile:
+The Controller calls placeTileComponents(tile, xIndex, yIndex) on the SpaceshipPlance to attempt placing the tile.
+
+5) Validation (Optional Outcomes):
+
+If the tile position is outside the valid grid, SpaceshipPlance responds to the Client with "Outbound index".
+
+If the tile position is already occupied, it sends "Already busy spot".
+
+Otherwise, it checks if the tile is well connected by invoking checkNewTile(x, y) on the ComponentTile, and updates connectivity.
+
+6) Update Internal Structures:
+The Controller requests from SpaceshipPlance:
+
+The current reserve spot (getReserveSpot)
+
+The current tile-to-grid mapping (getTileToGrid)
+The SpaceshipPlance returns the respective values.
+
+7) Notify the Client to Update the View:
+The Controller triggers the event SHOW_SHIP via listener.onEvent(SHOW_SHIP).
+The Server then tells the Client to update the view with showUpdate(SHOW_SHIP).
