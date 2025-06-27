@@ -6,6 +6,9 @@ import it.polimi.ingsw.controller.network.data.DataString;
 import it.polimi.ingsw.model.adventureCards.*;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.*;
+import it.polimi.ingsw.model.resources.CombatZoneType;
+import it.polimi.ingsw.model.resources.Planet;
+import it.polimi.ingsw.model.resources.Projectile;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -330,6 +333,419 @@ public class ControllerTest {
         assertFalse(controller.getTmpPlayers().contains(player1));
     }
 
+    @Test
+    public void testManageCard_slaversCard_playerConnected() {
+        // Mock della carta SlaversCard
+        SlaversCard card = mock(SlaversCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        // Imposto i giocatori
+        controller.setTmpPlayers(new ArrayList<>(List.of(player1)));
+        controller.addPlayerListenerPair(listener1, player1);
+
+        // Stub metodi di flusso
+        doNothing().when(controller).handleWaitersEnemy(listener1);
+
+        // Eseguo il metodo
+        controller.manageCard();
+
+        // Verifico che venga chiamato handleWaitersEnemy
+        verify(controller).handleWaitersEnemy(listener1);
+        // Verifico che il giocatore sia stato rimosso
+        assertFalse(controller.getTmpPlayers().contains(player1));
+    }
+
+    @Test
+    public void testManageCard_slaversCard_enemyAlreadyDefeated() {
+        SlaversCard card = mock(SlaversCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        controller.setTmpPlayers(new ArrayList<>());
+        // Imposta la condizione enemy già sconfitto
+        controller.setEnemyDefeated(); // lo setta a TRUE
+
+        // Stub metodo
+        doNothing().when(controller).defeatedBySlavers();
+
+        controller.manageCard();
+
+        verify(controller).defeatedBySlavers();
+    }
+
+    @Test
+    public void testManageCard_smugglersCard_activePlayerHandled() {
+        SmugglersCard card = mock(SmugglersCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        controller.setTmpPlayers(new ArrayList<>(List.of(player1)));
+        controller.addPlayerListenerPair(listener1, player1);
+
+        // Stub dei metodi usati
+        doNothing().when(controller).handleWaitersEnemy(listener1);
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica che il giocatore sia stato rimosso
+        assertFalse(controller.getTmpPlayers().contains(player1));
+
+        // Verifica che sia stato invocato il metodo di gestione
+        verify(controller).handleWaitersEnemy(listener1);
+    }
+
+    @Test
+    public void testManageCard_smugglersCard_cargoEnded() {
+        SmugglersCard card = mock(SmugglersCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        // Simula la condizione in cui il cargo è terminato
+        controller.setCargoended(); //a TRUE
+
+        controller.setTmpPlayers(new ArrayList<>());
+
+        // Stub del metodo invocato
+        doNothing().when(controller).defeatedBySmugglers();
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica che venga invocato il comportamento corretto
+        verify(controller).defeatedBySmugglers();
+
+        // Verifica che il flag sia stato aggiornato
+        assertTrue(controller.getSmugglersFlag());
+
+        // Verifica che cargoended sia stato azzerato
+        assertFalse(controller.getCargoended());
+    }
+
+    @Test
+    public void testManageCard_piratesCard_activePlayerHandled() {
+        PiratesCard card = mock(PiratesCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        controller.setTmpPlayers(new ArrayList<>(List.of(player1)));
+        controller.addPlayerListenerPair(listener1, player1);
+
+        // Stub
+        doNothing().when(controller).handleWaitersEnemy(listener1);
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica
+        verify(controller).handleWaitersEnemy(listener1);
+        assertFalse(controller.getTmpPlayers().contains(player1));
+    }
+
+    @Test
+    public void testManageCard_piratesCard_piratesEnded() {
+        PiratesCard card = mock(PiratesCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        controller.setPiratesended(); // a TRUE
+        controller.setTmpPlayers(new ArrayList<>());
+
+        // Aggiungi un giocatore sconfitto
+        controller.setDefeatedPlayers(new ArrayList<>(Collections.singleton(player1)));
+
+        // Stub del metodo invocato
+        doNothing().when(controller).defeatedByPirates();
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica chiamata al metodo e aggiornamento flag
+        verify(controller).defeatedByPirates();
+        assertFalse(controller.getPiratesended());
+        assertTrue(controller.getPiratesFlag());
+
+        // Verifica che venga inserito nella mappa isDonePirates
+        assertTrue(controller.isDonePirates.containsKey(player1));
+        assertFalse(controller.isDonePirates.get(player1));
+    }
+
+    @Test
+    public void testManageCard_planetsCard_withFreePlanets() {
+        Game game = Mockito.mock(Game.class);
+        controller.setGame(game);
+        PlanetsCard card = mock(PlanetsCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        controller.setTmpPlayers(new ArrayList<>(List.of(player1)));
+
+        // Stub comportamento della carta
+        ArrayList<Planet> planets = new ArrayList<>(List.of(mock(Planet.class), mock(Planet.class)));
+        when(card.getPlanets()).thenReturn(planets);
+        when(game.freePlanets(card, planets)).thenReturn(true);
+
+        // Stub del metodo invocato
+        doNothing().when(controller).handleWaitersPlanets(player1);
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica
+        verify(controller).handleWaitersPlanets(player1);
+    }
+
+    @Test
+    public void testManageCard_planetsCard_noFreePlanets() {
+        Game game = Mockito.mock(Game.class);
+        controller.setGame(game);
+        PlanetsCard card = mock(PlanetsCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        controller.setTmpPlayers(new ArrayList<>(List.of(player1)));
+        controller.addPlayerListenerPair(listener1, player1);
+
+        // Stub comportamento della carta
+        ArrayList<Planet> planets = new ArrayList<>(List.of(mock(Planet.class), mock(Planet.class)));
+        when(card.getPlanets()).thenReturn(planets);
+        when(game.freePlanets(card, planets)).thenReturn(false);
+
+        // Stub metodo chiamato
+        doNothing().when(controller).handlePlanets(listener1);
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifiche
+        verify(controller).handlePlanets(listener1);
+        assertFalse(controller.getTmpPlayers().contains(player1));
+    }
+
+    @Test
+    public void testManageCard_meteorSwarmCard_allNullProjectiles() {
+        MeteorSwarmCard card = mock(MeteorSwarmCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        // Stub array di soli null
+        Projectile[] meteors = new Projectile[4];
+        when(card.getMeteors()).thenReturn(meteors);
+
+        // Stub reset
+        doNothing().when(controller).resetShowAndDraw();
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica
+        verify(controller).resetShowAndDraw();
+    }
+
+    @Test
+    public void testManageCard_meteorSwarmCard_withProjectiles() {
+        MeteorSwarmCard card = mock(MeteorSwarmCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        // Stub array con almeno un proiettile valido
+        Projectile projectile = mock(Projectile.class);
+        Projectile[] meteors = new Projectile[] { projectile, null, null };
+        when(card.getMeteors()).thenReturn(meteors);
+
+        // Stub game
+        Game game = mock(Game.class);
+        controller.setGame(game);
+        when(game.throwDices()).thenReturn(7);  // qualunque valore
+
+        // Stub lista giocatori
+        Player p1 = mock(Player.class);
+        Player p2 = mock(Player.class);
+        Player p3 = mock(Player.class);
+        Player p4 = mock(Player.class);
+        controller.setPlayers(new ArrayList<>(List.of(p1, p2, p3, p4)));
+
+        // Stub activateMeteor
+        doNothing().when(controller).activateMeteor(p1);
+        doNothing().when(controller).activateMeteor(p2);
+        doNothing().when(controller).activateMeteor(p3);
+        doNothing().when(controller).activateMeteor(p4);
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica chiamate
+        verify(controller).activateMeteor(p1);
+        verify(controller).activateMeteor(p2);
+        verify(controller).activateMeteor(p3);
+        verify(controller).activateMeteor(p4);
+    }
+
+    @Test
+    public void testManageCard_epidemicCard_sendsEventToAllPlayers() {
+        // Crea mock della carta
+        EpidemicCard card = mock(EpidemicCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        // Crea 3 giocatori e listener mock
+        Player p1 = mock(Player.class);
+        Player p2 = mock(Player.class);
+        Player p3 = mock(Player.class);
+
+        ClientListener l1 = mock(ClientListener.class);
+        ClientListener l2 = mock(ClientListener.class);
+        ClientListener l3 = mock(ClientListener.class);
+
+        // Setta i player nel controller
+        controller.setPlayers(new ArrayList<>(List.of(p1, p2, p3)));
+
+        // Registra le associazioni player → listener
+        controller.addPlayerListenerPair(l1, p1);
+        controller.addPlayerListenerPair(l2, p2);
+        controller.addPlayerListenerPair(l3, p3);
+
+        // Stub del metodo eventCrafter (se lo chiami direttamente)
+        GameState expectedState = GameState.EPIDEMIC_MANAGEMENT;
+        doReturn(mock(Event.class)).when(controller).eventCrafter(eq(expectedState), isNull(), any(Player.class));
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica che ogni listener abbia ricevuto l’evento
+        verify(l1).onEvent(any());
+        verify(l2).onEvent(any());
+        verify(l3).onEvent(any());
+
+        // (opzionale) Verifica che l'evento sia quello giusto per ogni player
+        verify(controller).eventCrafter(expectedState, null, p1);
+        verify(controller).eventCrafter(expectedState, null, p2);
+        verify(controller).eventCrafter(expectedState, null, p3);
+    }
+
+    @Test
+    public void testManageCard_stardustCard_movesAllPlayersAndSendsEvent() {
+        // Mock della carta
+        StardustCard card = mock(StardustCard.class);
+        controller.setCurrentAdventureCard(card);
+
+        // Mock dei giocatori
+        Player p1 = mock(Player.class);
+        Player p2 = mock(Player.class);
+        Player p3 = mock(Player.class); // disconnesso
+
+        // Mock dei rispettivi listener
+        ClientListener l1 = mock(ClientListener.class);
+        ClientListener l2 = mock(ClientListener.class);
+
+        // Mock dei plance
+        SpaceshipPlance sp1 = mock(SpaceshipPlance.class);
+        SpaceshipPlance sp2 = mock(SpaceshipPlance.class);
+        SpaceshipPlance sp3 = mock(SpaceshipPlance.class);
+
+        // Stub countExposedConnectors
+        when(p1.getSpaceshipPlance()).thenReturn(sp1);
+        when(p2.getSpaceshipPlance()).thenReturn(sp2);
+        when(p3.getSpaceshipPlance()).thenReturn(sp3);
+
+        when(sp1.countExposedConnectors()).thenReturn(2); // p1 ha 2 connettori esposti
+        when(sp2.countExposedConnectors()).thenReturn(1); // p2 ha 1 connettore esposto
+        when(sp3.countExposedConnectors()).thenReturn(3); // p3 ha 3 connettori esposti
+
+        // Imposta players e disconnessi
+        controller.setPlayers(new ArrayList<>(List.of(p1, p2)));
+        controller.setDisconnectedPlayers(new ArrayList<>(List.of(p3)));
+
+        controller.addPlayerListenerPair(l1, p1);
+        controller.addPlayerListenerPair(l2, p2);
+
+        // Mock Game e Flightplance
+        Game game = mock(Game.class);
+        Flightplance flightplance = mock(Flightplance.class);
+        when(game.getFlightplance()).thenReturn(flightplance);
+        controller.setGame(game);
+
+        // Stub eventCrafter e reset
+        doReturn(mock(Event.class)).when(controller).eventCrafter(eq(GameState.MOVE_PLAYER), anyInt(), isNull());
+        doNothing().when(controller).resetShowAndDraw();
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica invio eventi
+        verify(l1).onEvent(any());
+        verify(l2).onEvent(any());
+
+        verify(controller).eventCrafter(GameState.MOVE_PLAYER, 2, null);
+        verify(controller).eventCrafter(GameState.MOVE_PLAYER, 1, null);
+
+        // Verifica movimento su flightplance
+        verify(flightplance).move(-2, p1);
+        verify(flightplance).move(-1, p2);
+        verify(flightplance).move(-3, p3);
+
+        // Verifica chiamata finale
+        verify(controller).resetShowAndDraw();
+    }
+
+    @Test
+    public void testManageCard_combatZone_lostCrew_withUniqueMin() {
+        // Mock della carta
+        CombatZoneCard card = mock(CombatZoneCard.class);
+        when(card.getType()).thenReturn(CombatZoneType.LOSTCREW);
+        when(card.getLostDays()).thenReturn(2);
+        controller.setCurrentAdventureCard(card);
+
+        // Mock giocatori
+        Player p1 = mock(Player.class); // crew: 3
+        Player p2 = mock(Player.class); // crew: 2 → min
+        Player p3 = mock(Player.class); // crew: 4
+
+        SpaceshipPlance sp1 = mock(SpaceshipPlance.class);
+        SpaceshipPlance sp2 = mock(SpaceshipPlance.class);
+        SpaceshipPlance sp3 = mock(SpaceshipPlance.class);
+
+        when(p1.getSpaceshipPlance()).thenReturn(sp1);
+        when(p2.getSpaceshipPlance()).thenReturn(sp2);
+        when(p3.getSpaceshipPlance()).thenReturn(sp3);
+
+        when(sp1.getCrew()).thenReturn(3);
+        when(sp2.getCrew()).thenReturn(2); // minimo
+        when(sp3.getCrew()).thenReturn(4);
+
+        controller.setTmpPlayers(new ArrayList<>(List.of(p1, p2, p3)));
+        controller.setPlayers(new ArrayList<>(List.of(p1, p2, p3)));
+
+        // Listener
+        ClientListener l1 = mock(ClientListener.class);
+        ClientListener l2 = mock(ClientListener.class);
+        ClientListener l3 = mock(ClientListener.class);
+
+        controller.addPlayerListenerPair(l1, p1);
+        controller.addPlayerListenerPair(l2, p2);
+        controller.addPlayerListenerPair(l3, p3);
+
+        // Game + Flightplance
+        Game game = mock(Game.class);
+        Flightplance flightplance = mock(Flightplance.class);
+        when(game.getFlightplance()).thenReturn(flightplance);
+        controller.setGame(game);
+
+        // Stub eventCrafter
+        Event moveEvent = mock(Event.class);
+        Event chooseEngineEvent = mock(Event.class);
+        doReturn(moveEvent).when(controller).eventCrafter(eq(GameState.MOVE_PLAYER), eq(2), isNull());
+        doReturn(chooseEngineEvent).when(controller).eventCrafter(eq(GameState.CHOOSE_ENGINE), isNull(), any());
+
+        // Stub metodo personalizzato
+        doNothing().when(controller).handleMinEquip(l2);
+
+        // Esegui
+        controller.manageCard();
+
+        // Verifica solo p2 subisce penalità
+        verify(controller).handleMinEquip(l2);
+        verify(l2).onEvent(moveEvent);
+        verify(flightplance).move(-2, p2);
+
+        verify(l1, never()).onEvent(moveEvent);
+        verify(l3, never()).onEvent(moveEvent);
+
+        // Verifica che tutti ricevono CHOOSE_ENGINE
+        verify(l1).onEvent(chooseEngineEvent);
+        verify(l2).onEvent(chooseEngineEvent);
+        verify(l3).onEvent(chooseEngineEvent);
+    }
 
 }
 
