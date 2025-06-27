@@ -1,5 +1,6 @@
 package it.polimi.ingsw.gui.pageControllers;
 
+import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.gui.Controller;
 import it.polimi.ingsw.gui.ShowTextUtils;
 import it.polimi.ingsw.model.bank.GoodsBlock;
@@ -149,7 +150,7 @@ public class CargoManagementController extends Controller {
                 }
             }
 
-            String style = container.isSpecial() ? "-fx-background-color: lightgrey" : "-fx-background-color: #ffcccc";
+            String style = container.isSpecial() ? "-fx-background-color: #ffcccc" : "-fx-background-color: lightgrey";
             cargoPane.setStyle(style);
         }
     }
@@ -344,15 +345,11 @@ public class CargoManagementController extends Controller {
     public void handleNext(ActionEvent actionEvent) {
     }
 
-    public void addGood(ActionEvent actionEvent) {
-    }
-
-    public void swapGoods(ActionEvent actionEvent) {
-    }
-
-    public void removeGood(ActionEvent actionEvent) {
-    }
-
     public void endCargoManagement(ActionEvent actionEvent) {
+        try {
+            clientRmi.server.endCargoManagement(clientRmi);
+        } catch (RemoteException e) {
+            ShowTextUtils.showTextVolatile("Error", e.getMessage());
+        }
     }
 }

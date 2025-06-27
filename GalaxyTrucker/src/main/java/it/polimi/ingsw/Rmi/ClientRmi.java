@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.gui.MainApp;
+import it.polimi.ingsw.model.adventureCards.AbandonedShipCard;
 import it.polimi.ingsw.model.bank.GoodsBlock;
 import it.polimi.ingsw.model.componentTiles.Cabin;
 import it.polimi.ingsw.model.componentTiles.DoubleCannon;
@@ -828,9 +829,48 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 mainApp.turnStart(server.guiBoardInfo(), server.playerColors());
             }
             case DRAW_CARD -> {
-                Card card = (Card) getCurrentEvent().getData();
-                mainApp.drawCard(card.getName(), card.getLevel());
+                String name;
+                int level;
+                DataContainer data = getCurrentEvent().getData();
+                switch (data){
+                    case AbShipCard abShipCard->{
+                        name = abShipCard.getName();
+                        level = abShipCard.getLevel();
+                    }
+                    case AbStationCard abStationCard ->{
+                        name = abStationCard.getName();
+                        level = abStationCard.getLevel();
+                    }
+                    case CZCCrew czcCrew ->{
+                        name = czcCrew.getName();
+                        level = czcCrew.getLevel();
+                    }
+                    case Pirates pirates ->{
+                        name = pirates.getName();
+                        level = pirates.getLevel();
+                    }
+                    case Planets planets ->{
+                        name = planets.getName();
+                        level = planets.getLevel();
+                    }
+                    case Slavers slavers ->{
+                        name = slavers.getName();
+                        level = slavers.getLevel();
+                    }
+                    case Smugglers smugglers ->{
+                        name = smugglers.getName();
+                        level = smugglers.getLevel();
+                    }
+                    case Card card ->{
+                        name = card.getName();
+                        level = card.getLevel();
+                    }
+
+                    default -> throw new IllegalStateException("Unexpected value: " + data);
+                }
+                mainApp.drawCard(name, level);
             }
+
             case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
             case CARGO_MANAGEMENT -> {
                 try{
