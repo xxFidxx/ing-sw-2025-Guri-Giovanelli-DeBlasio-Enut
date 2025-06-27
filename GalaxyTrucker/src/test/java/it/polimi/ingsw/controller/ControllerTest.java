@@ -157,6 +157,45 @@ public class ControllerTest {
         // Verifica che il metodo removeAdjust sia stato invocato per rimuovere il componente
         verify(controller).removeAdjust(eq(listener1), eq(1), eq(1)); // x=1, y=1
     }
+    @Test
+    public void testHandlePlanets_AllPlayersDone_TriggersReset() {
+        // Prepara lo stato: tutti i giocatori hanno isDone = true
+        controller.isDone.put(player1, true);
+        controller.isDone.put(player2, true);
+
+        // mocka resetShowAndDraw per vedere se viene chiamato
+        doNothing().when(controller).resetShowAndDraw();
+
+        // chiama il metodo
+        controller.handlePlanets(listener1);
+
+        // deve aver aggiornato lastMethodCalled
+        assertEquals("handlePlanets", controller.getLastMethodCalled());
+
+        // deve aver chiamato resetShowAndDraw
+        verify(controller).resetShowAndDraw();
+
+        // non deve aver chiamato manageCard (quindi nessun evento wait dovrebbe partire)
+        verify(listener1, never()).onEvent(any());
+    }
+    @Test
+    public void testHandleWaitersPlayer_CorrectEventsDispatched() {
+        // Chiamata del metodo con listener1 (quello associato a player1)
+        controller.handleWaitersPlayer(listener1);
+
+        // Verifica che player1 riceve CHOOSE_PLAYER
+        verify(listener1).onEvent(argThat(event ->
+                event.getState().equals(GameState.CHOOSE_PLAYER)));
+
+        // Verifica che player2 riceve WAIT_PLAYER
+        verify(listener2).onEvent(argThat(event ->
+                event.getState().equals(GameState.WAIT_PLAYER)));
+
+        // Verifica che il campo lastMethodCalled sia stato aggiornato
+        assertEquals("handleWaitersPlayer", controller.getLastMethodCalled());
+    }
+
+
 
     @Test
     public void testManageCard_abandonedShip_conditionMet() {
@@ -746,6 +785,37 @@ public class ControllerTest {
         verify(l2).onEvent(chooseEngineEvent);
         verify(l3).onEvent(chooseEngineEvent);
     }
+    @Test
+    public void testHandleMinEquip_SendsCorrectEvents() {
+        // Mock degli eventi da restituire dal controller
+        Event leastCrewEvent = mock(Event.class);
+        when(leastCrewEvent.getState()).thenReturn(GameState.LEAST_CREW);
+        Event notMinEquipEvent = mock(Event.class);
+        when(notMinEquipEvent.getState()).thenReturn(GameState.NOT_MIN_EQUIP);
+
+        // Fai in modo che eventCrafter restituisca gli eventi giusti
+        doReturn(leastCrewEvent)
+                .when(controller).eventCrafter(eq(GameState.LEAST_CREW), any(), any());
+        doReturn(notMinEquipEvent)
+                .when(controller).eventCrafter(eq(GameState.NOT_MIN_EQUIP), any(), any());
+
+        // Chiamo il metodo passando listener1
+        controller.handleMinEquip(listener1);
+
+        // listener1 deve ricevere evento LEAST_CREW
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.LEAST_CREW));
+
+        // listener2 deve ricevere evento NOT_MIN_EQUIP
+        verify(listener2).onEvent(argThat(event ->
+                event.getState() == GameState.NOT_MIN_EQUIP));
+    }
+
+
+
+
+
+
 
 }
 

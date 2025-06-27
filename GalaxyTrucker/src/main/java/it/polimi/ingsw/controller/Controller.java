@@ -163,6 +163,9 @@ public class Controller{
     public Game getGame() {
         return game;
     }
+    public String getLastMethodCalled() {
+        return lastMethodCalled;
+    }
 
 
     public void createLobby(int numPlayers) {
