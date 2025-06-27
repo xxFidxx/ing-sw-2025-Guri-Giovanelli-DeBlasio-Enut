@@ -669,6 +669,7 @@ public class Controller{
                 player.getSpaceshipPlance().updateLists();
             }
             if (cardName != null) {
+                currentGameState = GameState.DRAW_CARD;
                 notifyAllRealListeners(eventCrafter(GameState.DRAW_CARD, null, null));
                 if(players.size() > 1 || !(currentAdventureCard instanceof CombatZoneCard)){
                     orderPlayers();

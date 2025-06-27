@@ -4,6 +4,7 @@ package it.polimi.ingsw.Rmi;
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.ClientListenerRmi;
 import it.polimi.ingsw.controller.Controller;
+import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.controller.network.Event;
 import it.polimi.ingsw.model.game.CargoManagementException;
@@ -393,7 +394,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void playerProtected(VirtualViewRmi clientRmi) throws RemoteException {
+    public void playerProtected(VirtualViewRmi clientRmi) throws RemoteException, ControllerExceptions {
         ClientListenerRmi listener = realClientListeners.get(clientRmi);
         controller.playerProtected(listener);
     }

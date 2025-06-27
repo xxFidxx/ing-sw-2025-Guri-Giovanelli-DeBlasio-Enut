@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.VirtualServer;
+import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
@@ -60,7 +61,7 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void playerHit(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void playerProtected(VirtualViewRmi clientRmi) throws RemoteException;
+    void playerProtected(VirtualViewRmi clientRmi) throws RemoteException, ControllerExceptions;
 
     boolean addAlienCabin(VirtualViewRmi clientRmi, int cabinId, String alienColor) throws RemoteException;
 

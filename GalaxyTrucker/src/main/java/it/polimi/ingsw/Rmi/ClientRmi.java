@@ -640,7 +640,15 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ASK_SHIELD, ASK_CANNON -> {
                 switch (input) {
                     case "0" -> server.playerHit(this);
-                    case "1" -> server.playerProtected(this);
+                    case "1" -> {
+                        try{
+                            server.playerProtected(this);
+                        } catch (ControllerExceptions e) {
+                            System.out.println(e.getMessage());
+                        } catch (Exception e) {
+                            System.out.println("Error " + e.getMessage());
+                        }
+                    }
                     default -> System.out.print("Not accepted input, please try again:\n");
                 }
             }
