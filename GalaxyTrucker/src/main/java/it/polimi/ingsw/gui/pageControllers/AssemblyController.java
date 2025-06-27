@@ -30,6 +30,7 @@ public class AssemblyController extends Controller {
     private TileData[][] lastSpaceship;
     private final CardsUtils cardsUtils = new CardsUtils();
     private int lookingDeck = -1;
+    private boolean isHoldingTile = false;
     static {
         try (InputStream in = AssemblyController.class.getResourceAsStream("/tiles/coveredTile.jpg")) {
             File tempFile = File.createTempFile("coveredTile", ".jpg");
@@ -153,6 +154,7 @@ public class AssemblyController extends Controller {
     }
 
     private void handleTileClick(int index) throws RemoteException {
+        isHoldingTile = true;
         clientRmi.server.pickTile(clientRmi, index);
         if (clientRmi.getCurrentState() == GameState.PICKED_TILE) {
             loadTileImage(index);
@@ -260,6 +262,7 @@ public class AssemblyController extends Controller {
 
     @FXML
     private void handlePutBack() throws RemoteException {
+        isHoldingTile = false;
         clientRmi.server.putTileBack(clientRmi);
         tileDisplay.setImage(null);
         coveredTilesGrid.setDisable(false);
@@ -269,6 +272,7 @@ public class AssemblyController extends Controller {
 
     @FXML
     private void handleStore() throws RemoteException {
+        isHoldingTile = false;
         clientRmi.server.addReserveSpot(clientRmi);
         tileDisplay.setImage(null);
         coveredTilesGrid.setDisable(false);
@@ -374,22 +378,36 @@ public class AssemblyController extends Controller {
     }
 
     public void requestDeck1() throws RemoteException {
-        if(lookingDeck!=-1)
-            clientRmi.server.endShowCards(clientRmi, lookingDeck);
-        showDeckCards(1);
+        if(isHoldingTile)
+            ShowTextUtils.showTextVolatile("Illegal action", "You can't watch decks while you are holding a tile");
+        else{
+            if(lookingDeck!=-1)
+                clientRmi.server.endShowCards(clientRmi, lookingDeck);
+            showDeckCards(1);
+        }
     }
 
 
     public void requestDeck2() throws RemoteException {
-        if(lookingDeck!=-1)
-            clientRmi.server.endShowCards(clientRmi, lookingDeck);
-        showDeckCards(2);
+        if(isHoldingTile)
+            ShowTextUtils.showTextVolatile("Illegal action", "You can't watch decks while you are holding a tile");
+        else{
+            if(lookingDeck!=-1)
+                clientRmi.server.endShowCards(clientRmi, lookingDeck);
+            showDeckCards(2);
+        }
+
     }
 
     public void requestDeck3() throws RemoteException {
-        if(lookingDeck!=-1)
-            clientRmi.server.endShowCards(clientRmi, lookingDeck);
-        showDeckCards(3);
+        if(isHoldingTile)
+            ShowTextUtils.showTextVolatile("Illegal action", "You can't watch decks while you are holding a tile");
+        else{
+            if(lookingDeck!=-1)
+                clientRmi.server.endShowCards(clientRmi, lookingDeck);
+            showDeckCards(3);
+        }
+
     }
 
     private void showDeckCards(int nDeck) throws RemoteException {
