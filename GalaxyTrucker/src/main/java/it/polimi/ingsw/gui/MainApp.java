@@ -4,6 +4,9 @@ import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
 import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
+import it.polimi.ingsw.gui.pageControllers.AssemblyController;
+import it.polimi.ingsw.gui.pageControllers.GameController;
+import it.polimi.ingsw.gui.pageControllers.LobbyController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -27,11 +30,11 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.sceneManager = new SceneManager(primaryStage);
 
-        loadScene("home", "/home.fxml");
-        loadScene("lobby", "/lobby.fxml");
-        loadScene("assembly", "/assembly.fxml");
-        loadScene("game", "/game.fxml");
-        loadScene("end", "/end.fxml");
+        loadScene("home", "/fxmls/home.fxml");
+        loadScene("lobby", "/fxmls/lobby.fxml");
+        loadScene("assembly", "/fxmls/assembly.fxml");
+        loadScene("game", "/fxmls/game.fxml");
+        loadScene("end", "/fxmls/end.fxml");
 
         // Start with the menu scene
         sceneManager.switchTo("home");
@@ -109,6 +112,12 @@ public class MainApp extends Application {
         Platform.runLater(() -> {
             ((GameController) controllers.get("game")).updateBoard(boardInfo);
             ((GameController) controllers.get("game")).setPlayerColorArea(playerColor);
+        });
+    }
+
+    public void drawCard(String name, Integer level) {
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).setCard(name,level);
         });
     }
 

@@ -1,17 +1,17 @@
-package it.polimi.ingsw.gui;
+package it.polimi.ingsw.gui.pageControllers;
 
 import it.polimi.ingsw.Server.GameState;
-import it.polimi.ingsw.controller.network.data.DataString;
-import it.polimi.ingsw.controller.network.data.ListCabinAliens;
-import it.polimi.ingsw.controller.network.data.PickedTile;
-import it.polimi.ingsw.controller.network.data.TileData;
-import it.polimi.ingsw.model.componentTiles.AlienColor;
+import it.polimi.ingsw.controller.network.data.*;
+import it.polimi.ingsw.gui.CardsUtils;
+import it.polimi.ingsw.gui.Controller;
+import it.polimi.ingsw.gui.ShowTextUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
@@ -21,12 +21,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class AssemblyController extends Controller {
     private static final Image COVERED_CARD_IMAGE, SPACESHIP_IMAGE;
     private int lastIndex = 0;
     private TileData[][] lastSpaceship;
-
+    private final CardsUtils cardsUtils = new CardsUtils();
+    private int lookingDeck = -1;
     static {
         try (InputStream in = AssemblyController.class.getResourceAsStream("/tiles/coveredTile.jpg")) {
             File tempFile = File.createTempFile("coveredTile", ".jpg");
@@ -46,6 +49,7 @@ public class AssemblyController extends Controller {
         }
     }
 
+
     @FXML private GridPane coveredTilesGrid;
     @FXML private ImageView tileDisplay;
     @FXML private GridPane spaceshipGrid;
@@ -55,6 +59,12 @@ public class AssemblyController extends Controller {
     @FXML private AnchorPane assemblyPane;
     @FXML private AnchorPane chooseAliensPane;
     @FXML private GridPane cabinsGrid;
+    @FXML private ImageView deck1covered;
+    @FXML private ImageView deck2covered;
+    @FXML private ImageView deck3covered;
+    @FXML private ImageView card1deck;
+    @FXML private ImageView card2deck;
+    @FXML private ImageView card3deck;
 
     public void initialize() {
         for (int row = 0; row < 12; row++) {
@@ -121,6 +131,14 @@ public class AssemblyController extends Controller {
 
             reserveGrid.add(imageView, col, 0);
         }
+
+        deck1covered.setImage(new Image(Objects.requireNonNull(getClass().getResource("/cardsCover/Cover1.jpg")).toExternalForm()));
+        deck2covered.setImage(new Image(Objects.requireNonNull(getClass().getResource("/cardsCover/Cover1.jpg")).toExternalForm()));
+        deck3covered.setImage(new Image(Objects.requireNonNull(getClass().getResource("/cardsCover/Cover1.jpg")).toExternalForm()));
+
+        card1deck.setVisible(false);
+        card2deck.setVisible(false);
+        card3deck.setVisible(false);
     }
 
     private void handleSpaceshipClick(ImageView view, int col, int row) throws RemoteException {
@@ -354,4 +372,57 @@ public class AssemblyController extends Controller {
         clientRmi.server.handleEndChooseAliens(clientRmi);
         sceneManager.switchTo("game");
     }
+
+    public void requestDeck1() throws RemoteException {
+        if(lookingDeck!=-1)
+            clientRmi.server.endShowCards(clientRmi, lookingDeck);
+        showDeckCards(1);
+    }
+
+
+    public void requestDeck2() throws RemoteException {
+        if(lookingDeck!=-1)
+            clientRmi.server.endShowCards(clientRmi, lookingDeck);
+        showDeckCards(2);
+    }
+
+    public void requestDeck3() throws RemoteException {
+        if(lookingDeck!=-1)
+            clientRmi.server.endShowCards(clientRmi, lookingDeck);
+        showDeckCards(3);
+    }
+
+    private void showDeckCards(int nDeck) throws RemoteException {
+        if(!clientRmi.server.showCardsbyDeck(clientRmi, nDeck))
+            ShowTextUtils.showTextVolatile("Error","Another player is looking at this deck, please retry");
+        else{
+            lookingDeck = nDeck;
+            System.out.println("showDeckCards");
+            AdventureCardsData data = (AdventureCardsData) clientRmi.getData();
+            ArrayList<Card> cards= data.getAdventureCards();
+            for(int i = 0; i < cards.size(); i++){
+                Card card = cards.get(i);
+                System.out.println(card.getName() + card.getName());
+                switch (i){
+                    case 0->{
+                        card1deck.setImage(cardsUtils.resolveCardImage(card.getName(), card.getLevel()));
+                        card1deck.setVisible(true);
+                    }
+
+                    case 1->{
+                        card2deck.setImage(cardsUtils.resolveCardImage(card.getName(), card.getLevel()));
+                        card2deck.setVisible(true);
+                    }
+
+                    case 2->{
+                        card3deck.setImage(cardsUtils.resolveCardImage(card.getName(), card.getLevel()));
+                        card3deck.setVisible(true);
+                    }
+
+                    default-> {}
+                }
+            }
+        }
+    }
+
 }

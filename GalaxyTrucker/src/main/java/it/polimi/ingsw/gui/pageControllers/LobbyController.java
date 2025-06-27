@@ -1,6 +1,7 @@
-package it.polimi.ingsw.gui;
+package it.polimi.ingsw.gui.pageControllers;
 
 import it.polimi.ingsw.Server.GameState;
+import it.polimi.ingsw.gui.Controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;

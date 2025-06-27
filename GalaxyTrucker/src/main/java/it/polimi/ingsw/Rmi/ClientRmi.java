@@ -819,7 +819,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case TURN_START ->{
                 mainApp.turnStart(server.guiBoardInfo(), server.playerColors());
             }
-            case DRAW_CARD -> System.out.println("This is the drawn card:");
+            case DRAW_CARD -> {
+                Card card = (Card) getCurrentEvent().getData();
+                mainApp.drawCard(card.getName(), card.getLevel());
+            }
             case FAILED_CARD -> System.out.println("You haven't met the requirements to activate this card:");
             case CARGO_MANAGEMENT -> {
                 try{
@@ -1205,4 +1208,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     public GameState getCurrentState() {
         return currentState;
     }
+
+    public DataContainer getData(){return currentEvent.getData();}
 }

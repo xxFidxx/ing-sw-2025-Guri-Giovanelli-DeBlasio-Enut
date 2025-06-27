@@ -1,15 +1,8 @@
-package it.polimi.ingsw.gui;
+package it.polimi.ingsw.gui.pageControllers;
 
-import com.sun.javafx.scene.control.InputField;
-import it.polimi.ingsw.Rmi.ClientRmi;
-import it.polimi.ingsw.Rmi.VirtualServerRmi;
+import it.polimi.ingsw.gui.Controller;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 
 public class HomeController extends Controller {

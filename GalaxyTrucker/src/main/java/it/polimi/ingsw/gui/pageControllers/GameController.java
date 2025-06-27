@@ -1,5 +1,6 @@
-    package it.polimi.ingsw.gui;
+    package it.polimi.ingsw.gui.pageControllers;
 
+    import it.polimi.ingsw.gui.Controller;
     import javafx.fxml.FXML;
     import javafx.scene.control.TextArea;
     import javafx.scene.image.Image;
@@ -9,11 +10,16 @@
     import java.rmi.RemoteException;
     import java.util.Arrays;
     import java.util.HashMap;
+    import java.util.Map;
     import java.util.Objects;
+
+    import it.polimi.ingsw.gui.CardsUtils;
 
     public class GameController extends Controller {
 
 
+        @FXML private ImageView background;
+        @FXML private ImageView cardPlaceHolder;
         @FXML private TextArea playerColorArea;
         @FXML private ImageView pos_0;
         @FXML private ImageView pos_1;
@@ -45,6 +51,8 @@
 
         private ImageView[] tileViews;
 
+        private final CardsUtils utils = new CardsUtils();
+
         @FXML
         private void initialize() {
             tileViews = new ImageView[] {
@@ -54,13 +62,12 @@
                     pos_18, pos_19, pos_20, pos_21, pos_22, pos_23
             };
 
-            for (int i = 0; i < tileViews.length; i++) {
-                if (tileViews[i] == null) {
-                    System.err.println("⚠️ pos_" + i + " is null");
-                }
-            }
+            cardPlaceHolder.setImage(new Image(Objects.requireNonNull(getClass().getResource("/cardsCover/Cover1.jpg")).toExternalForm()));
 
             playerColorArea.setEditable(false);
+
+            background.setImage(new Image(Objects.requireNonNull(getClass().getResource("/backgrounds/game.png")).toExternalForm()));
+
         }
 
         @FXML
@@ -105,6 +112,11 @@
             }
         }
 
+        public void setCard(String name, Integer level){
+            Image image = utils.resolveCardImage(name,level);
+            cardPlaceHolder.setImage(image);
+        }
+
         public void onLoad() throws RemoteException {
             System.out.println("Chiamato updateBoard");
             int[] boardInfo = clientRmi.server.guiBoardInfo();
@@ -122,4 +134,7 @@
             };
             return new Image(Objects.requireNonNull(getClass().getResource(path)).toExternalForm());
         }
+
+
+
     }
