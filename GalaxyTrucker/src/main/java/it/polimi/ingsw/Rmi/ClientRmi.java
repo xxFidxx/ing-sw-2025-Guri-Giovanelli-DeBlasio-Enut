@@ -20,10 +20,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
@@ -848,7 +845,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Here are your goods, you will have to remove the most valuable ones");
                 System.out.println("Press 0 to continue");
             }
-            case CARGO_VIEW -> System.out.println("Choose what to do: press 0 to add a good from the reward, 1 to swap goods, 2 to delete a good, 3 to end Cargo Management");
+            case CARGO_VIEW -> {
+                Cargos cargos = (Cargos) currentEvent.getData();
+                mainApp.cargoManagement(cargos.getCargos());
+            }
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
             case LEAST_CREW -> System.out.print("You have the least crew");
@@ -858,7 +858,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
-            case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
+            case CHOOSE_PLANETS -> {
+                System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
+                DataContainer data = currentEvent.getData();
+                ArrayList<Planet> planets = ((PlanetsBlock) data).getPlanets();
+                int size = planets.size();
+                mainApp.choosePlanet(size);
+            }
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
