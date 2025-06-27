@@ -329,7 +329,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         controller.putTileBack(listener);
     }
     @Override
-    public void choosePlanets(VirtualViewRmi clientRmi, int i)throws RemoteException{
+    public void choosePlanets(VirtualViewRmi clientRmi, int i) throws RemoteException,CargoManagementException {
         ClientListenerRmi listener = realClientListeners.get(clientRmi);
         controller.choosePlanets(listener,i);
     }
@@ -340,7 +340,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
     }
 
     @Override
-    public void handlePlanets(VirtualViewRmi clientRmi) throws RemoteException {
+    public void handlePlanets(VirtualViewRmi clientRmi) throws RemoteException,CargoManagementException {
         ClientListenerRmi listener = realClientListeners.get(clientRmi);
         controller.handlePlanets(listener);
     }

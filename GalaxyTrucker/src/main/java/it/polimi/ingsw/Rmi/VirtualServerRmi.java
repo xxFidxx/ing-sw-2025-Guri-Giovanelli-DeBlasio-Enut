@@ -1,7 +1,7 @@
 package it.polimi.ingsw.Rmi;
 
 import it.polimi.ingsw.Server.VirtualServer;
-import it.polimi.ingsw.controller.ControllerExceptions;
+import it.polimi.ingsw.controller.ControllerExceptions; // Eccezioni di controller
 import it.polimi.ingsw.controller.LobbyExceptions;
 import it.polimi.ingsw.model.game.CargoManagementException;
 import it.polimi.ingsw.model.game.SpaceShipPlanceException;
@@ -35,21 +35,21 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void addTile(VirtualViewRmi clientRmi, int xIndex, int yIndex) throws RemoteException, SpaceShipPlanceException;
 
-    void chargeEngines(VirtualViewRmi clientRmi, int i) throws RemoteException;
+    void chargeEngines(VirtualViewRmi clientRmi, int i) throws RemoteException, ControllerExceptions; // AGGIUNTO
 
     void putTileBack(VirtualViewRmi client) throws RemoteException;
 
-    void choosePlanets(VirtualViewRmi clientRmi, int i)throws RemoteException;
+    void choosePlanets(VirtualViewRmi clientRmi, int i) throws RemoteException, CargoManagementException, ControllerExceptions; // AGGIUNTO
 
     void manageCard() throws RemoteException;
 
-    void handlePlanets(VirtualViewRmi clientRmi) throws RemoteException;
+    void handlePlanets(VirtualViewRmi clientRmi) throws RemoteException, CargoManagementException;
 
-    void fromChargeToManage(VirtualViewRmi clientRmi) throws RemoteException ;
+    void fromChargeToManage(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException ;
+    void addReserveSpot(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void endCargoManagement(VirtualViewRmi clientRmi) throws RemoteException ;
+    void endCargoManagement(VirtualViewRmi clientRmi) throws RemoteException;
 
     void chargeCannons(VirtualViewRmi clientRmi, ArrayList<Integer> chosenIndices) throws RemoteException;
 
@@ -73,19 +73,19 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     void handleSurrenderEnded(VirtualViewRmi clientRmi) throws RemoteException;
 
-    boolean removeBatteries(VirtualViewRmi clientRmi, int powerCenterId, int batteries)throws RemoteException;
+    boolean removeBatteries(VirtualViewRmi clientRmi, int powerCenterId, int batteries) throws RemoteException;
 
-    void endManagement(VirtualViewRmi clientRmi)throws RemoteException;
+    void endManagement(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void endCrewManagement(VirtualViewRmi clientRmi)throws RemoteException;
+    void endCrewManagement(VirtualViewRmi clientRmi) throws RemoteException;
 
-    void endMVGoodsManagement(VirtualViewRmi clientRmi)throws RemoteException;
+    void endMVGoodsManagement(VirtualViewRmi clientRmi) throws RemoteException;
 
     boolean removeMVGood(VirtualViewRmi clientRmi, int cargoIndex, int goodIndex) throws RemoteException;
 
     void showDecks(VirtualViewRmi clientRmi) throws RemoteException;
 
-    boolean showCardsbyDeck(VirtualViewRmi clientRmi, int nDeck) throws  RemoteException;
+    boolean showCardsbyDeck(VirtualViewRmi clientRmi, int nDeck) throws RemoteException;
 
     void endShowCards(VirtualViewRmi clientRmi, int i) throws RemoteException;
 
@@ -99,5 +99,5 @@ public interface VirtualServerRmi extends Remote, VirtualServer {
 
     int[] guiBoardInfo() throws RemoteException;
 
-    HashMap<String,Integer> playerColors() throws RemoteException;
+    HashMap<String, Integer> playerColors() throws RemoteException;
 }
