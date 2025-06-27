@@ -5,8 +5,10 @@ import it.polimi.ingsw.Rmi.VirtualServerRmi;
 import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
 import it.polimi.ingsw.gui.pageControllers.AssemblyController;
+import it.polimi.ingsw.gui.pageControllers.CargoManagementController;
 import it.polimi.ingsw.gui.pageControllers.GameController;
 import it.polimi.ingsw.gui.pageControllers.LobbyController;
+import it.polimi.ingsw.model.resources.GoodsContainer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +19,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +37,7 @@ public class MainApp extends Application {
         loadScene("lobby", "/fxmls/lobby.fxml");
         loadScene("assembly", "/fxmls/assembly.fxml");
         loadScene("game", "/fxmls/game.fxml");
+        loadScene("cargoManagement", "/fxmls/cargoManagement.fxml");
         loadScene("end", "/fxmls/end.fxml");
 
         // Start with the menu scene
@@ -122,4 +126,17 @@ public class MainApp extends Application {
     }
 
 
+
+    public void cargoManagement(ArrayList<GoodsContainer> cargos){
+        sceneManager.switchTo("cargoManagement");
+        Platform.runLater(() -> {
+            ((CargoManagementController) controllers.get("cargoManagement")).setCargos(cargos);
+        });
+    }
+
+    public void choosePlanet(int size) {
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).showPlanetsChoice(size);
+        });
+    }
 }

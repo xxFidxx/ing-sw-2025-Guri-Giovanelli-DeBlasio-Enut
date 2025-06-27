@@ -4,10 +4,16 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.gui.pageControllers.GameController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.gui.pageControllers.CargoManagementController">
    <children>
+      <Line endX="-100.0" endY="653.0" layoutX="185.0" layoutY="59.0" startX="-100.0" startY="5.0" />
+      <Line endX="-100.0" endY="653.0" layoutX="251.0" layoutY="59.0" startX="-100.0" startY="4.0" />
+      <Line endX="-100.0" endY="653.0" layoutX="285.0" layoutY="59.0" startX="-100.0" startY="6.0" />
+      <Line endX="-100.0" endY="653.0" layoutX="218.0" layoutY="59.0" startX="-100.0" startY="5.0" />
+      <Line endX="43.0" endY="676.0" layoutX="177.0" layoutY="32.0" startX="43.0" startY="33.0" />
       <ImageView fx:id="background" fitHeight="733.0" fitWidth="1298.0" layoutX="-8.0" layoutY="-4.0" pickOnBounds="true" preserveRatio="true" />
       <Label layoutX="432.0" layoutY="14.0" text="CARGO MANAGEMENT">
          <font>
@@ -15,5 +21,81 @@
          </font>
       </Label>
       <Button layoutX="1227.0" layoutY="681.0" mnemonicParsing="false" onAction="#handleNext" text="next" />
+      <AnchorPane fx:id="rewardCargoPane" layoutX="85.0" layoutY="72.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="goodReward0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="goodReward1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="goodReward2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="goodReward3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="goodReward4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <Button fx:id="rewardButton" layoutX="324.0" layoutY="77.0" mnemonicParsing="false" text="Reward" />
+      <Button id="0" fx:id="cargo0Button" layoutX="324.0" layoutY="161.0" mnemonicParsing="false" text="Button" />
+      <Button id="1" fx:id="cargo1Button" layoutX="324.0" layoutY="231.0" mnemonicParsing="false" text="Button" />
+      <Button id="2" fx:id="cargo2Button" layoutX="324.0" layoutY="317.0" mnemonicParsing="false" text="Button" />
+      <Button id="3" fx:id="cargo3Button" layoutX="324.0" layoutY="423.0" mnemonicParsing="false" text="Button" />
+      <Button id="4" fx:id="cargo4Button" layoutX="324.0" layoutY="522.0" mnemonicParsing="false" text="Button" />
+      <Button id="5" fx:id="cargo5Button" layoutX="324.0" layoutY="613.0" mnemonicParsing="false" text="Button" />
+      <AnchorPane fx:id="cargo1Pane" layoutX="84.0" layoutY="156.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="cargo0Good0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="cargo0Reward1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="cargo0Good2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="cargo0Good3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="cargo0Good4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="cargo2Pane" layoutX="84.0" layoutY="226.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="cargo1Good0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="cargo1Good1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="cargo1Good2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="cargo1Good3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="cargo1Good4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="cargo3Pane" layoutX="85.0" layoutY="312.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="cargo2Good0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="cargo2Good1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="cargo2Good2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="cargo2Good3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="cargo2Good4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="cargo4Pane" layoutX="84.0" layoutY="418.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="cargo3Good0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="cargo3Good1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="cargo3Good2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="cargo3Good3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="cargo3Good4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="cargo5Pane" layoutX="84.0" layoutY="517.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="cargo4Good0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="cargo4Good1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="cargo4Good2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="cargo4Good3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="cargo4Good4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="cargo6Pane" layoutX="84.0" layoutY="608.0" prefHeight="35.0" prefWidth="201.0">
+         <children>
+            <ImageView id="0" fx:id="cargo5Good0" fitHeight="25.0" fitWidth="27.0" layoutX="1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="1" fx:id="cargo5Good1" fitHeight="25.0" fitWidth="27.0" layoutX="36.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="2" fx:id="cargo5Good2" fitHeight="25.0" fitWidth="27.0" layoutX="74.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="3" fx:id="cargo5Good3" fitHeight="25.0" fitWidth="27.0" layoutX="101.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+            <ImageView id="4" fx:id="cargo5Good4" fitHeight="25.0" fitWidth="27.0" layoutX="136.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#handleOnGoodClicked" />
+         </children>
+      </AnchorPane>
+      <Button fx:id="addGoodButton" layoutX="624.0" layoutY="601.0" mnemonicParsing="false" onAction="#onAddGoodButtonClicked" text="AddGood" />
+      <Button fx:id="swapGoodsButton" layoutX="721.0" layoutY="601.0" mnemonicParsing="false" onAction="#onSwapGoodsButtonClicked" text="SwapGoods" />
+      <Button fx:id="removeGoodButton" layoutX="837.0" layoutY="601.0" mnemonicParsing="false" onAction="#onRemoveGoodButtonClicked" text="RemoveGood" />
+      <Button fx:id="endButton" layoutX="1075.0" layoutY="681.0" mnemonicParsing="false" onAction="#endCargoManagement" text="End" />
+      <Button fx:id="confirmButton" layoutX="658.0" layoutY="656.0" mnemonicParsing="false" onAction="#onConfirmClicked" text="Confirm" />
+      <Button fx:id="cancelButton" layoutX="781.0" layoutY="656.0" mnemonicParsing="false" onAction="#onCancelClicked" text="Reset" />
    </children>
 </AnchorPane>

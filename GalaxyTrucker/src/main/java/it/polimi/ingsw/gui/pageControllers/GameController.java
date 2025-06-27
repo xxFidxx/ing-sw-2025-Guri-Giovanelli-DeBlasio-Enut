@@ -1,7 +1,11 @@
     package it.polimi.ingsw.gui.pageControllers;
 
     import it.polimi.ingsw.gui.Controller;
+    import it.polimi.ingsw.gui.ShowTextUtils;
+    import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
+    import javafx.scene.control.Button;
+    import javafx.scene.control.ChoiceBox;
     import javafx.scene.control.TextArea;
     import javafx.scene.image.Image;
     import javafx.scene.image.ImageView;
@@ -18,6 +22,8 @@
     public class GameController extends Controller {
 
 
+        @FXML private ChoiceBox planetsChoice;
+        @FXML private Button confirmPlanetButton;
         @FXML private ImageView background;
         @FXML private ImageView cardPlaceHolder;
         @FXML private TextArea playerColorArea;
@@ -112,14 +118,32 @@
             }
         }
 
+        public void showPlanetsChoice(int n) {
+            planetsChoice.getItems().clear();
+
+            for (int i = 1; i <= n; i++) {
+                planetsChoice.getItems().add("Planet " + i);
+            }
+
+            planetsChoice.getSelectionModel().selectFirst();
+            planetsChoice.setDisable(false);
+            confirmPlanetButton.setDisable(false);
+            confirmPlanetButton.setVisible(true);
+        }
+
         public void setCard(String name, Integer level){
             Image image = utils.resolveCardImage(name,level);
             cardPlaceHolder.setImage(image);
         }
 
-        public void onLoad() throws RemoteException {
+        public void onLoad() {
             System.out.println("Chiamato updateBoard");
-            int[] boardInfo = clientRmi.server.guiBoardInfo();
+            int[] boardInfo = null;
+            try {
+                boardInfo = clientRmi.server.guiBoardInfo();
+            } catch (Exception e) {
+                ShowTextUtils.showTextVolatile("Error", e.getMessage());
+            }
             System.out.println(Arrays.toString(boardInfo));
             updateBoard(boardInfo);
         }
@@ -136,5 +160,19 @@
         }
 
 
-
+        @FXML
+        private void onConfirmPlanetClicked() {
+            int selectedIndex = planetsChoice.getSelectionModel().getSelectedIndex();
+            if (selectedIndex >= 0) {
+                try {
+                    clientRmi.server.choosePlanets(clientRmi ,selectedIndex);
+                } catch (RemoteException e) {
+                    ShowTextUtils.showTextVolatile("Error", e.getMessage());
+                }
+                confirmPlanetButton.setDisable(true);
+                planetsChoice.setDisable(true);
+            } else {
+                ShowTextUtils.showTextVolatile("Error", "No planet selected.");
+            }
+        }
     }
