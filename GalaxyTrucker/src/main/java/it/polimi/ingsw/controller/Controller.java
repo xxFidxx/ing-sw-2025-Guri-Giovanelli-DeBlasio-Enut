@@ -44,7 +44,7 @@ public class Controller{
     private int currentDiceThrow;
     private ArrayList<Player> tmpPlayers;
     private List<AdventureCard> cards;
-    private final ArrayList<Player> defeatedPlayers;
+    private ArrayList<Player> defeatedPlayers;
     private boolean combatZoneFlag;
     private boolean piratesFlag;
     private boolean smugglersFlag;
@@ -82,6 +82,8 @@ public class Controller{
     // Setter e getter utili per il testing
     public void setPlayers(ArrayList<Player> players) { this.players = players;}
     public void setTmpPlayers(ArrayList<Player> tmpPlayers) { this.tmpPlayers = tmpPlayers;}
+    public void setDefeatedPlayers(ArrayList<Player> defeatedPlayers) { this.defeatedPlayers = defeatedPlayers;}
+    public void setDisconnectedPlayers(ArrayList<Player> disconnectedPlayers) { this.disconnectedPlayers = disconnectedPlayers;}
     public ArrayList<Player> getTmpPlayers() { return tmpPlayers; }
     public void addRealListener(ClientListener listener) { realListeners.add(listener);}
     public void addRealListeners(Collection<ClientListener> listeners) { this.realListeners.addAll(listeners);}
@@ -97,6 +99,14 @@ public class Controller{
         return currentAdventureCard;
     }
     public void setCurrentAdventureCard(AdventureCard currentAdventureCard) { this.currentAdventureCard = currentAdventureCard;}
+    public void setEnemyDefeated(){ this.enemyDefeated=true;}
+    public void setCargoended(){ this.cargoended=true;}
+    public boolean getCargoended(){return this.cargoended;}
+    public boolean getSmugglersFlag(){return this.smugglersFlag;}
+    public void setPiratesended(){ this.piratesended=true;}
+    public boolean getPiratesended(){return this.piratesended;}
+    public boolean getPiratesFlag(){return this.piratesFlag;}
+
 
 
     public boolean getPause(){
@@ -831,7 +841,6 @@ public class Controller{
                     tmpPlayers.remove(currentPlayer);
                     manageCard();
                 }
-
             }
 
             case PlanetsCard pc -> {
@@ -856,7 +865,6 @@ public class Controller{
             }
 
             case MeteorSwarmCard msc -> {
-                System.out.println("manageCard: entro");
                 Projectile[] meteorArray = ((MeteorSwarmCard) currentAdventureCard).getMeteors();
                 int length = meteorArray.length;
                 int i = 0;
@@ -1196,7 +1204,7 @@ public class Controller{
         }
     }
 
-    private void handleWaitersPlanets(Player chosenPlayer) {
+    public void handleWaitersPlanets(Player chosenPlayer) {
 
         lastMethodCalled = "handleWaitersPlanets";
         System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
