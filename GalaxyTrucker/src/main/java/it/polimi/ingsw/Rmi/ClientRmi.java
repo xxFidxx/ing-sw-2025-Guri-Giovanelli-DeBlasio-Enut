@@ -535,6 +535,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             if(inputLine.equals("-1")){
                                 server.endCargoManagement(this);
                                 System.out.print("Cargo management ended:\n");
+                                inputValid = true;
                             }else{
                                 try {
                                     String[] parts = inputLine.split(" ");
@@ -571,6 +572,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                                 if(inputLine.equals("-1")){
                                     server.endCargoManagement(this);
                                     System.out.print("Cargo management ended:\n");
+                                    inputValid = true;
                                 }else {
                                     String[] parts = inputLine.split(" ");
                                     if (parts.length == 4) {
@@ -603,6 +605,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             if(inputLine.equals("-1")){
                                 server.endCargoManagement(this);
                                 System.out.print("Cargo management ended:\n");
+                                inputValid = true;
                             }else{
                                 try {
                                     String[] parts = inputLine.split(" ");
@@ -943,8 +946,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LEAST_CREW -> System.out.println("You have the least crew");
             case LEAST_ENGINE -> System.out.println("You have the least engine strength");
             case LEAST_FIRE -> System.out.println("You have the least fire strength");
-            // case MOVE_PLAYER -> System.out.println("You have the least crew");
-            // case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
             case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
@@ -1043,6 +1044,14 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PickableTiles pt -> printPickableTiles(pt.getTilesId(), pt.getReservedTiles());
             case PickedTile ptl -> System.out.println(ptl.getDescription());
             case Card c -> System.out.println("Card: " + c.getName() + ", level: " + c.getLevel());
+            case AbShipCard asc -> System.out.println("Card: " + asc.getName() + ", level: " + asc.getLevel() + ", lostDays: " + asc.getLostDays() + ", lostCrew: " + asc.getLostCrew() + ", credits: " + asc.getCredits());
+            case AbStationCard asc -> printAbStationCard(asc);
+            case CZCCrew czc -> System.out.println("Card: " + czc.getName() + ", level: " + czc.getLevel() + ", lostDays: " + czc.getLostDays() + ", lostCrew: " + czc.getLostCrew() + ", cannonShots: 2");
+            case CZCGoods czc -> System.out.println("Card: " + czc.getName() + ", level: " + czc.getLevel() + ", lostDays: " + czc.getLostDays() + ", lostGoods: " + czc.getLostGoods() + ", cannonShots: 4");
+            case Pirates pc -> System.out.println("Card: " + pc.getName() + ", level: " + pc.getLevel()  + ", lostDays: " + pc.getLostDays() + ", credits: " + pc.getCredits());
+            case Planets pc -> System.out.println("Card: " + pc.getName() + ", level: " + pc.getLevel()  + ", lostDays: " + pc.getLostDays());
+            case Slavers sc -> System.out.println("Card: " + sc.getName() + ", level: " + sc.getLevel() + ", lostDays: " + sc.getLostDays() + ", lostCrew: " + sc.getLostCrew() + ", credits: " + sc.getCredits());
+            case Smugglers sc -> printSmugglers(sc);
             case AdventureCardsData adC -> printCards(adC.getAdventureCards());
             case Cargos c -> printCargos(c.getCargos());
             case CrewManagement cM-> printConnectedCabin(cM.getCabins());
@@ -1139,6 +1148,23 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.print("\n");}
         }
         System.out.print("\n");
+    }
+
+    private void printGoodsBlock(GoodsBlock[] blocks){
+        for(GoodsBlock block : blocks){
+            System.out.printf(" [" + block.getValue() + "] ");
+        }
+        System.out.print("\n");
+    }
+
+    private void printAbStationCard(AbStationCard asc) {
+        System.out.print("Card: " + asc.getName() + ", level: " + asc.getLevel() + ", lostDays: " + asc.getLostDays() + ", requiredCrew: " + asc.getRequiredCrew() + ", reward: ");
+        printGoodsBlock(asc.getReward());
+    }
+
+    private void printSmugglers(Smugglers sc) {
+        System.out.print("Card: " + sc.getName() + ", level: " + sc.getLevel() + ", lostDays: " + sc.getLostDays() + ", lostGoods " + sc.getLostGoods() + ", reward: ");
+        printGoodsBlock(sc.getReward());
     }
 
     private void printCargos(ArrayList<GoodsContainer> cargos) {

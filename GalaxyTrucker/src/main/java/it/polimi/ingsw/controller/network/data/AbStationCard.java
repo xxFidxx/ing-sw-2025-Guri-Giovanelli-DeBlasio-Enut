@@ -1,0 +1,39 @@
+package it.polimi.ingsw.controller.network.data;
+
+import it.polimi.ingsw.model.bank.GoodsBlock;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+public class AbStationCard extends DataContainer implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String name;
+    private int level;
+    int lostDays;
+    int requiredCrew;
+    GoodsBlock[] reward;
+
+    public AbStationCard(String name, int level, int lostDays, int requiredCrew, GoodsBlock[] reward) {
+        super();
+        this.name = name;
+        this.level = level;
+        this.lostDays = lostDays;
+        this.requiredCrew = requiredCrew;
+        this.reward = reward;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getLostDays() { return lostDays; }
+
+    public int getRequiredCrew() { return requiredCrew; }
+
+    public GoodsBlock[] getReward() { return reward; }
+}

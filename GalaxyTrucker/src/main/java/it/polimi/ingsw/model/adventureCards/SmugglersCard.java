@@ -28,6 +28,8 @@ public class SmugglersCard extends EnemyCard {
         return lossMalus;
     }
 
+    public GoodsBlock[] getReward() { return reward; }
+
     @Override
     public String toString() {
         return super.toString() + "SmugglersCard{" +

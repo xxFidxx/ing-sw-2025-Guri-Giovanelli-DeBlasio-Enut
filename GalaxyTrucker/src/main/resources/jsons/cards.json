@@ -1,5 +1,26 @@
 [
   {
+    "type": "EpidemicCard",
+    "name": "Epidemic",
+    "level": 2
+  },
+  {
+    "type": "AbandonedShipCard",
+    "name": "Abandoned Ship",
+    "level": 1,
+    "lostDays": 1,
+    "lostCrew": 2,
+    "credits": 3
+  },
+  {
+    "type": "AbandonedStationCard",
+    "name": "Abandoned Station 2",
+    "level": 1,
+    "lostDays": 1,
+    "requiredCrew": 6,
+    "reward": [3, 3]
+  },
+  {
     "type": "MeteorSwarmCard",
     "name": "Meteor Swarm 2",
     "level": 1,
@@ -110,14 +131,6 @@
     ]
   },
   {
-    "type": "AbandonedShipCard",
-    "name": "Abandoned Ship",
-    "level": 1,
-    "lostDays": 1,
-    "lostCrew": 2,
-    "credits": 3
-  },
-  {
     "type": "PlanetsCard",
     "name": "Planets 3",
     "level": 1,
@@ -161,14 +174,6 @@
     ]
   },
   {
-    "type": "AbandonedStationCard",
-    "name": "Abandoned Station 2",
-    "level": 1,
-    "lostDays": 1,
-    "requiredCrew": 6,
-    "reward": [3, 3]
-  },
-  {
     "type": "StardustCard",
     "name": "Stardust",
     "level": 2,
@@ -181,11 +186,6 @@
     "lostDays": 1,
     "lostCrew": 3,
     "credits": 4
-  },
-  {
-    "type": "EpidemicCard",
-    "name": "Epidemic",
-    "level": 2
   },
   {
     "type": "EpidemicCard",

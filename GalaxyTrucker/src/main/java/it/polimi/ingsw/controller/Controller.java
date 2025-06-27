@@ -267,7 +267,68 @@ public class Controller{
             }
 
             case DRAW_CARD -> {
-                event = new Event(state, (Card) data);
+                String cardName = currentAdventureCard.getName();
+                int cardLevel = currentAdventureCard.getLevel();
+                switch(currentAdventureCard){
+                    case AbandonedShipCard asc -> {
+                        int ld = ((AbandonedShipCard) currentAdventureCard).getLostDays();
+                        int lc = ((AbandonedShipCard) currentAdventureCard).getLostCrew();
+                        int cr = ((AbandonedShipCard) currentAdventureCard).getReward();
+                        AbShipCard ashipc = new AbShipCard(cardName, cardLevel, ld, lc, cr);
+                        event = new Event(state, ashipc);
+                    }
+                    case AbandonedStationCard asc -> {
+                        int ld = ((AbandonedStationCard) currentAdventureCard).getLostDays();
+                        int rc = ((AbandonedStationCard) currentAdventureCard).getRequiredCrew();
+                        GoodsBlock[] rw = ((AbandonedStationCard) currentAdventureCard).getReward();
+                        for(GoodsBlock block: rw){
+                            System.out.printf(" [" + block.getValue() + "] ");
+                        }
+                        AbStationCard astationc = new AbStationCard(cardName, cardLevel, ld, rc, rw);
+                        event = new Event(state, astationc);
+                    }
+                    case CombatZoneCard czc -> {
+                        int ld = ((CombatZoneCard) currentAdventureCard).getLostDays();
+                        if(((CombatZoneCard) currentAdventureCard).getType() == CombatZoneType.LOSTCREW){
+                            int lc = ((CombatZoneCard) currentAdventureCard).getLostOther();
+                            CZCCrew czcg = new CZCCrew(cardName, cardLevel, ld, lc);
+                            event = new Event(state, czcg);
+                        } else {
+                            int lg = ((CombatZoneCard) currentAdventureCard).getLostOther();
+                            CZCGoods czcg = new CZCGoods(cardName, cardLevel, ld, lg);
+                            event = new Event(state, czcg);
+                        }
+                    }
+                    case PiratesCard pc -> {
+                        int ld = ((PiratesCard) currentAdventureCard).getLostDays();
+                        int cr = ((PiratesCard) currentAdventureCard).getReward();
+                        Pirates pcdata = new Pirates(cardName, cardLevel, ld, cr);
+                        event = new Event(state, pcdata);
+                    }
+                    case PlanetsCard pc -> {
+                        int ld = ((PlanetsCard) currentAdventureCard).getLostDays();
+                        Planets pl = new Planets(cardName, cardLevel, ld);
+                        event = new Event(state, pl);
+                    }
+                    case SlaversCard sc -> {
+                        int ld = ((SlaversCard) currentAdventureCard).getLostDays();
+                        int lc = ((SlaversCard) currentAdventureCard).getLostCrew();
+                        int cr = ((SlaversCard) currentAdventureCard).getReward();
+                        Slavers scdata = new Slavers(cardName, cardLevel, ld, lc, cr);
+                        event = new Event(state, scdata);
+                    }
+                    case SmugglersCard sm -> {
+                        int ld = ((SmugglersCard) currentAdventureCard).getLostDays();
+                        int lg = ((SmugglersCard) currentAdventureCard).getLossMalus();
+                        GoodsBlock[] rw = ((SmugglersCard) currentAdventureCard).getReward();
+                        Smugglers smdata = new Smugglers(cardName, cardLevel, ld, lg, rw);
+                        event = new Event(state, smdata);
+                    }
+                    default -> {
+                        Card card = new Card(cardName, cardLevel);
+                        event = new Event(state, card);
+                    }
+                }
             }
 
             case SHOW_CARDS ->{
@@ -599,8 +660,8 @@ public class Controller{
 //            currentAdventureCard = cards.get(randomNumber);
             currentAdventureCard = cards.getFirst();
             String cardName = currentAdventureCard.getName();
-            int cardLevel = currentAdventureCard.getLevel();
-            Card card = new Card(cardName, cardLevel);
+            // int cardLevel = currentAdventureCard.getLevel();
+            // Card card = new Card(cardName, cardLevel);
 
 
             // aggiorniamo liste della nave prima di attivare la carta
@@ -608,14 +669,14 @@ public class Controller{
                 player.getSpaceshipPlance().updateLists();
             }
             if (cardName != null) {
-                notifyAllRealListeners(eventCrafter(GameState.DRAW_CARD, card, null));
+                notifyAllRealListeners(eventCrafter(GameState.DRAW_CARD, null, null));
                 if(players.size() > 1 || !(currentAdventureCard instanceof CombatZoneCard)){
                     orderPlayers();
                     tmpPlayers = new ArrayList<>(players);
                     isDone.replaceAll((c, v) -> false);
                     manageCard();
                 }else{
-                    notifyAllRealListeners(eventCrafter(GameState.SKIPPED_CARD, card, null));
+                    notifyAllRealListeners(eventCrafter(GameState.SKIPPED_CARD, null, null));
                     resetShowAndDraw();
                 }
             }
@@ -1471,7 +1532,6 @@ public class Controller{
            ClientListener l= listenerbyPlayer.get(p);
             if (defeatedPlayers.contains(p)) {
                 defeatedPlayers.remove(p);
-                //sendToCrewManagement(p);
                 int lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
                 l.onEvent(eventCrafter(GameState.CREW_MANAGEMENT, lostCrew, p));
             } else {
