@@ -305,7 +305,6 @@ public class SpaceshipPlance {
                                                 if(tile2 instanceof LifeSupportSystem)
                                                     colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
                                                 else if(figures[0] != null || figures[1] != null){
-                                                    System.out.println("ho una interconnected cab: " + cab + "   altra cab     " + tile2);
                                                     // if a cabin has 0 crew, I don't need to use it epidemic card
                                                     interconnectedCabins.add(cab);
                                                 }

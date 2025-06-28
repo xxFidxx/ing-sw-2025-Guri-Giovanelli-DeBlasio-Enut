@@ -283,7 +283,7 @@ public class SocketServer implements VirtualServerSocket {
                     break;
 
                 case "removeFigureEpidemic":
-                    result = controller.removeFigureEpidemic(clientListeners.get(out), (int) parameters[0]);
+                    controller.removeFigureEpidemic(clientListeners.get(out));
                     break;
 
                 case "endCrewManagement":

@@ -418,9 +418,9 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         return controller.removeFigure(listener,cabinId);
     }
 
-    public boolean removeFigureEpidemic(VirtualViewRmi clientRmi, int cabinId) throws RemoteException {
+    public void removeFigureEpidemic(VirtualViewRmi clientRmi) throws RemoteException {
         ClientListenerRmi listener = realClientListeners.get(clientRmi);
-        return controller.removeFigureEpidemic(listener,cabinId);
+         controller.removeFigureEpidemic(listener);
     }
 
     public boolean isEpidemicDone(VirtualViewRmi clientRmi) throws RemoteException {
