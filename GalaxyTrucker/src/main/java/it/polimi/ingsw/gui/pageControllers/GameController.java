@@ -2,6 +2,7 @@
 
     import it.polimi.ingsw.gui.Controller;
     import it.polimi.ingsw.gui.ShowTextUtils;
+    import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
     import javafx.scene.control.Button;
     import javafx.scene.control.ChoiceBox;
@@ -104,6 +105,7 @@
         }
 
         public void setPlayerColorArea(HashMap<String,Integer> playerColor){
+            playerColorArea.clear();
             for(String s: playerColor.keySet()){
                 String color = switch (playerColor.get(s)) {
                     case 1 -> "blue";
@@ -141,7 +143,7 @@
             try {
                 boardInfo = clientRmi.server.guiBoardInfo();
             } catch (Exception e) {
-                ShowTextUtils.showTextVolatile("Error", e.getMessage());
+                ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
             }
             System.out.println(Arrays.toString(boardInfo));
             updateBoard(boardInfo);
@@ -165,16 +167,15 @@
             if (selectedIndex >= 0) {
                 try {
                     clientRmi.server.choosePlanets(clientRmi ,selectedIndex);
-                } catch (RemoteException e) {
-                    ShowTextUtils.showTextVolatile("Error", e.getMessage());
+                } catch (Exception e) {
+                    ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
                 }
                 confirmPlanetButton.setDisable(true);
                 planetsChoice.setDisable(true);
             } else {
-                ShowTextUtils.showTextVolatile("Error", "No planet selected.");
+                ShowTextUtils.showTextVolatileImmediate("Error", "No planet selected.");
             }
         }
-
 
 
     }

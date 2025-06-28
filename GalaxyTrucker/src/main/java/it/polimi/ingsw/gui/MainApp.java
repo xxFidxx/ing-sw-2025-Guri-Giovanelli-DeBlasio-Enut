@@ -22,13 +22,19 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 public class MainApp extends Application {
 
     private SceneManager sceneManager;
-    private ClientRmi clientRmi;
-    private Map<String, Controller> controllers = new HashMap<>();
+    private final Map<String, Controller> controllers = new HashMap<>();
     private Controller activeController;
+    private final PopupHandler popupHandler = PopupHandler.getInstance();
+
+    public PopupHandler popupQueue() {
+        return popupHandler;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -53,12 +59,12 @@ public class MainApp extends Application {
         Registry registry = LocateRegistry.getRegistry(serverIp, 1234);
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
-        this.clientRmi = new ClientRmi(server);
-        this.clientRmi.setMainApp(this);
-        this.clientRmi.run(1);
+        ClientRmi clientRmi = new ClientRmi(server);
+        clientRmi.setMainApp(this);
+        clientRmi.run(1);
 
         for (Controller controller : controllers.values()) {
-            controller.setClientRmi(this.clientRmi);
+            controller.setClientRmi(clientRmi);
         }
     }
 
@@ -145,6 +151,7 @@ public class MainApp extends Application {
     }
 
     public void askSurrender(){
+        System.out.println("[DEBUG] MainApp.askSurrender() chiamato - controller attivo: " + activeController.getClass().getSimpleName());
         Platform.runLater(() -> {
             activeController.askSurrender();
         });
@@ -154,5 +161,9 @@ public class MainApp extends Application {
         Platform.runLater(() -> {
             activeController.waitPlayer();
         });
+    }
+
+    public void askSkip(String text, Consumer<Boolean> callback) {
+        activeController.askSkip(text, callback);
     }
 }

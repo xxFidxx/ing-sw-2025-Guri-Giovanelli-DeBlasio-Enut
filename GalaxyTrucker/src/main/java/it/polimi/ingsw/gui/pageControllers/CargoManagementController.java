@@ -265,7 +265,7 @@ public class CargoManagementController extends Controller {
             try {
                 clientRmi.server.addGood(clientRmi ,cargoPaneIndex, goodIndex, rewardIndex);
             } catch (Exception e) {
-                ShowTextUtils.showTextVolatile("Error", e.getMessage());
+                ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
             }
             System.out.println("[INFO] Added reward good " + rewardIndex + " to cargo pane " + cargoPaneIndex + ", slot " + goodIndex);
         } else if (!isAddOperation && firstSwapGood != null && pendingSecondGood != null) {
@@ -278,7 +278,7 @@ public class CargoManagementController extends Controller {
             try {
                 clientRmi.server.removeGood(clientRmi ,cargoPaneIndex, goodIndex);
             } catch (Exception e) {
-                ShowTextUtils.showTextVolatile("Error", e.getMessage());
+                ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
             }
             System.out.println("[INFO] Removed good from cargo pane " + cargoPaneIndex + ", slot " + goodIndex);
         } else {
@@ -302,7 +302,7 @@ public class CargoManagementController extends Controller {
         try {
             clientRmi.server.swapGoods(clientRmi , Integer.parseInt(pane1.getId()), Integer.parseInt(pane2.getId()), Integer.parseInt(id1) , Integer.parseInt(id2));
         } catch (Exception e) {
-            ShowTextUtils.showTextVolatile("Error", e.getMessage());
+            ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
         }
     }
 
@@ -348,8 +348,21 @@ public class CargoManagementController extends Controller {
     public void endCargoManagement(ActionEvent actionEvent) {
         try {
             clientRmi.server.endCargoManagement(clientRmi);
-        } catch (RemoteException e) {
-            ShowTextUtils.showTextVolatile("Error", e.getMessage());
+
+        } catch (Exception e) {
+            ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
         }
+        disableAllButtons();
+    }
+
+    private void disableAllButtons() {
+        endButton.setVisible(false);
+        endButton.setDisable(true);
+        addGoodButton.setVisible(false);
+        addGoodButton.setDisable(true);
+        swapGoodsButton.setVisible(false);
+        swapGoodsButton.setDisable(true);
+        removeGoodButton.setVisible(false);
+        removeGoodButton.setDisable(true);
     }
 }

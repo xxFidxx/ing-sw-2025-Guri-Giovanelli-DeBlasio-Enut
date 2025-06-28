@@ -249,7 +249,7 @@ public class AssemblyController extends Controller {
         try{
             clientRmi.server.endCrafting(clientRmi);
         }catch (Exception e){
-            ShowTextUtils.showTextVolatile("Exception",e.getMessage());
+            ShowTextUtils.showTextVolatileImmediate("Exception",e.getMessage());
         }
         //sceneManager.switchTo("game");
     }
@@ -379,7 +379,7 @@ public class AssemblyController extends Controller {
 
     public void requestDeck1() throws RemoteException {
         if(isHoldingTile)
-            ShowTextUtils.showTextVolatile("Illegal action", "You can't watch decks while you are holding a tile");
+            ShowTextUtils.showTextVolatileImmediate("Illegal action", "You can't watch decks while you are holding a tile");
         else{
             if(lookingDeck!=-1)
                 clientRmi.server.endShowCards(clientRmi, lookingDeck);
@@ -390,7 +390,7 @@ public class AssemblyController extends Controller {
 
     public void requestDeck2() throws RemoteException {
         if(isHoldingTile)
-            ShowTextUtils.showTextVolatile("Illegal action", "You can't watch decks while you are holding a tile");
+            ShowTextUtils.showTextVolatileImmediate("Illegal action", "You can't watch decks while you are holding a tile");
         else{
             if(lookingDeck!=-1)
                 clientRmi.server.endShowCards(clientRmi, lookingDeck);
@@ -401,7 +401,7 @@ public class AssemblyController extends Controller {
 
     public void requestDeck3() throws RemoteException {
         if(isHoldingTile)
-            ShowTextUtils.showTextVolatile("Illegal action", "You can't watch decks while you are holding a tile");
+            ShowTextUtils.showTextVolatileImmediate("Illegal action", "You can't watch decks while you are holding a tile");
         else{
             if(lookingDeck!=-1)
                 clientRmi.server.endShowCards(clientRmi, lookingDeck);
@@ -412,7 +412,7 @@ public class AssemblyController extends Controller {
 
     private void showDeckCards(int nDeck) throws RemoteException {
         if(!clientRmi.server.showCardsbyDeck(clientRmi, nDeck))
-            ShowTextUtils.showTextVolatile("Error","Another player is looking at this deck, please retry");
+            ShowTextUtils.showTextVolatileImmediate("Error","Another player is looking at this deck, please retry");
         else{
             lookingDeck = nDeck;
             System.out.println("showDeckCards");

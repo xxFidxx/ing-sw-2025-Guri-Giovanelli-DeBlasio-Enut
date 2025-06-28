@@ -5,38 +5,53 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ShowTextUtils {
 
-    public static void showTextWait(String header, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Messaggio");
-        alert.setHeaderText(header);
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
 
     public static void showTextVolatile(String header, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Messaggio");
-        alert.setHeaderText(header);
-        alert.setContentText(msg);
-        alert.show();
+        PopupHandler.getInstance().enqueue(() -> {
+            Alert infoBox = new Alert(Alert.AlertType.INFORMATION);
+            infoBox.setTitle(header);
+            infoBox.setContentText(msg);
+            infoBox.setOnHidden(event -> {
+                PopupHandler.getInstance().dequeue();
+            });
+            infoBox.show();
+        });
     }
 
-    public static boolean askYesNo(String header, String msg) {
+    public static void showTextVolatileImmediate(String header, String msg) {
+                Alert infoBox = new Alert(Alert.AlertType.INFORMATION);
+                infoBox.setTitle("Messaggio");
+                infoBox.setHeaderText(header);
+                infoBox.setContentText(msg);
+                infoBox.show();
+    }
+
+
+    public static Alert buildYesNo(String header, String text) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Conferma");
-        alert.setHeaderText(header);
-        alert.setContentText(msg);
+        alert.setTitle(header);
+        alert.setContentText(text);
 
-        ButtonType yesButton = new ButtonType("Sì", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+        ButtonType yes = new ButtonType("Sì", ButtonBar.ButtonData.YES);
+        ButtonType no = new ButtonType("No", ButtonBar.ButtonData.NO);
+        alert.getButtonTypes().setAll(yes, no);
 
-        alert.getButtonTypes().setAll(yesButton, noButton);
+        return alert;
+    }
 
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == yesButton;
+
+    public static void askYesNo(String header, String text, Consumer<Boolean> callback) {
+        PopupHandler.getInstance().enqueue(() -> {
+            Alert confirmBox = buildYesNo(header, text);
+            Optional<ButtonType> userChoice = confirmBox.showAndWait();
+            boolean confirmed = userChoice.isPresent() &&
+                    userChoice.get().getButtonData() == ButtonBar.ButtonData.YES;
+            callback.accept(confirmed);
+        });
     }
 
 }

@@ -911,11 +911,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> {
                 System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
-                DataContainer data = currentEvent.getData();
-                ArrayList<Planet> planets = ((PlanetsBlock) data).getPlanets();
-                int size = planets.size();
-                mainApp.choosePlanet(size);
+                mainApp.askSkip("Press YES to skip your turn, or press NO to land on one of the planets", skip -> {
+                    handleSkip(skip);
+                });
             }
+
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
@@ -945,6 +945,120 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
         }
         System.out.print("> ");
     }
+
+    public void handleSkip(boolean skip) {
+        try {
+            switch (currentState) {
+
+                case ASSEMBLY, PICKED_TILE, PICK_RESERVED_CARD, ADJUST_SHIP, SELECT_SHIP -> {
+                    if (skip) {
+                        server.endCrafting(this);
+                    }
+                }
+
+                case SHOW_DECKS -> {
+                    if (skip) {
+                        server.endShowCards(this, -1);
+                    }
+                }
+
+                case SHOW_CARDS -> {
+                    if (skip) {
+                        DataContainer data = currentEvent.getData();
+                        int nDeck = ((AdventureCardsData) data).getnDeck();
+                        server.endShowCards(this, nDeck);
+                    }
+                }
+
+                case CHOOSE_ALIEN -> {
+                    if (skip) {
+                        server.handleEndChooseAliens(this);
+                    }
+                }
+
+                case CREW_MANAGEMENT -> {
+                    if (skip) {
+                        server.endCrewManagement(this);
+                    }
+                }
+
+                case EPIDEMIC_MANAGEMENT -> {
+                    if (skip) {
+                        server.endCrewManagement(this);
+                    }
+                }
+
+                case BATTERIES_MANAGEMENT -> {
+                    if (skip) {
+                        server.endManagement(this);
+                    }
+                }
+
+                case REMOVE_EXTRA_BATTERIES -> {
+                    if (skip) {
+                        server.endMVGoodsManagement(this);
+                    }
+                }
+
+                case CARGO_VIEW -> {
+                    if (skip) {
+                        server.endCargoManagement(this);
+                    }
+                }
+
+                case CHOOSE_PLANETS -> {
+                    if (skip) {
+                        server.handlePlanets(this);
+                    }else{
+                        DataContainer data = currentEvent.getData();
+                        ArrayList<Planet> planets = ((PlanetsBlock) data).getPlanets();
+                        int size = planets.size();
+                        mainApp.choosePlanet(size);
+                    }
+                }
+
+                case ASK_SURRENDER -> {
+                    if (skip) {
+                        server.surrender(this);
+                        System.out.println("You surrendered, you will now be in spectator mode");
+                    } else {
+                        server.handleSurrenderEnded(this);
+                    }
+                }
+
+                case ASK_SHIELD -> {
+                    if (skip) {
+                        server.playerHit(this);
+                    } else {
+                        try {
+                            server.playerProtected(this);
+                        } catch (ControllerExceptions e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
+
+                case ASK_CANNON -> {
+                    if (skip) {
+                        server.playerHit(this);
+                    } else {
+                        try {
+                            server.playerProtected(this);
+                        } catch (ControllerExceptions e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
+
+                default -> {
+                    System.out.println("Skip not supported in current state: " + currentState);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error during skip handling: " + e.getMessage());
+        }
+    }
+
 
     private void handleState() throws RemoteException {
         System.out.print("\n");
