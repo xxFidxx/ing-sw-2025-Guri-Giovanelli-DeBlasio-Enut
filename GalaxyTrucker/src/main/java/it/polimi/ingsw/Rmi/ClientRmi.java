@@ -891,9 +891,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
                 mainApp.crewManagement((CrewManagement) data);
             }
-            case BATTERIES_MANAGEMENT -> {
+            case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
                 System.out.println("Press 0 to continue");
+                DataContainer data = getCurrentEvent().getData();
+                mainApp.batteriesManagement((BatteriesManagement) data);
             }
             case REMOVE_MV_GOODS -> {
                 System.out.println("Here are your goods, you will have to remove the most valuable ones");
@@ -1420,4 +1422,20 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     public DataContainer getData(){return currentEvent.getData();}
 
 
+    public void endBatteriesManagement() {
+        if(currentEvent.getState() == GameState.BATTERIES_MANAGEMENT) {
+            try {
+                server.endManagement(this);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            try {
+                server.endMVGoodsManagement(this);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

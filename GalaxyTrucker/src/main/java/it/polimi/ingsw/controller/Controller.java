@@ -2273,6 +2273,7 @@ public class Controller{
 
     public boolean addAlienCabin(ClientListener listener, int cabinId, String alienColor) {
         Player p = playerbyListener.get(listener);
+        p.getSpaceshipPlance().updateLists();
         ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
         for (Cabin c : cabins) {
             if (c.getId() == cabinId) {

@@ -2,6 +2,7 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
+import it.polimi.ingsw.controller.network.data.BatteriesManagement;
 import it.polimi.ingsw.controller.network.data.CrewManagement;
 import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
@@ -44,6 +45,7 @@ public class MainApp extends Application {
         loadScene("game", "/fxmls/game.fxml");
         loadScene("cargoManagement", "/fxmls/cargoManagement.fxml");
         loadScene("crewManagement", "/fxmls/crewManagement.fxml");
+        loadScene("batteriesManagement", "/fxmls/batteriesManagement.fxml");
         loadScene("end", "/fxmls/end.fxml");
 
         // Start with the menu scene
@@ -192,6 +194,14 @@ public class MainApp extends Application {
         sceneManager.switchTo("crewManagement");
         Platform.runLater(() -> {
             ((CrewManagementController) controllers.get("crewManagement")).showShip(data);
+        });
+    }
+
+    public void batteriesManagement(BatteriesManagement data) {
+        activeController = controllers.get("batteriesManagement");
+        sceneManager.switchTo("batteriesManagement");
+        Platform.runLater(() -> {
+            ((BatteriesManagementController) controllers.get("batteriesManagement")).showShip(data);
         });
     }
 }

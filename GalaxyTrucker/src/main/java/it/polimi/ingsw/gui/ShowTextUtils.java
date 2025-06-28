@@ -51,6 +51,8 @@ public class ShowTextUtils {
             boolean confirmed = userChoice.isPresent() &&
                     userChoice.get().getButtonData() == ButtonBar.ButtonData.YES;
             callback.accept(confirmed);
+
+            PopupHandler.getInstance().dequeue();
         });
     }
 
