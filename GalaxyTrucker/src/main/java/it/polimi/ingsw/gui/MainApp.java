@@ -28,6 +28,7 @@ public class MainApp extends Application {
     private SceneManager sceneManager;
     private ClientRmi clientRmi;
     private Map<String, Controller> controllers = new HashMap<>();
+    private Controller activeController;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -82,6 +83,7 @@ public class MainApp extends Application {
     }
 
     public void gameInit() {
+        activeController = controllers.get("assembly");
         sceneManager.switchTo("assembly");
     }
 
@@ -112,6 +114,7 @@ public class MainApp extends Application {
     }
 
     public void turnStart(int [] boardInfo, HashMap<String, Integer> playerColor) {
+            activeController = controllers.get("game");
             sceneManager.switchTo("game");
         Platform.runLater(() -> {
             ((GameController) controllers.get("game")).updateBoard(boardInfo);
@@ -128,6 +131,7 @@ public class MainApp extends Application {
 
 
     public void cargoManagement(ArrayList<GoodsContainer> cargos){
+        activeController = controllers.get("cargoManagement");
         sceneManager.switchTo("cargoManagement");
         Platform.runLater(() -> {
             ((CargoManagementController) controllers.get("cargoManagement")).setCargos(cargos);
@@ -137,6 +141,18 @@ public class MainApp extends Application {
     public void choosePlanet(int size) {
         Platform.runLater(() -> {
             ((GameController) controllers.get("game")).showPlanetsChoice(size);
+        });
+    }
+
+    public void askSurrender(){
+        Platform.runLater(() -> {
+            activeController.askSurrender();
+        });
+    }
+
+    public void waitPlayer(){
+        Platform.runLater(() -> {
+            activeController.waitPlayer();
         });
     }
 }

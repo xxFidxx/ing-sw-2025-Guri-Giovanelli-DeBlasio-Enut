@@ -19,4 +19,26 @@ public abstract class Controller {
 
     public void onLoad() throws RemoteException {}
 
+    public void waitPlayer(){
+        ShowTextUtils.showTextVolatile("Information", "Please wait until the other players complete their actions");
+    }
+
+    public void askSurrender(){
+        boolean surrender = ShowTextUtils.askYesNo("SURRENDER?", "Press yes you want to surrender, else press no ");
+        if(surrender) {
+            try {
+                clientRmi.server.surrender(clientRmi);
+            } catch (RemoteException e) {
+                ShowTextUtils.showTextVolatile("Error", e.getMessage());
+            }
+        }
+        else {
+            try {
+                clientRmi.server.handleSurrenderEnded(clientRmi);
+            } catch (RemoteException e) {
+                ShowTextUtils.showTextVolatile("Error", e.getMessage());
+            }
+        }
+    }
+
 }

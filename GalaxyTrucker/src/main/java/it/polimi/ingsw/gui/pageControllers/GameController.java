@@ -2,7 +2,6 @@
 
     import it.polimi.ingsw.gui.Controller;
     import it.polimi.ingsw.gui.ShowTextUtils;
-    import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
     import javafx.scene.control.Button;
     import javafx.scene.control.ChoiceBox;
@@ -14,7 +13,6 @@
     import java.rmi.RemoteException;
     import java.util.Arrays;
     import java.util.HashMap;
-    import java.util.Map;
     import java.util.Objects;
 
     import it.polimi.ingsw.gui.CardsUtils;
@@ -126,6 +124,7 @@
             }
 
             planetsChoice.getSelectionModel().selectFirst();
+            planetsChoice.setVisible(true);
             planetsChoice.setDisable(false);
             confirmPlanetButton.setDisable(false);
             confirmPlanetButton.setVisible(true);
@@ -175,4 +174,7 @@
                 ShowTextUtils.showTextVolatile("Error", "No planet selected.");
             }
         }
+
+
+
     }
