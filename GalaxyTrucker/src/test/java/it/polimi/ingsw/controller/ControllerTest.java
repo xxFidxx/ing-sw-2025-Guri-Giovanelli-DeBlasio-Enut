@@ -2,10 +2,12 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.Event;
+import it.polimi.ingsw.controller.network.Lobby;
 import it.polimi.ingsw.controller.network.data.DataString;
 import it.polimi.ingsw.model.adventureCards.*;
 import it.polimi.ingsw.model.componentTiles.*;
 import it.polimi.ingsw.model.game.*;
+import it.polimi.ingsw.model.game.Timer;
 import it.polimi.ingsw.model.resources.CombatZoneType;
 import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.Projectile;
@@ -24,6 +26,7 @@ public class ControllerTest {
     private ClientListener listener1, listener2;
     private AdventureCard card;
     private SpaceshipPlance spaceship;
+    private Lobby lobby;
 
     @Before
     public void setUp() {
@@ -61,7 +64,6 @@ public class ControllerTest {
         // Aggiungi alla lista giocatori
         controller.setPlayers(new ArrayList<>(Arrays.asList(player1, player2)));
         controller.addRealListeners(Arrays.asList(listener1, listener2));
-
     }
 
     @Test
@@ -811,8 +813,359 @@ public class ControllerTest {
                 event.getState() == GameState.NOT_MIN_EQUIP));
     }
 
+    @Test
+    public void testPickTile_reserveSpot0_success() throws LobbyExceptions {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+
+        ComponentTile tile = mock(ComponentTile.class);
+        when(game.pickTileReserveSpot(player1, 0)).thenReturn(tile);
+        controller.addPlayerListenerPair(listener1, player1);
+
+        controller.pickTile(listener1, 1000);
+
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.PICK_RESERVED_CARD));
+    }
+
+    @Test
+    public void testPickTile_reserveSpot1_success() throws LobbyExceptions {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+
+        ComponentTile tile = mock(ComponentTile.class);
+        when(game.pickTileReserveSpot(player1, 1)).thenReturn(tile);
+        controller.addPlayerListenerPair(listener1, player1);
+
+        controller.pickTile(listener1, 1001);
+
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.PICK_RESERVED_CARD ));
+    }
+
+    @Test
+    public void testPickTile_reserveSpot0_empty() throws LobbyExceptions {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+
+        when(game.pickTileReserveSpot(player1, 0)).thenReturn(null);
+        controller.addPlayerListenerPair(listener1, player1);
+
+        controller.pickTile(listener1, 1000);
+
+        verify(listener1).onEvent(argThat(event -> event.getState() == GameState.VOID_RESERVED_SPOT));
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.ASSEMBLY ));
+    }
+
+    @Test
+    public void testPickTile_normal_success() throws LobbyExceptions {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+
+        ComponentTile tile = mock(ComponentTile.class);
+        when(game.pickTile(player1, 42)).thenReturn(tile);
+        controller.addPlayerListenerPair(listener1, player1);
+
+        controller.pickTile(listener1, 42);
+
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.PICKED_TILE ));
+    }
 
 
+    @Test
+    public void testPickTile_normal_robbed() throws LobbyExceptions {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+
+        when(game.pickTile(player1, 42)).thenReturn(null);
+        controller.addPlayerListenerPair(listener1, player1);
+
+        controller.pickTile(listener1, 42);
+
+        verify(listener1).onEvent(argThat(event -> event.getState() == GameState.ROBBED_TILE));
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.ASSEMBLY ));
+    }
+
+    @Test
+    public void testAddTile_success() throws SpaceShipPlanceException {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+        ComponentTile tile = mock(ComponentTile.class);
+        SpaceshipPlance spaceship = mock(SpaceshipPlance.class);
+
+        when(player1.getHandTile()).thenReturn(tile);
+        when(player1.getSpaceshipPlance()).thenReturn(spaceship);
+        controller.addPlayerListenerPair(listener1, player1);
+
+        controller.addTile(listener1, 2, 3);
+
+        verify(spaceship).placeTileComponents(tile, 2, 3);
+        verify(controller).printSpaceship(listener1);
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.ASSEMBLY ));
+    }
+
+    @Test
+    public void testAddTile_withException() throws SpaceShipPlanceException {
+        Game game = mock(Game.class);
+        controller.setGame(game);
+        ComponentTile tile = mock(ComponentTile.class);
+        SpaceshipPlance spaceship = mock(SpaceshipPlance.class);
+
+        when(player1.getHandTile()).thenReturn(tile);
+        when(player1.getSpaceshipPlance()).thenReturn(spaceship);
+        doThrow(new SpaceShipPlanceException("invalid placement"))
+                .when(spaceship).placeTileComponents(tile, 1, 1);
+
+        controller.addPlayerListenerPair(listener1, player1);
+
+        assertThrows(SpaceShipPlanceException.class, () ->
+                controller.addTile(listener1, 1, 1)
+        );
+
+        verify(spaceship).placeTileComponents(tile, 1, 1);
+        verify(controller).printSpaceship(listener1);
+        verify(listener1).onEvent(argThat(event ->
+                event.getState() == GameState.ASSEMBLY ));
+    }
+
+    @Test
+    public void testAddNickname_lobbyPhase_notFull() throws LobbyExceptions {
+        Lobby lobby = spy(new Lobby(4));
+        controller.setLobby(lobby);
+
+        // Imposta lo stato corrente del gioco su LOBBY_PHASE
+        controller.setCurrentGameState(GameState.LOBBY_PHASE);
+
+        boolean result = controller.addNickname(listener1, "Alice");
+
+        assertTrue(controller.getRegistredListeners().containsKey(listener1));
+        assertTrue(controller.getRealListeners().contains(listener1));
+        verify(listener1).onEvent(argThat(e -> e.getState() == GameState.WAIT_LOBBY));
+        assertFalse(result);
+    }
+
+    @Test
+    public void testAddNickname_lobbyPhase_full() throws LobbyExceptions {
+        Lobby lobby = spy(new Lobby(1)); // Lobby con 1 solo posto
+        Controller controllerSpy = spy(new Controller()); // <-- spy invece del controller reale
+        controllerSpy.setLobby(lobby);
+        controllerSpy.setCurrentGameState(GameState.LOBBY_PHASE);
+
+        // Stub di gameInit per evitare eccezioni reali
+        doNothing().when(controllerSpy).gameInit();
+
+        // Stub: setPlayersNicknames simula aggiunta del nome
+        doAnswer(invocation -> {
+            lobby.getPlayersNicknames().add("Alice");
+            return null;
+        }).when(lobby).setPlayersNicknames("Alice");
+
+        when(lobby.isFull()).thenReturn(true);
+
+        boolean result = controllerSpy.addNickname(listener1, "Alice");
+
+        assertTrue(controllerSpy.getRegistredListeners().containsKey(listener1));
+        assertTrue(result);
+
+        verify(lobby).setPlayersNicknames("Alice");
+        verify(listener1).onEvent(argThat(e -> e.getState() == GameState.WAIT_LOBBY));
+        verify(controllerSpy).gameInit(); // <-- verifica che venga chiamato
+    }
+
+    @Test(expected = LobbyExceptions.class)
+    public void testAddNickname_noLobby() throws LobbyExceptions {
+        controller.setLobby(null); // Nessuna lobby presente
+        controller.setCurrentGameState(GameState.LOBBY_PHASE);
+
+        controller.addNickname(listener1, "Alice"); // Deve lanciare LobbyExceptions
+    }
+
+    @Test
+    public void testCreateLobby_success() {
+        Controller controller = new Controller();
+
+        // Aggiungi il listener alla lista corretta
+        controller.addTestListener(listener1); // oppure accedi direttamente se possibile
+
+        controller.createLobby(3);
+
+        assertNotNull(controller.getLobby());
+        assertEquals(GameState.LOBBY_PHASE, controller.getCurrentGameState());
+
+        // Verifica che listener1 abbia ricevuto l'evento corretto
+        verify(listener1).onEvent(argThat(e -> e.getState() == GameState.LOBBY_PHASE));
+    }
+
+    @Test(expected = LobbyExceptions.class)
+    public void testCreateLobby_alreadyExists() {
+        Controller controller = new Controller();
+        controller.setLobby(new Lobby(2)); // Lobby già impostata
+
+        controller.createLobby(3); // Deve lanciare eccezione
+    }
+
+    @Test(expected = LobbyExceptions.class)
+    public void testCreateLobby_tooFewPlayers() {
+        Controller controller = new Controller();
+        controller.createLobby(1); // Deve lanciare eccezione
+    }
+
+    @Test(expected = LobbyExceptions.class)
+    public void testCreateLobby_tooManyPlayers() {
+        Controller controller = new Controller();
+        controller.createLobby(5); // Deve lanciare eccezione
+    }
+
+    @Test
+    public void testNotifyAllListeners() {
+        Controller controller = new Controller();
+
+        // Crea due listener mock
+        ClientListener listener1 = mock(ClientListener.class);
+        ClientListener listener2 = mock(ClientListener.class);
+
+        // Aggiungili direttamente alla lista dei listeners
+        synchronized (controller.getListeners()) {
+            controller.getListeners().add(listener1);
+            controller.getListeners().add(listener2);
+        }
+
+        // Crea un evento dummy da inviare
+        Event event = new Event(GameState.LOBBY_PHASE, null);
+
+        // Chiamata al metodo da testare
+        controller.notifyAllListeners(event);
+
+        // Verifica che entrambi i listener abbiano ricevuto l'evento
+        verify(listener1).onEvent(event);
+        verify(listener2).onEvent(event);
+    }
+
+    @Test
+    public void testRemoveEventListener_removesListener() {
+        Controller controller = new Controller();
+
+        // Crea due listener mock
+        ClientListener listener1 = mock(ClientListener.class);
+        ClientListener listener2 = mock(ClientListener.class);
+
+        // Aggiungili alla lista listeners (usa getListeners o riflessione)
+        synchronized (controller.getListeners()) {
+            controller.getListeners().add(listener1);
+            controller.getListeners().add(listener2);
+        }
+
+        // Rimuovi listener1
+        controller.removeEventListener(listener1);
+
+        // Verifica che solo listener2 sia rimasto
+        List<ClientListener> remaining;
+        synchronized (controller.getListeners()) {
+            remaining = new ArrayList<>(controller.getListeners());
+        }
+
+        assertEquals(1, remaining.size());
+        assertTrue(remaining.contains(listener2));
+        assertFalse(remaining.contains(listener1));
+    }
+
+    @Test
+    public void testAddEventListener_idleState() {
+        Controller controller = new Controller();
+        controller.setCurrentGameState(GameState.IDLE);
+
+        ClientListener listener = mock(ClientListener.class);
+
+        controller.addEventListener(listener);
+
+        // Verifica che sia stato aggiunto
+        synchronized (controller.getListeners()) {
+            assertTrue(controller.getListeners().contains(listener));
+        }
+
+        // Verifica che riceva evento IDLE
+        verify(listener).onEvent(argThat(e -> e.getState() == GameState.IDLE));
+    }
+
+    @Test
+    public void testAddEventListener_lobbyPhase() {
+        Controller controller = new Controller();
+        controller.setCurrentGameState(GameState.LOBBY_PHASE);
+
+        ClientListener listener = mock(ClientListener.class);
+
+        controller.addEventListener(listener);
+
+        // Verifica che sia stato aggiunto
+        synchronized (controller.getListeners()) {
+            assertTrue(controller.getListeners().contains(listener));
+        }
+
+        // Verifica che riceva evento LOBBY_PHASE
+        verify(listener).onEvent(argThat(e -> e.getState() == GameState.LOBBY_PHASE));
+    }
+
+    /*@Test
+    public void testGameInit_success() {
+        // Mocka/nicknames
+        Lobby mockLobby = mock(Lobby.class);
+        when(mockLobby.getPlayersNicknames()).thenReturn(new ArrayList<>(Arrays.asList("Alice", "Bob")));
+
+        Game mockGame = mock(Game.class);
+        Timer mockTimer = mock(Timer.class);
+
+        // Mock giocatori
+        Player mockPlayer1 = mock(Player.class);
+        Player mockPlayer2 = mock(Player.class);
+
+        Flightplance mockFlightplance = mock(Flightplance.class);
+        Deck mockDeck = mock(Deck.class);
+        when(mockDeck.getCards()).thenReturn(new ArrayList<>());
+        when(mockFlightplance.getDeck()).thenReturn(mockDeck);
+
+        when(mockGame.getPlayers()).thenReturn(new ArrayList<>(Arrays.asList(mockPlayer1, mockPlayer2)));
+        when(mockGame.getFlightplance()).thenReturn(mockFlightplance);
+        when(mockGame.getTimer()).thenReturn(mockTimer);
+
+        // Spia Controller e inietti mock
+        Controller spyController = spy(new Controller());
+        spyController.setLobby(mockLobby);
+        spyController.setCurrentGameState(GameState.LOBBY_PHASE);
+
+        // Inietta mock Game al posto della creazione vera
+        doReturn(mockGame).when(spyController).createGame(any(ArrayList.class));
+
+        // Prepara realListeners
+        spyController.getRealListeners().add(listener1);
+        spyController.getRealListeners().add(listener2);
+
+        // Sostituisci il metodo gameInit per usare il tuo game mockato
+        doAnswer(invocation -> {
+            return mockGame;
+        }).when(spyController).createGame(any(ArrayList.class));
+
+        // Esegui
+        spyController.gameInit();
+
+        // Verifiche principali
+        assertEquals(GameState.ASSEMBLY, spyController.getCurrentGameState());
+        assertEquals(2, spyController.getPlayers().size());
+
+        // Verifica che i listener ricevano l'evento
+        verify(listener1).onEvent(any(Event.class));
+        verify(listener2).onEvent(any(Event.class));
+
+        // Verifica che timer sia stato avviato
+        verify(mockTimer).start();
+
+        // Verifica che mappa player-listener sia coerente
+        assertEquals(mockPlayer1, spyController.getPlayerbyListener().get(listener1));
+        assertEquals(listener1, spyController.getListenerbyPlayer().get(mockPlayer1));
+    }*/
 
 
 

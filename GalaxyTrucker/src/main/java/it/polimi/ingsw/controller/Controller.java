@@ -81,6 +81,7 @@ public class Controller{
 
     // Setter e getter utili per il testing
     public void setPlayers(ArrayList<Player> players) { this.players = players;}
+    public ArrayList<Player> getPlayers() { return players; }
     public void setTmpPlayers(ArrayList<Player> tmpPlayers) { this.tmpPlayers = tmpPlayers;}
     public void setDefeatedPlayers(ArrayList<Player> defeatedPlayers) { this.defeatedPlayers = defeatedPlayers;}
     public void setDisconnectedPlayers(ArrayList<Player> disconnectedPlayers) { this.disconnectedPlayers = disconnectedPlayers;}
@@ -92,9 +93,8 @@ public class Controller{
         listenerbyPlayer.put(player, listener);
     }
     public void setCards(List<AdventureCard> cards) { this.cards = new LinkedList<>(cards);}
-    public GameState getCurrentGameState(){
-        return currentGameState;
-    }
+    public GameState getCurrentGameState(){ return currentGameState;}
+    public void setCurrentGameState(GameState gameState){ this.currentGameState = gameState;}
     public AdventureCard getCurrentAdventureCard(){
         return currentAdventureCard;
     }
@@ -106,6 +106,26 @@ public class Controller{
     public void setPiratesended(){ this.piratesended=true;}
     public boolean getPiratesended(){return this.piratesended;}
     public boolean getPiratesFlag(){return this.piratesFlag;}
+    public void setLobby(Lobby lobby) { this.lobby = lobby;}
+    public HashMap<ClientListener,String> getRegistredListeners(){return registredListeners;}
+    public List<ClientListener> getRealListeners(){return realListeners;}
+    public Lobby getLobby(){return lobby;}
+    public void addTestListener(ClientListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+    public List<ClientListener> getListeners() { return listeners;}
+    protected Game createGame(ArrayList<String> nicks) {
+        return new Game(nicks);
+    }
+    public Map<ClientListener, Player> getPlayerbyListener() {
+        return playerbyListener;
+    }
+    public Map<Player, ClientListener> getListenerbyPlayer() {
+        return listenerbyPlayer;
+    }
+
 
 
 
@@ -134,7 +154,7 @@ public class Controller{
         }
     }
 
-    private void notifyAllListeners(Event event) {
+    public void notifyAllListeners(Event event) {
         List<ClientListener> listenersCopy;
         synchronized (listeners) {
             listenersCopy = new ArrayList<>(listeners);
