@@ -1013,14 +1013,16 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
 
                 case CHOOSE_PLANETS -> {
-                    if (skip) {
+                    if(skip)
                         server.handlePlanets(this);
-                    }else{
+                    else {
                         DataContainer data = currentEvent.getData();
                         ArrayList<Planet> planets = ((PlanetsBlock) data).getPlanets();
                         int size = planets.size();
                         mainApp.choosePlanet(size);
                     }
+
+
                 }
 
                 case ASK_SURRENDER -> {

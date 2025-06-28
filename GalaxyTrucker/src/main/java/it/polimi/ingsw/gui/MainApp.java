@@ -146,6 +146,7 @@ public class MainApp extends Application {
     }
 
     public void choosePlanet(int size) {
+        System.out.println("Show planets choice mainapp");
         Platform.runLater(() -> {
             ((GameController) controllers.get("game")).showPlanetsChoice(size);
         });
@@ -167,6 +168,7 @@ public class MainApp extends Application {
     public void askSkip(String text, Consumer<Boolean> callback) {
         activeController.askSkip(text, callback);
     }
+
     public void assembly() {
         Platform.runLater(() -> {
             ((AssemblyController) controllers.get("assembly")).assembly();

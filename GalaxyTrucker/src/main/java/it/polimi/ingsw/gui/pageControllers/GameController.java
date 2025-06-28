@@ -73,6 +73,9 @@
 
             background.setImage(new Image(Objects.requireNonNull(getClass().getResource("/backgrounds/game.png")).toExternalForm()));
 
+            confirmPlanetButton.setVisible(false);
+            planetsChoice.setVisible(true);
+
         }
 
         @FXML
@@ -119,6 +122,7 @@
         }
 
         public void showPlanetsChoice(int n) {
+            System.out.println("Show planets choice");
             planetsChoice.getItems().clear();
 
             for (int i = 1; i <= n; i++) {

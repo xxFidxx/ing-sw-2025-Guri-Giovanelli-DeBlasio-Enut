@@ -2449,6 +2449,9 @@ public class Controller{
         players.remove(player);
         player.setSurrended(true);
         listener.onEvent(eventCrafter(GameState.DIED, null, null));
+
+        if(players.isEmpty())
+            notifyAllRealListeners(eventCrafter(GameState.END_GAME, null, null));
     }
 
     public boolean removeBatteries(ClientListener listener, int powerCenterId, int batteries) {
