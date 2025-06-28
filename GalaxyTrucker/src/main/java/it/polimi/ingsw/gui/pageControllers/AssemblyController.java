@@ -354,7 +354,7 @@ public class AssemblyController extends Controller {
                 }
 
                 ComponentTile tile = cabinAliens.getCabinAliens().get(index).getCabin();
-                int id = tile.getId();
+                final int id = tile.getId();
                 int rotation = tile.getRotation();
                 CabinAliens c = cabinAliens.getCabinAliens().get(index);
                 final boolean purple = c.isPurple();
@@ -368,7 +368,7 @@ public class AssemblyController extends Controller {
 
                 imageView.setOnMouseClicked(event -> {
                     try {
-                        handleAddAlien((ImageView) event.getSource(), index, purple, brown);
+                        handleAddAlien((ImageView) event.getSource(), id, purple, brown);
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
