@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.gui.CardsUtils;
 import it.polimi.ingsw.gui.Controller;
 import it.polimi.ingsw.gui.ShowTextUtils;
+import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -12,12 +13,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.ColorInput;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.io.IOException;
@@ -339,6 +344,7 @@ public class AssemblyController extends Controller {
     public void chooseAlien(ListCabinAliens cabinAliens) {
         assemblyPane.setVisible(false);
         chooseAliensPane.setVisible(true);
+        cabinsGrid.setDisable(false);
 
         for (int row = 0; row < 2; row++) {
             for (int col = 0; col < 5; col++) {
@@ -347,9 +353,9 @@ public class AssemblyController extends Controller {
                     break;
                 }
 
-
-                int id = cabinAliens.getCabinAliens().get(index).getCabin().getId();
-                int rotation = cabinAliens.getCabinAliens().get(index).getCabin().getRotation();
+                ComponentTile tile = cabinAliens.getCabinAliens().get(index).getCabin();
+                int id = tile.getId();
+                int rotation = tile.getRotation();
                 CabinAliens c = cabinAliens.getCabinAliens().get(index);
                 final boolean purple = c.isPurple();
                 final boolean brown = c.isBrown();
@@ -358,27 +364,38 @@ public class AssemblyController extends Controller {
                 imageView.setFitWidth(100);
                 imageView.setFitHeight(100);
                 imageView.setPreserveRatio(true);
-                imageView.setPickOnBounds(false);
+                imageView.setPickOnBounds(true);
 
                 imageView.setOnMouseClicked(event -> {
                     try {
-                        handleAddAlien(index, purple, brown);
+                        handleAddAlien((ImageView) event.getSource(), index, purple, brown);
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
                 });
 
 
-                ColorAdjust effect = new ColorAdjust();
+                Blend blend = new Blend();
+                blend.setMode(BlendMode.SRC_OVER);
+
+                ColorInput colorOverlay;
+
+
                 if (purple && brown) {
-                    effect.setHue(0.2);
+                     colorOverlay= new ColorInput(0, 0, 25, 25, Color.YELLOW);
                 }
                 else if (purple) {
-                    effect.setHue(0.8);
+                    colorOverlay= new ColorInput(0, 0, 25, 25, Color.PURPLE);
                 }
                 else if (brown) {
-                    effect.setHue(0.05);
+                    colorOverlay= new ColorInput(0, 0, 25, 25, Color.BROWN);
                 }
+                else {
+                    colorOverlay= new ColorInput(0, 0, 25, 25, Color.WHITE);
+                }
+
+                blend.setTopInput(colorOverlay);
+                imageView.setEffect(blend);
 
                 Image img = getImageFromId(id);
                 imageView.setRotate(rotation);
@@ -389,7 +406,7 @@ public class AssemblyController extends Controller {
         }
     }
 
-    private void handleAddAlien(int index, boolean purple, boolean brown) throws RemoteException {
+    private void handleAddAlien(ImageView imageView, int index, boolean purple, boolean brown) throws RemoteException {
         if (purple && brown) {
             ButtonType purpleButton = new ButtonType("Purple", ButtonBar.ButtonData.OK_DONE);
             ButtonType brownButton = new ButtonType("Brown", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -405,7 +422,9 @@ public class AssemblyController extends Controller {
             else clientRmi.server.addAlienCabin(clientRmi, index, "b");
         }
         else if (purple) clientRmi.server.addAlienCabin(clientRmi, index, "p");
-        else clientRmi.server.addAlienCabin(clientRmi, index, "b");
+        else if (brown) clientRmi.server.addAlienCabin(clientRmi, index, "b");
+        imageView.setDisable(true);
+        imageView.setVisible(false);
     }
 
     @FXML
