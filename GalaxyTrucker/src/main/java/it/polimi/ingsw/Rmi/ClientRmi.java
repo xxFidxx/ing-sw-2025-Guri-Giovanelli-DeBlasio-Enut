@@ -816,9 +816,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case LOBBY_PHASE -> mainApp.lobbyPhase();
             case WAIT_LOBBY -> System.out.println("Waiting for other players to join...");
             case GAME_INIT -> mainApp.gameInit();
-            case ASSEMBLY -> System.out.println("List of available tiles: ");
+            case ASSEMBLY -> mainApp.assembly();
             case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
-            case PICKED_TILE -> System.out.println("This is the tile you picked: press 0 to place it in you spaceship plance, 1 rotate it clockwise, 2 to put it back, 3 to reserve it");
+            case PICKED_TILE -> mainApp.pickedTile();
+            case PICK_RESERVED_CARD -> mainApp.pickReservedCard();
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case ADJUST_SHIP -> mainApp.adjustShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SELECT_SHIP -> mainApp.selectShip(((DataString)getCurrentEvent().getData()).getTileIds());

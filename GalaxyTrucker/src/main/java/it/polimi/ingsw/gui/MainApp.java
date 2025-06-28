@@ -166,4 +166,21 @@ public class MainApp extends Application {
     public void askSkip(String text, Consumer<Boolean> callback) {
         activeController.askSkip(text, callback);
     }
+    public void assembly() {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).assembly();
+        });
+    }
+
+    public void pickedTile() {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).pickedTile();
+        });
+    }
+
+    public void pickReservedCard() {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).pickedReservedCard();
+        });
+    }
 }

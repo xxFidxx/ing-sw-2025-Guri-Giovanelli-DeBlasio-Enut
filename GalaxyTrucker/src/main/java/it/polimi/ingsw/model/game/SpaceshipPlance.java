@@ -64,7 +64,7 @@ public class SpaceshipPlance {
                 ConnectorType.UNIVERSAL,   // Lato inferiore
                 ConnectorType.UNIVERSAL    // Lato sinistro
         };
-        components[2][3] = new Cabin(centralCabinConnectors, true, 100);
+        components[2][3] = new Cabin(centralCabinConnectors, true, 32);
         ComponentTile tile = components[2][3];
         tile.setWellConnected(true);
     }
@@ -876,7 +876,8 @@ public class SpaceshipPlance {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 7; j++) {
                 ComponentTile tile = components[i][j];
-                result[i][j] = (tile != null) ? new TileData(tile.getId(), tile.getRotation()) : new TileData(-1, 0);
+                int sc = shownComponents[i][j];
+                result[i][j] = (tile != null) ? new TileData(tile.getId(), tile.getRotation(), tile.isWellConnected(), sc) : new TileData(-1, 0);
             }
         }
 

@@ -369,6 +369,28 @@
   {
     "type": "Cabin",
     "connectors": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "isCentral": true,
+    "id": 32
+  },
+  {
+    "type": "Cabin",
+    "connectors": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "isCentral": true,
+    "id": 33
+  },
+  {
+    "type": "Cabin",
+    "connectors": [
       0,
       0,
       3,
@@ -554,6 +576,17 @@
     "id": 50
   },
   {
+    "type": "Cabin",
+    "connectors": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "isCentral": true,
+    "id": 51
+  },
+  {
     "type": "StructuralModule",
     "connectors": [
       3,
@@ -632,6 +665,17 @@
       3
     ],
     "id": 59
+  },
+  {
+    "type": "Cabin",
+    "connectors": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "isCentral": true,
+    "id": 60
   },
   {
     "type": "CargoHolds",

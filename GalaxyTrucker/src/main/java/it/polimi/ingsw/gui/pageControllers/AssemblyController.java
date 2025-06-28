@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -21,8 +22,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
 public class AssemblyController extends Controller {
     private static final Image COVERED_CARD_IMAGE, SPACESHIP_IMAGE;
@@ -30,6 +30,8 @@ public class AssemblyController extends Controller {
     private TileData[][] lastSpaceship;
     private final CardsUtils cardsUtils = new CardsUtils();
     private int lookingDeck = -1;
+    Set<Integer> ignoreIds = new HashSet<>(Arrays.asList(32, 33, 51, 60));
+
     private boolean isHoldingTile = false;
     static {
         try (InputStream in = AssemblyController.class.getResourceAsStream("/tiles/coveredTile.jpg")) {
@@ -49,7 +51,6 @@ public class AssemblyController extends Controller {
             throw new RuntimeException("Failed to load covered card image", e);
         }
     }
-
 
     @FXML private GridPane coveredTilesGrid;
     @FXML private ImageView tileDisplay;
@@ -75,16 +76,21 @@ public class AssemblyController extends Controller {
                 imageView.setFitHeight(30);
 
                 int index = row * 13 + col;
-                imageView.setOnMouseClicked(event -> {
-                    try {
-                        handleTileClick(index);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+
+                if (!ignoreIds.contains(index)) {
+                    imageView.setOnMouseClicked(event -> {
+                        try {
+                            handleTileClick(index);
+                        } catch (RemoteException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+                else {
+                    imageView.setDisable(true);
+                }
 
                 coveredTilesGrid.add(imageView, col, row);
-
             }
         }
         for (int row = 0; row < 5; row++) {
@@ -118,7 +124,6 @@ public class AssemblyController extends Controller {
             imageView.setFitWidth(80);
             imageView.setFitHeight(80);
             imageView.setPreserveRatio(true);
-            imageView.setPickOnBounds(true);
 
             final int c = col + 1000;
 
@@ -144,32 +149,12 @@ public class AssemblyController extends Controller {
 
     private void handleSpaceshipClick(ImageView view, int col, int row) throws RemoteException {
         clientRmi.server.addTile(clientRmi, col, row);
-        if (clientRmi.getCurrentState() == GameState.ASSEMBLY) {
-            tileDisplay.setImage(null);
-            //loadToSpaceship(view, lastIndex);
-            coveredTilesGrid.setDisable(false);
-            reserveGrid.setDisable(false);
-            spaceshipGrid.setDisable(true);
-        }
     }
 
     private void handleTileClick(int index) throws RemoteException {
         isHoldingTile = true;
         clientRmi.server.pickTile(clientRmi, index);
-        if (clientRmi.getCurrentState() == GameState.PICKED_TILE) {
-            loadTileImage(index);
-            coveredTilesGrid.setDisable(true);
-            reserveGrid.setDisable(true);
-            spaceshipGrid.setDisable(false);
-        }
-        else if (clientRmi.getCurrentState() == GameState.PICK_RESERVED_CARD) {
-            int id = lastSpaceship[0][5 + index - 1000].getId();
-            lastSpaceship[0][5 + index - 1000] = new TileData(-1, 0);
-            loadTileImage(id);
-            coveredTilesGrid.setDisable(true);
-            reserveGrid.setDisable(true);
-            spaceshipGrid.setDisable(false);
-        }
+        lastIndex = (index < 1000) ? index : lastSpaceship[0][5+index-1000].getId();
     }
 
     public void loadTileImage(int index) {
@@ -179,7 +164,6 @@ public class AssemblyController extends Controller {
         int rotation = ((PickedTile) clientRmi.getCurrentEvent().getData()).getRotation();
         tileDisplay.setRotate(rotation);
 
-        lastIndex = index;
     }
 
     public void setLastSpaceship(TileData[][] tileIds) {
@@ -195,12 +179,22 @@ public class AssemblyController extends Controller {
                 Integer col = GridPane.getColumnIndex(node);
                 Integer row = GridPane.getRowIndex(node);
 
-                int id = lastSpaceship[row][col].getId();
-                int rotation = lastSpaceship[row][col].getRotation();
+                TileData tile = lastSpaceship[row][col];
+                int id = tile.getId();
+                int rotation = tile.getRotation();
 
                 imageView.setRotate(rotation);
                 Image img = getImageFromId(id);
-                if (img != null) imageView.setImage(img);
+                imageView.setImage(img);
+
+                if (tile.isWellConnected()) {
+                    imageView.setEffect(null);
+                }
+                else {
+                    ColorAdjust effect = new ColorAdjust();
+                    effect.setBrightness(-0.5);
+                    imageView.setEffect(effect);
+                }
             }
         }
 
@@ -213,7 +207,7 @@ public class AssemblyController extends Controller {
 
                 imageView.setRotate(rotation);
                 Image img = getImageFromId(id);
-                if (img != null) imageView.setImage(img);
+                imageView.setImage(img);
             }
         }
     }
@@ -322,10 +316,11 @@ public class AssemblyController extends Controller {
             if (node instanceof ImageView imageView) {
                 Integer col = GridPane.getColumnIndex(node);
                 Integer row = GridPane.getRowIndex(node);
+                final int part = lastSpaceship[row][col].getPart();
 
                 imageView.setOnMouseClicked(event -> {
                     try {
-                        clientRmi.server.selectShipPart(clientRmi, 0);;
+                        clientRmi.server.selectShipPart(clientRmi, part);;
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
@@ -341,7 +336,7 @@ public class AssemblyController extends Controller {
         for (int row = 0; row < 2; row++) {
             for (int col = 0; col < 5; col++) {
                 final int index = row * 5 + col;
-                if (index > cabinAliens.getCabinAliens().size()) {
+                if (index >= cabinAliens.getCabinAliens().size()) {
                     break;
                 }
 
@@ -443,4 +438,27 @@ public class AssemblyController extends Controller {
         }
     }
 
+    public void assembly() {
+        tileDisplay.setImage(null);
+
+        coveredTilesGrid.setDisable(false);
+        reserveGrid.setDisable(false);
+        spaceshipGrid.setDisable(true);
+    }
+
+    public void pickedTile() {
+        loadTileImage(lastIndex);
+
+        coveredTilesGrid.setDisable(true);
+        reserveGrid.setDisable(true);
+        spaceshipGrid.setDisable(false);
+    }
+
+    public void pickedReservedCard() {
+        loadTileImage(lastIndex);
+
+        coveredTilesGrid.setDisable(true);
+        reserveGrid.setDisable(true);
+        spaceshipGrid.setDisable(false);
+    }
 }
