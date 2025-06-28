@@ -31,41 +31,42 @@ public class ComponentTileDeserializer implements JsonDeserializer<ComponentTile
         JsonObject obj = json.getAsJsonObject();
         String type = obj.get("type").getAsString();
         ConnectorType[] connectors = parseConnectors(obj.get("connectors").getAsJsonArray());
-
+        int id = obj.get("id").getAsInt();
+        
         switch (type) {
             case "Cabin":
                 boolean isCentral = obj.get("isCentral").getAsBoolean();
-                return new Cabin(connectors, isCentral, id++);
+                return new Cabin(connectors, isCentral, id);
             case "Cannon":
-                return new Cannon(connectors, id++);
+                return new Cannon(connectors, id);
             case "CargoHolds": {
                 boolean isSpecial = obj.get("isSpecial").getAsBoolean();
                 int capacity = obj.get("capacity").getAsInt();
-                return new CargoHolds(connectors, id++, isSpecial, capacity);
+                return new CargoHolds(connectors, id, isSpecial, capacity);
             }
             case "DoubleCannon":
-                return new DoubleCannon(connectors, id++);
+                return new DoubleCannon(connectors, id);
             case "DoubleEngine":
-                return new DoubleEngine(connectors, id++);
+                return new DoubleEngine(connectors, id);
             case "Engine":
-                return new Engine(connectors, id++);
+                return new Engine(connectors, id);
             case "LifeSupportSystem": {
                 AlienColor color = AlienColor.values()[obj.get("color").getAsInt()]; //connectors[i] = ConnectorType.values()[array.get(i).getAsInt()];
-                return new LifeSupportSystem(color, connectors, id++);
+                return new LifeSupportSystem(color, connectors, id);
             }
             case "PowerCenter":
                 int capacity = obj.get("capacity").getAsInt();
-                return new PowerCenter(connectors, capacity, id++);
+                return new PowerCenter(connectors, capacity, id);
             case "ShieldGenerator": {
                 JsonArray protArr = obj.get("protection").getAsJsonArray();
                 boolean[] protection = new boolean[4];
                 for (int i = 0; i < 4; i++) {
                     protection[i] = protArr.get(i).getAsBoolean();
                 }
-                return new ShieldGenerator(connectors, protection, id++);
+                return new ShieldGenerator(connectors, protection, id);
             }
             case "StructuralModule":
-                return new StructuralModule(connectors, id++);
+                return new StructuralModule(connectors, id);
             default:
                 throw new JsonParseException("Unknown component tile type: " + type);
         }
