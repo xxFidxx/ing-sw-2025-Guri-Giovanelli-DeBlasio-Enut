@@ -71,7 +71,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
             System.setProperty("java.rmi.server.hostname", hotspotIp);
 
 
-            Registry registry = LocateRegistry.createRegistry(5001);
+            Registry registry = LocateRegistry.createRegistry(1234);
             VirtualServerRmi server = new ServerRmi();
             registry.rebind(serverName, server);
 
