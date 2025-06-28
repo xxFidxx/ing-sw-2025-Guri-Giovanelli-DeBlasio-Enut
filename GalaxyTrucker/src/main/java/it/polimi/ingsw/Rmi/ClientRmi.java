@@ -880,6 +880,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case REMOVE_MV_GOODS -> {
                 System.out.println("Here are your goods, you will have to remove the most valuable ones");
                 System.out.println("Press 0 to continue");
+                DataContainer data = getCurrentEvent().getData();
+                mainApp.removeMVGoods((RemoveMostValuable) data);
             }
             case CARGO_VIEW -> {
                 Cargos cargos = (Cargos) currentEvent.getData();
@@ -891,9 +893,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 mainApp.waitPlayer();
             }
             case LEAST_CREW -> System.out.print("You have the least crew");
-            case LEAST_ENGINE -> System.out.println("You have the least engine strength");
+            case LEAST_ENGINE, LOST_CREW -> System.out.println("You have the least engine strength");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
-            case LOST_CREW -> System.out.println("You have the least engine strength");
             case END_CARD -> System.out.println("End card");
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");

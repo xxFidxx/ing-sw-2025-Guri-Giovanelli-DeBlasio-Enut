@@ -2,10 +2,7 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
-import it.polimi.ingsw.controller.network.data.BatteriesManagement;
-import it.polimi.ingsw.controller.network.data.CrewManagement;
-import it.polimi.ingsw.controller.network.data.ListCabinAliens;
-import it.polimi.ingsw.controller.network.data.TileData;
+import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.gui.pageControllers.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import javafx.application.Application;
@@ -46,6 +43,7 @@ public class MainApp extends Application {
         loadScene("cargoManagement", "/fxmls/cargoManagement.fxml");
         loadScene("crewManagement", "/fxmls/crewManagement.fxml");
         loadScene("batteriesManagement", "/fxmls/batteriesManagement.fxml");
+        loadScene("removeMVGoods", "/fxmls/removeMVGoods.fxml");
         loadScene("end", "/fxmls/end.fxml");
 
         // Start with the menu scene
@@ -202,6 +200,14 @@ public class MainApp extends Application {
         sceneManager.switchTo("batteriesManagement");
         Platform.runLater(() -> {
             ((BatteriesManagementController) controllers.get("batteriesManagement")).showShip(data);
+        });
+    }
+
+    public void removeMVGoods(RemoveMostValuable data) {
+        activeController = controllers.get("removeMVGoods");
+        sceneManager.switchTo("removeMVGoods");
+        Platform.runLater(() -> {
+            ((RemoveMVGoodsController) controllers.get("RemoveMVGoodsController")).startRemoveMVGoods(data);
         });
     }
 }
