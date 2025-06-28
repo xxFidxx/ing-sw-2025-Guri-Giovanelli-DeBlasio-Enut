@@ -60,9 +60,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
         String ipAddress = scanner.nextLine().trim();
         if (ipAddress.isEmpty()) ipAddress = "127.0.0.1";
-        System.setProperty("java.rmi.server.hostname", ipAddress);
 
-        Registry registry = LocateRegistry.getRegistry(ipAddress, 1234);
+        Registry registry = LocateRegistry.getRegistry(ipAddress, 5001);
         VirtualServerRmi server = (VirtualServerRmi) registry.lookup(serverName);
 
         new ClientRmi(server).run(0);
