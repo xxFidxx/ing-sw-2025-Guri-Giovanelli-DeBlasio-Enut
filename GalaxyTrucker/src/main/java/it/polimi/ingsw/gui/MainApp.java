@@ -2,6 +2,7 @@ package it.polimi.ingsw.gui;
 
 import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
+import it.polimi.ingsw.controller.network.data.CrewManagement;
 import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
 import it.polimi.ingsw.gui.pageControllers.*;
@@ -181,6 +182,14 @@ public class MainApp extends Application {
     public void pickReservedCard() {
         Platform.runLater(() -> {
             ((AssemblyController) controllers.get("assembly")).pickedReservedCard();
+        });
+    }
+
+    public void crewManagement(CrewManagement data) {
+        activeController = controllers.get("crewManagement");
+        sceneManager.switchTo("crewManagement");
+        Platform.runLater(() -> {
+            ((CrewManagementController) controllers.get("crewManagement")).showShip(data);
         });
     }
 }

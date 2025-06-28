@@ -1,5 +1,14 @@
 [
   {
+    "type": "SlaversCard",
+    "name": "Slavers",
+    "level": 1,
+    "cannonStrength": 6,
+    "lostDays": 1,
+    "lostCrew": 3,
+    "reward": 5
+  },
+  {
     "type": "PlanetsCard",
     "name": "Planets 1",
     "level": 1,
@@ -60,15 +69,6 @@
       { "type": 0, "direction": 0 }
     ],
     "reward": 4
-  },
-  {
-    "type": "SlaversCard",
-    "name": "Slavers",
-    "level": 1,
-    "cannonStrength": 6,
-    "lostDays": 1,
-    "lostCrew": 3,
-    "reward": 5
   },
   {
     "type": "AbandonedStationCard",

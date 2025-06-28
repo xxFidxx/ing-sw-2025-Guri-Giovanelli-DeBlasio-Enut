@@ -17,6 +17,7 @@ import it.polimi.ingsw.model.resources.Planet;
 import it.polimi.ingsw.model.resources.TileSymbols;
 
 
+import javax.xml.crypto.Data;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -885,6 +886,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CREW_MANAGEMENT -> {
                 System.out.println("Here are your cabins, you will have to choose which crew to remove from which cabin");
                 System.out.println("Press 0 to continue");
+
+                DataContainer data = getCurrentEvent().getData();
+
+                mainApp.crewManagement((CrewManagement) data);
             }
             case BATTERIES_MANAGEMENT -> {
                 System.out.println("Here are your PowerCenter, you will have to choose which one to remove batteries");
