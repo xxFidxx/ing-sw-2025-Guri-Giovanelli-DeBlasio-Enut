@@ -4,10 +4,7 @@ import it.polimi.ingsw.Rmi.ClientRmi;
 import it.polimi.ingsw.Rmi.VirtualServerRmi;
 import it.polimi.ingsw.controller.network.data.ListCabinAliens;
 import it.polimi.ingsw.controller.network.data.TileData;
-import it.polimi.ingsw.gui.pageControllers.AssemblyController;
-import it.polimi.ingsw.gui.pageControllers.CargoManagementController;
-import it.polimi.ingsw.gui.pageControllers.GameController;
-import it.polimi.ingsw.gui.pageControllers.LobbyController;
+import it.polimi.ingsw.gui.pageControllers.*;
 import it.polimi.ingsw.model.resources.GoodsContainer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -45,6 +42,7 @@ public class MainApp extends Application {
         loadScene("assembly", "/fxmls/assembly.fxml");
         loadScene("game", "/fxmls/game.fxml");
         loadScene("cargoManagement", "/fxmls/cargoManagement.fxml");
+        loadScene("crewManagement", "/fxmls/crewManagement.fxml");
         loadScene("end", "/fxmls/end.fxml");
 
         // Start with the menu scene
@@ -99,6 +97,8 @@ public class MainApp extends Application {
 
     public void updateSpaceship(TileData[][] tileIds) {
         ((AssemblyController) controllers.get("assembly")).setLastSpaceship(tileIds);
+        ((CrewManagementController) controllers.get("crewManagement")).setLastSpaceship(tileIds);
+
     }
 
     public void adjustShip(TileData[][] tileIds) {

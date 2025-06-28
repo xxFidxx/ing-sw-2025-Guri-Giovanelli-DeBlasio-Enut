@@ -678,6 +678,7 @@ public class Controller{
         for(Player p: players){
             isDone.put(p, false);
         }
+
         drawCard();
     }
 
@@ -687,7 +688,13 @@ public class Controller{
 
         notifyAllRealListeners(eventCrafter(GameState.TURN_START, null, null));
 
+
         if (!cards.isEmpty() || players.isEmpty()) {
+
+            for(ClientListener listener: realListeners){
+                printSpaceship(listener);
+            }
+
 //            Random random = new Random();
 //            int randomNumber = random.nextInt(cards.size());
 //            currentAdventureCard = cards.get(randomNumber);
@@ -1679,6 +1686,8 @@ public class Controller{
         currentGameState = GameState.CRAFTING_ENDED;
         int pos = 0;
         ArrayList<Player> disconnected = new ArrayList<>(disconnectedPlayers);
+
+
 
 
         // it means he disconnected after submitting isDonecrafting
