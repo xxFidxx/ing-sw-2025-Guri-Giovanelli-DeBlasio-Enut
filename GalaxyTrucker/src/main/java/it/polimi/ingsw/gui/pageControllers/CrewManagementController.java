@@ -157,7 +157,7 @@ public class CrewManagementController extends Controller {
         ArrayList<Cabin> cabins = data.getCabins();
         lostCrew = data.getLostCrew();
         textBox.setDisable(true);
-        textBox.setText("You have to remove " + lostCrew + " crew members, please type on the cabin you want to remove a crew component from");
+        textBox.setText("You have to remove " + lostCrew + " crew members,\n please type on the cabin you want to remove a crew component from");
 
         for (Node node : spaceshipGrid.getChildren()) {
             if (!(node instanceof StackPane tilePane)) continue;

@@ -444,36 +444,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
 
             case EPIDEMIC_MANAGEMENT ->{
-                if (input.equals("0")) {
-                    while (!server.isEpidemicDone(this)) {
-                        System.out.println("Please write the cabinId you want to remove the crew member from");
-                        System.out.print("> ");
-                        String line = scan.nextLine();
-                        boolean removed = false;
-                        try {
-                            String[] parts = line.split(" ");
-                            if (parts.length == 1) {
-                                int cabinId = Integer.parseInt(parts[0]);
-                                if (server.removeFigureEpidemic(this, cabinId)){
-                                    removed = true;
-                                } else {
-                                    System.out.println("You have to put a cabinId containing at least one crew member");
-                                }
-                            } else {
-                                System.out.println("Wrong input. You need to put a number\n");
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid input, ensure to write only a number");
-                        } catch (RemoteException e) {
-                            System.out.println("Error " + e.getMessage());
-                        }
-                        if (removed)
-                            System.out.println("Successfully removed");
+                    if(input.equals("0")) {
+                        server.removeFigureEpidemic(this);
+                        server.endCrewManagement(this);
                     }
-                    server.endCrewManagement(this);
-                } else {
-                    System.out.print("Not accepted input, please try again:\n");
-                }
+                    else
+                        System.out.print("Not accepted input, please try again:\n");
             }
 
             case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES ->{
@@ -801,6 +777,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
 
+            case SCS_DIR_POS,BCS_DIR_POS,BMS_DIR_POS,SMS_DIR_POS ->{
+                if(!input.equals("0")){}
+            }
+
             case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case DIED -> System.out.println("You are on spectator mode because you died");
             case PAUSED_GAME -> System.out.println("Game has been paused, we will wait for 30 seconds for someone to join again, else you will automatically win!");
@@ -1109,8 +1089,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
 
             case EPIDEMIC_MANAGEMENT -> {
-                System.out.println("Here are your interconnected cabins with at least one crew member, you will have to remove a crew member from each of the shown cabins");
-                System.out.println("Press 0 to continue");
+                System.out.println("Here are your interconnected cabins with at least one crew member, it will be removed a crew member from each of the shown cabins");
             }
 
             case BATTERIES_MANAGEMENT,REMOVE_EXTRA_BATTERIES -> {
@@ -1165,6 +1144,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PAUSED_GAME -> System.out.println("Game has been paused, a 30 seconds timer has been set to wait for someone to join again, else you will automatically win");
             case WAIT_RECONNECT -> System.out.println("Welcome back!\nWait for other players to end the turn, then you will join them again!");
             case WON_FOR_DISCONESSION -> System.out.println("You won because everyone except you disconnected!");
+            case BCS_DIR_POS,SCS_DIR_POS,BMS_DIR_POS,SMS_DIR_POS ->{
+                System.out.println("Press 0 to continue with next one");
+            }
             default -> System.out.println();
         }
         System.out.print("> ");

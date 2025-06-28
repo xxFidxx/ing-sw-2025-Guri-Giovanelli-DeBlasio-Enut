@@ -161,7 +161,7 @@ public class BatteriesManagementController extends Controller {
         ArrayList<PowerCenter> powerCenters = data.getPowerCenters();
         nBatteries = data.getNBatteries();
         textBox.setDisable(true);
-        textBox.setText("You have to remove " + nBatteries + " batteries, please type on the powerCenter you want to remove a battery from");
+        textBox.setText("You have to remove " + nBatteries + " batteries.\n" + "Please type the name of the Power Center you want to remove a battery from.");
 
         for (Node node : spaceshipGrid.getChildren()) {
             if (!(node instanceof StackPane tilePane)) continue;
