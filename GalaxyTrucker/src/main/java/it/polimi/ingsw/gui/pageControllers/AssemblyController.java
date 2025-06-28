@@ -8,7 +8,10 @@ import it.polimi.ingsw.gui.ShowTextUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -67,6 +70,10 @@ public class AssemblyController extends Controller {
     @FXML private ImageView card1deck;
     @FXML private ImageView card2deck;
     @FXML private ImageView card3deck;
+    @FXML private Button rotateButton;
+    @FXML private Button storeButton;
+    @FXML private Button putBackButton;
+
 
     public void initialize() {
         for (int row = 0; row < 12; row++) {
@@ -340,6 +347,13 @@ public class AssemblyController extends Controller {
                     break;
                 }
 
+
+                int id = cabinAliens.getCabinAliens().get(index).getCabin().getId();
+                int rotation = cabinAliens.getCabinAliens().get(index).getCabin().getRotation();
+                CabinAliens c = cabinAliens.getCabinAliens().get(index);
+                final boolean purple = c.isPurple();
+                final boolean brown = c.isBrown();
+
                 ImageView imageView = new ImageView();
                 imageView.setFitWidth(100);
                 imageView.setFitHeight(100);
@@ -348,15 +362,24 @@ public class AssemblyController extends Controller {
 
                 imageView.setOnMouseClicked(event -> {
                     try {
-                        clientRmi.server.addAlienCabin(clientRmi, index, "b");
+                        handleAddAlien(index, purple, brown);
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
                 });
 
 
-                int id = cabinAliens.getCabinAliens().get(index).getCabin().getId();
-                int rotation = cabinAliens.getCabinAliens().get(index).getCabin().getRotation();
+                ColorAdjust effect = new ColorAdjust();
+                if (purple && brown) {
+                    effect.setHue(0.2);
+                }
+                else if (purple) {
+                    effect.setHue(0.8);
+                }
+                else if (brown) {
+                    effect.setHue(0.05);
+                }
+
                 Image img = getImageFromId(id);
                 imageView.setRotate(rotation);
                 imageView.setImage(img);
@@ -364,6 +387,25 @@ public class AssemblyController extends Controller {
                 cabinsGrid.add(imageView, col, row);
             }
         }
+    }
+
+    private void handleAddAlien(int index, boolean purple, boolean brown) throws RemoteException {
+        if (purple && brown) {
+            ButtonType purpleButton = new ButtonType("Purple", ButtonBar.ButtonData.OK_DONE);
+            ButtonType brownButton = new ButtonType("Brown", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Choose a Color");
+            alert.setHeaderText("Select a color:");
+            alert.getButtonTypes().setAll(purpleButton, brownButton);
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.get() == purpleButton) {clientRmi.server.addAlienCabin(clientRmi, index, "p");}
+            else clientRmi.server.addAlienCabin(clientRmi, index, "b");
+        }
+        else if (purple) clientRmi.server.addAlienCabin(clientRmi, index, "p");
+        else clientRmi.server.addAlienCabin(clientRmi, index, "b");
     }
 
     @FXML
@@ -441,6 +483,10 @@ public class AssemblyController extends Controller {
     public void assembly() {
         tileDisplay.setImage(null);
 
+        putBackButton.setDisable(true);
+        storeButton.setDisable(true);
+        rotateButton.setDisable(true);
+
         coveredTilesGrid.setDisable(false);
         reserveGrid.setDisable(false);
         spaceshipGrid.setDisable(true);
@@ -449,6 +495,10 @@ public class AssemblyController extends Controller {
     public void pickedTile() {
         loadTileImage(lastIndex);
 
+        putBackButton.setDisable(false);
+        storeButton.setDisable(false);
+        rotateButton.setDisable(false);
+
         coveredTilesGrid.setDisable(true);
         reserveGrid.setDisable(true);
         spaceshipGrid.setDisable(false);
@@ -456,6 +506,10 @@ public class AssemblyController extends Controller {
 
     public void pickedReservedCard() {
         loadTileImage(lastIndex);
+
+        putBackButton.setDisable(true);
+        storeButton.setDisable(false);
+        rotateButton.setDisable(false);
 
         coveredTilesGrid.setDisable(true);
         reserveGrid.setDisable(true);

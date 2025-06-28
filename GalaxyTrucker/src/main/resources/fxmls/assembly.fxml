@@ -75,9 +75,9 @@
               </rowConstraints>
             </GridPane>
             <ImageView fx:id="tileDisplay" fitHeight="200.0" fitWidth="200.0" layoutX="14.0" layoutY="506.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-width: 10;" />
-            <Button layoutX="228.0" layoutY="506.0" mnemonicParsing="false" onAction="#handleRotate" text="rotate" />
-            <Button layoutX="228.0" layoutY="594.0" mnemonicParsing="false" onAction="#handlePutBack" text="put back" />
-            <Button layoutX="231.0" layoutY="681.0" mnemonicParsing="false" onAction="#handleStore" text="store" />
+            <Button fx:id="rotateButton" layoutX="228.0" layoutY="506.0" mnemonicParsing="false" onAction="#handleRotate" text="rotate" />
+            <Button fx:id="putBackButton" layoutX="228.0" layoutY="594.0" mnemonicParsing="false" onAction="#handlePutBack" text="put back" />
+            <Button fx:id="storeButton" layoutX="231.0" layoutY="681.0" mnemonicParsing="false" onAction="#handleStore" text="store" />
             <Button fx:id="endCraftingButton" layoutX="946.0" layoutY="656.0" mnemonicParsing="false" onAction="#handleEndCrafting" text="end crafting" />
             <StackPane layoutX="706.0" layoutY="160.0" prefHeight="400.0" prefWidth="560.0">
                <children>
