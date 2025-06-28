@@ -273,12 +273,12 @@ public class Controller{
         switch (state) {
             case WAIT_LOBBY -> {
                 ArrayList<String> nicks;
-                    nicks = lobby.getPlayersNicknames();
+                nicks = lobby.getPlayersNicknames();
                 event = new Event(state, new LobbyNicks(nicks));
             }
             case ASSEMBLY -> {
                 Integer[] assemblingTilesIds;
-                    assemblingTilesIds = game.getTilesId();
+                assemblingTilesIds = game.getTilesId();
 
                 ArrayList<ComponentTile> reservedTiles = player.getSpaceshipPlance().getReserveSpot();
 
@@ -514,7 +514,7 @@ public class Controller{
                 ArrayList<PowerCenter> pc = player.getSpaceshipPlance().getPowerCenters();
 
                 if(!pc.isEmpty())
-                printSpaceshipbyTile(listenerbyPlayer.get(player), pc.getFirst());
+                    printSpaceshipbyTile(listenerbyPlayer.get(player), pc.getFirst());
 
                 event = new Event(state, new BatteriesManagement((int) data, pc));
             }
@@ -557,7 +557,7 @@ public class Controller{
                 }
 
                 if(!playerCargos.isEmpty())
-                printSpaceshipbyTile(listenerbyPlayer.get(player), playerCargos.getFirst());
+                    printSpaceshipbyTile(listenerbyPlayer.get(player), playerCargos.getFirst());
 
                 event = new Event(state, new RemoveMostValuable(cargosToRemove, goodsContainers, batteriesToRemove));
             }
@@ -661,8 +661,8 @@ public class Controller{
             resetIsDoneDraw();
         } else {
             for(Player p: players){
-                    ClientListener l = listenerbyPlayer.get(p);
-                    l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                ClientListener l = listenerbyPlayer.get(p);
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
         }
     }
@@ -1161,7 +1161,7 @@ public class Controller{
 
     public void handleMinEquip(ClientListener listener) {
         for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+            ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 l.onEvent(eventCrafter(GameState.LEAST_CREW, null, null));
             } else {
@@ -1172,7 +1172,7 @@ public class Controller{
 
     public void handleMinEngine(ClientListener listener) {
         for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+            ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 System.out.println("mando in LEAST_ENGINE");
                 l.onEvent(eventCrafter(GameState.LEAST_ENGINE, null, null));
@@ -1185,7 +1185,7 @@ public class Controller{
 
     public void handleMinFire(ClientListener listener) {
         for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+            ClientListener l= listenerbyPlayer.get(player);
             if (l == listener) {
                 System.out.println("mando in LEAST_FIRE");
                 l.onEvent(eventCrafter(GameState.LEAST_FIRE, null, null));
@@ -1355,7 +1355,7 @@ public class Controller{
                         if (!combatZoneFlag) {
 
                             if(player!= null)
-                            isDone.put(player,true);
+                                isDone.put(player,true);
 
                             if(!isDone.containsValue(false)){
                                 System.out.println("fromChargeToManage: combatZoneFlag " + combatZoneFlag);
@@ -1385,7 +1385,7 @@ public class Controller{
                         } else {
 
                             if(player!= null)
-                            isDone.put(player, true);
+                                isDone.put(player, true);
 
                             if (!isDone.containsValue(false)) {
                                 afterShots = true;
@@ -1405,14 +1405,14 @@ public class Controller{
                             } else {
 
                                 if(listener != null)
-                                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                             }
                         }
                     } else {
                         if (!combatZoneFlag) {
 
                             if(player!= null)
-                            isDone.put(player, true);
+                                isDone.put(player, true);
 
                             if (!isDone.containsValue(false)) {
                                 combatZoneFlag = true;
@@ -1433,11 +1433,11 @@ public class Controller{
 
                             } else {
                                 if(listener!= null)
-                                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                             }
                         } else {
                             if(player != null)
-                            isDone.put(player, true);
+                                isDone.put(player, true);
                             if (!isDone.containsValue(false)) {
                                 isDone.replaceAll((c, v) -> false);
                                 int minEngine = players.stream().mapToInt(Player::getEngineStrenght).min().orElse(Integer.MAX_VALUE);
@@ -1453,7 +1453,7 @@ public class Controller{
                                 }
                             } else {
                                 if(listener!= null)
-                                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
                             }
                         }
                     }
@@ -1490,7 +1490,7 @@ public class Controller{
 
     public void combatZoneCannons() {
         for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+            ClientListener l= listenerbyPlayer.get(player);
             l.onEvent(eventCrafter(GameState.CHOOSE_CANNON, null, player));
         }
     }
@@ -1568,7 +1568,7 @@ public class Controller{
             return;
         }
         for (Player p: players) {
-           ClientListener l= listenerbyPlayer.get(p);
+            ClientListener l= listenerbyPlayer.get(p);
             if (defeatedPlayers.contains(p)) {
                 defeatedPlayers.remove(p);
                 int lostCrew = ((SlaversCard)currentAdventureCard).getLostCrew();
@@ -1587,7 +1587,7 @@ public class Controller{
         }
         System.out.println("defeatedBySmugglers: defeatedPlayers size: " + defeatedPlayers.size());
         for (Player player: players) {
-           ClientListener l= listenerbyPlayer.get(player);
+            ClientListener l= listenerbyPlayer.get(player);
             Player p = playerbyListener.get(l);
             if (defeatedPlayers.contains(p)) {
                 System.out.println("defeatedBySmugglers: defeatedPlayers remove ");
@@ -1612,7 +1612,7 @@ public class Controller{
         lastMethodCalled = "sendToRemoveMVGoods";
         System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
         l.onEvent(eventCrafter(GameState.REMOVE_MV_GOODS, cardMalus, p));
-        }
+    }
 
     public void waitForEnemies(ClientListener l) {
         Player p = null;
@@ -1639,7 +1639,7 @@ public class Controller{
         } else {
             System.out.println("waitForEnemies: mando in WAIT_PLAYER");
             if(l!=null)
-            l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                l.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 
@@ -1827,7 +1827,7 @@ public class Controller{
             player.getSpaceshipPlance().setGoodsContainers(goodsContainers);
 
             if(!playerCargos.isEmpty())
-            printSpaceshipbyTile(listener, playerCargos.getFirst());
+                printSpaceshipbyTile(listener, playerCargos.getFirst());
 
             listener.onEvent(new Event(GameState.CARGO_VIEW, new Cargos(goodsContainers)));
         } else {
@@ -2171,7 +2171,7 @@ public class Controller{
 
 
         for (Player p: players) {
-           ClientListener l= listenerbyPlayer.get(p);
+            ClientListener l= listenerbyPlayer.get(p);
             ArrayList<Cabin> cabins = p.getSpaceshipPlance().getCabins();
             ArrayList<CabinAliens> cabinAliens = new ArrayList<>();
             boolean atLeastOneSupport = false;
@@ -2438,7 +2438,7 @@ public class Controller{
                 restoreReconnectedPlayers();
             else {
                 if(listener!=null)
-                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                    listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }
         }
     }
@@ -2538,13 +2538,13 @@ public class Controller{
             resetShowAndDraw();
         } else {
             if(listener!=null)
-            listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
+                listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
         }
     }
 
     public void fromMvGoodstoBatteries(ClientListener listener, int nBatteries) {
         if(nBatteries > 0)
-        listener.onEvent(eventCrafter(GameState.REMOVE_EXTRA_BATTERIES, nBatteries, playerbyListener.get(listener)));
+            listener.onEvent(eventCrafter(GameState.REMOVE_EXTRA_BATTERIES, nBatteries, playerbyListener.get(listener)));
         else
             endMVGoodsManagement(listener);
     }
@@ -2722,17 +2722,17 @@ public class Controller{
             }
             System.out.println("Timer done");
 
-                if(currentGameState == GameState.ASSEMBLY){
-                    notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
+            if(currentGameState == GameState.ASSEMBLY){
+                notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
 
-                    for(ClientListener listener: realListeners) {
-                        if(!isDone.get(playerbyListener.get(listener))){
-                            try {
-                                playerIsDoneCrafting(listener);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
+                for(ClientListener listener: realListeners) {
+                    if(!isDone.get(playerbyListener.get(listener))){
+                        try {
+                            playerIsDoneCrafting(listener);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
                         }
+                    }
                 }
             }
         }).start();
@@ -2747,14 +2747,14 @@ public class Controller{
         int size = placeholders.size() * 2;
         int[] infos = new int[size];
         for(Placeholder p: placeholders){
-                infos[i] = p.getColor().getValue();
-                i++;
-                int pos = (p.getPosizione()) % 24;
-                if (pos < 0) {
-                    pos = pos + 24;
-                }
-                infos[i] = pos;
-                i++;
+            infos[i] = p.getColor().getValue();
+            i++;
+            int pos = (p.getPosizione()) % 24;
+            if (pos < 0) {
+                pos = pos + 24;
+            }
+            infos[i] = pos;
+            i++;
         }
         return infos;
     }

@@ -77,7 +77,6 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
             System.out.println("Server running on: " + hotspotIp + ":1234");
         } catch (Exception e) {
-
             System.err.println("Server failed: " + e.getMessage());
             e.printStackTrace();
         }
@@ -88,16 +87,16 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         new Thread(() -> {
             while (true) {
                 for(VirtualViewRmi client : realClients){
-                        try{
-                            client.ping();
-                        } catch (RemoteException e) {
-                            System.out.println("Client " + client + " failed to ping");
-                            try {
-                                handleDisconnect(client);
-                            } catch (Exception ex) {
-                                throw new RuntimeException(ex);
-                            }
+                    try{
+                        client.ping();
+                    } catch (RemoteException e) {
+                        System.out.println("Client " + client + " failed to ping");
+                        try {
+                            handleDisconnect(client);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
                         }
+                    }
                 }
                 try {
                     Thread.sleep(1000);
@@ -109,26 +108,26 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         }).start();
     }
 
-        private void handleDisconnect(VirtualViewRmi client) throws Exception {
-            String disconnectedNick = nicknamebyClient.get(client);
-            nicknamebyClient.remove(client);
+    private void handleDisconnect(VirtualViewRmi client) throws Exception {
+        String disconnectedNick = nicknamebyClient.get(client);
+        nicknamebyClient.remove(client);
 
-            ClientListenerRmi listener = realClientListeners.get(client);
-            if (listener != null) {
-                controller.handleDisconnect(listener);
-            }
-
-            synchronized (lock) {
-                clientbyNickname.remove(disconnectedNick);
-                realClientListeners.remove(client);
-                realClients.remove(client);
-            }
-
-            if(gameStarted)
-                disconnectedPlayersNicks.add(disconnectedNick);
-
-            checkPauseGame();
+        ClientListenerRmi listener = realClientListeners.get(client);
+        if (listener != null) {
+            controller.handleDisconnect(listener);
         }
+
+        synchronized (lock) {
+            clientbyNickname.remove(disconnectedNick);
+            realClientListeners.remove(client);
+            realClients.remove(client);
+        }
+
+        if(gameStarted)
+            disconnectedPlayersNicks.add(disconnectedNick);
+
+        checkPauseGame();
+    }
 
     private void checkPauseGame() throws Exception {
 
@@ -154,42 +153,42 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     synchronized void handleReconnect(String nickname, VirtualViewRmi client) throws RemoteException, InterruptedException {
 
-            synchronized (lock){
-                clientbyNickname.put(nickname, client);
-                disconnectedPlayersNicks.remove(nickname);
-                realClientListeners.put(client, clientListeners.get(client));
-                realClients.add(client);
-                nicknamebyClient.put(client, nickname);
-            }
+        synchronized (lock){
+            clientbyNickname.put(nickname, client);
+            disconnectedPlayersNicks.remove(nickname);
+            realClientListeners.put(client, clientListeners.get(client));
+            realClients.add(client);
+            nicknamebyClient.put(client, nickname);
+        }
 
 
-            ClientListenerRmi listener = realClientListeners.get(client);
+        ClientListenerRmi listener = realClientListeners.get(client);
 
-            if(listener != null){
-                client.showUpdate(new Event(GameState.WAIT_RECONNECT, null));
-            }
+        if(listener != null){
+            client.showUpdate(new Event(GameState.WAIT_RECONNECT, null));
+        }
 
-            synchronized (controller) {
-                if(controller.getPause()){
-                    controller.setPause(false);
+        synchronized (controller) {
+            if(controller.getPause()){
+                controller.setPause(false);
 
-                    for(String nick: nicknames){
-                        if(!disconnectedPlayersNicks.contains(nick)){
-                            VirtualViewRmi realClient = clientbyNickname.get(nick);
-                            System.out.println("client " + nicknamebyClient.get(realClient));
-                            Event last = lastEventSent.get(nick);
-                            System.out.println("Last event is: " + (last == null ? "null" : last.getState()));
-                            notifyClient(realClient,last);
-                        }
+                for(String nick: nicknames){
+                    if(!disconnectedPlayersNicks.contains(nick)){
+                        VirtualViewRmi realClient = clientbyNickname.get(nick);
+                        System.out.println("client " + nicknamebyClient.get(realClient));
+                        Event last = lastEventSent.get(nick);
+                        System.out.println("Last event is: " + (last == null ? "null" : last.getState()));
+                        notifyClient(realClient,last);
                     }
-                    controller.handleReconnectPause(listener, nickname);
                 }
-            }
-
-            if(listener!=null){
-                controller.handleReconnect(listener, nickname);
+                controller.handleReconnectPause(listener, nickname);
             }
         }
+
+        if(listener!=null){
+            controller.handleReconnect(listener, nickname);
+        }
+    }
 
 
 
@@ -273,7 +272,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
     @Override
     public boolean startTimer() throws RemoteException {
-       return controller.startTimer();
+        return controller.startTimer();
     }
 
     @Override
@@ -519,4 +518,3 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
         }
     }
 }
-
