@@ -391,7 +391,7 @@ public class AssemblyController extends Controller {
                     colorOverlay= new ColorInput(0, 0, 25, 25, Color.BROWN);
                 }
                 else {
-                    colorOverlay= new ColorInput(0, 0, 25, 25, Color.WHITE);
+                    colorOverlay= new ColorInput(0, 0, 25, 25, Color.RED);
                 }
 
                 blend.setTopInput(colorOverlay);
