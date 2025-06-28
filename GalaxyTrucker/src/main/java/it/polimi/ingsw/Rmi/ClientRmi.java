@@ -898,7 +898,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 mainApp.cargoManagement(cargos.getCargos());
             }
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
-            case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
+            case WAIT_PLAYER -> {
+                System.out.println("Wait for the choice of the current player");
+                mainApp.waitPlayer();
+            }
             case LEAST_CREW -> System.out.print("You have the least crew");
             case LEAST_ENGINE -> System.out.println("You have the least engine strength");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
@@ -916,7 +919,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
             case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
             case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
-            case ASK_SURRENDER -> System.out.println("Type -1 to surrender or 0 to continue the game");
+            case ASK_SURRENDER -> {
+                System.out.println("Type -1 to surrender or 0 to continue the game");
+                mainApp.askSurrender();
+            }
             case NOT_MIN_EQUIP -> System.out.println("You are not the player with minimum equipment");
             case NOT_MIN_ENGINE -> System.out.println("You are not the player with minimum engine strength");
             case NOT_MIN_FIRE -> System.out.println("You are not the player with minimum fire strength");
@@ -1290,4 +1296,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
     }
 
     public DataContainer getData(){return currentEvent.getData();}
+
+
 }
