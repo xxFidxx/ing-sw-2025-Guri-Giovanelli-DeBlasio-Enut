@@ -77,6 +77,7 @@ public class ServerRmi extends UnicastRemoteObject implements VirtualServerRmi {
 
             System.out.println("Server running on: " + hotspotIp + ":1234");
         } catch (Exception e) {
+
             System.err.println("Server failed: " + e.getMessage());
             e.printStackTrace();
         }

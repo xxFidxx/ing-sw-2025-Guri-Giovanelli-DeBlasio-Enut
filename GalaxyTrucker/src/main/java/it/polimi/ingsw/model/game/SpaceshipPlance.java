@@ -14,6 +14,117 @@ import java.util.stream.Collectors;
 import static it.polimi.ingsw.model.componentTiles.AlienColor.*;
 import static it.polimi.ingsw.model.game.ColorType.*;
 
+/**
+ * The SpaceshipPlance class represents a system for managing and constructing a spaceship
+ * with various components and subsystems. It provides functionality to initialize, modify,
+ * and validate the structure and components of the spaceship, as well as manage cargo and
+ * crew members. The class also supports grid manipulation, allowing for placement, removal,
+ * and validation of components on a 2D plane. Additionally, it tracks attributes such as
+ * astronauts, aliens, batteries, and exposed connectors.
+ *
+ * Fields:
+ * - components: Represents the grid of components that make up the spaceship.
+ * - reserveSpot: A collection of spare parts for the spaceship.
+ * - cargoHolds: Stores the cargo sections of the spaceship.
+ * - engines: A list of engines used to power the spaceship.
+ * - cannons: A collection of cannons for offensive capabilities.
+ * - cabins: The cabins where the crew resides.
+ * - interconnectedCabins: Encapsulation for linked cabins in the spaceship.
+ * - powerCenters: Represents the energy source components of the spaceship.
+ * - visited: Tracks which components have been visited in certain operations.
+ * - shownComponents: Stores visibility of grid components during operations.
+ * - shieldGenerators: A collection of shield-generating components for protection.
+ * - nAstronauts: The number of astronauts aboard the spaceship.
+ * - nBrownAliens: The number of brown aliens aboard.
+ * - nPurpleAliens: The number of purple aliens aboard.
+ * - nBatteries: Total number of batteries available in the spaceship.
+ * - exposedConnectors: Tracks the total number of connectors exposed on the spaceship.
+ * - goodsContainers: A list to store and manage goods containers.
+ * - ROWS: Static representation of the grid's number of rows.
+ * - COLS: Static representation of the grid's number of columns.
+ * - DIR_X, DIR_Y: Directional constants used for navigation and operations.
+ * - isCorrect: A flag indicating whether the current spaceship structure is valid.
+ *
+ * Methods:
+ * - Constructor:
+ *   - SpaceshipPlance(): Initializes a new instance of the spaceship management object.
+ *
+ * - Component management:
+ *   - setComponent(): Places a specific component at a given location on the grid.
+ *   - getComponent(): Retrieves a component from a specific location on the grid.
+ *   - setShownComponents(): Sets the visibility grid for operations.
+ *   - getShownComponents(): Retrieves the grid showing visibility state of the components.
+ *   - getComponents(): Returns the grid of all components currently on the spaceship.
+ *   - placeTileComponents(): Adds a new component to the grid at a specific location.
+ *   - addReserveSpot(): Adds a component tile to the reserve list.
+ *
+ * - Cargo management:
+ *   - setGoodsContainers(): Updates the list of goods containers.
+ *   - getGoodsContainers(): Retrieves the current list of goods containers.
+ *   - handleSwap(): Swaps the contents of two goods containers.
+ *   - handleRemove(): Removes a specific good from a container.
+ *   - handleAdd(): Adds specific goods to a container.
+ *   - swapGoods(): Swaps goods between two containers at specific indices.
+ *   - removeGoods(): Removes goods from a specified cargo container.
+ *   - addGoods(): Adds goods to a specified cargo container.
+ *   - checkSpecialGoods(): Validates special rules for goods during operations.
+ *   - removeMVGood(): Removes a movable good from a container.
+ *
+ * - Validation and correctness:
+ *   - isCorrect(): Checks whether the spaceship structure is valid.
+ *   - checkCorrectness(): Validates the current spaceship structure.
+ *   - isTileValid(): Validates the placement of a single tile.
+ *   - inBounds(): Checks if the provided coordinates are within grid bounds.
+ *   - validateRemainingTiles(): Ensures all tiles in the spaceship meet validation rules.
+ *
+ * - Exploration and operations:
+ *   - dfsExploration(): Performs depth-first search on the grid for exploration.
+ *   - dfsRemove(): Depth-first removal of components based on iterations.
+ *   - selectPart(): Selects a specific tile for further operations.
+ *   - initVisited(): Initializes the visited grid for exploration operations.
+ *   - initShownComponents(): Initializes the shown components grid.
+ *   - removeUnvisitedTiles(): Removes tiles that have not been visited during operations.
+ *   - remove(): Removes a specific component from the grid.
+ *   - edgeCases(): Handles edge-case conditions for grid-based operations.
+ *
+ * - Count and statistics:
+ *   - countFigures(): Counts different structural elements in the spaceship.
+ *   - countBatteries(): Computes the total number of batteries.
+ *   - countExposedConnectors(): Counts all exposed connectors on the spaceship.
+ *   - countGoods(): Computes the total number of goods stored in the spaceship.
+ *
+ * - Cabin and crew management:
+ *   - getCabins(): Returns the list of all cabins.
+ *   - getConnectedCabins(): Retrieves a list of cabins connected to the spaceship network.
+ *   - getnAstronauts(): Returns the number of astronauts on board.
+ *   - getPurpleAliens(): Retrieves the number of purple aliens aboard.
+ *   - getBrownAliens(): Retrieves the number of brown aliens aboard.
+ *   - checkInterconnectedCabinsEmpty(): Checks if there are any cabins linked.
+ *   - removeInterconnectedCabin(): Removes a specific interconnected cabin.
+ *   - getCrew(): Calculates the total crew including astronauts and aliens.
+ *
+ * - Energy and protection:
+ *   - getPowerCenters(): Retrieves all power center components of the spaceship.
+ *   - getShields(): Returns a list of shield generators.
+ *   - checkProtection(): Validates protection by shielding.
+ *   - isCannonValid(): Validates the placement of a cannon.
+ *   - isEngineValid(): Validates the placement of an engine.
+ *
+ * - Conversion utilities:
+ *   - tileGridToString(): Converts the grid of tiles to a string representation.
+ *   - tileGridToStringAdjustments(): Adjusts and converts grid to a string.
+ *   - tileGridToStringParts(): Converts grid parts to a string representation.
+ *   - tileGridToStringTile(): Converts a specific tile to string form.
+ *   - tiletoString(): Converts a specific component tile to string.
+ *   - reserveSpotToString(): Converts the reserve spot data to a string format.
+ *
+ * - Miscellaneous:
+ *   - toString(): Provides a string representation for the SpaceshipPlance instance.
+ *   - getTileIds(): Retrieves IDs of tiles in the grid.
+ *   - getCOLS(): Returns the static column count of the grid.
+ *   - getROWS(): Returns the static row count of the grid.
+ *   - connectorToChar(): Maps a connector type to its character representation.
+ */
 public class SpaceshipPlance {
     private final ComponentTile[][] components;
     private final ArrayList<ComponentTile> reserveSpot;

@@ -8,6 +8,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Stack;
 
+/**
+ * Represents an abstract enemy card in the adventure game.
+ * EnemyCard serves as the base class for specific types of enemy cards
+ * that players may encounter during gameplay. It extends the functionality
+ * of the AdventureCard class and provides additional properties and behaviors
+ * specific to enemy interactions.
+ *
+ * Each EnemyCard contains information about its cannon strength, the number of
+ * days lost if it is activated, and the player who activates the card.
+ * The class also defines methods to determine the outcome of a fight
+ * between the player and the enemy, as well as abstract behaviors for
+ * rewarding or penalizing players based on the fight outcome.
+ */
 public abstract class EnemyCard extends AdventureCard {
     private int cannonStrength;
     private int lostDays;
