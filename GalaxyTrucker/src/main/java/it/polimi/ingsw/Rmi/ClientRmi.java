@@ -939,6 +939,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double cannon");
                 server.fromChargeToManage(this);
             }
+
+            case EPIDEMIC_MANAGEMENT -> {
+                server.removeFigureEpidemic(this);
+                server.endCrewManagement(this);
+            }
             case END_GAME -> mainApp.endGame((DataString) getCurrentEvent().getData());
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
             case NO_HIT -> mainApp.noHit();
