@@ -903,7 +903,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 });
             }
 
-            case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
+            case CHOOSE_CANNON -> {
+                System.out.println("Type 0 to not use double cannons or 1 to use them");
+                DataContainer data = getCurrentEvent().getData();
+                mainApp.chooseCannons((DoubleCannonList) data);
+
+            }
             case BCS_DIR_POS,SCS_DIR_POS,BMS_DIR_POS,SMS_DIR_POS ->{
                 mainApp.setLastProjectile((ProjectileDirPos) getCurrentEvent().getData());
             }

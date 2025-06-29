@@ -264,4 +264,5 @@ public class BatteriesManagementController extends Controller {
             }
         }
     }
+
 }
