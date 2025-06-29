@@ -253,4 +253,11 @@ public class MainApp extends Application {
             ((GameController) controllers.get("game")).chooseEngine(data);
         });
     }
+
+    public void endGame(DataString data) {
+        Platform.runLater(() -> {
+            sceneManager.switchTo("end");
+            ((EndController) controllers.get("end")).setText(data.getText());
+        });
+    }
 }

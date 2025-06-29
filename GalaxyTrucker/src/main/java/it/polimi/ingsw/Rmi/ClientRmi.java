@@ -933,7 +933,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double cannon");
                 server.fromChargeToManage(this);
             }
-            case END_GAME -> System.out.println("Game has ended, below are the stats:");
+            case END_GAME -> mainApp.endGame((DataString) getCurrentEvent().getData());
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
             case NO_HIT -> System.out.println("You have not been hit");
             case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
