@@ -17,10 +17,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class RemoveMVGoodsController extends Controller {
 
@@ -88,6 +90,8 @@ public class RemoveMVGoodsController extends Controller {
             ).toExternalForm(),
             true
     );
+
+    private final Map<Integer, Image> goodsImageCache = new HashMap<>();
 
 
     @FXML
@@ -161,14 +165,36 @@ public class RemoveMVGoodsController extends Controller {
     }
 
     private Image getImageByValue(int value) {
-        return switch (value) {
-            case 1 -> new Image(Objects.requireNonNull(getClass().getResource("/goodsBlocks/blue.png")).toExternalForm());
-            case 2 -> new Image(Objects.requireNonNull(getClass().getResource("/goodsBlocks/green.png")).toExternalForm());
-            case 3 -> new Image(Objects.requireNonNull(getClass().getResource("/goodsBlocks/yellow.png")).toExternalForm());
-            case 4 -> new Image(Objects.requireNonNull(getClass().getResource("/goodsBlocks/red.png")).toExternalForm());
-            default -> new Image(Objects.requireNonNull(getClass().getResource("/goodsBlocks/default.png")).toExternalForm());
+        if (goodsImageCache.containsKey(value)) return goodsImageCache.get(value);
+
+        String filename = switch (value) {
+            case 1 -> "/goodsBlocks/blue.png";
+            case 2 -> "/goodsBlocks/green.png";
+            case 3 -> "/goodsBlocks/yellow.png";
+            case 4 -> "/goodsBlocks/red.png";
+            default -> "/goodsBlocks/default.png";
         };
+
+        Image img = loadImageTmp(filename);
+        if (img != null) goodsImageCache.put(value, img);
+        return img;
     }
+
+    private Image loadImageTmp(String pathInResources) {
+        try (InputStream in = getClass().getResourceAsStream(pathInResources)) {
+            if (in == null) return null;
+
+            File tempFile = File.createTempFile("img_", ".tmp");
+            tempFile.deleteOnExit();
+            Files.copy(in, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return new Image(tempFile.toURI().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 
     public void onRemoveGoodButtonClicked() {
