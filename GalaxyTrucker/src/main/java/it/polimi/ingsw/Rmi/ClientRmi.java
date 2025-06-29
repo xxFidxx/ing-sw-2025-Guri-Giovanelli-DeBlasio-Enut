@@ -687,6 +687,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             if(inputValid){
                                 try{
                                     server.chargeCannons(this, chosenIndices);
+                                }catch (ControllerExceptions e){
+                                    System.out.println(e.getMessage());
                                 } catch (Exception e) {
                                     System.out.println(e.getMessage());
                                 }
@@ -902,8 +904,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
 
             case CHOOSE_CANNON -> System.out.println("Type 0 to not use double cannons or 1 to use them");
-            case ASK_SHIELD -> System.out.println("Type 0 to not use your shield or 1 to use it");
-            case ASK_CANNON -> System.out.println("Type 0 to not use your double cannon or 1 to use it");
+            case BCS_DIR_POS,SCS_DIR_POS,BMS_DIR_POS,SMS_DIR_POS ->{
+                mainApp.setLastProjectile((ProjectileDirPos) getCurrentEvent().getData());
+            }
+            case ASK_SHIELD -> mainApp.askShield();
+            case ASK_CANNON -> mainApp.askCannon();
             case ASK_SURRENDER -> {
                 System.out.println("Type -1 to surrender or 0 to continue the game");
                 mainApp.askSurrender();

@@ -13,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class MainApp extends Application {
     public void updateSpaceship(TileData[][] tileIds) {
         ((AssemblyController) controllers.get("assembly")).setLastSpaceship(tileIds);
         ((CrewManagementController) controllers.get("crewManagement")).setLastSpaceship(tileIds);
-
+        ((GameController) controllers.get("game")).setLastSpaceship(tileIds);
     }
 
     public void adjustShip(TileData[][] tileIds) {
@@ -208,6 +209,30 @@ public class MainApp extends Application {
         sceneManager.switchTo("removeMVGoods");
         Platform.runLater(() -> {
             ((RemoveMVGoodsController) controllers.get("removeMVGoods")).startRemoveMVGoods(data);
+        });
+    }
+
+    public void setLastProjectile(ProjectileDirPos projectile) {
+        ((GameController) controllers.get("game")).setLastProjectile(projectile.getDirection(), projectile.getPosition());
+    }
+
+    public void askCannon() throws RemoteException {
+        Platform.runLater(() -> {
+            try {
+                ((GameController) controllers.get("game")).askCannon();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public void askShield() throws RemoteException {
+        Platform.runLater(() -> {
+            try {
+                ((GameController) controllers.get("game")).askShield();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 }

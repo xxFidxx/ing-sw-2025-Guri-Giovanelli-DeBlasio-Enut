@@ -36,7 +36,7 @@ public class ShowTextUtils {
         alert.setTitle(header);
         alert.setContentText(text);
 
-        ButtonType yes = new ButtonType("Sì", ButtonBar.ButtonData.YES);
+        ButtonType yes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
         ButtonType no = new ButtonType("No", ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(yes, no);
 
@@ -54,6 +54,12 @@ public class ShowTextUtils {
 
             PopupHandler.getInstance().dequeue();
         });
+    }
+
+    public static Optional<ButtonType> askYesNoImmediate(String header, String text) {
+        Alert confirmBox = buildYesNo(header, text);
+        Optional<ButtonType> userChoice = confirmBox.showAndWait();
+        return userChoice;
     }
 
 }

@@ -1,22 +1,35 @@
     package it.polimi.ingsw.gui.pageControllers;
 
+    import it.polimi.ingsw.controller.network.data.TileData;
     import it.polimi.ingsw.gui.Controller;
     import it.polimi.ingsw.gui.ShowTextUtils;
+    import it.polimi.ingsw.model.componentTiles.Direction;
+    import javafx.application.Platform;
     import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
+    import javafx.scene.Node;
     import javafx.scene.control.Button;
+    import javafx.scene.control.ButtonType;
     import javafx.scene.control.ChoiceBox;
     import javafx.scene.control.TextArea;
+    import javafx.scene.effect.ColorAdjust;
     import javafx.scene.image.Image;
     import javafx.scene.image.ImageView;
     import javafx.scene.layout.AnchorPane;
 
+    import java.io.File;
+    import java.io.IOException;
+    import java.io.InputStream;
+    import java.nio.file.Files;
+    import java.nio.file.StandardCopyOption;
     import java.rmi.RemoteException;
     import java.util.Arrays;
     import java.util.HashMap;
     import java.util.Objects;
+    import java.util.Optional;
 
     import it.polimi.ingsw.gui.CardsUtils;
+    import javafx.scene.layout.GridPane;
 
     public class GameController extends Controller {
 
@@ -50,13 +63,32 @@
         @FXML private ImageView pos_21;
         @FXML private ImageView pos_22;
         @FXML private ImageView pos_23;
-
+        @FXML private GridPane spaceshipGrid;
+        @FXML private GridPane reserveGrid;
+        @FXML private ImageView spaceshipDisplay;
 
         @FXML private AnchorPane boardPane;
 
         private ImageView[] tileViews;
 
         private final CardsUtils utils = new CardsUtils();
+
+        private TileData[][] lastSpaceship;
+        private Direction lastDir;
+        private int lastPos;
+
+        private static final Image SPACESHIP_IMAGE;
+
+        static {
+            try (InputStream in = AssemblyController.class.getResourceAsStream("/boards/spaceship.jpg")) {
+                File tempFile = File.createTempFile("spaceship", ".jpg");
+                tempFile.deleteOnExit();
+                Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                SPACESHIP_IMAGE = new Image(tempFile.toURI().toString());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load covered card image", e);
+            }
+        }
 
         @FXML
         private void initialize() {
@@ -76,6 +108,92 @@
             confirmPlanetButton.setVisible(false);
             planetsChoice.setVisible(true);
 
+            for (int row = 0; row < 5; row++) {
+                for (int col = 0; col < 7; col++) {
+                    ImageView imageView = new ImageView();
+                    imageView.setFitWidth(80);
+                    imageView.setFitHeight(80);
+                    imageView.setPreserveRatio(true);
+                    imageView.setPickOnBounds(true);
+
+                    spaceshipGrid.add(imageView, col, row);
+                }
+            }
+
+            spaceshipDisplay.setImage(SPACESHIP_IMAGE);
+            spaceshipGrid.setDisable(true);
+
+            for (int col = 0; col < 2; col++) {
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(80);
+                imageView.setFitHeight(80);
+                imageView.setPreserveRatio(true);
+
+                reserveGrid.add(imageView, col, 0);
+            }
+
+        }
+
+        public void setLastSpaceship(TileData[][] tileIds) {
+            this.lastSpaceship = tileIds;
+            Platform.runLater(() -> {
+                updateSpaceship();
+            });
+        }
+
+        public void setLastProjectile(Direction dir, int pos) {
+            this.lastDir = dir;
+            this.lastPos = pos;
+        }
+
+        private void updateSpaceship() {
+            for (Node node : spaceshipGrid.getChildren()) {
+                if (node instanceof ImageView imageView) {
+                    Integer col = GridPane.getColumnIndex(node);
+                    Integer row = GridPane.getRowIndex(node);
+
+                    TileData tile = lastSpaceship[row][col];
+                    int id = tile.getId();
+                    int rotation = tile.getRotation();
+
+                    imageView.setRotate(rotation);
+                    Image img = getImageFromId(id);
+                    imageView.setImage(img);
+
+                    if (tile.isWellConnected()) {
+                        imageView.setEffect(null);
+                    }
+                    else {
+                        ColorAdjust effect = new ColorAdjust();
+                        effect.setBrightness(-0.5);
+                        imageView.setEffect(effect);
+                    }
+                }
+            }
+
+            for (Node node : reserveGrid.getChildren()) {
+                if (node instanceof ImageView imageView) {
+                    Integer col = GridPane.getColumnIndex(node);
+
+                    int id = lastSpaceship[0][col + 5].getId();
+                    int rotation = lastSpaceship[0][col + 5].getRotation();
+
+                    imageView.setRotate(rotation);
+                    Image img = getImageFromId(id);
+                    imageView.setImage(img);
+                }
+            }
+        }
+
+        private Image getImageFromId(int id) {
+            if (id < 0) return null;
+
+            String imagePath = "/tiles/tile" + id + ".jpg";
+
+            InputStream imageStream = getClass().getResourceAsStream(imagePath);
+            Image image = new Image(imageStream);
+
+            return image;
         }
 
         @FXML
@@ -181,5 +299,23 @@
             }
         }
 
+        public void askCannon() throws RemoteException {
+            Optional<ButtonType> result = ShowTextUtils.askYesNoImmediate(
+                    "USE CANNON",
+                    "Do you want to charge a cannon to protect yourself?\nProjectile\ndirection: " + lastDir.toString() + "\nposition: " + lastPos
+            );
 
+            if (result.get() == ButtonType.YES) clientRmi.server.playerProtected(clientRmi);
+            else clientRmi.server.playerHit(clientRmi);
+        }
+
+        public void askShield() throws RemoteException {
+            Optional<ButtonType> result = ShowTextUtils.askYesNoImmediate(
+                    "USE SHIELD",
+                    "Do you want to charge a shield to protect yourself?\nProjectile\ndirection: " + lastDir.toString() + "\nposition: " + lastPos
+            );
+
+            if (result.get() == ButtonType.YES) clientRmi.server.playerProtected(clientRmi);
+            else clientRmi.server.playerHit(clientRmi);
+        }
     }
