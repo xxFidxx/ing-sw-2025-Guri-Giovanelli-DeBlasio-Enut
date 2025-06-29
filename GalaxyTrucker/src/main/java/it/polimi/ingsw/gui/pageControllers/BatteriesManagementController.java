@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BatteriesManagementController extends Controller {
 
@@ -37,6 +39,8 @@ public class BatteriesManagementController extends Controller {
     @FXML private ImageView spaceshipDisplay;
     TileData[][] lastSpaceship = null;
     private static final Image SPACESHIP_IMAGE;
+    private final Map<Integer, Image> tileImageCache = new HashMap<>();
+    private Image batteryImageCache = null;
     int nBatteries;
 
     static {
@@ -222,17 +226,38 @@ public class BatteriesManagementController extends Controller {
         }
     }
 
-    private Image getImageForBattery() {
-        String imagePath = "/symbols/batteryToken.png";
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-        return new Image(imageStream);
-    }
-
     private Image getImageFromId(int id) {
         if (id < 0) return null;
+        if (tileImageCache.containsKey(id)) return tileImageCache.get(id);
+
         String imagePath = "/tiles/tile" + id + ".jpg";
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-        return new Image(imageStream);
+        Image img = loadImageTmp(imagePath);
+        if (img != null) tileImageCache.put(id, img);
+        return img;
+    }
+
+    private Image getImageForBattery() {
+        if (batteryImageCache != null) return batteryImageCache;
+
+        String imagePath = "/symbols/batteryToken.png";
+        Image img = loadImageTmp(imagePath);
+        if (img != null) batteryImageCache = img;
+        return img;
+    }
+
+    private Image loadImageTmp(String pathInResources) {
+        try (InputStream in = getClass().getResourceAsStream(pathInResources)) {
+            if (in == null) return null;
+
+            File tempFile = File.createTempFile("image_", ".tmp");
+            tempFile.deleteOnExit();
+            Files.copy(in, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return new Image(tempFile.toURI().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void disableAllButtons() {

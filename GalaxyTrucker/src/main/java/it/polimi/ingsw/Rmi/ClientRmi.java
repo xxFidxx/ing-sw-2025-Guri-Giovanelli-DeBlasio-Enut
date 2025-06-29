@@ -796,10 +796,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_LOBBY -> System.out.println("Waiting for other players to join...");
             case GAME_INIT -> mainApp.gameInit();
             case ASSEMBLY -> mainApp.assembly();
-            case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
-            case PICKED_TILE -> mainApp.pickedTile();
-            case PICK_RESERVED_CARD -> mainApp.pickReservedCard();
-            case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
+            case CRAFTING_ENDED -> mainApp.craftingEnded();
+            case PICKED_TILE -> mainApp.pickedTile((PickedTile)currentEvent.getData());
+            case PICK_RESERVED_CARD -> mainApp.pickReservedCard((PickedTile)currentEvent.getData());
+            case ROBBED_TILE -> mainApp.robbedTile();
             case ADJUST_SHIP -> mainApp.adjustShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SELECT_SHIP -> mainApp.selectShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SHOW_SHIP -> mainApp.updateSpaceship(((DataString)getCurrentEvent().getData()).getTileIds());
@@ -901,11 +901,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Wait for the choice of the current player");
                 mainApp.waitPlayer();
             }
+            case WAIT_PLAYER_LEADER -> mainApp.waitPlayerLeader();
             case LEAST_CREW -> System.out.print("You have the least crew");
             case LEAST_ENGINE, LOST_CREW -> System.out.println("You have the least engine strength");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
             case END_CARD -> System.out.println("End card");
-            case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
+            case SHOW_PLAYER -> mainApp.showPlayer((PlayerInfo)getCurrentEvent().getData());
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> {
                 System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
@@ -942,6 +943,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case ENEMY_DRAW -> System.out.println("You have the same power of enemies");
             case NO_DOUBLE_CANNON -> {
                 System.out.println("You don't have any double cannon");
+                server.fromChargeToManage(this);
+            }
+
+            case NO_DOUBLE_ENGINE -> {
+                System.out.println("You don't have any double engine");
                 server.fromChargeToManage(this);
             }
 
@@ -1010,7 +1016,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PICK_RESERVED_CARD -> System.out.println("This is the tile you picked from the reserve spot: press 0 to place it in you spaceship plance, 1 rotate it clockwise, 2 to put it back");
             case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
             case VOID_RESERVED_SPOT -> System.out.print("This reserve spot is empty!");
-            case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!");
+            case FULL_RESERVE_SPOT -> System.out.print("Your reserve spot is full!"); //
             case ADJUST_SHIP -> System.out.println("Type 0 to remove a tile");
             case SELECT_SHIP -> System.out.println("Type the number corresponding to ship part you want to keep");
             case SHOW_SHIP -> System.out.println("Here is your spaceship");
@@ -1050,11 +1056,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
             case WAIT_PLAYER -> System.out.println("Wait for the choice of the current player");
             case WAIT_PLAYER_LEADER -> System.out.println("Wait for other players are done crafting or start the timer by pressing 1");
-            case TIMER_DONE -> System.out.println("TIMER IS DONE!");
-            case LEAST_CREW -> System.out.println("You have the least crew");
+            case TIMER_DONE -> System.out.println("TIMER IS DONE!"); //
+            case LEAST_CREW -> System.out.println("You have the least crew"); //
             case LEAST_ENGINE -> System.out.println("You have the least engine strength");
             case LEAST_FIRE -> System.out.println("You have the least fire strength");
-            case END_CARD -> System.out.println("End card");
+            case END_CARD -> System.out.println("End card"); //
             case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
             case CHOOSE_ENGINE -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
@@ -1076,7 +1082,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("You don't have any double engine");
                 server.fromChargeToManage(this);
             }
-            case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
+            case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone"); //
             case END_GAME -> System.out.println("Game has ended, below are the stats:");
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
             case NO_HIT -> System.out.println("You have not been hit");

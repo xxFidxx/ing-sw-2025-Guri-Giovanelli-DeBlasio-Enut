@@ -85,6 +85,7 @@ public class AssemblyController extends Controller {
     @FXML private Button storeButton;
     @FXML private Button putBackButton;
     @FXML private Label spaceshipStateLabel;
+    @FXML private Button startTimerButton;
 
 
     public void initialize() {
@@ -178,7 +179,6 @@ public class AssemblyController extends Controller {
     private void handleTileClick(int index) throws RemoteException {
         isHoldingTile = true;
         clientRmi.server.pickTile(clientRmi, index);
-        lastIndex = (index < 1000) ? index : lastSpaceship[0][5+index-1000].getId();
     }
 
     public void loadTileImage(int index) {
@@ -540,7 +540,8 @@ public class AssemblyController extends Controller {
         spaceshipGrid.setDisable(true);
     }
 
-    public void pickedTile() {
+    public void pickedTile(PickedTile pickedTile) {
+        lastIndex = pickedTile.getId();
         loadTileImage(lastIndex);
 
         putBackButton.setDisable(false);
@@ -552,7 +553,8 @@ public class AssemblyController extends Controller {
         spaceshipGrid.setDisable(false);
     }
 
-    public void pickedReservedCard() {
+    public void pickedReservedCard(PickedTile pickedTile) {
+        lastIndex = pickedTile.getId();
         loadTileImage(lastIndex);
 
         putBackButton.setDisable(true);
@@ -562,5 +564,26 @@ public class AssemblyController extends Controller {
         coveredTilesGrid.setDisable(true);
         reserveGrid.setDisable(true);
         spaceshipGrid.setDisable(false);
+    }
+
+    public void robbedTile() {
+        ShowTextUtils.showTextVolatileImmediate("ROBBED TILE", "The tile has already been taken.");
+    }
+
+    @FXML
+    private void handleStartTimer() {
+        try{
+            clientRmi.server.startTimer();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void waitPlayerLeader() {
+        startTimerButton.setDisable(false);
+    }
+
+    public void craftingEnded() {
+        coveredTilesGrid.setDisable(false);
     }
 }

@@ -25,6 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CrewManagementController extends Controller {
 
@@ -35,6 +37,8 @@ public class CrewManagementController extends Controller {
     @FXML private ImageView spaceshipDisplay;
     TileData[][] lastSpaceship = null;
     private static final Image SPACESHIP_IMAGE;
+    private final Map<Integer, Image> tileImageCache = new HashMap<>();
+    private final Map<String, Image> symbolImageCache = new HashMap<>();
     int lostCrew;
 
     static {
@@ -216,6 +220,16 @@ public class CrewManagementController extends Controller {
         enableButtons();
     }
 
+    private Image getImageFromId(int id) {
+        if (id < 0) return null;
+        if (tileImageCache.containsKey(id)) return tileImageCache.get(id);
+
+        String imagePath = "/tiles/tile" + id + ".jpg";
+        Image img = loadImageTmp(imagePath);
+        if (img != null) tileImageCache.put(id, img);
+        return img;
+    }
+
     private Image getImageForFigure(Figure figure) {
         String imagePath;
 
@@ -227,18 +241,29 @@ public class CrewManagementController extends Controller {
                 else
                     imagePath = "/symbols/purpleAlien.png";
             }
-            default -> throw new IllegalStateException("Unexpected value: " + figure);
+            default -> throw new IllegalStateException("Unexpected figure type: " + figure);
         }
 
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-        return new Image(imageStream);
+        if (symbolImageCache.containsKey(imagePath)) return symbolImageCache.get(imagePath);
+
+        Image img = loadImageTmp(imagePath);
+        if (img != null) symbolImageCache.put(imagePath, img);
+        return img;
     }
 
-    private Image getImageFromId(int id) {
-        if (id < 0) return null;
-        String imagePath = "/tiles/tile" + id + ".jpg";
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-        return new Image(imageStream);
+    private Image loadImageTmp(String pathInResources) {
+        try (InputStream in = getClass().getResourceAsStream(pathInResources)) {
+            if (in == null) return null;
+
+            File tempFile = File.createTempFile("img_", ".tmp");
+            tempFile.deleteOnExit();
+            Files.copy(in, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return new Image(tempFile.toURI().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void disableAllButtons() {

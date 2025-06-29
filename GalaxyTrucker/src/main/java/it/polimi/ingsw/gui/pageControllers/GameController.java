@@ -2,12 +2,12 @@
 
     import it.polimi.ingsw.controller.ControllerExceptions;
     import it.polimi.ingsw.controller.network.data.DoubleEngineNumber;
+    import it.polimi.ingsw.controller.network.data.PlayerInfo;
     import it.polimi.ingsw.controller.network.data.TileData;
     import it.polimi.ingsw.gui.Controller;
     import it.polimi.ingsw.gui.ShowTextUtils;
     import it.polimi.ingsw.model.componentTiles.Direction;
     import javafx.application.Platform;
-    import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
     import javafx.scene.Node;
     import javafx.scene.control.*;
@@ -67,6 +67,7 @@
         @FXML private AnchorPane boardPane;
 
         @FXML private Label spaceshipStateLabel;
+        @FXML private Label playerInfoLabel;
 
         private ImageView[] tileViews;
 
@@ -76,6 +77,7 @@
         private Direction lastDir;
         private int lastPos;
         private final Map<Integer, Image> imageCache = new HashMap<>();
+        private final Map<Integer, Image> placeholdersImageCache = new HashMap<>();
 
         private static final Image SPACESHIP_IMAGE;
 
@@ -286,16 +288,22 @@
             updateBoard(boardInfo);
         }
 
-        private Image getImageForColor(int color) {
-            String path = switch (color) {
-                case 1 -> "/placeholders/blue.png";
-                case 2 -> "/placeholders/green.png";
-                case 3 -> "/placeholders/yellow.png";
-                case 4 -> "/placeholders/red.png";
-                default -> "/placeholders/default.png";
+        private Image getImageForColor(int value) {
+            if (placeholdersImageCache.containsKey(value)) return placeholdersImageCache.get(value);
+
+            String filename = switch (value) {
+                case 1 -> "/goodsBlocks/blue.png";
+                case 2 -> "/goodsBlocks/green.png";
+                case 3 -> "/goodsBlocks/yellow.png";
+                case 4 -> "/goodsBlocks/red.png";
+                default -> "/goodsBlocks/default.png";
             };
-            return new Image(Objects.requireNonNull(getClass().getResource(path)).toExternalForm());
+
+            Image img = loadImageTmp(filename);
+            if (img != null) placeholdersImageCache.put(value, img);
+            return img;
         }
+
 
 
         @FXML
@@ -392,5 +400,9 @@
 
         public void shotHit() {
             ShowTextUtils.showTextVolatile("SHOT HIT", "The projectile hit you");
+        }
+
+        public void showPlayer(PlayerInfo data) {
+            playerInfoLabel.setText("astronauts: " + data.getNumAstronauts() + " aliens: " + data.getNumAliens() + " batteries: " + data.getNumBatteries());
         }
     }
