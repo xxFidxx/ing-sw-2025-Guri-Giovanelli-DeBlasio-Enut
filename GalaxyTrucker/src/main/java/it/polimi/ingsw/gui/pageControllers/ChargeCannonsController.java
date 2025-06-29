@@ -1,5 +1,6 @@
 package it.polimi.ingsw.gui.pageControllers;
 
+import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.data.DoubleCannonList;
 import it.polimi.ingsw.controller.network.data.TileData;
 import it.polimi.ingsw.gui.Controller;
@@ -33,6 +34,7 @@ public class ChargeCannonsController extends Controller {
     TileData[][] lastSpaceship = null;
     private static final Image SPACESHIP_IMAGE;
     ArrayList<Integer> chosenIndices = new ArrayList<>();
+    DoubleCannonList data = null;
 
     static {
         try (InputStream in = AssemblyController.class.getResourceAsStream("/boards/spaceship.jpg")) {
@@ -71,7 +73,6 @@ public class ChargeCannonsController extends Controller {
                         throw new RuntimeException(e);
                     }
                 });
-
                 spaceshipGrid.add(tilePane, col, row);
             }
         }
@@ -83,8 +84,6 @@ public class ChargeCannonsController extends Controller {
         TileData selectedTile = lastSpaceship[row][col];
         int tileId = selectedTile.getId();
             chosenIndices.add(tileId);
-
-            //quando esci clear
     }
 
     public void setLastSpaceship(TileData[][] lastSpaceship) {
@@ -95,6 +94,7 @@ public class ChargeCannonsController extends Controller {
     }
 
     public void showShip(DoubleCannonList data) {
+        this.data = data;
         ArrayList<DoubleCannon> powerCenters = data.getDoubleCannons();
         textBox.setDisable(true);
         textBox.setText("Choose which double cannons you want to charge:");
@@ -173,6 +173,20 @@ public class ChargeCannonsController extends Controller {
             for (Node child : parent.getChildrenUnmodifiable()) {
                 disableButtonsRec(child);
             }
+        }
+    }
+
+    public void onEndButton(ActionEvent actionEvent) {
+        try {
+            clientRmi.server.chargeCannons(clientRmi, chosenIndices);
+            chosenIndices.clear();
+            disableAllButtons();
+        } catch (RemoteException e) {
+            ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
+        }catch (ControllerExceptions e){
+            ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
+            chosenIndices.clear();
+            showShip(data);
         }
     }
 }

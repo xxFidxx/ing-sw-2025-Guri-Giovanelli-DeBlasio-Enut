@@ -117,6 +117,11 @@
             <ImageView fx:id="card1deck" fitHeight="150.0" fitWidth="97.0" layoutX="414.0" layoutY="519.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="card2deck" fitHeight="150.0" fitWidth="97.0" layoutX="535.0" layoutY="518.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="card3deck" fitHeight="150.0" fitWidth="97.0" layoutX="653.0" layoutY="519.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="spaceshipStateLabel" layoutX="706.0" layoutY="104.0" text="build your spaceship">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

@@ -45,6 +45,7 @@ public class MainApp extends Application {
         loadScene("crewManagement", "/fxmls/crewManagement.fxml");
         loadScene("batteriesManagement", "/fxmls/batteriesManagement.fxml");
         loadScene("removeMVGoods", "/fxmls/removeMVGoods.fxml");
+        loadScene("chargeCannons", "/fxmls/chargeCannons.fxml");
         loadScene("end", "/fxmls/end.fxml");
 
         // Start with the menu scene
@@ -101,6 +102,8 @@ public class MainApp extends Application {
         ((AssemblyController) controllers.get("assembly")).setLastSpaceship(tileIds);
         ((CrewManagementController) controllers.get("crewManagement")).setLastSpaceship(tileIds);
         ((GameController) controllers.get("game")).setLastSpaceship(tileIds);
+        ((ChargeCannonsController) controllers.get("chargeCannons")).setLastSpaceship(tileIds);
+        ((BatteriesManagementController) controllers.get("batteriesManagement")).setLastSpaceship(tileIds);
     }
 
     public void adjustShip(TileData[][] tileIds) {
@@ -233,6 +236,14 @@ public class MainApp extends Application {
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
+        });
+    }
+
+    public void chooseCannons(DoubleCannonList data) {
+        activeController = controllers.get("chargeCannons");
+        sceneManager.switchTo("chargeCannons");
+        Platform.runLater(() -> {
+            ((ChargeCannonsController) controllers.get("chargeCannons")).showShip(data);
         });
     }
 }
