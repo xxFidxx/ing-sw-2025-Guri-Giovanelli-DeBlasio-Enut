@@ -885,7 +885,13 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 Cargos cargos = (Cargos) currentEvent.getData();
                 mainApp.cargoManagement(cargos.getCargos());
             }
-            case CHOOSE_PLAYER -> System.out.println("Type 0 to activate the card, 1 to reject the card");
+            case CHOOSE_PLAYER ->{
+                System.out.println("Type 0 to activate the card, 1 to reject the card");
+                System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
+                mainApp.askSkip("Press YES to skip your turn, or press NO to skip Abandoned place", skip -> {
+                    handleSkip(skip);
+                });
+            }
             case WAIT_PLAYER -> {
                 System.out.println("Wait for the choice of the current player");
                 mainApp.waitPlayer();
@@ -961,12 +967,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                     }
                 }
 
-                case ASK_SURRENDER -> {
+                case CHOOSE_PLAYER -> {
                     if (skip) {
-                        server.surrender(this);
-                        System.out.println("You surrendered, you will now be in spectator mode");
+                        server.acceptCard(this);
                     } else {
-                        server.handleSurrenderEnded(this);
+                        server.manageCard();
                     }
                 }
 
