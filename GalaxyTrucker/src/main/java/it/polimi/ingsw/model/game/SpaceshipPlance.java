@@ -21,110 +21,8 @@ import static it.polimi.ingsw.model.game.ColorType.*;
  * crew members. The class also supports grid manipulation, allowing for placement, removal,
  * and validation of components on a 2D plane. Additionally, it tracks attributes such as
  * astronauts, aliens, batteries, and exposed connectors.
- *
- * Fields:
- * - components: Represents the grid of components that make up the spaceship.
- * - reserveSpot: A collection of spare parts for the spaceship.
- * - cargoHolds: Stores the cargo sections of the spaceship.
- * - engines: A list of engines used to power the spaceship.
- * - cannons: A collection of cannons for offensive capabilities.
- * - cabins: The cabins where the crew resides.
- * - interconnectedCabins: Encapsulation for linked cabins in the spaceship.
- * - powerCenters: Represents the energy source components of the spaceship.
- * - visited: Tracks which components have been visited in certain operations.
- * - shownComponents: Stores visibility of grid components during operations.
- * - shieldGenerators: A collection of shield-generating components for protection.
- * - nAstronauts: The number of astronauts aboard the spaceship.
- * - nBrownAliens: The number of brown aliens aboard.
- * - nPurpleAliens: The number of purple aliens aboard.
- * - nBatteries: Total number of batteries available in the spaceship.
- * - exposedConnectors: Tracks the total number of connectors exposed on the spaceship.
- * - goodsContainers: A list to store and manage goods containers.
- * - ROWS: Static representation of the grid's number of rows.
- * - COLS: Static representation of the grid's number of columns.
- * - DIR_X, DIR_Y: Directional constants used for navigation and operations.
- * - isCorrect: A flag indicating whether the current spaceship structure is valid.
- *
- * Methods:
- * - Constructor:
- *   - SpaceshipPlance(): Initializes a new instance of the spaceship management object.
- *
- * - Component management:
- *   - setComponent(): Places a specific component at a given location on the grid.
- *   - getComponent(): Retrieves a component from a specific location on the grid.
- *   - setShownComponents(): Sets the visibility grid for operations.
- *   - getShownComponents(): Retrieves the grid showing visibility state of the components.
- *   - getComponents(): Returns the grid of all components currently on the spaceship.
- *   - placeTileComponents(): Adds a new component to the grid at a specific location.
- *   - addReserveSpot(): Adds a component tile to the reserve list.
- *
- * - Cargo management:
- *   - setGoodsContainers(): Updates the list of goods containers.
- *   - getGoodsContainers(): Retrieves the current list of goods containers.
- *   - handleSwap(): Swaps the contents of two goods containers.
- *   - handleRemove(): Removes a specific good from a container.
- *   - handleAdd(): Adds specific goods to a container.
- *   - swapGoods(): Swaps goods between two containers at specific indices.
- *   - removeGoods(): Removes goods from a specified cargo container.
- *   - addGoods(): Adds goods to a specified cargo container.
- *   - checkSpecialGoods(): Validates special rules for goods during operations.
- *   - removeMVGood(): Removes a movable good from a container.
- *
- * - Validation and correctness:
- *   - isCorrect(): Checks whether the spaceship structure is valid.
- *   - checkCorrectness(): Validates the current spaceship structure.
- *   - isTileValid(): Validates the placement of a single tile.
- *   - inBounds(): Checks if the provided coordinates are within grid bounds.
- *   - validateRemainingTiles(): Ensures all tiles in the spaceship meet validation rules.
- *
- * - Exploration and operations:
- *   - dfsExploration(): Performs depth-first search on the grid for exploration.
- *   - dfsRemove(): Depth-first removal of components based on iterations.
- *   - selectPart(): Selects a specific tile for further operations.
- *   - initVisited(): Initializes the visited grid for exploration operations.
- *   - initShownComponents(): Initializes the shown components grid.
- *   - removeUnvisitedTiles(): Removes tiles that have not been visited during operations.
- *   - remove(): Removes a specific component from the grid.
- *   - edgeCases(): Handles edge-case conditions for grid-based operations.
- *
- * - Count and statistics:
- *   - countFigures(): Counts different structural elements in the spaceship.
- *   - countBatteries(): Computes the total number of batteries.
- *   - countExposedConnectors(): Counts all exposed connectors on the spaceship.
- *   - countGoods(): Computes the total number of goods stored in the spaceship.
- *
- * - Cabin and crew management:
- *   - getCabins(): Returns the list of all cabins.
- *   - getConnectedCabins(): Retrieves a list of cabins connected to the spaceship network.
- *   - getnAstronauts(): Returns the number of astronauts on board.
- *   - getPurpleAliens(): Retrieves the number of purple aliens aboard.
- *   - getBrownAliens(): Retrieves the number of brown aliens aboard.
- *   - checkInterconnectedCabinsEmpty(): Checks if there are any cabins linked.
- *   - removeInterconnectedCabin(): Removes a specific interconnected cabin.
- *   - getCrew(): Calculates the total crew including astronauts and aliens.
- *
- * - Energy and protection:
- *   - getPowerCenters(): Retrieves all power center components of the spaceship.
- *   - getShields(): Returns a list of shield generators.
- *   - checkProtection(): Validates protection by shielding.
- *   - isCannonValid(): Validates the placement of a cannon.
- *   - isEngineValid(): Validates the placement of an engine.
- *
- * - Conversion utilities:
- *   - tileGridToString(): Converts the grid of tiles to a string representation.
- *   - tileGridToStringAdjustments(): Adjusts and converts grid to a string.
- *   - tileGridToStringParts(): Converts grid parts to a string representation.
- *   - tileGridToStringTile(): Converts a specific tile to string form.
- *   - tiletoString(): Converts a specific component tile to string.
- *   - reserveSpotToString(): Converts the reserve spot data to a string format.
- *
- * - Miscellaneous:
- *   - toString(): Provides a string representation for the SpaceshipPlance instance.
- *   - getTileIds(): Retrieves IDs of tiles in the grid.
- *   - getCOLS(): Returns the static column count of the grid.
- *   - getROWS(): Returns the static row count of the grid.
- *   - connectorToChar(): Maps a connector type to its character representation.
  */
+
 public class SpaceshipPlance {
     private final ComponentTile[][] components;
     private final ArrayList<ComponentTile> reserveSpot;
@@ -232,6 +130,14 @@ public class SpaceshipPlance {
     }
 
 
+    /**
+     * Checks specific edge case conditions for the given coordinates (y, x).
+     * The conditions are based on predetermined values for y and corresponding potential x values.
+     *
+     * @param y the row index to check
+     * @param x the column index to check
+     * @return true if the given (y, x) coordinates satisfy the edge case conditions, false otherwise
+     */
     public boolean edgeCases(int y, int x) {
         if (y == 0) {
             return x == 0 || x == 1 || x == 3 || x == 5 || x == 6;
@@ -243,6 +149,11 @@ public class SpaceshipPlance {
         return false;
     }
 
+    /**
+     * Initializes the `visited` matrix by setting all its elements to `false`.
+     * This method iterates through each cell of the matrix and resets its value,
+     * typically used to prepare for operations that require tracking visitation state.
+     */
     public void initVisited() {
         // Imposta visited a false
         for (int i = 0; i < ROWS; i++) {
@@ -252,6 +163,14 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Initializes the `shownComponents` matrix by setting all its elements to `-1`.
+     * This method iterates over every cell within the matrix defined by the dimensions `ROWS` x `COLS`,
+     * resetting each value to `-1`.
+     *
+     * This method is typically used to prepare the components for a default or uninitialized state
+     * before conducting further operations on them.
+     */
     public void initShownComponents() {
         // Imposta shownComponents a -1
         for (int i = 0; i < ROWS; i++) {
@@ -261,12 +180,43 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Adds a ComponentTile to the reserve spot list.
+     *
+     * @param c the ComponentTile to be added to the reserve spot
+     */
     public void addReserveSpot(ComponentTile c) {
         this.reserveSpot.add(c);
     }
 
 
 
+    /**
+     * Updates the state of multiple component lists within the spaceship.
+     *
+     * This method clears existing lists of various ship components (e.g., cannons,
+     * engines, cabins, cargo holds, shield generators, and power centers), and
+     * rebuilds them by iterating through the ship's grid of components. It categorizes
+     * each tile into its respective list based on its type.
+     *
+     * During the process, specific operations are performed for certain component
+     * types:
+     * - For cabins, life support connections and crew situations are analyzed.
+     *   Adjustments are made to alien figures depending on the presence or removal
+     *   of life support systems, ensuring data consistency.
+     * - Interconnected cabins are identified and updated if they meet specific
+     *   conditions.
+     * - Life support colors are checked and reset as necessary to maintain correct
+     *   associations with cabins.
+     *
+     * Once all lists are rebuilt and the required operations are performed, methods
+     * for counting figures and batteries are invoked to ensure that all dependent
+     * systems are updated accordingly.
+     *
+     * This method is designed to accommodate dynamic updates, ensuring that the
+     * internal state of the spaceship accurately reflects the current arrangement
+     * and condition of its components.
+     */
     public void updateLists() {
         cannons.clear();
         engines.clear();
@@ -337,6 +287,14 @@ public class SpaceshipPlance {
         countBatteries();
     }
 
+    /**
+     * Determines if the specified coordinates (x, y) are within the valid bounds of the grid
+     * and do not fall under predefined edge case conditions.
+     *
+     * @param x the column index to check
+     * @param y the row index to check
+     * @return true if the coordinates are both within the standard bounds and do not meet edge case criteria, false otherwise
+     */
     public boolean inBounds(int x, int y) {
         // Prima controlla i bound standard
         boolean standardBounds = (x >= 0 && x < COLS && y >= 0 && y < ROWS);
@@ -345,6 +303,20 @@ public class SpaceshipPlance {
         return standardBounds && !edgeCases(y, x);
     }
 
+    /**
+     * Checks the correctness of the current configuration of components on the grid.
+     *
+     * This method performs a series of operations to ensure the validity of the grid:
+     * 1. Initializes the `visited` matrix to track examined components.
+     * 2. Determines the starting tile for validation:
+     *    - If the central tile (3, 2) is null, searches for the first non-null tile as the starting point.
+     *    - Otherwise, starts exploration from the central tile.
+     * 3. Conducts a depth-first search (DFS) exploration to mark all connected and valid tiles.
+     * 4. Removes any tiles that are not connected to the valid cluster.
+     * 5. Verifies the remaining tiles to confirm that all configurations meet the spaceship's requirements.
+     *
+     * @return true if the grid configuration is valid after verification, false otherwise
+     */
     public boolean checkCorrectness() {
         initVisited();
         // prima guardo se la tile in 3 2 è null, se è null allora faccio un doppio for dove cerco la prima tile libera, perch vuol dire che sono nel caso in cui è stato rimosso
@@ -377,6 +349,14 @@ public class SpaceshipPlance {
         return isCorrect;
     }
 
+    /**
+     * Explores the grid using a depth-first search (DFS) algorithm starting at the given coordinates.
+     * The method marks tiles as visited, ensuring that only unvisited, in-bounds, and valid tiles are processed.
+     * Smooth connectors are ignored during the exploration process.
+     *
+     * @param x the column index of the starting tile
+     * @param y the row index of the starting tile
+     */
     public void dfsExploration(int x, int y) {
         if (!inBounds(x, y) || components[y][x] == null || visited[y][x]) {
             return;
@@ -396,6 +376,17 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Removes unvisited tiles from the spaceship grid and moves them to the reserve spot.
+     *
+     * This method iterates over the components grid, checking each tile to determine
+     * whether it has been marked as visited. If a tile is not visited and it is not null,
+     * it is added to the reserve spot list using the `addReserveSpot` method and is then
+     * removed from the grid by setting its position to null.
+     *
+     * Iteration is performed row by row through the grid, with the dimensions determined
+     * by the constants `ROWS` and `COLS`.
+     */
     public void removeUnvisitedTiles() {
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLS; x++) {
@@ -409,6 +400,16 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Validates the remaining tiles in the spaceship grid and updates their connection status.
+     *
+     * This method iterates through each component tile in the grid, checking its validity
+     * using the `isTileValid` method. If a tile is valid, its connection status is set to
+     * true; otherwise, it is set to false. Additionally, the method tracks whether all tiles
+     * in the grid are valid.
+     *
+     * @return true if all tiles in the grid are valid after validation, false if at least one tile is invalid
+     */
     public boolean validateRemainingTiles() {
         boolean allValid = true;
 
@@ -426,6 +427,14 @@ public class SpaceshipPlance {
         return allValid;
     }
 
+    /**
+     * Checks if a tile at the specified coordinates is valid based on its type, connections,
+     * and placement rules within the grid structure.
+     *
+     * @param x the x-coordinate of the tile to be validated
+     * @param y the y-coordinate of the tile to be validated
+     * @return true if the tile is valid according to the defined rules, false otherwise
+     */
     public boolean isTileValid(int x, int y) {
         ComponentTile tile = components[y][x];
 
@@ -451,6 +460,15 @@ public class SpaceshipPlance {
         return true;
     }
 
+    /**
+     * Determines whether two connector types can form a valid connection
+     * based on predefined connection rules.
+     *
+     * @param a the first connector type to be checked
+     * @param b the second connector type to be checked
+     * @return true if the connection between the two connector types is valid,
+     *         otherwise returns false
+     */
     public boolean isConnectionValid(ConnectorType a, ConnectorType b) {
         //System.out.println(a.toString() + " " + b.toString());
         boolean prova;
@@ -479,11 +497,30 @@ public class SpaceshipPlance {
         return prova;
     }
 
+    /**
+     * Checks if the engine at the given coordinates is valid.
+     * This method validates the orientation and ensures that there is either
+     * space or a void behind the engine.
+     *
+     * @param y The vertical coordinate of the engine.
+     * @param x The horizontal coordinate of the engine.
+     * @return true if the engine is valid according to the specified rules; false otherwise.
+     */
     public boolean isEngineValid(int y, int x) {
         // Controlla solo orientamento e spazio dietro oppure se lo spazio dietro è nel vuoto
         return components[y][x].getConnectors()[2] == ConnectorType.ENGINE && (!inBounds(x,y+1) || components[y + 1][x] == null);
     }
 
+    /**
+     * Determines if a cannon located at the specified position is valid.
+     * A cannon is considered valid if the direction it is facing is either
+     * outside the bounds of the ship or pointing to an empty cell.
+     *
+     * @param y the row coordinate in the grid
+     * @param x the column coordinate in the grid
+     * @return true if the cannon is valid based on the direction it is facing,
+     *         false otherwise
+     */
     public boolean isCannonValid(int y, int x) {
         ConnectorType[] connectors = components[y][x].getConnectors();
 
@@ -507,6 +544,15 @@ public class SpaceshipPlance {
     }
 
 
+    /**
+     * Checks whether the tile at the specified position is valid based on various conditions.
+     * This method verifies edge cases, bounds, specific rules for certain component types
+     * (e.g., Engine or Cannon), and the validity of connections to adjacent tiles.
+     *
+     * @param x the x-coordinate of the tile to check
+     * @param y the y-coordinate of the tile to check
+     * @return true if the tile satisfies all the conditions for being valid; false otherwise
+     */
     public boolean checkNewTile(int x, int y) {
         if (edgeCases(y, x) || !inBounds(x, y) || components[y][x] == null) {
             return false;
@@ -547,6 +593,17 @@ public class SpaceshipPlance {
     }
 
 
+    /**
+     * Removes a component from the specified coordinates and processes its adjacent components.
+     *
+     * This method checks if there is a valid component at the given coordinates,
+     * removes it, and traverses its neighboring components based on specific conditions.
+     *
+     * @param x the x-coordinate of the component to be removed
+     * @param y the y-coordinate of the component to be removed
+     * @return the number of parts found and processed through the removal operation
+     * @throws SpaceShipPlanceException if there is no tile at the specified coordinates
+     */
     public int remove(int x, int y) {
         initShownComponents();
         initVisited();
@@ -571,6 +628,16 @@ public class SpaceshipPlance {
         return partsFound;
     }
 
+    /**
+     * Executes a depth-first search (DFS) to remove and count components from a grid
+     * starting at a specified position. Marks visited components and tracks their
+     * iteration in an auxiliary matrix.
+     *
+     * @param x the x-coordinate of the starting position
+     * @param y the y-coordinate of the starting position
+     * @param iteration the current iteration identifier to mark the processed components
+     * @return the count of components removed starting from the given position
+     */
     private int dfsRemove(int x, int y, int iteration) {
         if (!inBounds(x, y) || visited[y][x] || components[y][x] == null) {
             return 0;
@@ -594,6 +661,12 @@ public class SpaceshipPlance {
         return count;
     }
 
+    /**
+     * Selects and retains the components that match the specified iteration value.
+     * All other components are set to null.
+     *
+     * @param iteration the iteration value used to filter and select components
+     */
     public void selectPart(int iteration) {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -605,6 +678,22 @@ public class SpaceshipPlance {
     }
 
 
+    /**
+     * Counts the number of specific types of figures (Astronauts, Brown Aliens, and Purple Aliens)
+     * present in a collection of cabins and updates the corresponding counters.
+     *
+     * This method iterates through all cabins, retrieves their figures, and determines the type
+     * of each figure. The method distinguishes between Astronauts and Aliens. For Aliens, it further
+     * checks their color to classify them as either Brown Aliens or Purple Aliens.
+     *
+     * The counts of the identified figures are printed to the console in the following format:
+     * "Astronauts: <number> Brown aliens: <number> Purple aliens: <number>"
+     *
+     * Modifies:
+     * - nAstronauts: Counter for the number of Astronauts found.
+     * - nBrownAliens: Counter for the number of Brown Aliens found.
+     * - nPurpleAliens: Counter for the number of Purple Aliens found.
+     */
     public void countFigures() {
         nAstronauts = 0;
         nBrownAliens = 0;
@@ -628,10 +717,25 @@ public class SpaceshipPlance {
         System.out.println("Astronauts: " + nAstronauts + "Brown aliens: " + nBrownAliens + "Purple aliens: " + nPurpleAliens);
     }
 
+    /**
+     * Checks whether the storage (cargo holds) is not empty.
+     *
+     * @return true if the cargo holds are not empty, false otherwise
+     */
     public boolean checkStorage() {
         return !cargoHolds.isEmpty();
     }
 
+    /**
+     * Handles the swapping of goods between two cargo containers.
+     * Validates the constraints of cargo and goods indexes and ensures special rules for goods are maintained.
+     *
+     * @param cargoIndex1 The index of the first cargo container involved in the swap.
+     * @param cargoIndex2 The index of the second cargo container involved in the swap.
+     * @param goodIndex1 The index of the goods in the first cargo container to be swapped.
+     * @param goodIndex2 The index of the goods in the second cargo container to be swapped.
+     * @throws CargoManagementException if any index is out of bounds or the swap violates special constraints.
+     */
     public void handleSwap(int cargoIndex1, int cargoIndex2, int goodIndex1, int goodIndex2) throws CargoManagementException {
 
         // il +1 è dato dal fatto che noi in posizione 0 simuliamo avere i rewards
@@ -657,6 +761,13 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Handles the removal of a specific good from a specified cargo container.
+     *
+     * @param cargoIndex the index of the cargo container in the list
+     * @param goodIndex the index of the good to be removed within the specified cargo container
+     * @throws CargoManagementException if the cargoIndex is out of bounds or if the goodIndex is out of bounds
+     */
     public void handleRemove(int cargoIndex, int goodIndex) throws CargoManagementException {
 
         if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
@@ -669,6 +780,23 @@ public class SpaceshipPlance {
             throw new CargoManagementException("cargo index is outbound");
     }
 
+    /**
+     * Handles the addition of a goods block from card rewards to a specific cargo's goods container.
+     * Performs checks to ensure the indices are within bounds and validates the addition based
+     * on the type of goods and existing constraints in the cargo.
+     *
+     * @param cardReward Array of goods blocks available as rewards.
+     * @param cargoIndex Index of the cargo container in the goods container list.
+     * @param goodIndex Index within the goods array in the specified cargo container where the
+     *                  reward goods block is to be added.
+     * @param rewardIndex Index of the goods block in the card rewards array to be added.
+     * @throws CargoManagementException if any of the following conditions occur:
+     *                                  - The specified cargo index is out of bounds.
+     *                                  - The specified goods index is out of bounds.
+     *                                  - The reward goods index is out of bounds.
+     *                                  - A good already exists at the specified location in the cargo.
+     *                                  - The addition violates special goods constraints.
+     */
     public void handleAdd(GoodsBlock[] cardReward, int cargoIndex, int goodIndex, int rewardIndex) throws CargoManagementException {
 
         if (cargoIndex >= 0 && cargoIndex < goodsContainers.size()) {
@@ -690,6 +818,14 @@ public class SpaceshipPlance {
             throw new CargoManagementException("cargo index is outbound");
     }
 
+    /**
+     * Swaps goods between two goods containers at specified indices.
+     *
+     * @param cargo1 the first goods container involved in the swap
+     * @param cargo2 the second goods container involved in the swap
+     * @param j1 the index of the goods block in the first goods container to be swapped
+     * @param j2 the index of the goods block in the second goods container to be swapped
+     */
     public void swapGoods(GoodsContainer cargo1, GoodsContainer cargo2, int j1, int j2) {
 
         GoodsBlock[] goods1 = cargo1.getGoods();
@@ -701,6 +837,16 @@ public class SpaceshipPlance {
 
     }
 
+    /**
+     * Checks the conditions for special goods based on the provided GoodsContainer
+     * and GoodsBlock objects.
+     *
+     * @param cargo1 the first GoodsContainer to be checked
+     * @param cargo2 the second GoodsContainer to be checked
+     * @param good1 the first GoodsBlock to be checked, may be null
+     * @param good2 the second GoodsBlock to be checked, may be null
+     * @return true if conditions for special goods are satisfied, otherwise false
+     */
     private boolean checkSpecialGoods(GoodsContainer cargo1, GoodsContainer cargo2, GoodsBlock good1, GoodsBlock good2) {
         if ((((good1 != null) && good1.getType() == RED && !cargo2.isSpecial())) || (((good2 != null) && good2.getType() == RED && !cargo1.isSpecial())))
             return false;
@@ -708,16 +854,39 @@ public class SpaceshipPlance {
 
     }
 
+    /**
+     * Checks if the specified goods block is allowed in the given cargo container based on its type
+     * and the special status of the cargo container.
+     *
+     * @param cargo the container that holds goods, which may have a special status
+     * @param good the goods block to be checked for compatibility with the cargo container
+     * @return true if the goods block is allowed in the cargo container, false otherwise
+     */
     private boolean checkSpecialGoods(GoodsContainer cargo, GoodsBlock good) {
         if ((good.getType() == RED && !cargo.isSpecial()))
             return false;
         return true;
     }
 
+    /**
+     * Removes a good from the specified goods container at the specified index.
+     *
+     * @param cargo1 the goods container from which the good will be removed
+     * @param j1 the index of the good to be removed within the goods container
+     */
     private void removeGoods(GoodsContainer cargo1, int j1) {
         cargo1.getGoods()[j1] = null;
     }
 
+    /**
+     * Adds a goods item from the given card reward array to the specified position in the goods container.
+     * Updates the card reward array by setting the used item to null.
+     *
+     * @param cargo1     The container where the goods will be added.
+     * @param cardReward The array of goods blocks serving as the source for the goods.
+     * @param j1         The index in the goods container where the goods will be added.
+     * @param k          The index in the card reward array that specifies which goods block to add.
+     */
     private void addGoods(GoodsContainer cargo1, GoodsBlock[] cardReward, int j1, int k) {
         cargo1.getGoods()[j1] = cardReward[k];
         cardReward[k] = null;
@@ -755,6 +924,17 @@ public class SpaceshipPlance {
         return shieldGenerators;
     }
 
+    /**
+     * Counts the total number of active batteries across all power centers.
+     *
+     * This method iterates through a collection of power centers and checks
+     * each battery's status within them. If a battery is active, it increments
+     * the count of active batteries. The method uses the `getBatteries` method
+     * of each power center to check the statuses of individual batteries.
+     *
+     * The results are printed to standard output for each power center
+     * encountered during the iteration.
+     */
     public void countBatteries(){
         nBatteries=0;
         for(PowerCenter powerCenter : powerCenters){
@@ -765,6 +945,13 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Counts the total number of exposed connectors in a grid of components.
+     * A connector is considered exposed if it does not belong to the types SMOOTH, CANNON, or ENGINE
+     * and either has no adjacent tile in the specified direction or is out of bounds.
+     *
+     * @return the total number of exposed connectors in the grid.
+     */
     public int countExposedConnectors() {
 
         exposedConnectors = 0;
@@ -794,6 +981,21 @@ public class SpaceshipPlance {
         return exposedConnectors;
     }
 
+    /**
+     * Checks the protection level of a given position in a specific direction.
+     *
+     * The method determines if a position in a given direction is protected
+     * by a cannon or a double cannon. The check proceeds in the specified direction
+     * until either a protection object is found or the bounds of the grid are exceeded.
+     *
+     * @param direction the direction to check for protection (e.g., NORTH, EAST, SOUTH, WEST)
+     * @param position the starting position in the grid from which the check begins
+     * @return an integer representing the protection level:
+     *         -1 if no protection object is present within bounds,
+     *         0 if no cannon is detected at the found position,
+     *         1 if a single cannon is found at the position,
+     *         2 if a double cannon is found at the position
+     */
     public int checkProtection(Direction direction, int position) {
         int max_lenght = 7;
         // casella da cui partire
@@ -865,6 +1067,13 @@ public class SpaceshipPlance {
         return 0; // se non abbiamo un cannone
     }
 
+    /**
+     * Determines the direction of the cannon connector within the given cannon object.
+     *
+     * @param cannon the cannon object whose connector direction is to be determined
+     * @return the index of the cannon connector within the cannon's connectors array
+     * @throws IllegalStateException if no cannon connector is found in the cannon's connectors
+     */
     public int getCannonDirection(Cannon cannon) {
         ConnectorType[] cannonConnectors = cannon.getConnectors();
         for (int i = 0; i < cannonConnectors.length; i++) {
@@ -915,6 +1124,16 @@ public class SpaceshipPlance {
 
 
 
+    /**
+     * Places a tile component at the specified coordinates on the spaceship grid.
+     *
+     * @param tile the tile component to be placed on the grid.
+     * @param x the x-coordinate where the tile will be placed (0 to 6 inclusive).
+     * @param y the y-coordinate where the tile will be placed (0 to 4 inclusive).
+     * @throws SpaceShipPlanceException if the specified coordinates are out of bounds,
+     *                                  if the spot is already occupied,
+     *                                  or if placement fails due to an edge case.
+     */
     public void placeTileComponents(ComponentTile tile, int x, int y) throws SpaceShipPlanceException {
         if (x < 0 || x > 6 || y < 0 || y > 4 || edgeCases(y, x))
             throw new SpaceShipPlanceException("Outbound index");
@@ -926,6 +1145,15 @@ public class SpaceshipPlance {
     }
 
 
+    /**
+     * Checks if there is an exposed connector in the specified direction starting at the given position.
+     * The method iterates through the components in the specified direction to check for a connector that
+     * matches disallowed connector types (SINGLE, DOUBLE, or UNIVERSAL).
+     *
+     * @param direction the direction to check for the exposed connector (e.g., NORTH, EAST, SOUTH, or WEST)
+     * @param position the starting position from which to begin the search
+     * @return true if an exposed connector of a disallowed type is found; false otherwise
+     */
     public boolean checkExposedConnector(Direction direction, int position) {
         int max_lenght = 7;
         // casella da cui partire
@@ -983,6 +1211,18 @@ public class SpaceshipPlance {
         return false;
     }
 
+    /**
+     * Retrieves a 2D array of TileData objects representing the tiles
+     * from the current state of the components and reserve spots.
+     *
+     * The array contains:
+     * - Tiles from the component grid.
+     * - Tiles from the reserve spots, if available, added at specific positions.
+     *
+     * If a tile is null, a default TileData object is created with an ID of -1 and a rotation of 0.
+     *
+     * @return A 2D array of TileData objects representing the tiles and their properties.
+     */
     public TileData[][] getTileIds() {
         TileData[][] result = new TileData[5][7];
 
@@ -1002,6 +1242,13 @@ public class SpaceshipPlance {
         return result;
     }
 
+    /**
+     * Converts the components array into a readable string representation,
+     * where each row of the array is separated by a newline character and
+     * elements in each row are separated by commas.
+     *
+     * @return A string representation of the components array.
+     */
     @Override
     public String toString() {
         String result = "";
@@ -1016,6 +1263,14 @@ public class SpaceshipPlance {
         return result;
     }
 
+    /**
+     * Constructs a string representation of a grid of tiles, formatted row by row
+     * with specific tile characteristics represented visually. The grid structure
+     * includes numeric row and column headers for guidance and incorporates
+     * blank spaces for edge cases where no tile is present.
+     *
+     * @return A formatted string representation of the tile grid.
+     */
     public String tileGridToString() {
         int rows = this.components.length;
         int cols = this.components[0].length;
@@ -1055,6 +1310,15 @@ public class SpaceshipPlance {
 
 
 
+    /**
+     * Generates a 2D character array representation of a tile, illustrating its structure,
+     * connectors, center symbol, and any applicable shields.
+     *
+     * @param tile The ComponentTile object representing the tile to be rendered.
+     *             If null, a default empty tile representation with no connections or shields is returned.
+     * @return A 2D character array depicting the tile, where each character represents a specific
+     *         part of the tile (e.g., borders, connectors, center symbol, or shields).
+     */
     private char[][] tileCrafter(ComponentTile tile) {
         char[][] lines = {
                 {'┌', '-', '┐'},
@@ -1092,6 +1356,14 @@ public class SpaceshipPlance {
         return lines;
     }
 
+    /**
+     * Converts the internal grid of tiles into a formatted string representation with adjustments
+     * for grid layouts and specific tile edge cases.
+     * The resulting string includes grid indices and tile components formatted in a multi-line structure.
+     *
+     * @return A string representation of the tile grid with adjustments, including grid indices,
+     *         formatted rows and columns, and handling for applicable edge cases.
+     */
     public String tileGridToStringAdjustments() {
         int rows = this.components.length;
         int cols = this.components[0].length;
@@ -1130,6 +1402,14 @@ public class SpaceshipPlance {
         return result.toString();
     }
 
+    /**
+     * Adjusts the visual representation of a tile based on its properties and characteristics.
+     *
+     * @param tile the tile component to be adjusted; if null, a default grid representation is returned.
+     * @return a 2D character array representing the adjusted visual appearance of the tile. The array shows
+     *         the tile borders, connectors, central symbol, and any additional features such as shield representation
+     *         for specific types of tiles.
+     */
     private char[][] tileCrafterAdjustments(ComponentTile tile) {
         char[][] lines = {
                 {'┌', '-', '┐'},
@@ -1172,6 +1452,13 @@ public class SpaceshipPlance {
         return lines;
     }
 
+    /**
+     * Converts the given ConnectorType to its corresponding character symbol.
+     *
+     * @param ct the ConnectorType to convert
+     * @return the character representation of the specified ConnectorType,
+     *         or '?' if the type is not recognized
+     */
     public char connectorToChar(ConnectorType ct) {
         switch (ct) {
             case UNIVERSAL -> {
@@ -1198,6 +1485,13 @@ public class SpaceshipPlance {
         }
     }
 
+    /**
+     * Converts a given ComponentTile object into its corresponding string representation.
+     *
+     * @param tile the ComponentTile object to be converted to a string. Can be null.
+     * @return a string representation of the given ComponentTile. If the tile does not match any known type,
+     *         the method returns "not Catched in tiletoString". Returns null if the input tile is null.
+     */
     public String tiletoString(ComponentTile tile) {
         if (tile != null) {
             switch (tile) {
@@ -1246,6 +1540,13 @@ public class SpaceshipPlance {
         return null;
     }
 
+    /**
+     * Converts the reserveSpot tiles into a string representation, formatting them in a stylized 3×3 grid layout.
+     * Each tile in the reserveSpot is processed to generate its character representation, and the formatted result
+     * is concatenated line by line to form the final string output.
+     *
+     * @return A string representation of the reserveSpot tiles in a structured grid format.
+     */
     public String reserveSpotToString() {
         StringBuilder result = new StringBuilder();
 
@@ -1269,6 +1570,15 @@ public class SpaceshipPlance {
         return reserveSpot;
     }
 
+    /**
+     * Checks if the interconnected cabins list is empty.
+     *
+     * This method iterates through the interconnectedCabins collection,
+     * printing each cabin for debugging purposes, and determines
+     * whether the list is empty.
+     *
+     * @return true if the interconnectedCabins list is empty, false otherwise
+     */
     public boolean checkInterconnectedCabinsEmpty(){
 
         System.out.println("sono entrato in checkInterconnectedCabinsEmpty");
@@ -1279,11 +1589,25 @@ public class SpaceshipPlance {
         return interconnectedCabins.isEmpty();
     }
 
+    /**
+     * Removes the specified cabin from the list of interconnected cabins.
+     *
+     * @param cab the Cabin object to be removed from the interconnectedCabins list
+     */
     public void removeInterconnectedCabin(Cabin cab){
          interconnectedCabins.remove(cab);
     }
 
 
+    /**
+     * Converts a grid of tiles represented by shownComponents into a string,
+     * displaying the structured layout in multiple rows and columns.
+     * Each tile in the grid is represented by a 3x3 set of characters.
+     * Blank spaces are added for edge cases where a tile is not to be displayed.
+     *
+     * @return A formatted string representation of the tile grid,
+     *         with each tile rendered in multiple lines, separated by new lines.
+     */
     public String tileGridToStringParts() {
         int rows = this.shownComponents.length;
         int cols = this.shownComponents[0].length;
@@ -1311,6 +1635,14 @@ public class SpaceshipPlance {
     }
 
 
+    /**
+     * Creates a 2D character array representing a tile with a crafted part.
+     *
+     * @param tile an integer representing the tile value to be added to the center of the tile.
+     *             If the value is -1, no value is added to the tile center.
+     * @return a 2D character array representing the crafted tile. The tile includes a border and optionally
+     *         a character at its center based on the input value.
+     */
     private char[][] tileCrafterParts(int tile) {
         char[][] lines = {
                 {'┌', '-', '┐'},
@@ -1327,6 +1659,15 @@ public class SpaceshipPlance {
         return lines;
     }
 
+    /**
+     * Converts the grid of components into a string representation for a specific tile.
+     * The method generates a formatted string where the given tile is highlighted
+     * within a grid representation of the components.
+     *
+     * @param tileToShow The specific tile to be represented in the string format.
+     * @return A string representation of the grid with the specified tile highlighted,
+     *         maintaining proper alignment and formatting.
+     */
     public String tileGridToStringTile(ComponentTile tileToShow) {
         int rows = this.components.length;
         int cols = this.components[0].length;
@@ -1353,6 +1694,14 @@ public class SpaceshipPlance {
         return result.toString();
     }
 
+    /**
+     * Generates a 2D character representation of a given tile and overlays it with specific details if it matches
+     * the specified tile type to display. The representation includes borders, an ID or symbol, and connectors.
+     *
+     * @param tile the tile for which the character representation is to be created. If null, a default border is returned.
+     * @param tileToShow the tile type to compare with the given tile to decide the representation details.
+     * @return a 5x5 2D character array representing the tile, including borders, connectors, and additional details.
+     */
     public char[][] tileCrafterbyTile(ComponentTile tile, ComponentTile tileToShow) {
         char[][] lines = {
                 {'┌', '-', '-', '-', '┐'},  // Riga superiore
@@ -1399,6 +1748,16 @@ public class SpaceshipPlance {
         return lines;
     }
 
+    /**
+     * Removes a GoodsBlock from a specified CargoHolds within the player's cargo if certain conditions are met.
+     * The removal is based on the value of the GoodsBlock at the specified indices compared to the value of
+     * the most valuable GoodsBlock owned by the player.
+     *
+     * @param cargoIndex The index of the CargoHolds container in the player's cargo.
+     * @param goodIndex The index of the GoodsBlock within the specified CargoHolds.
+     * @return {@code true} if the GoodsBlock is successfully removed; {@code false} if the removal conditions are not met.
+     * @throws CargoManagementException if the CargoHolds or GoodsBlock index is out of bounds, or if attempting to remove a null GoodsBlock.
+     */
     public boolean removeMVGood(int cargoIndex, int goodIndex) {
         ArrayList<CargoHolds> playerCargo = getCargoHolds();
         ArrayList<GoodsBlock> playerGoods = new ArrayList<>();
@@ -1430,6 +1789,11 @@ public class SpaceshipPlance {
             throw new CargoManagementException("cargo index is outbound");
     }
 
+    /**
+     * Counts the total number of goods across all player's cargo holds.
+     *
+     * @return the total number of goods present in all cargo holds
+     */
     public int countGoods(){
         int i = 0;
         ArrayList<CargoHolds> playerCargo = getCargoHolds();

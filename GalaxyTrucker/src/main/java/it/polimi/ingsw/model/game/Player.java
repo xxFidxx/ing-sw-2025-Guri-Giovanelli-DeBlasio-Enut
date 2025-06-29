@@ -107,8 +107,18 @@ public class Player {
 
 
 
-    // io metterei che si chiede se si vogliono caricare i cannoni mentre si conta la potenza, anche perché sembra si faccia così dalle regole
-    public int getEngineStrenght() {//è da vedere se controllare qui se ci sono batterie
+
+    /**
+     * Calculates and returns the total strength of the spaceship's engines.
+     * The engine strength is computed by summing the power of all engines
+     * present in the spaceship. For engines of type {@code DoubleEngine},
+     * they are only included in the total if they are charged. If there is
+     * exactly one brown alien on the spaceship and the total calculated
+     * power is greater than zero, an extra strength bonus of 2 is added.
+     *
+     * @return the total engine strength as an integer
+     */
+    public int getEngineStrenght() {
         int sumPower=0;
 
 
@@ -127,6 +137,19 @@ public class Player {
         return sumPower;
     }
 
+    /**
+     * Calculates the total firepower of the spaceship, taking into account the power of all
+     * cannon components and any applicable bonuses for specific conditions.
+     *
+     * The method iterates over all cannons in the spaceship's cannon list and adds their
+     * power to the total firepower. For DoubleCannon instances, the cannon contributes to
+     * the firepower only if it is charged. Additionally, if there is exactly one purple alien
+     * present on the spaceship and the total firepower is greater than zero, a bonus of 2
+     * is added to the firepower.
+     *
+     * @return the total firepower as a float value, calculated based on the spaceship's firearms
+     *         and any relevant bonuses.
+     */
     public float getFireStrenght() {
         float sumPower=0;
 
