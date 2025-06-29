@@ -1,5 +1,6 @@
     package it.polimi.ingsw.gui.pageControllers;
 
+    import it.polimi.ingsw.controller.ControllerExceptions;
     import it.polimi.ingsw.controller.network.data.DoubleEngineNumber;
     import it.polimi.ingsw.controller.network.data.TileData;
     import it.polimi.ingsw.gui.Controller;
@@ -323,24 +324,30 @@
         }
 
         public void chooseEngine(DoubleEngineNumber data) {
-            Optional <Integer> res = ShowTextUtils.askNumberImmediate("Insert a number", "Insert the number of double engines you want to charge");
+            while (true) {
+                Optional<Integer> res = ShowTextUtils.askNumberImmediate(
+                        "Insert a number",
+                        "Insert the number of double engines you want to charge"
+                );
 
-            while (!res.isPresent()){
-                ShowTextUtils.showTextVolatileImmediate("Error", "Please insert a number.");
-                res = ShowTextUtils.askNumberImmediate("Insert a number", "Insert the number of double engines you want to charge");
-            }
+                if (res.isEmpty()) {
+                    ShowTextUtils.showTextVolatileImmediate("Error", "Please insert a valid number.");
+                    continue;
+                }
 
-            if(res.isPresent()){
-                int ress = res.get();
-                try{
-                    clientRmi.server.chargeEngines(clientRmi,ress);
-                }catch (Exception e){
+                int number = res.get();
+
+                try {
+                    clientRmi.server.chargeEngines(clientRmi, number);
+                    break;
+                } catch (RemoteException e) {
+                    ShowTextUtils.showTextVolatileImmediate("Remote Error", e.getMessage());
+                }catch (ControllerExceptions e){
                     ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
                 }
             }
-
-
         }
+
 
         public void selectShip(TileData[][] tileIds) {
             this.lastSpaceship = tileIds;
