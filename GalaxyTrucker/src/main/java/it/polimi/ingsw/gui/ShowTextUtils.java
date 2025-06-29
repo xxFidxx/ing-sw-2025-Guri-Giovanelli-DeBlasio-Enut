@@ -1,8 +1,10 @@
 package it.polimi.ingsw.gui;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -62,4 +64,23 @@ public class ShowTextUtils {
         return userChoice;
     }
 
+    public static Optional<Integer> askNumberImmediate(String header, String text) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Inserisci un numero");
+        dialog.setHeaderText(header);
+        dialog.setContentText(text);
+
+
+        Platform.runLater(() -> dialog.getEditor().requestFocus());
+        Optional<String> result = dialog.showAndWait();
+
+
+        return result.flatMap(input -> {
+            try {
+                return Optional.of(Integer.parseInt(input));
+            } catch (NumberFormatException e) {
+                return Optional.empty();
+            }
+        });
+    }
 }

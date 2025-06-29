@@ -44,5 +44,6 @@
          </children>
       </StackPane>
       <TextArea fx:id="textBox" layoutX="104.0" layoutY="25.0" prefHeight="104.0" prefWidth="306.0" />
+      <Button fx:id="endButton" layoutX="1013.0" layoutY="622.0" mnemonicParsing="false" onAction="#onEndButton" text="END" />
    </children>
 </AnchorPane>

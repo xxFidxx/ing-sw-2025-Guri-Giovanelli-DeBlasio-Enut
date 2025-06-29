@@ -2237,7 +2237,7 @@ public class Controller{
     }
 
     public void playerProtected(ClientListener listener) throws ControllerExceptions {
-        Player p = playerbyListener.get(listener);
+
         // togliere una batteria dato che ha attivato uno scudo o un doppio cannone
         Player player = playerbyListener.get(listener);
         int batteries = player.getSpaceshipPlance().getnBatteries();

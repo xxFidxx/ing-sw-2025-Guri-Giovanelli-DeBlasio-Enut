@@ -1,5 +1,6 @@
 package it.polimi.ingsw.gui.pageControllers;
 
+import it.polimi.ingsw.controller.ControllerExceptions;
 import it.polimi.ingsw.controller.network.data.BatteriesManagement;
 import it.polimi.ingsw.controller.network.data.TileData;
 import it.polimi.ingsw.gui.Controller;
@@ -9,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 
 public class BatteriesManagementController extends Controller {
 
+    @FXML private  Button endButton;
     @FXML private TextArea textBox;
     @FXML private ImageView background;
     @FXML private GridPane spaceshipGrid;
@@ -98,6 +101,7 @@ public class BatteriesManagementController extends Controller {
         }
 
         spaceshipDisplay.setImage(SPACESHIP_IMAGE);
+
     }
 
     private StackPane checkPaneCabin(int col, int row) {
@@ -134,8 +138,7 @@ public class BatteriesManagementController extends Controller {
             ShowTextUtils.showTextVolatileImmediate("Error", "You didn't remove anything");
         }
 
-        if(nBatteries ==0){
-            System.out.println("lostCrew==0");
+        if(nBatteries <=0){
             try {
                 clientRmi.endBatteriesManagement();
             }catch (Exception e){
@@ -161,7 +164,9 @@ public class BatteriesManagementController extends Controller {
         ArrayList<PowerCenter> powerCenters = data.getPowerCenters();
         nBatteries = data.getNBatteries();
         textBox.setDisable(true);
-        textBox.setText("You have to remove " + nBatteries + " batteries.\n" + "Please type the name of the Power Center you want to remove a battery from.");
+        textBox.setText("You have to remove " + nBatteries + " batteries.\n" + "Please type the name of the Power Center you want to remove a battery from.\n" +
+                " If you have 0 batteries to remove just type on end");
+        endButton.setDisable(false);
 
         for (Node node : spaceshipGrid.getChildren()) {
             if (!(node instanceof StackPane tilePane)) continue;
@@ -262,6 +267,19 @@ public class BatteriesManagementController extends Controller {
             for (Node child : parent.getChildrenUnmodifiable()) {
                 disableButtonsRec(child);
             }
+        }
+    }
+
+    public void onEndButton(ActionEvent actionEvent) {
+        if(nBatteries <=0){
+            try {
+                clientRmi.endBatteriesManagement();
+            }catch (Exception e){
+                ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
+            }
+
+            textBox.setText("Wait for the other player to be done!");
+            disableAllButtons();
         }
     }
 

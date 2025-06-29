@@ -8,7 +8,6 @@ import it.polimi.ingsw.gui.ShowTextUtils;
 import it.polimi.ingsw.model.componentTiles.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -31,6 +30,7 @@ public class ChargeCannonsController extends Controller {
     @FXML private ImageView background;
     @FXML private GridPane spaceshipGrid;
     @FXML private ImageView spaceshipDisplay;
+
     TileData[][] lastSpaceship = null;
     private static final Image SPACESHIP_IMAGE;
     ArrayList<Integer> chosenIndices = new ArrayList<>();
@@ -69,6 +69,8 @@ public class ChargeCannonsController extends Controller {
                 tilePane.setOnMouseClicked(event -> {
                     try {
                         handleSpaceshipClick(c, r);
+                        tilePane.setOpacity(0.5);
+                        tilePane.setDisable(true);
                     } catch (RemoteException e) {
                         throw new RuntimeException(e);
                     }
@@ -83,7 +85,8 @@ public class ChargeCannonsController extends Controller {
     private void handleSpaceshipClick(int col, int row) throws RemoteException {
         TileData selectedTile = lastSpaceship[row][col];
         int tileId = selectedTile.getId();
-            chosenIndices.add(tileId);
+        chosenIndices.add(tileId);
+        System.out.println(tileId + " tile id aggiunta alla lista");
     }
 
     public void setLastSpaceship(TileData[][] lastSpaceship) {
@@ -91,11 +94,12 @@ public class ChargeCannonsController extends Controller {
     }
 
     public void handleNext(ActionEvent actionEvent) {
+
     }
 
     public void showShip(DoubleCannonList data) {
         this.data = data;
-        ArrayList<DoubleCannon> powerCenters = data.getDoubleCannons();
+        ArrayList<DoubleCannon> doubleCannons = data.getDoubleCannons();
         textBox.setDisable(true);
         textBox.setText("Choose which double cannons you want to charge:");
 
@@ -110,7 +114,7 @@ public class ChargeCannonsController extends Controller {
             int id = tile.getId();
 
             DoubleCannon matchingDoubleCannon = null;
-            for (DoubleCannon doubleCannon : powerCenters) {
+            for (DoubleCannon doubleCannon : doubleCannons) {
                 if (doubleCannon.getId() == id) {
                     matchingDoubleCannon = doubleCannon;
                     break;
@@ -128,6 +132,11 @@ public class ChargeCannonsController extends Controller {
                     }
                 }
 
+
+                tilePane.setDisable(false);
+                tilePane.setOpacity(1.0);
+            } else {
+                tilePane.setDisable(true);
             }
         }
     }
@@ -140,11 +149,9 @@ public class ChargeCannonsController extends Controller {
     }
 
     private void disableAllButtons() {
-
         for (Node node : spaceshipGrid.getChildren()) {
             if (node instanceof StackPane tilePane) {
                 tilePane.setDisable(true);
-
 
                 for (Node child : tilePane.getChildren()) {
                     if (child instanceof ImageView imageView) {
@@ -160,11 +167,9 @@ public class ChargeCannonsController extends Controller {
             }
         }
 
-
         Node sceneRoot = spaceshipGrid.getScene().getRoot();
         disableButtonsRec(sceneRoot);
     }
-
 
     private void disableButtonsRec(Node node) {
         node.setDisable(true);
@@ -178,12 +183,13 @@ public class ChargeCannonsController extends Controller {
 
     public void onEndButton(ActionEvent actionEvent) {
         try {
+            System.out.println("Quanto è chosen indices: " + chosenIndices.size());
+            System.out.println("Chosen indices: " + chosenIndices);
             clientRmi.server.chargeCannons(clientRmi, chosenIndices);
             chosenIndices.clear();
-            disableAllButtons();
         } catch (RemoteException e) {
             ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
-        }catch (ControllerExceptions e){
+        } catch (ControllerExceptions e) {
             ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
             chosenIndices.clear();
             showShip(data);

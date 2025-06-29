@@ -323,6 +323,22 @@
         }
 
         public void chooseEngine(DoubleEngineNumber data) {
+            Optional <Integer> res = ShowTextUtils.askNumberImmediate("Insert a number", "Insert the number of double engines you want to charge");
+
+            while (!res.isPresent()){
+                ShowTextUtils.showTextVolatileImmediate("Error", "Please insert a number.");
+                res = ShowTextUtils.askNumberImmediate("Insert a number", "Insert the number of double engines you want to charge");
+            }
+
+            if(res.isPresent()){
+                int ress = res.get();
+                try{
+                    clientRmi.server.chargeEngines(clientRmi,ress);
+                }catch (Exception e){
+                    ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
+                }
+            }
+
 
         }
 
