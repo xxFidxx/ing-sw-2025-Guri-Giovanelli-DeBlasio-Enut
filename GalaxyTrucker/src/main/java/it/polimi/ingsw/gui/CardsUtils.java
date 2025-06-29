@@ -4,7 +4,9 @@ import it.polimi.ingsw.controller.network.data.Card;
 import it.polimi.ingsw.gui.pageControllers.GameController;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,8 +14,9 @@ import java.util.Objects;
 public class CardsUtils {
 
     private static final Map<String, String> CARD_IMAGE_MAP = new HashMap<>();
+    private static final Map<String, Image> cardImageCache = new HashMap<>();
 
-    static{
+    static {
         CARD_IMAGE_MAP.put("Abandoned Ship 1:1", "AbandonedShipCard_1_1.jpg");
         CARD_IMAGE_MAP.put("Abandoned Ship 2:1", "AbandonedShipCard_1_2.jpg");
         CARD_IMAGE_MAP.put("Abandoned Ship 1:2", "AbandonedShipCard_2_1.jpg");
@@ -66,17 +69,35 @@ public class CardsUtils {
         CARD_IMAGE_MAP.put("Stardust:2", "StardustCard_2.jpg");
     }
 
-
-
-    public  Image resolveCardImage(String name, int level) {
+    public Image resolveCardImage(String name, int level) {
         String key = name.trim() + ":" + level;
+
+        if (cardImageCache.containsKey(key)) {
+            return cardImageCache.get(key);
+        }
+
         String filename = CARD_IMAGE_MAP.get(key);
         if (filename == null) throw new IllegalArgumentException("Card not found: " + key);
 
-        InputStream is = getClass().getClassLoader().getResourceAsStream("cards/" + filename);
-        if (is == null) throw new IllegalArgumentException("Image not found: " + filename);
+        Image image = loadImageTmp("/cards/" + filename);
+        if (image == null) throw new IllegalArgumentException("Image not found: " + filename);
 
-        return new Image(is);
+        cardImageCache.put(key, image);
+        return image;
+    }
+
+    private Image loadImageTmp(String pathInResources) {
+        try (InputStream in = getClass().getResourceAsStream(pathInResources)) {
+            if (in == null) return null;
+
+            File tempFile = File.createTempFile("card", ".jpg");
+            tempFile.deleteOnExit();
+            Files.copy(in, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            return new Image(tempFile.toURI().toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
-

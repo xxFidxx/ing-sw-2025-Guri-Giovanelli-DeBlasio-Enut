@@ -22,10 +22,7 @@
     import java.nio.file.Files;
     import java.nio.file.StandardCopyOption;
     import java.rmi.RemoteException;
-    import java.util.Arrays;
-    import java.util.HashMap;
-    import java.util.Objects;
-    import java.util.Optional;
+    import java.util.*;
 
     import it.polimi.ingsw.gui.CardsUtils;
     import javafx.scene.layout.GridPane;
@@ -78,6 +75,7 @@
         private TileData[][] lastSpaceship;
         private Direction lastDir;
         private int lastPos;
+        private final Map<Integer, Image> imageCache = new HashMap<>();
 
         private static final Image SPACESHIP_IMAGE;
 
@@ -189,13 +187,25 @@
 
         private Image getImageFromId(int id) {
             if (id < 0) return null;
+            if (imageCache.containsKey(id)) return imageCache.get(id);
 
             String imagePath = "/tiles/tile" + id + ".jpg";
+            Image img = loadImageTmp(imagePath);
+            if (img != null) imageCache.put(id, img);
+            return img;
+        }
 
-            InputStream imageStream = getClass().getResourceAsStream(imagePath);
-            Image image = new Image(imageStream);
-
-            return image;
+        private Image loadImageTmp(String pathInResources) {
+            try (InputStream in = getClass().getResourceAsStream(pathInResources)) {
+                if (in == null) return null;
+                File tempFile = File.createTempFile("tile", ".jpg");
+                tempFile.deleteOnExit();
+                Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                return new Image(tempFile.toURI().toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         @FXML

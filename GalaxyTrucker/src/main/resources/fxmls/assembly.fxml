@@ -111,9 +111,9 @@
                   </GridPane>
                </children>
             </StackPane>
-            <ImageView fx:id="deck1covered" fitHeight="58.0" fitWidth="48.0" layoutX="881.0" layoutY="590.0" onMouseClicked="#requestDeck1" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="deck2covered" fitHeight="58.0" fitWidth="48.0" layoutX="948.0" layoutY="593.0" onMouseClicked="#requestDeck2" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="deck3covered" fitHeight="58.0" fitWidth="48.0" layoutX="1026.0" layoutY="594.0" onMouseClicked="#requestDeck3" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="deck1covered" fitHeight="58.0" fitWidth="48.0" layoutX="880.0" layoutY="590.0" onMouseClicked="#requestDeck1" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="deck2covered" fitHeight="58.0" fitWidth="48.0" layoutX="950.0" layoutY="590.0" onMouseClicked="#requestDeck2" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="deck3covered" fitHeight="58.0" fitWidth="48.0" layoutX="1030.0" layoutY="590.0" onMouseClicked="#requestDeck3" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="card1deck" fitHeight="150.0" fitWidth="97.0" layoutX="414.0" layoutY="519.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="card2deck" fitHeight="150.0" fitWidth="97.0" layoutX="535.0" layoutY="518.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="card3deck" fitHeight="150.0" fitWidth="97.0" layoutX="653.0" layoutY="519.0" pickOnBounds="true" preserveRatio="true" />

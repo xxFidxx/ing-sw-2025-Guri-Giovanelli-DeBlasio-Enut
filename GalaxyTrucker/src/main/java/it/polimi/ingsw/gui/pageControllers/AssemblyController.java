@@ -1,6 +1,5 @@
 package it.polimi.ingsw.gui.pageControllers;
 
-import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.controller.network.data.*;
 import it.polimi.ingsw.gui.CardsUtils;
 import it.polimi.ingsw.gui.Controller;
@@ -16,7 +15,6 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.ColorInput;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -35,6 +33,7 @@ public class AssemblyController extends Controller {
     private TileData[][] lastSpaceship;
     private final CardsUtils cardsUtils = new CardsUtils();
     private int lookingDeck = -1;
+    private final Map<Integer, Image> imageCache = new HashMap<>();
     Set<Integer> ignoreIds = new HashSet<>(Arrays.asList(32, 33, 51, 60));
 
     private boolean isHoldingTile = false;
@@ -252,15 +251,28 @@ public class AssemblyController extends Controller {
         }
     }
 
+
     private Image getImageFromId(int id) {
         if (id < 0) return null;
+        if (imageCache.containsKey(id)) return imageCache.get(id);
 
         String imagePath = "/tiles/tile" + id + ".jpg";
+        Image img = loadImageTmp(imagePath);
+        if (img != null) imageCache.put(id, img);
+        return img;
+    }
 
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-        Image image = new Image(imageStream);
-
-        return image;
+    private Image loadImageTmp(String pathInResources) {
+        try (InputStream in = getClass().getResourceAsStream(pathInResources)) {
+            if (in == null) return null;
+            File tempFile = File.createTempFile("tile", ".jpg");
+            tempFile.deleteOnExit();
+            Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return new Image(tempFile.toURI().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @FXML
