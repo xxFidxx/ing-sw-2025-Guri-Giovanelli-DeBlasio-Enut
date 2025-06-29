@@ -2,6 +2,7 @@ package it.polimi.ingsw.gui.pageControllers;
 
 import it.polimi.ingsw.Server.GameState;
 import it.polimi.ingsw.gui.Controller;
+import it.polimi.ingsw.gui.ShowTextUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
@@ -44,8 +45,12 @@ public class LobbyController extends Controller {
     }
 
     @FXML
-    private void handleAddNickname() throws RemoteException, InterruptedException {
-        clientRmi.server.addNickname(clientRmi, nicknameField.getText());
+    private void handleAddNickname(){
+        try {
+            clientRmi.server.addNickname(clientRmi, nicknameField.getText());
+        }catch (Exception e) {
+            ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
+        }
 
         nicknamePane.setVisible(false);
         lobbyPane.setVisible(true);
