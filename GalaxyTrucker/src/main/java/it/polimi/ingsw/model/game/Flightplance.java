@@ -56,6 +56,7 @@ public class Flightplance {
         try {
             // Load cards and initialize the deck
             List<AdventureCard> cards = AdventureCardFactory.loadCards(this.game);
+            Collections.shuffle(cards);
             this.deck = new Deck(cards, this);
         } catch (Exception e) {
             System.err.println("Failed to load cards: " + e.getMessage());
