@@ -246,4 +246,10 @@ public class MainApp extends Application {
             ((ChargeCannonsController) controllers.get("chargeCannons")).showShip(data);
         });
     }
+
+    public void chooseEngine(DoubleEngineNumber data) {
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).chooseEngine(data);
+        });
+    }
 }

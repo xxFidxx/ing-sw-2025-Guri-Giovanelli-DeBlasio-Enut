@@ -1,5 +1,6 @@
     package it.polimi.ingsw.gui.pageControllers;
 
+    import it.polimi.ingsw.controller.network.data.DoubleEngineNumber;
     import it.polimi.ingsw.controller.network.data.TileData;
     import it.polimi.ingsw.gui.Controller;
     import it.polimi.ingsw.gui.ShowTextUtils;
@@ -317,5 +318,9 @@
 
             if (result.get() == ButtonType.YES) clientRmi.server.playerProtected(clientRmi);
             else clientRmi.server.playerHit(clientRmi);
+        }
+
+        public void chooseEngine(DoubleEngineNumber data) {
+
         }
     }

@@ -50,6 +50,8 @@ public class Controller{
     private boolean smugglersFlag;
     private boolean enemyDefeated;
     private boolean afterShots;
+    private boolean doneFirstCrafting;
+    final private Object  doneFirstCraftingLock;
     private String lastMethodCalled;
     private volatile boolean pause;
 
@@ -77,6 +79,8 @@ public class Controller{
         this.busyDecks = new boolean[3];
         this.lastMethodCalled = null;
         this.pause = false;
+        doneFirstCrafting = false;
+        doneFirstCraftingLock = new Object();
     }
 
     // Setter e getter utili per il testing
@@ -1645,6 +1649,10 @@ public class Controller{
 
     public void playerIsDoneCrafting(ClientListener listener){
 
+        synchronized (doneFirstCraftingLock){
+            doneFirstCrafting = true;
+        }
+
         lastMethodCalled = "playerIsDoneCrafting";
         System.out.println("Stampa temporanea: lastMethodCalled " + lastMethodCalled);
 
@@ -2712,24 +2720,24 @@ public class Controller{
             }
             System.out.println("Timer done");
 
-            if(currentGameState == GameState.ASSEMBLY){
+            synchronized (doneFirstCraftingLock){
+                if(!doneFirstCrafting){
 
-                notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
+                    notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
 
-                for(ClientListener listener: realListeners) {
-                    if(!isDone.get(playerbyListener.get(listener))){
-                        try {
-                            playerIsDoneCrafting(listener);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
+                    for(ClientListener listener: realListeners) {
+                        if(!isDone.get(playerbyListener.get(listener))){
+                            try {
+                                playerIsDoneCrafting(listener);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
                 }
             }
 
         }).start();
-
-        System.out.println("CURRENT GAME STATE AGTER TIMER " + currentGameState);
 
         return true;
 
