@@ -207,7 +207,7 @@ public class MainApp extends Application {
         activeController = controllers.get("removeMVGoods");
         sceneManager.switchTo("removeMVGoods");
         Platform.runLater(() -> {
-            ((RemoveMVGoodsController) controllers.get("RemoveMVGoodsController")).startRemoveMVGoods(data);
+            ((RemoveMVGoodsController) controllers.get("removeMVGoods")).startRemoveMVGoods(data);
         });
     }
 }
