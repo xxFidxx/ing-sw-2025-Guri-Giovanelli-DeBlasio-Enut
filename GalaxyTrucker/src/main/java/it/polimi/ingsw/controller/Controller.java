@@ -2711,6 +2711,7 @@ public class Controller{
             System.out.println("Timer done");
 
             if(currentGameState == GameState.ASSEMBLY){
+
                 notifyAllRealListeners(eventCrafter(GameState.TIMER_DONE, null, null));
 
                 for(ClientListener listener: realListeners) {
@@ -2723,7 +2724,10 @@ public class Controller{
                     }
                 }
             }
+
         }).start();
+
+        System.out.println("CURRENT GAME STATE AGTER TIMER " + currentGameState);
 
         return true;
 
@@ -2870,7 +2874,7 @@ public class Controller{
     }
 
     public void pause() {
-        final long timeout = 30000;
+        final long timeout = 90000;
         final long startTime = System.currentTimeMillis();
         System.out.println("wonGameForDisconessions timer set: " + timeout + " ms");
 

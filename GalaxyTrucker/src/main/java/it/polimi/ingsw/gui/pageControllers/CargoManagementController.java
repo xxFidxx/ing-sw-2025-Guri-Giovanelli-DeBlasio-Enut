@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CargoManagementController extends Controller {
+    @FXML private ImageView goodsOrder;
     @FXML private Button addGoodButton;
     @FXML private Button swapGoodsButton;
     @FXML private Button removeGoodButton;
@@ -98,6 +99,10 @@ public class CargoManagementController extends Controller {
                 cargo1Pane, cargo2Pane, cargo3Pane,
                 cargo4Pane, cargo5Pane, cargo6Pane
         );
+
+        goodsOrder.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/goodsBlocks/order.jpg"))));
+        goodsOrder.preserveRatioProperty();
+        goodsOrder.setVisible(true);
     }
 
     private enum State {
