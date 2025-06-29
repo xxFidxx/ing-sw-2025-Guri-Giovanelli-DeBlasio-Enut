@@ -139,7 +139,7 @@ public class CrewManagementController extends Controller {
             System.out.println("lostCrew==0");
             clientRmi.server.endCrewManagement(clientRmi);
             textBox.setText("Wait for the other player to be done!");
-            disableAllButtons();
+            //disableAllButtons();
         }else{
             textBox.setText("You have to remove " + lostCrew + " crew members,\n please type on the cabin you want to remove a crew component from");
         }
@@ -209,6 +209,7 @@ public class CrewManagementController extends Controller {
                 }
             }
         }
+        enableButtons();
     }
 
     private Image getImageForFigure(Figure figure) {
@@ -269,6 +270,31 @@ public class CrewManagementController extends Controller {
         if (node instanceof javafx.scene.Parent parent) {
             for (Node child : parent.getChildrenUnmodifiable()) {
                 disableButtonsRec(child);
+            }
+        }
+    }
+
+    public void enableButtons() {
+        textBox.setDisable(false);
+        textBox.setVisible(true);
+        textBox.setText("You have to remove " + lostCrew + " crew members,\n please type on the cabin you want to remove a crew component from");
+
+        for (Node node : spaceshipGrid.getChildren()) {
+            if (node instanceof StackPane tilePane) {
+                tilePane.setDisable(false);
+                tilePane.setOpacity(1.0);
+
+                for (Node child : tilePane.getChildren()) {
+                    if (child instanceof ImageView iv) {
+                        iv.setDisable(false);
+                    } else if (child instanceof HBox hbox) {
+                        for (Node iconNode : hbox.getChildren()) {
+                            if (iconNode instanceof ImageView iconView) {
+                                iconView.setDisable(false);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

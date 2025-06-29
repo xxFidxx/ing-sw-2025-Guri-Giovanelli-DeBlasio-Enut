@@ -139,6 +139,7 @@ public class ChargeCannonsController extends Controller {
                 tilePane.setDisable(true);
             }
         }
+        enableButtons();
     }
 
     private Image getImageFromId(int id) {
@@ -194,5 +195,21 @@ public class ChargeCannonsController extends Controller {
             chosenIndices.clear();
             showShip(data);
         }
+    }
+
+    public void enableButtons() {
+        textBox.setDisable(false);
+        textBox.setVisible(true);
+        textBox.setText("Choose which double cannons you want to charge:");
+
+        for (Node node : spaceshipGrid.getChildren()) {
+            if (node instanceof StackPane tilePane) {
+                tilePane.setDisable(true);
+                tilePane.setOpacity(1.0);
+            }
+        }
+
+        chosenIndices.clear();
+        System.out.println("[STATE] Double Cannon Charging phase started");
     }
 }
