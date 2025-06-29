@@ -118,7 +118,7 @@ public class BatteriesManagementController extends Controller {
         TileData selectedTile = lastSpaceship[row][col];
         int tileId = selectedTile.getId();
 
-        if (clientRmi.server.removeFigure(clientRmi, tileId)) {
+        if (clientRmi.server.removeBatteries(clientRmi, tileId,1)) {
             StackPane tilePane = checkPaneCabin(col, row);
             if (tilePane == null) return;
 
