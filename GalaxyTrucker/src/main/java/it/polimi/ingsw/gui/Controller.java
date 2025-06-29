@@ -50,5 +50,4 @@ public abstract class Controller {
     public void askSkip(String text, Consumer<Boolean> callback) {
         ShowTextUtils.askYesNo("SKIP?", text, callback);
     }
-
 }
