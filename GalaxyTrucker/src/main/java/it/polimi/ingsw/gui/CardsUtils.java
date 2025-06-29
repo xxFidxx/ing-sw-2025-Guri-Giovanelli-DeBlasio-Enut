@@ -77,9 +77,12 @@ public class CardsUtils {
             return cardImageCache.get(key);
         }
 
+        System.out.println("TEST key " + key);
+
         String filename = CARD_IMAGE_MAP.get(key);
         if (filename == null) throw new IllegalArgumentException("Card not found: " + key);
 
+        System.out.println("TEST filename " + filename);
         Image image = loadImageTmp("/cards/" + filename);
         if (image == null) throw new IllegalArgumentException("Image not found: " + filename);
 
