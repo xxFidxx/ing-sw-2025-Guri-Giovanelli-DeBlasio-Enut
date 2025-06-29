@@ -164,8 +164,9 @@ public class BatteriesManagementController extends Controller {
         ArrayList<PowerCenter> powerCenters = data.getPowerCenters();
         nBatteries = data.getNBatteries();
         textBox.setDisable(true);
-        textBox.setText("You have to remove " + nBatteries + " batteries.\n" + "Please type the name of the Power Center you want to remove a battery from.\n" +
-                " If you have 0 batteries to remove just type on end");
+        textBox.setText("You have to remove " + nBatteries + " batteries.\n" +
+                "Please type the name of the Power Center you want to remove a battery from.\n" +
+                "If you have 0 batteries to remove just type on end");
         endButton.setDisable(false);
 
         for (Node node : spaceshipGrid.getChildren()) {
@@ -187,6 +188,9 @@ public class BatteriesManagementController extends Controller {
             }
 
             if (matchingPowerCenter != null) {
+                tilePane.setDisable(false);
+                tilePane.setOpacity(1.0);
+
                 int rotation = tile.getRotation();
 
                 for (Node child : tilePane.getChildren()) {
@@ -216,9 +220,12 @@ public class BatteriesManagementController extends Controller {
                         }
                     }
                 }
+            } else {
+                tilePane.setDisable(true);
             }
         }
     }
+
 
     private Image getImageForBattery() {
         String imagePath = "/symbols/batteryToken.png";
