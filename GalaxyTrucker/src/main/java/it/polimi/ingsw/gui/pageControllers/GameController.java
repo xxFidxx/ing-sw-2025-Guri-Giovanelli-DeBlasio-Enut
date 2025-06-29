@@ -9,10 +9,7 @@
     import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
     import javafx.scene.Node;
-    import javafx.scene.control.Button;
-    import javafx.scene.control.ButtonType;
-    import javafx.scene.control.ChoiceBox;
-    import javafx.scene.control.TextArea;
+    import javafx.scene.control.*;
     import javafx.scene.effect.ColorAdjust;
     import javafx.scene.image.Image;
     import javafx.scene.image.ImageView;
@@ -69,6 +66,8 @@
         @FXML private ImageView spaceshipDisplay;
 
         @FXML private AnchorPane boardPane;
+
+        @FXML private Label spaceshipStateLabel;
 
         private ImageView[] tileViews;
 
@@ -256,6 +255,9 @@
         }
 
         public void setCard(String name, Integer level){
+            spaceshipGrid.setDisable(true);
+            spaceshipStateLabel.setText("your spaceship");
+
             Image image = utils.resolveCardImage(name,level);
             cardPlaceHolder.setImage(image);
         }
@@ -322,5 +324,31 @@
 
         public void chooseEngine(DoubleEngineNumber data) {
 
+        }
+
+        public void selectShip(TileData[][] tileIds) {
+            this.lastSpaceship = tileIds;
+            updateSpaceship();
+
+            spaceshipStateLabel.setText("select spaceship part");
+
+            reserveGrid.setDisable(true);
+            spaceshipGrid.setDisable(false);
+
+            for (Node node : spaceshipGrid.getChildren()) {
+                if (node instanceof ImageView imageView) {
+                    Integer col = GridPane.getColumnIndex(node);
+                    Integer row = GridPane.getRowIndex(node);
+                    final int part = lastSpaceship[row][col].getPart();
+
+                    imageView.setOnMouseClicked(event -> {
+                        try {
+                            clientRmi.server.selectShipPart(clientRmi, part);;
+                        } catch (RemoteException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            }
         }
     }

@@ -115,6 +115,7 @@ public class MainApp extends Application {
     public void selectShip(TileData[][] tileIds) {
         Platform.runLater(() -> {
             ((AssemblyController) controllers.get("assembly")).selectShip(tileIds);
+            ((GameController) controllers.get("game")).selectShip(tileIds);
         });
     }
 

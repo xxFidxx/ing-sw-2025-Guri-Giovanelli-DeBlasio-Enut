@@ -30,7 +30,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 
 public class AssemblyController extends Controller {
-    private static final Image COVERED_CARD_IMAGE, SPACESHIP_IMAGE;
+    private static final Image COVERED_CARD_IMAGE, SPACESHIP_IMAGE, CENTRAL_CABIN_IMAGE;
     private int lastIndex = 0;
     private TileData[][] lastSpaceship;
     private final CardsUtils cardsUtils = new CardsUtils();
@@ -53,6 +53,14 @@ public class AssemblyController extends Controller {
             tempFile.deleteOnExit();
             Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             SPACESHIP_IMAGE = new Image(tempFile.toURI().toString());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load covered card image", e);
+        }
+        try (InputStream in = AssemblyController.class.getResourceAsStream("/tiles/tile32.jpg")) {
+            File tempFile = File.createTempFile("centralCabin", ".jpg");
+            tempFile.deleteOnExit();
+            Files.copy(in, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            CENTRAL_CABIN_IMAGE = new Image(tempFile.toURI().toString());
         } catch (IOException e) {
             throw new RuntimeException("Failed to load covered card image", e);
         }
@@ -122,6 +130,9 @@ public class AssemblyController extends Controller {
                         throw new RuntimeException(e);
                     }
                 });
+
+                if ((row == 2) && (col == 3))
+                    imageView.setImage(CENTRAL_CABIN_IMAGE);
 
                 spaceshipGrid.add(imageView, col, row);
             }
