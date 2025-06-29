@@ -5,7 +5,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.gui.pageControllers.EndController">
    <children>
       <Label layoutX="525.0" layoutY="14.0" text="END SCREEN">
@@ -13,22 +12,7 @@
             <Font size="40.0" />
          </font>
       </Label>
-      <Label layoutX="601.0" layoutY="290.0" text="player1">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="601.0" layoutY="325.0" text="player2">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="601.0" layoutY="360.0" text="player3">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="601.0" layoutY="395.0" text="player4">
+      <Label fx:id="endTextLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="573.0" layoutY="287.0" text="game ended" textAlignment="CENTER">
          <font>
             <Font size="24.0" />
          </font>
