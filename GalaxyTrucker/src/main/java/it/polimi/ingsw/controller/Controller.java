@@ -1660,8 +1660,10 @@ public class Controller{
                 else
                     listener.onEvent(eventCrafter(GameState.WAIT_PLAYER, null, null));
             }else{
-                if (!isDone.containsValue(false) || (lobby.getNumPlayers() == (donecraftingPlayers.size() + disconnectedPlayers.size())))
+                if (!isDone.containsValue(false) || (lobby.getNumPlayers() == (donecraftingPlayers.size() + disconnectedPlayers.size()))){
+                    currentGameState = GameState.CRAFTING_ENDED;
                     handleCraftingEnded();
+                }
             }
 
         }else {
