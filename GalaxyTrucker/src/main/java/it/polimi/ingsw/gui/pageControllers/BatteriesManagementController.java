@@ -146,7 +146,7 @@ public class BatteriesManagementController extends Controller {
             }
 
             textBox.setText("Wait for the other player to be done!");
-            disableAllButtons();
+            //disableAllButtons();
         }else{
             textBox.setText("You have to remove " + nBatteries + " crew members,\n please type on the PowerCenter you want to remove a crew component from");
         }
@@ -279,8 +279,8 @@ public class BatteriesManagementController extends Controller {
             }
 
             textBox.setText("Wait for the other player to be done!");
-            disableAllButtons();
         }
     }
+
 
 }

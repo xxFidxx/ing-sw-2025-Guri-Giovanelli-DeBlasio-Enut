@@ -172,6 +172,8 @@ public class CargoManagementController extends Controller {
         goodsOrder.setImage(ORDER_IMAGE);
         goodsOrder.preserveRatioProperty();
         goodsOrder.setVisible(true);
+
+        startCargoManagement();
     }
 
     private Image getImageByValue(int value) {
@@ -383,5 +385,23 @@ public class CargoManagementController extends Controller {
         swapGoodsButton.setDisable(true);
         removeGoodButton.setVisible(false);
         removeGoodButton.setDisable(true);
+    }
+
+    public void startCargoManagement() {
+        endButton.setVisible(true);
+        endButton.setDisable(false);
+        addGoodButton.setVisible(true);
+        addGoodButton.setDisable(false);
+        swapGoodsButton.setVisible(true);
+        swapGoodsButton.setDisable(false);
+        removeGoodButton.setVisible(true);
+        removeGoodButton.setDisable(false);
+
+        confirmButton.setVisible(false);
+        confirmButton.setDisable(false);
+        cancelButton.setVisible(false);
+        cancelButton.setDisable(false);
+
+        resetState();
     }
 }

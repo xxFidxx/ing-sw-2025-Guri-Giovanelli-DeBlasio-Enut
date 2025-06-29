@@ -125,6 +125,7 @@ public class RemoveMVGoodsController extends Controller {
         textBox.setText("You have to remove " + nGoods + " goods.\nRemove your most valuables one");
         ArrayList<GoodsContainer> cargos = data.getCargos();
         setCargos(cargos);
+        enableButtons();
     }
 
     public void setCargos(ArrayList<GoodsContainer> cargos) {
@@ -268,7 +269,7 @@ public class RemoveMVGoodsController extends Controller {
         } catch (Exception e) {
             ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
         }
-        disableAllButtons();
+        //disableAllButtons();
     }
 
     private void disableAllButtons() {
@@ -276,5 +277,19 @@ public class RemoveMVGoodsController extends Controller {
         endButton.setDisable(true);
         removeGoodButton.setVisible(false);
         removeGoodButton.setDisable(true);
+    }
+
+    public void enableButtons() {
+        endButton.setVisible(true);
+        endButton.setDisable(false);
+        removeGoodButton.setVisible(true);
+        removeGoodButton.setDisable(false);
+        confirmButton.setVisible(false);
+        cancelButton.setVisible(false);
+        confirmButton.setDisable(false);
+        cancelButton.setDisable(false);
+
+        resetState();
+        System.out.println("[STATE] Remove Most Valuable Goods phase started");
     }
 }
