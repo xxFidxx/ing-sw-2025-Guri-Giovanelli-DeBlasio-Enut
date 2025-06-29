@@ -2074,6 +2074,11 @@ public class Controller{
             }
         } else {
             if (stumps <= 1) {
+                Player p = null;
+                if(listener != null) {
+                    p = playerbyListener.get(listener);
+                    p.getSpaceshipPlance().updateLists();
+                }
                 if( currentGameState == GameState.TURN_START){
                     isDone.put(player,true);
                     if (handleAdjustmentEnded())
@@ -2083,9 +2088,9 @@ public class Controller{
                 }else{
                     switch(currentAdventureCard) {
                         case CombatZoneCard czc -> {
-                            Player p = null;
-                            if(listener != null)
-                                p = playerbyListener.get(listener);
+//                            Player p = null;
+//                            if(listener != null)
+//                                p = playerbyListener.get(listener);
                             System.out.println("removeAdjust: vado in combatZoneShots");
                             combatZoneShots(p);
                         }
