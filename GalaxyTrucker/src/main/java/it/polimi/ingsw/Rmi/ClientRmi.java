@@ -687,6 +687,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                             if(inputValid){
                                 try{
                                     server.chargeCannons(this, chosenIndices);
+                                }catch (ControllerExceptions e){
+                                    System.out.println(e.getMessage());
                                 } catch (Exception e) {
                                     System.out.println(e.getMessage());
                                 }

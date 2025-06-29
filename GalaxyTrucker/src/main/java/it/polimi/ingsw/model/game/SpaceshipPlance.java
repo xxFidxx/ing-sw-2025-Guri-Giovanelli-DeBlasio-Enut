@@ -265,6 +265,8 @@ public class SpaceshipPlance {
         this.reserveSpot.add(c);
     }
 
+
+
     public void updateLists() {
         cannons.clear();
         engines.clear();
@@ -306,7 +308,8 @@ public class SpaceshipPlance {
                                                     colors[((LifeSupportSystem) tile2).getColor().ordinal()] = ((LifeSupportSystem) tile2).getColor();
                                                 else if(figures[0] != null || figures[1] != null){
                                                     // if a cabin has 0 crew, I don't need to use it epidemic card
-                                                    interconnectedCabins.add(cab);
+                                                    if(!interconnectedCabins.contains(cab))
+                                                        interconnectedCabins.add(cab);
                                                 }
                                             }
                                         }
