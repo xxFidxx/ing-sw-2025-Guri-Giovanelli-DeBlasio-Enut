@@ -9,10 +9,7 @@ import it.polimi.ingsw.model.componentTiles.ComponentTile;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorAdjust;
@@ -79,6 +76,7 @@ public class AssemblyController extends Controller {
     @FXML private Button rotateButton;
     @FXML private Button storeButton;
     @FXML private Button putBackButton;
+    @FXML private Label spaceshipStateLabel;
 
 
     public void initialize() {
@@ -150,6 +148,8 @@ public class AssemblyController extends Controller {
 
             reserveGrid.add(imageView, col, 0);
         }
+
+        spaceshipStateLabel.setText("build spaceship");
 
         deck1covered.setImage(new Image(Objects.requireNonNull(getClass().getResource("/cardsCover/Cover1.jpg")).toExternalForm()));
         deck2covered.setImage(new Image(Objects.requireNonNull(getClass().getResource("/cardsCover/Cover1.jpg")).toExternalForm()));
@@ -296,6 +296,8 @@ public class AssemblyController extends Controller {
         this.lastSpaceship = tileIds;
         updateSpaceship();
 
+        spaceshipStateLabel.setText("adjust spaceship");
+
         coveredTilesGrid.setDisable(true);
         reserveGrid.setDisable(true);
         spaceshipGrid.setDisable(false);
@@ -320,6 +322,8 @@ public class AssemblyController extends Controller {
     public void selectShip(TileData[][] tileIds) {
         this.lastSpaceship = tileIds;
         updateSpaceship();
+
+        spaceshipStateLabel.setText("select spaceship part");
 
         coveredTilesGrid.setDisable(true);
         reserveGrid.setDisable(true);
