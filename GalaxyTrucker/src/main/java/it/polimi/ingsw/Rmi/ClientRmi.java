@@ -935,8 +935,8 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             }
             case END_GAME -> mainApp.endGame((DataString) getCurrentEvent().getData());
             case NO_EXPOSED_CONNECTORS -> System.out.println("You don't have exposed connectors");
-            case NO_HIT -> System.out.println("You have not been hit");
-            case SHOT_HIT -> System.out.println("The shot hit your spaceship!");
+            case NO_HIT -> mainApp.noHit();
+            case SHOT_HIT -> mainApp.shotHit();
             case SINGLE_CANNON_PROTECTION -> System.out.println("You have been protected by a single cannon");
             case DIED -> System.out.println("You are on spectator mode because you died");
             case PAUSED_GAME -> System.out.println("Game has been paused, a 30 seconds timer has been set to wait for someone to join again, else you will automatically win");
