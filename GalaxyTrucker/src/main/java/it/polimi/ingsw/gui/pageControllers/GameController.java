@@ -33,6 +33,7 @@
     public class GameController extends Controller {
 
 
+        @FXML private AnchorPane rootPane;
         @FXML private ChoiceBox planetsChoice;
         @FXML private Button confirmPlanetButton;
         @FXML private ImageView background;

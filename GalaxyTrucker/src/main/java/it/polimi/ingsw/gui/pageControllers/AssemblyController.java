@@ -38,7 +38,6 @@ public class AssemblyController extends Controller {
     Set<Integer> ignoreIds = new HashSet<>(Arrays.asList(32, 33, 51, 60));
 
     private boolean isHoldingTile = false;
-
     static {
         try (InputStream in = AssemblyController.class.getResourceAsStream("/tiles/coveredTile.jpg")) {
             File tempFile = File.createTempFile("coveredTile", ".jpg");
@@ -66,6 +65,8 @@ public class AssemblyController extends Controller {
         }
     }
 
+
+    @FXML private AnchorPane rootPane;
     @FXML private GridPane coveredTilesGrid;
     @FXML private ImageView tileDisplay;
     @FXML private GridPane spaceshipGrid;

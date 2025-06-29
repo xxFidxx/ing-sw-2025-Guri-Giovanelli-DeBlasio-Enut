@@ -13,6 +13,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 
 public class CrewManagementController extends Controller {
 
+    @FXML private AnchorPane rootPane;
     @FXML private TextArea textBox;
     @FXML private ImageView background;
     @FXML private GridPane spaceshipGrid;
@@ -139,6 +141,7 @@ public class CrewManagementController extends Controller {
             System.out.println("lostCrew==0");
             clientRmi.server.endCrewManagement(clientRmi);
             textBox.setText("Wait for the other player to be done!");
+            rootPane.setDisable(true);
             //disableAllButtons();
         }else{
             textBox.setText("You have to remove " + lostCrew + " crew members,\n please type on the cabin you want to remove a crew component from");
@@ -154,6 +157,7 @@ public class CrewManagementController extends Controller {
     }
 
     public void showShip(CrewManagement data) {
+        rootPane.setDisable(false);
         ArrayList<Cabin> cabins = data.getCabins();
         lostCrew = data.getLostCrew();
         textBox.setDisable(true);

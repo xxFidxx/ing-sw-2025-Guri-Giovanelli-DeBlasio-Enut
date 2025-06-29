@@ -28,6 +28,7 @@ public class RemoveMVGoodsController extends Controller {
     int nBatteries;
 
 
+    @FXML private AnchorPane rootPane;
     @FXML private  ImageView goodsOrder;
     @FXML private TextArea textBox;
     @FXML private Button removeGoodButton;
@@ -120,6 +121,7 @@ public class RemoveMVGoodsController extends Controller {
     }
 
     public void startRemoveMVGoods(RemoveMostValuable data){
+        rootPane.setDisable(false);
         nGoods = data.getNGoods();
         nBatteries = data.getBatteriesToRemove();
         textBox.setText("You have to remove " + nGoods + " goods.\nRemove your most valuables one");
@@ -269,6 +271,7 @@ public class RemoveMVGoodsController extends Controller {
         } catch (Exception e) {
             ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
         }
+        rootPane.setDisable(true);
         //disableAllButtons();
     }
 

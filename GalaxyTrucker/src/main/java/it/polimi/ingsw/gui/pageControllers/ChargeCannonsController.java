@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 
 public class ChargeCannonsController extends Controller {
 
+    @FXML private AnchorPane rootPane;
     @FXML private TextArea textBox;
     @FXML private ImageView background;
     @FXML private GridPane spaceshipGrid;
@@ -98,6 +100,7 @@ public class ChargeCannonsController extends Controller {
     }
 
     public void showShip(DoubleCannonList data) {
+        rootPane.setDisable(false);
         this.data = data;
         ArrayList<DoubleCannon> doubleCannons = data.getDoubleCannons();
         textBox.setDisable(true);
@@ -139,7 +142,6 @@ public class ChargeCannonsController extends Controller {
                 tilePane.setDisable(true);
             }
         }
-        enableButtons();
     }
 
     private Image getImageFromId(int id) {
@@ -188,6 +190,7 @@ public class ChargeCannonsController extends Controller {
             System.out.println("Chosen indices: " + chosenIndices);
             clientRmi.server.chargeCannons(clientRmi, chosenIndices);
             chosenIndices.clear();
+            rootPane.setDisable(true);
         } catch (RemoteException e) {
             ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
         } catch (ControllerExceptions e) {

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CargoManagementController extends Controller {
+    @FXML private AnchorPane rootPane;
     @FXML private ImageView goodsOrder;
     @FXML private Button addGoodButton;
     @FXML private Button swapGoodsButton;
@@ -134,6 +135,7 @@ public class CargoManagementController extends Controller {
     }
 
     public void setCargos(ArrayList<GoodsContainer> cargos) {
+        rootPane.setDisable(false);
         for (int i = 0; i < cargos.size(); i++) {
             GoodsContainer container = cargos.get(i);
             GoodsBlock[] blocks = container.getGoods();
@@ -373,7 +375,7 @@ public class CargoManagementController extends Controller {
         } catch (Exception e) {
             ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
         }
-        disableAllButtons();
+        rootPane.setDisable(true);
     }
 
     private void disableAllButtons() {

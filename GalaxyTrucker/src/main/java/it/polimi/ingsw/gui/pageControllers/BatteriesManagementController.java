@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 
 public class BatteriesManagementController extends Controller {
 
+    @FXML private AnchorPane rootPane;
     @FXML private  Button endButton;
     @FXML private TextArea textBox;
     @FXML private ImageView background;
