@@ -30,7 +30,8 @@ public class CardsUtils {
         CARD_IMAGE_MAP.put("Combat Zone:1", "CombatZoneCard_1.jpg");
         CARD_IMAGE_MAP.put("Combat Zone:2", "CombatZoneCard_2.jpg");
 
-        CARD_IMAGE_MAP.put("Epidemic:1", "EpidemicCard.jpg");
+        CARD_IMAGE_MAP.put("Epidemic:1", "EpidemicCard_1.jpg");
+        CARD_IMAGE_MAP.put("Epidemic:2", "EpidemicCard_2.jpg");
 
         CARD_IMAGE_MAP.put("Meteor Swarm 1:1", "MeteorSwarmCard_1_1.jpg");
         CARD_IMAGE_MAP.put("Meteor Swarm 2:1", "MeteorSwarmCard_1_2.jpg");
