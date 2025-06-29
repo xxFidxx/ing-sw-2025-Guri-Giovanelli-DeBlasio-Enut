@@ -946,6 +946,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 server.fromChargeToManage(this);
             }
 
+            case NO_DOUBLE_ENGINE -> {
+                System.out.println("You don't have any double engine");
+                server.fromChargeToManage(this);
+            }
+
             case EPIDEMIC_MANAGEMENT -> {
                 server.removeFigureEpidemic(this);
                 server.endCrewManagement(this);
