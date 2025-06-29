@@ -841,6 +841,11 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         name = smugglers.getName();
                         level = smugglers.getLevel();
                     }
+                    case CZCGoods czcGoods-> {
+                        name = czcGoods.getName();
+                        level = czcGoods.getLevel();
+                    }
+
                     case Card card ->{
                         name = card.getName();
                         level = card.getLevel();
@@ -1301,9 +1306,9 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
 
     private void printDoubleCannons(ArrayList<DoubleCannon> doubleCannons) {
         System.out.print("Here are the double cannons you can choose from:\n");
-        for (int i = 0; i < doubleCannons.size(); i++) {
-            float power = doubleCannons.get(i).getPower();
-            System.out.println("DoubleCannon: " + i + ", power: " + power);
+        for (DoubleCannon c : doubleCannons) {
+            float power = c.getPower();
+            System.out.println("DoubleCannon: " + c.getId() + ", power: " + power);
             System.out.print("\n");
         }
     }
