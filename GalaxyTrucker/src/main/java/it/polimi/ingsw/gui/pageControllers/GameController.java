@@ -320,7 +320,7 @@
                     "Do you want to charge a cannon to protect yourself?\nProjectile\ndirection: " + lastDir.toString() + "\nposition: " + lastPos
             );
 
-            if (result.get() == ButtonType.YES) clientRmi.server.playerProtected(clientRmi);
+            if (result.get().getButtonData() == ButtonBar.ButtonData.YES) clientRmi.server.playerProtected(clientRmi);
             else clientRmi.server.playerHit(clientRmi);
         }
 
@@ -330,7 +330,7 @@
                     "Do you want to charge a shield to protect yourself?\nProjectile\ndirection: " + lastDir.toString() + "\nposition: " + lastPos
             );
 
-            if (result.get() == ButtonType.YES) clientRmi.server.playerProtected(clientRmi);
+            if (result.get().getButtonData() == ButtonBar.ButtonData.YES) clientRmi.server.playerProtected(clientRmi);
             else clientRmi.server.playerHit(clientRmi);
         }
 
