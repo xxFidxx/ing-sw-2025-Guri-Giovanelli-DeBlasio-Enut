@@ -148,7 +148,7 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                         try {
                             int index = Integer.parseInt(input);
 
-                            if(index == 1000 || index == 1001 || index >= 0 && index <= 151){
+                            if(index == 1000 || index == 1001 || index >= 0 && index <= 151 || index != 32 || index != 33 || index != 51 || index != 60){
                                 server.pickTile(this, Integer.parseInt(input));
                             }else{
                                 System.out.println("Outbound index, please retry");
@@ -777,10 +777,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 }
             }
 
-            case SCS_DIR_POS,BCS_DIR_POS,BMS_DIR_POS,SMS_DIR_POS ->{
-                if(!input.equals("0")){}
-            }
-
             case SKIPPED_CARD -> System.out.println("Skipped the card because you are alone");
             case DIED -> System.out.println("You are on spectator mode because you died");
             case PAUSED_GAME -> System.out.println("Game has been paused, we will wait for 30 seconds for someone to join again, else you will automatically win!");
@@ -1145,9 +1141,6 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case PAUSED_GAME -> System.out.println("Game has been paused, a 30 seconds timer has been set to wait for someone to join again, else you will automatically win");
             case WAIT_RECONNECT -> System.out.println("Welcome back!\nWait for other players to end the turn, then you will join them again!");
             case WON_FOR_DISCONESSION -> System.out.println("You won because everyone except you disconnected!");
-            case BCS_DIR_POS,SCS_DIR_POS,BMS_DIR_POS,SMS_DIR_POS ->{
-                System.out.println("Press 0 to continue with next one");
-            }
             default -> System.out.println();
         }
         System.out.print("> ");

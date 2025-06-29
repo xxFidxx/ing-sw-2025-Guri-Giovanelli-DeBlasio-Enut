@@ -171,11 +171,11 @@
             if (selectedIndex >= 0) {
                 try {
                     clientRmi.server.choosePlanets(clientRmi ,selectedIndex);
+                    confirmPlanetButton.setDisable(true);
+                    planetsChoice.setDisable(true);
                 } catch (Exception e) {
                     ShowTextUtils.showTextVolatileImmediate("Error", e.getMessage());
                 }
-                confirmPlanetButton.setDisable(true);
-                planetsChoice.setDisable(true);
             } else {
                 ShowTextUtils.showTextVolatileImmediate("Error", "No planet selected.");
             }

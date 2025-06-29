@@ -15,6 +15,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,16 +98,21 @@ public class CargoManagementController extends Controller {
     private ImageView removeTargetGood;
     private boolean isAddOperation = false;
 
+
+    private static final Image ORDER_IMAGE = new Image(
+            Objects.requireNonNull(
+                    CargoManagementController.class.getResource("/goodsBlocks/order.png")
+            ).toExternalForm(),
+            true
+    );
+
+
     @FXML
     private void initialize() {
         cargoPanes = List.of(
                 cargo1Pane, cargo2Pane, cargo3Pane,
                 cargo4Pane, cargo5Pane, cargo6Pane
         );
-
-        goodsOrder.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/goodsBlocks/order.jpg"))));
-        goodsOrder.preserveRatioProperty();
-        goodsOrder.setVisible(true);
     }
 
     private enum State {
@@ -158,6 +168,10 @@ public class CargoManagementController extends Controller {
             String style = container.isSpecial() ? "-fx-background-color: #ffcccc" : "-fx-background-color: lightgrey";
             cargoPane.setStyle(style);
         }
+
+        goodsOrder.setImage(ORDER_IMAGE);
+        goodsOrder.preserveRatioProperty();
+        goodsOrder.setVisible(true);
     }
 
     private Image getImageByValue(int value) {

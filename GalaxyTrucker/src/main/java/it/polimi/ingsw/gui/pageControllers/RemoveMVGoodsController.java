@@ -81,6 +81,13 @@ public class RemoveMVGoodsController extends Controller {
 
     private ImageView removeTargetGood;
 
+    private static final Image ORDER_IMAGE = new Image(
+            Objects.requireNonNull(
+                    CargoManagementController.class.getResource("/goodsBlocks/order.png")
+            ).toExternalForm(),
+            true
+    );
+
 
     @FXML
     private void initialize() {
@@ -89,7 +96,7 @@ public class RemoveMVGoodsController extends Controller {
                 cargo4Pane, cargo5Pane, cargo6Pane
         );
 
-        goodsOrder.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/goodsBlocks/order.jpg"))));
+        goodsOrder.setImage(ORDER_IMAGE);
         goodsOrder.preserveRatioProperty();
         goodsOrder.setVisible(true);
     }
