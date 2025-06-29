@@ -289,7 +289,7 @@ public class Controller{
                 ArrayList <PickedTile> reserveTiles = new ArrayList<>();
 
                 for(ComponentTile componentTile: reservedTiles)
-                    reserveTiles.add(new PickedTile(componentTile.toString(), componentTile.getRotation()));
+                    reserveTiles.add(new PickedTile(componentTile.toString(), componentTile.getRotation(), componentTile.getId()));
 
                 event = new Event(state, new PickableTiles(assemblingTilesIds, reserveTiles));
             }
@@ -300,7 +300,7 @@ public class Controller{
 
             case PICKED_TILE,PICK_RESERVED_CARD -> {
                 ComponentTile tile = (ComponentTile) data;
-                event = new Event(state, new PickedTile(tile.toString(), tile.getRotation()));
+                event = new Event(state, new PickedTile(tile.toString(), tile.getRotation(), tile.getId()));
             }
 
             case DRAW_CARD -> {
@@ -405,7 +405,8 @@ public class Controller{
                 int cred = player.getCredits();
                 int astr = player.getSpaceshipPlance().getnAstronauts();
                 int al = player.getSpaceshipPlance().getBrownAliens() + player.getSpaceshipPlance().getPurpleAliens();
-                event = new Event(state, new PlayerInfo(nick, pos, cred, astr, al));
+                int bat = player.getSpaceshipPlance().getnBatteries();
+                event = new Event(state, new PlayerInfo(nick, pos, cred, astr, al, bat));
             }
 
             case CHOOSE_ENGINE -> {

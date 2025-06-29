@@ -122,6 +122,7 @@
                   <Font size="24.0" />
                </font>
             </Label>
+            <Button fx:id="startTimerButton" disable="true" layoutX="1054.0" layoutY="656.0" mnemonicParsing="false" onAction="#handleStartTimer" text="start timer" />
          </children>
       </AnchorPane>
    </children>

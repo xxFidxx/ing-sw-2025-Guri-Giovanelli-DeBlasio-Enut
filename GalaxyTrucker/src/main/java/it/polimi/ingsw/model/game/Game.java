@@ -55,7 +55,7 @@ public class Game{
         try {
             List<ComponentTile> assemblingTilesList = ComponentTileFactory.loadTiles(this);
             assert assemblingTilesList != null;
-            //Collections.shuffle(assemblingTilesList);
+            Collections.shuffle(assemblingTilesList);
             this.assemblingTiles = assemblingTilesList.toArray(ComponentTile[]::new);
         }
         catch (Exception e) {

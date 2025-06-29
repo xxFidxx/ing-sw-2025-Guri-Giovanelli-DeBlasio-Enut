@@ -2,6 +2,7 @@
 
     import it.polimi.ingsw.controller.ControllerExceptions;
     import it.polimi.ingsw.controller.network.data.DoubleEngineNumber;
+    import it.polimi.ingsw.controller.network.data.PlayerInfo;
     import it.polimi.ingsw.controller.network.data.TileData;
     import it.polimi.ingsw.gui.Controller;
     import it.polimi.ingsw.gui.ShowTextUtils;
@@ -67,6 +68,7 @@
         @FXML private AnchorPane boardPane;
 
         @FXML private Label spaceshipStateLabel;
+        @FXML private Label playerInfoLabel;
 
         private ImageView[] tileViews;
 
@@ -392,5 +394,9 @@
 
         public void shotHit() {
             ShowTextUtils.showTextVolatile("SHOT HIT", "The projectile hit you");
+        }
+
+        public void showPlayer(PlayerInfo data) {
+            playerInfoLabel.setText("astronauts: " + data.getNumAstronauts() + " aliens: " + data.getNumAliens() + " batteries: " + data.getNumBatteries());
         }
     }

@@ -180,15 +180,15 @@ public class MainApp extends Application {
         });
     }
 
-    public void pickedTile() {
+    public void pickedTile(PickedTile pickedTile) {
         Platform.runLater(() -> {
-            ((AssemblyController) controllers.get("assembly")).pickedTile();
+            ((AssemblyController) controllers.get("assembly")).pickedTile(pickedTile);
         });
     }
 
-    public void pickReservedCard() {
+    public void pickReservedCard(PickedTile pickedTile) {
         Platform.runLater(() -> {
-            ((AssemblyController) controllers.get("assembly")).pickedReservedCard();
+            ((AssemblyController) controllers.get("assembly")).pickedReservedCard(pickedTile);
         });
     }
 
@@ -270,6 +270,30 @@ public class MainApp extends Application {
     public void shotHit() {
         Platform.runLater(() -> {
             ((GameController) controllers.get("game")).shotHit();
+        });
+    }
+
+    public void robbedTile() {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).robbedTile();
+        });
+    }
+
+    public void waitPlayerLeader() {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).waitPlayerLeader();
+        });
+    }
+
+    public void craftingEnded() {
+        Platform.runLater(() -> {
+            ((AssemblyController) controllers.get("assembly")).craftingEnded();
+        });
+    }
+
+    public void showPlayer(PlayerInfo data) {
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).showPlayer(data);
         });
     }
 }

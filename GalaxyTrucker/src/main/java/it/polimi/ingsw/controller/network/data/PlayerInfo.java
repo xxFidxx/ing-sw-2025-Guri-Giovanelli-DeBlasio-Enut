@@ -14,14 +14,16 @@ public class PlayerInfo extends DataContainer implements Serializable {
     private int credits;
     private int numAstronauts;
     private int numAliens;
+    private int numBatteries;
 
-    public PlayerInfo(String nickname, int position, int credits, int numAstronauts, int numAliens) {
+    public PlayerInfo(String nickname, int position, int credits, int numAstronauts, int numAliens, int numBatteries) {
         super();
         this.nickname = nickname;
         this.position = position;
         this.credits = credits;
         this.numAstronauts = numAstronauts;
         this.numAliens = numAliens;
+        this.numBatteries = numBatteries;
     }
 
     public String getNickname() {
@@ -43,4 +45,6 @@ public class PlayerInfo extends DataContainer implements Serializable {
     public int getNumAliens() {
         return numAliens;
     }
+
+    public int getNumBatteries() {return numBatteries;}
 }

@@ -9,11 +9,13 @@ public class PickedTile extends DataContainer implements Serializable {
     ConnectorType[] connectors;
     String description;
     int rotation;
+    int id;
 
-    public PickedTile(String description, int rotation) {
+    public PickedTile(String description, int rotation, int id) {
         super();
         this.description = description;
         this.rotation = rotation;
+        this.id = id;
     }
 
     public ConnectorType[] getConnectors(){
@@ -26,5 +28,9 @@ public class PickedTile extends DataContainer implements Serializable {
 
     public int getRotation() {
         return rotation;
+    }
+
+    public int getId() {
+        return id;
     }
 }

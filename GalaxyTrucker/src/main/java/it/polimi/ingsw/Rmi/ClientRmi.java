@@ -796,10 +796,10 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
             case WAIT_LOBBY -> System.out.println("Waiting for other players to join...");
             case GAME_INIT -> mainApp.gameInit();
             case ASSEMBLY -> mainApp.assembly();
-            case CRAFTING_ENDED -> System.out.println("CRAFTING PHASE ENDED");
-            case PICKED_TILE -> mainApp.pickedTile();
-            case PICK_RESERVED_CARD -> mainApp.pickReservedCard();
-            case ROBBED_TILE -> System.out.println("Someone faster picked your card! Please try again");
+            case CRAFTING_ENDED -> mainApp.craftingEnded();
+            case PICKED_TILE -> mainApp.pickedTile((PickedTile)currentEvent.getData());
+            case PICK_RESERVED_CARD -> mainApp.pickReservedCard((PickedTile)currentEvent.getData());
+            case ROBBED_TILE -> mainApp.robbedTile();
             case ADJUST_SHIP -> mainApp.adjustShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SELECT_SHIP -> mainApp.selectShip(((DataString)getCurrentEvent().getData()).getTileIds());
             case SHOW_SHIP -> mainApp.updateSpaceship(((DataString)getCurrentEvent().getData()).getTileIds());
@@ -901,11 +901,12 @@ public class ClientRmi extends UnicastRemoteObject implements VirtualViewRmi {
                 System.out.println("Wait for the choice of the current player");
                 mainApp.waitPlayer();
             }
+            case WAIT_PLAYER_LEADER -> mainApp.waitPlayerLeader();
             case LEAST_CREW -> System.out.print("You have the least crew");
             case LEAST_ENGINE, LOST_CREW -> System.out.println("You have the least engine strength");
             case MOVE_PLAYER -> System.out.println("You have the least crew");
             case END_CARD -> System.out.println("End card");
-            case SHOW_PLAYER -> System.out.println("Now your updated attributes are:");
+            case SHOW_PLAYER -> mainApp.showPlayer((PlayerInfo)getCurrentEvent().getData());
             case CHOOSE_BATTERY -> System.out.println("Type 0 to skip your turn or 1 to charge your double engines ");
             case CHOOSE_PLANETS -> {
                 System.out.println("Type 0 to skip your turn or 1 to land on one of the planets");
