@@ -375,4 +375,12 @@
                 }
             }
         }
+
+        public void notHit() {
+            ShowTextUtils.showTextVolatile("NOT HIT", "The projectile did not hit you");
+        }
+
+        public void shotHit() {
+            ShowTextUtils.showTextVolatile("SHOT HIT", "The projectile hit you");
+        }
     }

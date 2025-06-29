@@ -260,4 +260,16 @@ public class MainApp extends Application {
             ((EndController) controllers.get("end")).setText(data.getText());
         });
     }
+
+    public void noHit() {
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).notHit();
+        });
+    }
+
+    public void shotHit() {
+        Platform.runLater(() -> {
+            ((GameController) controllers.get("game")).shotHit();
+        });
+    }
 }
