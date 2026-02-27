@@ -3,7 +3,7 @@
 # Galaxy Trucker - Software Engineering Project 2024/5
 Multiplayer game programmed in Java as a project for Software Engineering class 2024/5 at Politecnico di Milano, according to the following **rules** [(EN)](galaxy-trucker-rules-en.pdf) and **requirements** [(IT)](requirements.pdf).
 
-The game was developed in **Java**, along other technologies such as **Java RMI** for networking, **Mockito** for testing and **SceneBuilder** for GUI sketching.
+The game was developed in **Java**, along other technologies such as **Java RMI** for networking, **JavaFX** for the GUI, **Mockito** for testing and **SceneBuilder** for GUI sketching.
 
 Group members: 
 - Fidel Guri (10840243)
@@ -25,6 +25,7 @@ Advanced functionalities implemented:
 ## Try it out
 Instructions to run the project via the jar files:
 - Download the [jar files](deliverables/final/jar)
+- Download the JavaFX SDK for running the GUI client *(JavaFX is not part of the standard JDK anymore)*
 - Navigate to the folder
 - On the host: run the server jar
 	```bash
@@ -36,6 +37,6 @@ Instructions to run the project via the jar files:
 	```
 	or
 	```bash
-	java -jar gui-jar.jar
+	java --module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -jar gui-jar.jar
 	```
 
