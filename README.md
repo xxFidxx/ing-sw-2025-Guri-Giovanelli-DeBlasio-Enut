@@ -1,7 +1,7 @@
 <img width="4000" height="2431" alt="image" src="https://github.com/user-attachments/assets/ae2ba261-e391-4dfe-ac47-9f9cb9809922" />
 
 # Galaxy Trucker - Software Engineering Project 2024/5
-Multiplayer game programmed in Java as a project for Software Engineering class 2024/5 at Politecnico di Milano.
+Multiplayer game programmed in Java as a project for Software Engineering class 2024/5 at Politecnico di Milano, according to the following **rules** [(EN)](galaxy-trucker-rules-en.pdf) and **requirements** [(IT)](requirements.pdf).
 
 The game was developed in **Java**, along other technologies such as **Java RMI** for networking, **Mockito** for testing and **SceneBuilder** for GUI sketching.
 
@@ -13,7 +13,6 @@ Group members:
 
 ## Description
 
-
 Functionalities implemented:
 - complete ruleset
 - CLI client
@@ -21,7 +20,6 @@ Functionalities implemented:
 
 Advanced functionalities implemented:
 - disconnection handling
-
 
 
 ## Try it out
