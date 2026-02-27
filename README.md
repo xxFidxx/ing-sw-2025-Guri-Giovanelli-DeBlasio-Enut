@@ -1,4 +1,6 @@
-<img width="4000" height="2431" alt="image" src="https://github.com/user-attachments/assets/ae2ba261-e391-4dfe-ac47-9f9cb9809922" />
+<p align="center">
+	<img width="800" alt="image" src="https://github.com/user-attachments/assets/ae2ba261-e391-4dfe-ac47-9f9cb9809922"/>	
+</p>
 
 # Galaxy Trucker - Software Engineering Project 2024/5
 Multiplayer game programmed in Java as a project for Software Engineering class 2024/5 at Politecnico di Milano, according to the following **rules** [(EN)](galaxy-trucker-rules-en.pdf) and **requirements** [(IT)](requirements.pdf).
